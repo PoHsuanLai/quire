@@ -501,6 +501,18 @@ const SPECIMENS: &[Specimen] = &[
             }
         }
     }),
+    ("failed-detail", || {
+        rsx! {
+            SignInFailed {
+                provider: "Fastmail",
+                why: SignInFault::Refused,
+                detail: Some("535 5.7.8 Authentication credentials invalid".to_owned()),
+                on_retry: |_| {},
+                on_back: |_| {},
+                on_cancel: |_| {},
+            }
+        }
+    }),
     ("failed-unreachable", || failed(SignInFault::Unreachable)),
     ("failed-forbidden", || failed(SignInFault::Forbidden)),
     ("review", || review(None)),
@@ -920,4 +932,19 @@ fn an_account_already_added_says_so_and_offers_no_try_again() {
     assert!(page.contains("This account is already added."), "{page}");
     assert!(page.contains("Done"), "{page}");
     assert!(!page.contains("Try Again"), "{page}");
+}
+
+#[test]
+fn a_failure_with_a_detail_shows_it_under_the_sentence_and_above_the_actions() {
+    let page = light("failed-detail");
+    let at = |needle: &str| {
+        page.find(needle)
+            .unwrap_or_else(|| panic!("{needle} in {page}"))
+    };
+    let sentence = at("ds-acc-caption");
+    let detail = at("535 5.7.8 Authentication credentials invalid");
+    let actions = at("ds-acc-actions");
+    assert!(sentence < detail && detail < actions, "{page}");
+    assert!(page.contains("class=\"ds-acc-detail\""), "{page}");
+    assert!(!light("failed-unreachable").contains("ds-acc-detail"));
 }
