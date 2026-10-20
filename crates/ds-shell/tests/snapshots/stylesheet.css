@@ -525,6 +525,7 @@ html,body{margin:0;padding:0;background:transparent}
    a little below the triangle. */
 .ds-acc-advanced{ display:flex; flex-direction:column; gap:var(--s-20); padding-top:var(--s-12); }
 .ds-acc-caption{ font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
+.ds-acc-detail{ user-select:text; overflow-wrap:anywhere; }
 .ds-acc-waiting{ display:flex; align-items:center; gap:var(--s-8); }
 .ds-acc-url{ font-family:var(--font-data); font-size:var(--fs-small); color:var(--ink-soft); word-break:break-all; user-select:text; }
 .ds-acc-code{ align-self:center; padding:var(--s-8) var(--s-16); font-family:var(--font-data); font-size:var(--fs-display); font-weight:700; color:var(--ink); user-select:text; }
@@ -2587,11 +2588,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-space-rename{ width:240px; }
 .ds-space-part-acts{ display:flex; justify-content:flex-end; gap:var(--s-6); }
 
-/* The Edit Space sheet (design/34 section 3.8): the title, the grouped form (the name row, then
-   the colour on the group's ground at the row's side inset), and the buttons at the end, Cancel
-   before Save. The form brings its own 20 margin; the title and the buttons share it. */
+/* The Edit Space sheet (design/34 section 3.8): the title (a Title label), the grouped form (the name row,
+   then the colour on the group's ground at the row's side inset), and the buttons at the end,
+   Cancel before Save. The form brings its own 20 margin; the title and the buttons share it. */
 .ds-space-edit{ display:flex; flex-direction:column; min-width:0; }
-.ds-space-edit-title{ margin:0; padding:var(--s-20) var(--s-20) 0; font-size:var(--fs-subject); font-weight:700; color:var(--ink); }
+.ds-space-edit-title{ padding:var(--s-20) var(--s-20) 0; }
 .ds-space-edit-colour{ padding:var(--s-14); }
 .ds-space-edit-acts{ display:flex; justify-content:flex-end; gap:var(--s-8); padding:0 var(--s-20) var(--s-20); }
 /* -- progress -- */
@@ -3424,11 +3425,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-card-form-title{ font-size:var(--fs-title); font-weight:600; }
 .ds-card-form-field{ display:flex; flex-direction:column; gap:var(--s-4); }
 .ds-card-form-picks{ display:flex; flex-wrap:wrap; gap:var(--s-6); }
-
-/* A refusal: the headline, then what to do about it. */
-.ds-card-refused{ display:flex; flex-direction:column; gap:var(--s-4); padding:var(--s-10) var(--s-12); border-radius:var(--r-small); background:var(--fill-quaternary); }
-.ds-card-refused[*|data-why=failed]{ background:var(--danger-wash); }
-.ds-card-refused-head{ font-weight:600; }
 
 /* Actions: a row, each button with its effect tag beside it. The one with the keyboard shows
    the button's own focus ring. */
