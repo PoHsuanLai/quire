@@ -54,6 +54,9 @@ for `ds-core` and `ds-settings`; every old path still resolves.
   that lists the sidebar from `PageTable::pages()` calls `PageTable::sidebar()` instead.
 - The blitz-kit pin moves to f3c6ea87 (same Blitz 851fa7dd). A test that matched a kit sentence
   word for word follows the new wording.
+- The helper sheet (`HelperBody`) draws through `AlertColumn`, so `.ds-alert` no longer carries
+  `data-phase` (ask, installing, failed, not-found, unsupported). A test that keyed on it reads
+  what the sheet shows instead: `.ds-helper-progress`, the default button's label, the title.
 
 ## v0.3.36
 
