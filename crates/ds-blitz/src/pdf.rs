@@ -11,6 +11,7 @@
 //! and cut into pages by `paginate`'s rules, which read markers rather than CSS (Blitz drops
 //! `break-*` and `@page`): `data-break-before="page"` and `data-break-inside="avoid"`.
 
+mod bitmap_glyphs;
 mod error;
 mod flow;
 mod html;

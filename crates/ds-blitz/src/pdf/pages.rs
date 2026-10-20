@@ -3,6 +3,7 @@
 //! pdfrum painter under each page's placement (points per pixel, the flip to PDF's y-up, the
 //! margins), clipped to its content box.
 
+use crate::pdf::bitmap_glyphs;
 use crate::pdf::error::PdfError;
 use crate::pdf::flow;
 use crate::pdf::images;
@@ -77,6 +78,7 @@ fn page(doc: &mut BaseDocument, content: ContentBox, band: Span) -> Page {
         0,
         0,
     );
+    bitmap_glyphs::as_pictures(&mut scene);
     let scale = f64::from(PT_PER_PX);
     Page {
         size: Size::new(f64::from(width.0), f64::from(height.0)),
