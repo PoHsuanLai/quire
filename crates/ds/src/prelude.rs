@@ -26,6 +26,7 @@ pub use ds_core::vocab::Check;
 pub use ds_core::vocab::DropState;
 pub use ds_core::vocab::Emphasis;
 pub use ds_core::vocab::Fraction;
+pub use ds_core::vocab::HasPopup;
 pub use ds_core::vocab::Percent;
 pub use ds_core::vocab::Selection;
 pub use ds_core::vocab::Severity;

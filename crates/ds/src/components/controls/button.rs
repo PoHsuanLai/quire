@@ -1,6 +1,7 @@
 //! Button: `NSButton` in its push, toolbar, inline and help bezels (design/30 section 2.1).
 //! Markup: `button.ds-button[data-variant=<bezel>][data-role][data-size][data-availability]`;
-//! `data-state` and `aria-pressed` only for a toggle button; `data-answers` for a button that
+//! `data-state` and `aria-pressed` only for a toggle button; `aria-haspopup` only for a button
+//! that opens a menu, dialog or listbox; `data-answers` for a button that
 //! answers Return or Escape; `data-image=only` when the label is not drawn; `data-pressed`
 //! while a press is under way; the consumer's own `data-*` and classes after quire's.
 
@@ -26,7 +27,7 @@ use crate::focus::soon::focus_soon;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::press::Press;
-use ds_core::vocab::{Availability, Check, Shortcut, Shown};
+use ds_core::vocab::{Availability, Check, HasPopup, Shortcut, Shown};
 use ds_core::word::Word;
 use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use ds_motion::symbol::effect::{EffectActivity, LoopEffect, SymbolEffect};
@@ -56,7 +57,8 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 ///
 /// `value` makes it a toggle button: `Check::On` draws it pressed in (`aria-pressed`). `shown`
 /// says whether the menu or panel this button opens is up (`aria-expanded`); leave it `None` on a
-/// button that opens nothing. `title` is the hover hint: a Mac tooltip through the hover hub
+/// button that opens nothing. `popup` says what kind of surface it opens (`aria-haspopup`: a
+/// menu, a dialog or a listbox); leave it `None` on a button that opens nothing. `title` is the hover hint: a Mac tooltip through the hover hub
 /// (`title_tip`), drawn below the button from the button's own pointer events, with no wrapper; inside a `Tooltip` it draws nothing (the
 /// caller's tip stands), and outside a `Ds` it is the plain `title` attribute.
 ///
@@ -93,6 +95,7 @@ pub fn Button(
     #[props(default)] icon: Option<IconSource>,
     #[props(default)] value: Option<Check>,
     #[props(default)] shown: Option<Shown>,
+    #[props(default)] popup: Option<HasPopup>,
     #[props(default)] availability: Availability,
     #[props(default)] busy: BusyLook,
     onclick: EventHandler<Press>,
@@ -150,6 +153,7 @@ pub fn Button(
             "aria-description": tip.description(&name),
             "data-tip": tip.marker(&name),
             "aria-pressed": value.map(Check::aria),
+            "aria-haspopup": popup.map(|popup| popup.slug()),
             "aria-expanded": shown.map(Shown::aria),
             "aria-disabled": availability.aria_disabled(),
             "aria-busy": availability.aria_busy(),
