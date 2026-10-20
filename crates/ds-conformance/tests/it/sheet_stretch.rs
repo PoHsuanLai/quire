@@ -1,6 +1,7 @@
-//! A long sheet under a touchpad drag past its top stretches only while the fingers hold it. The
-//! stretch carries the content out from under the pointer; the lift still reaches the scroller the
-//! fingers latched, and it springs back.
+//! A sheet under a touchpad drag past its top: one whose content fits stays put, as it has
+//! nothing to scroll; a long one stretches only while the fingers hold it. The stretch carries the
+//! content out from under the pointer; the lift still reaches the scroller the fingers latched,
+//! and it springs back.
 
 use dioxus::prelude::*;
 use ds::host::gesture::GesturePhase;
@@ -60,6 +61,12 @@ fn pulled(height: u32) -> (Harness, Point, f64) {
     }
     let held = offset(&harness);
     (harness, at, held)
+}
+
+#[test]
+fn a_sheet_whose_content_fits_does_not_move_under_a_drag() {
+    let (_harness, _, held) = pulled(200);
+    assert_eq!(held, 0.0);
 }
 
 #[test]
