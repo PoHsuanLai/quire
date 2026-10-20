@@ -331,11 +331,7 @@ fn delete_focuses_cancel_and_return_cancels() {
         harness.html()
     );
     key(&mut harness, ShortcutKey::Enter);
-    assert_eq!(
-        harness.count(".ds-alert"),
-        0,
-        "Return pressed Cancel"
-    );
+    assert_eq!(harness.count(".ds-alert"), 0, "Return pressed Cancel");
     assert_eq!(dots(&harness), 3, "nothing was deleted");
     assert!(
         focused(&harness, OPENER),
