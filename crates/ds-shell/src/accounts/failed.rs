@@ -7,6 +7,7 @@ use super::model::SignInFault;
 use super::model::StepTitle;
 use super::wording::fault;
 use dioxus::prelude::*;
+use ds::components::content::label::{Label, LabelRole, LabelStyle};
 use ds::components::content::provider_mark::MarkProvider;
 
 /// Whether trying again could help, as the host knows from the fault.
@@ -56,7 +57,10 @@ pub struct FailureAction {
 /// The failure step for `provider`. With `Recovery::Retry` (the default, unless the fault says otherwise) Return is "Try Again"
 /// and Cancel calls `on_cancel`; with `Recovery::NoRetry` (the default for [`SignInFault::AlreadyAdded`], see [`SignInFault::recovery`]) there is no "Try Again" (`on_retry` is
 /// never called, so a host may leave it out) and Return is "Done", which calls `on_cancel`.
-/// Escape calls `on_cancel` either way. `extra` adds one button of the host's.
+/// Escape calls `on_cancel` either way. `extra` adds one button of the host's. `detail` is the
+/// server's own words (a status line, an error text): shown under the sentence in a quieter
+/// footnote the person can select and copy, and wrapped, above the actions; unset (the default)
+/// draws nothing.
 #[component]
 pub fn SignInFailed(
     #[props(into)] provider: String,
@@ -66,6 +70,7 @@ pub fn SignInFailed(
     on_back: EventHandler<()>,
     on_cancel: EventHandler<()>,
     #[props(default)] extra: Option<FailureAction>,
+    #[props(default)] detail: Option<String>,
     #[props(default)] title: StepTitle,
     #[props(default)] mark: Option<MarkProvider>,
 ) -> Element {
@@ -84,6 +89,11 @@ pub fn SignInFailed(
             oncancel: on_cancel,
             body: rsx! {
                 div { class: "ds-acc-caption", role: "alert", "{sentence}" }
+                if let Some(detail) = detail {
+                    div { class: "ds-acc-detail",
+                        Label { text: detail, role: LabelRole::Tertiary, style: LabelStyle::Footnote }
+                    }
+                }
             },
             actions: rsx! {
                 Action { label: "Back", onclick: move |()| on_back.call(()) }
