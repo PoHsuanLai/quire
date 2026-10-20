@@ -23,7 +23,7 @@ use ds_style::space::list::SpaceId;
 /// rule, New Space, and Delete Space... while there is more than one.
 /// Edit Space... opens [`EditSpaceSheet`]: the name and colour, changed live, with Cancel and Save.
 /// New Space opens its name at once, a field at the pointer that renames live (Escape puts the old
-/// name back). Delete is a question at the pointer. Each part takes the keyboard as it opens and
+/// name back). Delete asks in a critical alert, as any question that cannot be undone does. Each part takes the keyboard as it opens and
 /// hands it back on close. `on_deleted` hears a
 /// deleted Space's id: the app calls `TodayHandle::drop_space` there. `desktop` is the desktop's
 /// Spaces (`None` for an app with no desktop to follow: no link rows); a Link or Unlink pick is
@@ -113,7 +113,6 @@ where
         Showing::Edit => rsx! { EditSpaceSheet { space: id, handle } },
         Showing::Delete => rsx! {
             DeletePart {
-                at,
                 space: id,
                 handle,
                 kept,

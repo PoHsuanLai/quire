@@ -2555,9 +2555,6 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-space-part{ display:grid; gap:var(--s-10); padding:var(--s-12); }
 .ds-space-rename{ width:240px; }
-.ds-space-delete{ width:300px; }
-.ds-space-delete h3{ margin:0; }
-.ds-space-delete-body{ margin:0; }
 .ds-space-part-acts{ display:flex; justify-content:flex-end; gap:var(--s-6); }
 
 /* The Edit Space sheet (design/34 section 3.8): the title, the grouped form (the name row, then
