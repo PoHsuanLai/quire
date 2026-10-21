@@ -49,6 +49,7 @@
 
 use crate::components::controls::scroller::handle::ScrollerRef;
 use crate::components::controls::scroller::view::Scroller;
+use crate::components::lists::reach::Reach;
 use crate::components::lists::row::row::Row;
 use crate::components::lists::table::head::{cells, use_resize};
 use crate::components::lists::table::look::TableLook;
@@ -62,11 +63,10 @@ use crate::components::lists::virtual_table::model::{
 use crate::components::lists::virtual_table::split::{self, Line, Pane, Panes};
 use crate::keys::use_platform;
 use crate::root::common::Common;
-use chordkit::Platform;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::press::Press;
-use ds_core::selection::{Pick, PickHow, RowSelection};
+use ds_core::selection::{Pick, RowSelection};
 use ds_core::vocab::{RowState, Selection};
 use ds_core::word::Word;
 use ds_style::tokens::row_scale::ROW_SCALE;
@@ -86,44 +86,6 @@ enum Held {
 /// scroll to it.
 pub const fn row_pitch() -> Px {
     Px(ROW_SCALE.compact_height.0 as f32)
-}
-
-/// How the owner hears a row being reached: by a click or a key.
-#[derive(Clone, Copy)]
-struct Reach {
-    platform: Platform,
-    onreach: Option<EventHandler<Pick>>,
-    onselect: Option<EventHandler<usize>>,
-    onopen: Option<EventHandler<usize>>,
-}
-
-impl Reach {
-    /// Whether anyone listens.
-    fn heard(self) -> bool {
-        self.onreach.is_some() || self.onselect.is_some()
-    }
-
-    /// Tell the owner `pick`: `onreach` hears the row and how, else `onselect` hears the row.
-    fn tell(self, pick: Pick) {
-        match (self.onreach, self.onselect) {
-            (Some(onreach), _) => onreach.call(pick),
-            (None, Some(onselect)) => onselect.call(pick.row),
-            (None, None) => {}
-        }
-    }
-
-    /// The owner is asked to open `row`, if it listens.
-    fn opened(self, row: usize) {
-        if let Some(onopen) = self.onopen {
-            onopen.call(row);
-        }
-    }
-
-    /// A click on `row`, with the modifiers it carried.
-    fn clicked(self, row: usize, press: Press) {
-        let how = PickHow::of_press(self.platform, press.modifiers);
-        self.tell(Pick { row, how });
-    }
 }
 
 /// One row's content: its cells on the grid of `columns`, selected or not.

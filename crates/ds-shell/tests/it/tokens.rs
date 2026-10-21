@@ -341,6 +341,9 @@ const PER_ELEMENT: &[&str] = &[
     "--from",
     "--to",
     "--tip",
+    // A collection's thumbnail size and row pitch (`CollectionView { size }`).
+    "--cv-thumb",
+    "--cv-pitch",
 ];
 
 #[test]

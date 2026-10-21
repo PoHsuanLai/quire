@@ -19,6 +19,27 @@ pub fn clip_chars(text: &str, chars: usize) -> String {
     text.chars().take(kept).chain(Some(ELLIPSIS)).collect()
 }
 
+/// Where clipped text loses its characters.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Truncate {
+    /// From the end, the `…` last ([`clip_chars`]): prose, a subject line.
+    #[default]
+    End,
+    /// From the middle, so the start and the end stay ([`clip_middle`]): a file name, whose
+    /// extension says what it is (design/27-HIG-PARITY.md section 5.24, the centred ellipsis).
+    Middle,
+}
+
+impl Truncate {
+    /// `text` cut to at most `chars` characters where this mode cuts.
+    pub fn clip(self, text: &str, chars: usize) -> String {
+        match self {
+            Truncate::End => clip_chars(text, chars),
+            Truncate::Middle => clip_middle(text, chars),
+        }
+    }
+}
+
 /// The longest tail, in characters, that counts as an extension: a dot and up to seven more.
 const LONGEST_EXTENSION: usize = 8;
 
@@ -72,7 +93,7 @@ fn extension_len(all: &[char]) -> Option<usize> {
 
 #[cfg(test)]
 mod tests {
-    use super::{clip_chars, clip_middle};
+    use super::{Truncate, clip_chars, clip_middle};
 
     const MIDDLE: &[(&str, usize, &str)] = &[
         ("", 0, ""),
@@ -111,6 +132,36 @@ mod tests {
             let got = clip_middle("a-very-long-holiday-picture-name-2026.png", chars);
             assert!(got.chars().count() <= chars, "{chars}: {got:?}");
         }
+    }
+
+    const MODES: &[(Truncate, &str, usize, &str)] = &[
+        (
+            Truncate::End,
+            "Screenshot 2024-05-14 at 14.05.png",
+            12,
+            "Screenshot …",
+        ),
+        (
+            Truncate::Middle,
+            "Screenshot 2024-05-14 at 14.05.png",
+            18,
+            "Screensho…4.05.png",
+        ),
+        (Truncate::End, "report.pdf", 10, "report.pdf"),
+        (Truncate::Middle, "report.pdf", 10, "report.pdf"),
+    ];
+
+    #[test]
+    fn a_mode_cuts_where_it_says() {
+        let failures: Vec<String> = MODES
+            .iter()
+            .filter_map(|(mode, text, chars, want)| {
+                let got = mode.clip(text, *chars);
+                (got != *want)
+                    .then(|| format!("{mode:?}.clip({text:?}, {chars}) = {got:?}, want {want:?}"))
+            })
+            .collect();
+        assert!(failures.is_empty(), "{}", failures.join("\n"));
     }
 
     const CASES: &[(&str, usize, &str)] = &[

@@ -244,6 +244,7 @@ The single place a concept lives. Extend it; never write a second one.
 | A list that mounts only the rows near the viewport (one row height or one per key, cursor kept in view, paging cue, keyed exit or replacement) | `ds::components::lists::virtual_list` (`VirtualList`, `RowHeight`, `Change`; the prefix sum and window search in `layout`, its other pure steps in `model`) |
 | A scroll container and its scroll state as an owned value | `ds::components::controls::scroller` (`use_scroller` -> `ScrollerRef`, drawn by `Scroller`) |
 | A table of any number of rows that are never built (a row count and a cell callback, the header kept, columns resized, cursor by row and page, scroll to a row by the owner's `ScrollerRef`, leading columns held while the rest scroll sideways) | `ds::components::lists::virtual_table` (`VirtualTable`, `row_pitch`, `columns_id`; the keys in `model`; the two panes of a table that holds columns in `split`; the header and column widths are `lists::table::head`, shared with `Table`) |
+| A grid of tiles (thumbnail over a middle-clipped caption) of any number that are never built: windowed by rows, a 2-D cursor, type-select, an `edit` slot, fades by the roster | `ds::components::lists::collection_view` (`CollectionView`, `CollectionItem`, `CollectionSize`, `Flow`; the keys in `model`; `Reach`, the click-and-key report it shares with `VirtualTable`, is `lists::reach`) |
 | Which rows of a list or table are selected and how a click or key changes it (replace, toggle, extend from the anchor, select all, as ranges) | `ds-core::selection` (`RowSelection`, `Pick`, `PickHow`) |
 | Time, sleep, virtual clock | `ds-core::time` (`now`, `since`, `sleep`) |
 | A machine's "when" (ms from an origin) and the clock that makes it | `ds-core::time::stamp` (`Stamp`, `FrameClock`); every timed machine in `ds-behaviour` and `ds-motion` takes the same `Stamp` |
@@ -351,7 +352,7 @@ The single place a concept lives. Extend it; never write a second one.
 | The companion's components: orb, chips, answer cards, plan, replace, run row, activity, memory, served-by | `ds::components::companion` |
 | The mark of a result the person has not seen yet (still, ok or danger), on the orb and on a run row; the consumer passes `Some(Outcome)` and clears it with `None` | `ds::components::companion::outcome` (`Outcome`, `OutcomeMark`) |
 | A Space's look as compact JSON of at most 1024 bytes, both ways | `ds_style::space::look_json` (`SpaceLook::to_json`, `SpaceLook::from_json`) |
-| Text cut to a width in Rust, from the end (`clip_chars`) or the middle keeping an extension (`clip_middle`) | `ds_core::text::clip` |
+| Text cut to a width in Rust, from the end (`clip_chars`) or the middle keeping an extension (`clip_middle`), chosen by `Truncate` | `ds_core::text::clip` |
 | The confirmation card | `ds-shell::confirm` |
 | The window glow's values (`GlowLook`, `GlowSpec`, `glow_spec`) | `ds-style::tokens::glow` (sill's `sill-shell-kit::tokens::glow` re-exports them) |
 | Mail-only components | `ds::components::app` |
