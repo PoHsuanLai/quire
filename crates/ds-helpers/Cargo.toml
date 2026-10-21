@@ -25,6 +25,10 @@ workspace = true
 [dev-dependencies]
 # The tests' runtime; the crate itself names none (zbus brings its own executor).
 tokio = { workspace = true }
+# The tests run zbus on that runtime (the fake PackageKit sleeps with tokio inside a zbus
+# handler). Named here so `cargo test -p ds-helpers` alone builds it so, not only when another
+# workspace member happens to turn the feature on.
+zbus = { workspace = true, features = ["tokio"] }
 
 [features]
 default = ["quire-desktop"]
