@@ -35,7 +35,11 @@ const EXACT: &[(&str, Icon, &str)] = &[
     ("application/zip", Icon::FileArchive, "ZIP archive"),
     ("application/gzip", Icon::FileArchive, "gzip archive"),
     ("application/x-tar", Icon::FileArchive, "tar archive"),
-    ("application/x-7z-compressed", Icon::FileArchive, "7-Zip archive"),
+    (
+        "application/x-7z-compressed",
+        Icon::FileArchive,
+        "7-Zip archive",
+    ),
     ("application/vnd.rar", Icon::FileArchive, "RAR archive"),
     ("audio/mpeg", Icon::FileAudio, "MP3 audio"),
     ("audio/flac", Icon::FileAudio, "FLAC audio"),

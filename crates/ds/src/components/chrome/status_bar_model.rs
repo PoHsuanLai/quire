@@ -23,9 +23,24 @@ mod tests {
             ("none", 0, None, "0 items"),
             ("one", 1, None, "1 item"),
             ("many", 12, None, "12 items"),
-            ("many with room", 12, Some("40 GB"), "12 items, 40 GB available"),
-            ("one with room", 1, Some("512 MB"), "1 item, 512 MB available"),
-            ("none with room", 0, Some("1.2 TB"), "0 items, 1.2 TB available"),
+            (
+                "many with room",
+                12,
+                Some("40 GB"),
+                "12 items, 40 GB available",
+            ),
+            (
+                "one with room",
+                1,
+                Some("512 MB"),
+                "1 item, 512 MB available",
+            ),
+            (
+                "none with room",
+                0,
+                Some("1.2 TB"),
+                "0 items, 1.2 TB available",
+            ),
         ];
         for &(name, count, available, want) in CASES {
             assert_eq!(item_count_text(count, available), want, "{name}");
