@@ -119,6 +119,7 @@ mod shortcut_field_single_keys;
 mod sidebar_sections;
 mod skeleton_row;
 mod slider_ticks;
+mod source_list_hover;
 mod source_list_selection;
 mod space_dot_paint;
 mod space_editor_frame;
