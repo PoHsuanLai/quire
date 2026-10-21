@@ -69,6 +69,10 @@ pub enum ColourToken {
     /// whatever lies beneath. The accent stays on the focus ring, the cursor and the symbol.
     #[token(name = "sel-neutral")]
     SelectionNeutral,
+    /// `--hover-wash`: a source list's row under the pointer, half the selected row's wash so
+    /// the selection still reads above it: the foreground at 4 % in light, white at 5 % in dark.
+    #[token(name = "hover-wash")]
+    HoverWash,
     /// `--stripe`: the faint wash of every other row in a striped list (a table's list look): the
     /// foreground at 3 % in light, white at 3.5 % in dark, over whatever lies beneath.
     Stripe,
@@ -218,6 +222,7 @@ impl ColourToken {
             ColourToken::FillBtn => (alpha(0x000000, 60), alpha(0xFFFFFF, 100)),
             ColourToken::Fill => (alpha(0x000000, 100), alpha(0xFFFFFF, 140)),
             ColourToken::SelectionNeutral => (alpha(0x000000, 80), alpha(0xFFFFFF, 80)),
+            ColourToken::HoverWash => (alpha(0x000000, 40), alpha(0xFFFFFF, 50)),
             ColourToken::Stripe => (alpha(0x000000, 30), alpha(0xFFFFFF, 35)),
             ColourToken::Grp => (WHITE, solid(0x2C2C2E)),
             ColourToken::LineSoft => (solid(0xE6E6E6), solid(0x383838)),
