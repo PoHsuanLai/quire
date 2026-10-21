@@ -10,9 +10,11 @@
 use crate::components::overlays::popover::{Stacking, escape_closes, use_float};
 use crate::components::overlays::sheet_attach::Attach;
 use crate::components::overlays::sheet_width::SheetWidth;
+use crate::focus::soon::focus_soon;
 use crate::root::common::Common;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::vocab::{Dismiss, Shown};
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
@@ -22,6 +24,7 @@ use ds_motion::presence::{
     use_presence::{Presented, use_presence},
 };
 use ds_style::tokens::layer::ZLayer;
+use std::rc::Rc;
 
 /// A sheet.
 ///
@@ -89,6 +92,7 @@ pub fn Sheet(
         float.show(rsx! {}, onclose);
         return rsx! {};
     };
+    let keyed = use_hook(|| CopyValue::new(Keyed::Outside));
     let class = common.class("ds-sheet");
     let data = common.data_attributes();
     let panel = rsx! {
@@ -102,7 +106,15 @@ pub fn Sheet(
             "data-overscroll": "band",
             role: "dialog",
             "aria-label": "{label}",
-            onmounted: move |event| common.mounted(event),
+            tabindex: "-1",
+            onfocusin: move |_| {
+                let mut keyed = keyed;
+                keyed.set(Keyed::Inside);
+            },
+            onmounted: move |event: MountedEvent| {
+                take_keyboard(event.data(), keyed);
+                common.mounted(event);
+            },
             onkeydown: move |event| {
                 escape_closes(float, &event, onclose);
                 if let Some(press) = on_return
@@ -120,4 +132,24 @@ pub fn Sheet(
     let pane = attach.pane().and_then(|anchor| float.within(anchor));
     float.show(attach.stage(panel, pane), onclose);
     rsx! {}
+}
+
+/// Whether the keyboard has been inside the sheet since it mounted.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Keyed {
+    Outside,
+    Inside,
+}
+
+/// The sheet takes the keyboard as it comes up, as a Mac sheet becomes key: the menu or button
+/// that opened it may be gone (a context menu's pick), and then no key reached the app. A frame
+/// later, so a first stop the caller asked for inside it (a field's or button's `OnMount`, an
+/// alert's default button) has had its turn; only if nothing inside took it.
+fn take_keyboard(panel: Rc<MountedData>, keyed: CopyValue<Keyed>) {
+    spawn(async move {
+        sleep(FRAME_SLACK).await;
+        if keyed.try_peek().is_ok_and(|seen| *seen == Keyed::Outside) {
+            focus_soon(panel);
+        }
+    });
 }
