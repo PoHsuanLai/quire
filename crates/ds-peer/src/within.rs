@@ -16,7 +16,7 @@ pub struct NotAnswering {
 }
 
 impl NotAnswering {
-    /// Who did not answer, as a screen names it ("The package manager").
+    /// Who did not answer, as a screen names it ("The installer").
     pub fn peer(&self) -> &'static str {
         self.peer
     }
@@ -28,7 +28,7 @@ impl NotAnswering {
 }
 
 /// Run `work` for at most `deadline`. `peer` is the plain name a screen would use for whoever is
-/// being waited on ("The package manager", "Accounts"); it starts with a capital and names no
+/// being waited on ("The installer", "Accounts"); it starts with a capital and names no
 /// protocol. The call is dropped, and so cancelled at its next await, when the deadline passes.
 pub async fn within<T>(
     deadline: Deadline,

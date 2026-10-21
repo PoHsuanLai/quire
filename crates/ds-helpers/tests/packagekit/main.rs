@@ -204,7 +204,7 @@ async fn a_transaction_that_goes_quiet_is_cancelled_and_reported_as_not_answerin
     );
     assert_eq!(
         installer.install(&request(&["mpv"])).await,
-        Outcome::Failed("The package manager is not answering".to_owned())
+        Outcome::Failed("The installer is not answering".to_owned())
     );
     assert_eq!(calls.cancelled(), 1);
 }
@@ -232,6 +232,6 @@ async fn a_package_manager_that_vanishes_ends_the_wait_at_once() {
     let (outcome, ()) = tokio::join!(installer.install(&wanted), vanish);
     assert_eq!(
         outcome,
-        Outcome::Failed("The package manager stopped before it finished.".to_owned())
+        Outcome::Failed("The installer stopped before it finished.".to_owned())
     );
 }

@@ -23,7 +23,7 @@ const ROOT_INTERFACE: &str = "org.freedesktop.PackageKit";
 const TRANSACTION_INTERFACE: &str = "org.freedesktop.PackageKit.Transaction";
 const BUS_SERVICE: &str = "org.freedesktop.DBus";
 /// Who a screen says is not answering.
-pub(super) const PEER: &str = "The package manager";
+pub(super) const PEER: &str = "The installer";
 
 /// What a transaction reported before it finished.
 #[derive(Debug, Default)]
@@ -40,7 +40,7 @@ pub(super) enum Fault {
     Bus(#[from] zbus::Error),
     #[error(transparent)]
     Silent(#[from] NotAnswering),
-    #[error("The package manager stopped before it finished.")]
+    #[error("The installer stopped before it finished.")]
     Gone,
 }
 

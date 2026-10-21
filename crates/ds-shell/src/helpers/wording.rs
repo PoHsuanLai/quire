@@ -29,8 +29,7 @@ pub(crate) fn words(app: &str, tool: &str, purpose: &str, phase: &HelperPhase) -
         HelperPhase::NotFound { package } => Words {
             title: format!("{tool} isn’t in your software sources"),
             body: format!(
-                "Look for \u{201c}{package}\u{201d} in your software centre or package \
-                 manager, then try again."
+                "Look for \u{201c}{package}\u{201d} in your software centre, then try again."
             ),
         },
         HelperPhase::Unsupported { program, command } => Words {
@@ -39,9 +38,7 @@ pub(crate) fn words(app: &str, tool: &str, purpose: &str, phase: &HelperPhase) -
                 Some(_) => {
                     "Run this in Terminal to install it yourself, then try again:".to_owned()
                 }
-                None => format!(
-                    "Install a package that provides \u{201c}{program}\u{201d}, then try again."
-                ),
+                None => format!("Install \u{201c}{program}\u{201d} yourself, then try again."),
             },
         },
     }
@@ -80,7 +77,7 @@ mod tests {
                     command: None,
                 },
                 "Photos can’t install mpv here",
-                "provides \u{201c}mpv\u{201d}, then try again.",
+                "Install \u{201c}mpv\u{201d} yourself, then try again.",
             ),
             (
                 HelperPhase::Unsupported {
