@@ -3,7 +3,16 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## Unreleased
+## v0.3.40
+
+The files batch, second part: the icon view's tiles take a context menu, a drop and a badge; a
+toast that appears under a still pointer lets the press through; file-manager glyphs with a MIME
+map; a status bar; a trailing control in the command palette's search row and a group tooltip on
+a segmented control. Also a faint hover wash on source-list rows, `Row { line_height }`, and plain
+words where sign-in and installs stop. Blitz moves to 0be21979 and blitz-kit to 07f0272b: a
+pointer press whose default action is cancelled (a pop-up menu's items cancel `mousedown`)
+resets the drag state, so a menu item now picks on its first click on macOS. Consumers bump the
+blitz and blitz-kit revs with quire's. chordkit stays at ae28c23.
 
 **ds**
 - A toast that appears under a still pointer no longer takes the press (the Mac's banners
