@@ -908,12 +908,12 @@ fn the_working_line_names_the_agent_only_for_an_agent_login() {
 }
 
 #[test]
-fn the_failed_step_says_the_new_faults_and_where_google_looks() {
+fn the_failed_step_says_the_new_faults_and_that_google_is_not_available() {
     assert!(light("failed-no-launcher").contains("No app is set up to sign Fastmail in"));
     assert!(light("failed-not-installed").contains("Fastmail isn’t installed"));
     assert!(
         light("failed-google-client-id")
-            .contains("Google sign-in needs a client id: see docs/google.md")
+            .contains("Signing in with Google isn’t available in this version of the app.")
     );
 }
 

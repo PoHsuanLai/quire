@@ -140,10 +140,10 @@ pub(crate) fn fault(fault: SignInFault, label: &str, provider: Option<MarkProvid
         }
         SignInFault::Unreadable => "This desktop can’t read the server’s answer.",
         SignInFault::NeedsClientId => match provider {
-            Some(MarkProvider::Google) => "Google sign-in needs a client id: see docs/google.md",
-            _ => {
-                "This build isn’t registered with the provider. Add a client id in Settings, under Accounts."
+            Some(MarkProvider::Google) => {
+                "Signing in with Google isn’t available in this version of the app."
             }
+            _ => "Signing in this way isn’t available in this version of the app.",
         },
         SignInFault::TimedOut => "Signing in timed out.",
         SignInFault::Cancelled => "Signing in was cancelled.",
@@ -467,7 +467,7 @@ mod tests {
     }
 
     #[test]
-    fn google_needs_a_client_id_says_where_to_look_and_others_keep_their_text() {
+    fn a_missing_client_says_signing_in_is_not_available_in_plain_words() {
         let google = fault(
             SignInFault::NeedsClientId,
             "Ada",
@@ -475,11 +475,14 @@ mod tests {
         );
         assert_eq!(
             google,
-            "Google sign-in needs a client id: see docs/google.md"
+            "Signing in with Google isn’t available in this version of the app."
         );
         for provider in [None, Some(MarkProvider::Imap)] {
             let other = fault(SignInFault::NeedsClientId, "Ada", provider);
-            assert!(other.starts_with("This build isn’t registered"), "{other}");
+            assert!(
+                other.starts_with("Signing in this way isn’t available"),
+                "{other}"
+            );
         }
     }
 

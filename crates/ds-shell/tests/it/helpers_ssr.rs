@@ -165,7 +165,7 @@ fn the_end_phases_close_and_say_what_to_look_for() {
     for (name, needle) in [
         ("failed", "network"),
         ("not-found", "\u{201c}mpv\u{201d}"),
-        ("unsupported", "provides"),
+        ("unsupported", "yourself"),
     ] {
         let html = light(name);
         assert!(

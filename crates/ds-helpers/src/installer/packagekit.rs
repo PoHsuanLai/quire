@@ -161,7 +161,7 @@ async fn install_id(
         (EXIT_CANCELLED, _)
         | (_, Some((ERROR_TRANSACTION_CANCELLED | ERROR_NOT_AUTHORIZED, _))) => Outcome::Declined,
         (_, Some((_, details))) if !details.is_empty() => Outcome::Failed(details),
-        _ => Outcome::Failed("The package manager didn’t finish installing.".to_owned()),
+        _ => Outcome::Failed("The installation didn’t finish.".to_owned()),
     })
 }
 
