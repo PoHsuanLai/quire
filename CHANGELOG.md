@@ -29,6 +29,33 @@ first, with what a consumer has to change.
 - `CollectionItem::badged(Element)` (field `badge`): a slot centred under the caption
   (`span.ds-cv-badge`), for Finder's tag dots. It sits in the room the caption band already
   keeps, so the tile pitch is the same with and without one.
+- `ds_style::icon`: thirteen glyphs for a file manager, in the actions set (outline by default,
+  each with a solid form): `Home`, `Eject`, `DriveInternal`, `DriveExternal`, `Disc`, and the
+  per-type file glyphs `FileText`, `FileImage`, `FileAudio`, `FileVideo`, `FileArchive`,
+  `FileCode`, `FilePdf` and `FileApp`. `DriveExternal` and `FilePdf` are quire's own drawings on
+  Lucide's grid (Lucide has neither); the rest are Lucide.
+- `ds_style::icon::mime::glyph_for_mime(mime) -> MimeGlyph { icon, description }`: a MIME type
+  to its file glyph and Finder's plain kind name ("PNG image", "PDF document", "ZIP archive").
+  The exact type is looked up first, then its major type, then `File` with "Document".
+- `StatusBar` (new, `ds::components::chrome::status_bar`): Finder's bottom row. `text` centred
+  between an optional `leading` and an optional `trailing` element, in the secondary ink over a
+  hairline; the slots are always drawn so the text stays centred. `item_count_text(count,
+  available: Option<&str>)` writes "12 items, 40 GB available" ("1 item"); the app formats the
+  byte count itself, as quire has no byte formatter. Classes `ds-status-bar`,
+  `ds-status-bar-leading`, `ds-status-bar-text`, `ds-status-bar-trailing`.
+- `CommandPalette { trailing: Option<Element> }`: a control at the end of the search field's row
+  (sill's Auto/Manual switch). The row is laid out inside the card with the control's own room
+  (`.ds-palette-head`, `.ds-palette-trailing`), so a long query ends at the field's edge and never
+  runs under it. `None` changes nothing.
+- `SegmentedControl { title, title_shortcut }`: a hover hint for the whole group, drawn through
+  the hover hub as a `Button`'s is (`Name  ⌘K`); `aria-label` keeps the full wording and
+  `aria-description` carries the tip. A segment with its own tip keeps it.
+
+**Consumers**
+- Since v0.3.38 the `Sheet` panel takes the keyboard, so an inner `onkeydown` Return handler
+  inside a `Sheet` no longer hears Return. Use `Sheet { on_return }` (anyview moved its six
+  sheets).
+- A stylesheet golden picks up the status bar and palette-row rules. Re-bless.
 
 ## v0.3.39
 
