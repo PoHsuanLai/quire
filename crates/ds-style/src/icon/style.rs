@@ -74,6 +74,7 @@ impl Icon {
     pub fn solid_shapes(self) -> &'static [Shape] {
         [
             super::solid_fan::shapes,
+            super::solid_files::shapes,
             super::solid_mailo::shapes,
             super::solid_shell::shapes,
             super::solid_more::shapes,

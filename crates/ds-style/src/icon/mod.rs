@@ -25,6 +25,7 @@ pub mod family;
 pub(crate) mod geometry;
 pub(crate) mod geometry_actions;
 pub(crate) mod geometry_control;
+pub(crate) mod geometry_files;
 pub(crate) mod geometry_format;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
@@ -41,6 +42,7 @@ pub mod shape;
 #[cfg(feature = "dioxus")]
 pub mod slash;
 pub mod solid_fan;
+pub(crate) mod solid_files;
 pub(crate) mod solid_mailo;
 pub(crate) mod solid_more;
 pub mod solid_parts;
@@ -307,6 +309,33 @@ pub enum Icon {
     GitBranch,
     /// Lucide `diff`: lines added and removed (a plus over a minus).
     Diff,
+    // A file manager: places, drives and the kinds of file.
+    /// Lucide `house`: the home folder.
+    Home,
+    /// Lucide `eject`: a triangle over a bar; unmount a drive or a disc.
+    Eject,
+    /// Lucide `hard-drive`: a drive inside the machine.
+    DriveInternal,
+    /// quire's own drawing: a flat drive with a connector plug on it (`geometry_files`).
+    DriveExternal,
+    /// Lucide `disc`: an optical disc.
+    Disc,
+    /// Lucide `file-text`: a text document.
+    FileText,
+    /// Lucide `file-image`: a picture file.
+    FileImage,
+    /// Lucide `file-audio`: a sound file.
+    FileAudio,
+    /// Lucide `file-video`: a movie file.
+    FileVideo,
+    /// Lucide `file-archive`: a compressed archive.
+    FileArchive,
+    /// Lucide `file-code`: source code.
+    FileCode,
+    /// quire's own drawing: a file with a letter P (`geometry_files`).
+    FilePdf,
+    /// Lucide `file-cog`: a program.
+    FileApp,
 }
 
 impl Icon {
@@ -384,6 +413,19 @@ impl Icon {
             Icon::Heart => geometry_actions::HEART,
             Icon::GitBranch => geometry_actions::GIT_BRANCH,
             Icon::Diff => geometry_actions::DIFF,
+            Icon::Home
+            | Icon::Eject
+            | Icon::DriveInternal
+            | Icon::DriveExternal
+            | Icon::Disc
+            | Icon::FileText
+            | Icon::FileImage
+            | Icon::FileAudio
+            | Icon::FileVideo
+            | Icon::FileArchive
+            | Icon::FileCode
+            | Icon::FilePdf
+            | Icon::FileApp => geometry_files::shapes(self),
             shell => geometry_shell::shapes(shell),
         }
     }

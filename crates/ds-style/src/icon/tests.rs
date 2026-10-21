@@ -260,3 +260,46 @@ fn an_outline_is_the_stroke_and_names_its_style() {
     assert!(page.contains("data-style=\"outline\""), "{page}");
     assert!(page.contains("stroke-linecap=\"round\""), "{page}");
 }
+
+/// Glyphs that sit side by side in a folder listing share Lucide `file`'s page outline, so the
+/// rows line up; the audio, archive and app glyphs cut the page where their badge overlaps it.
+#[test]
+fn the_page_glyphs_share_the_file_outline() {
+    const PAGES: &[Icon] = &[
+        Icon::FileText,
+        Icon::FileImage,
+        Icon::FileVideo,
+        Icon::FileCode,
+        Icon::FilePdf,
+    ];
+    let page = Icon::File.shapes().first();
+    assert!(page.is_some());
+    for icon in PAGES {
+        assert_eq!(icon.shapes().first(), page, "{icon:?}");
+        assert_eq!(icon.native(), Native::Outline, "{icon:?}");
+    }
+}
+
+/// The file manager's places and drives are in the actions set, which the gallery draws.
+#[test]
+fn the_file_manager_glyphs_are_in_the_actions_set() {
+    const GLYPHS: &[Icon] = &[
+        Icon::Home,
+        Icon::Eject,
+        Icon::DriveInternal,
+        Icon::DriveExternal,
+        Icon::Disc,
+        Icon::FileApp,
+        Icon::FileArchive,
+        Icon::FileAudio,
+    ];
+    for icon in GLYPHS {
+        assert!(Icon::ACTIONS.contains(icon), "{icon:?}");
+        assert!(Icon::ALL.contains(icon), "{icon:?}");
+    }
+    // The eject mark is a triangle over a bar: one path, then the bar.
+    assert!(matches!(
+        Icon::Eject.shapes(),
+        [Shape::Path(_), Shape::Rect { .. }]
+    ));
+}
