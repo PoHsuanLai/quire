@@ -18,7 +18,7 @@ use crate::file::colrv1_emoji_file;
 use fontique::{
     Blob, Collection, FamilyId, GenericFamily, QueryFamily, QueryFont, QueryStatus, SourceCache,
 };
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 /// The font collection to work on: [`prefer_colour`] reads its families and reorders the generics.
 /// `parley::FontContext` (and so Blitz's) has exactly these two fields.
@@ -147,13 +147,25 @@ fn system_colour_face(fonts: &mut Fonts, tables: &[[u8; 4]]) -> Option<FamilyId>
     })
 }
 
+/// The COLRv1 file's bytes, found and read once per process: a program that builds a collection
+/// per pane or per window (temor, mailo) registers the same shared blob each time instead of
+/// walking the font folders and reading ~10 MB again. A machine with no file is remembered too.
+static COLRV1_BLOB: OnceLock<Option<Blob<u8>>> = OnceLock::new();
+
+fn colrv1_blob() -> Option<Blob<u8>> {
+    COLRV1_BLOB
+        .get_or_init(|| {
+            let bytes = std::fs::read(colrv1_emoji_file()?).ok()?;
+            Some(Blob::new(Arc::new(bytes) as _))
+        })
+        .clone()
+}
+
 /// The family of the COLRv1 file on this machine, registered with the collection. The
 /// registered family shadows a system family of the same name (the bitmap build's), so a stack
 /// that names `Noto Color Emoji` reaches the colour face too.
 fn register_colrv1_file(fonts: &mut Fonts) -> Option<FamilyId> {
-    let bytes = std::fs::read(colrv1_emoji_file()?).ok()?;
-    let blob = Blob::new(Arc::new(bytes) as _);
-    let families = fonts.collection.register_fonts(blob, None);
+    let families = fonts.collection.register_fonts(colrv1_blob()?, None);
     families.into_iter().next().map(|(id, _)| id)
 }
 
