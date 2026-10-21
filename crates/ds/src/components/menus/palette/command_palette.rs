@@ -111,6 +111,10 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 /// come in as roster rows do; the rows it removes go and what follows heals up by their height.
 /// A result set replaces the last one in place, with no motion.
 ///
+/// `trailing` is a control at the end of the search field's row (sill's Auto/Manual switch): the
+/// row gives it its own room, so the field narrows and a long query is cut at the field's edge,
+/// never run under it. Absent, the field is the whole row.
+///
 /// `corner` gives the card a squircle corner (`Corner::Squircle`, the launcher's) or another
 /// radius; absent, it keeps `--r-panel`.
 ///
@@ -141,6 +145,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] shown: Option<Shown>,
     #[props(default)] corner: Option<Corner>,
     #[props(default)] aside: Option<Element>,
+    #[props(default)] trailing: Option<Element>,
     #[props(default = ASIDE_WIDTH)] aside_width: Px,
     #[props(default)] initial_caret: InitialCaret,
     #[props(default)] handle: Option<PaletteHandle>,
@@ -297,6 +302,29 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     });
     let widened = side.as_ref().map(|_| "shown");
     let card_style = card_style(corner, side.as_ref().map(|_| aside_width));
+    let search = rsx! {
+        TextField {
+            label: label.clone(),
+            value: query.clone(),
+            placeholder,
+            tokens,
+            oninput,
+            onkey: field_key,
+            focus: field,
+            handle: Some(handle),
+            kind: FieldKind::Search,
+            bezel: FieldBezel::Plain,
+        }
+    };
+    let row = match trailing {
+        Some(trailing) => rsx! {
+            div { class: "ds-palette-head",
+                {search}
+                span { class: "ds-palette-trailing", {trailing} }
+            }
+        },
+        None => search,
+    };
     let card = rsx! {
         div {
             class: "ds-palette",
@@ -311,15 +339,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             "data-aside": widened,
             style: card_style,
             onpointerdown: move |event| event.stop_propagation(),
-            TextField {
-                label: label.clone(),
-                value: query.clone(),
-                placeholder,
-                tokens,
-                oninput,
-                onkey: field_key,
-                focus: field,
-                handle: Some(handle), kind: FieldKind::Search, bezel: FieldBezel::Plain }
+            {row}
             div {
                 class: "ds-palette-list",
                 role: "listbox",

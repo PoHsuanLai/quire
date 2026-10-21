@@ -390,3 +390,77 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
         "hidden again, nothing of the palette is painted"
     );
 }
+
+/// A launcher panel whose search row ends in a 72 px control, over a query far longer than the
+/// row; `trailing` says whether the control is given.
+fn trailing_page(trailing: bool) -> Element {
+    let control = trailing.then(|| {
+        rsx! {
+            span { id: "switch", style: "display:block;width:72px;height:24px" }
+        }
+    });
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Sheet,
+            div { style: "width:600px; height:400px",
+                CommandPalette::<u8> {
+                    label: "Launch".to_string(),
+                    placeholder: "Search".to_string(),
+                    query: "a very long query that goes on and on ".repeat(8),
+                    tokens: Vec::new(),
+                    groups: groups(),
+                    empty: "Nothing".to_string(),
+                    oninput: |_| {},
+                    onpick: |_| {},
+                    onclose: |_| {},
+                    host: CommandPaletteHost::Surface,
+                    id: "card".to_string(),
+                    trailing: control,
+                }
+            }
+        }
+    }
+}
+
+#[allow(non_snake_case)]
+fn WithTrailing() -> Element {
+    trailing_page(true)
+}
+
+#[allow(non_snake_case)]
+fn WithoutTrailing() -> Element {
+    trailing_page(false)
+}
+
+/// The control at the end of the search row has its own room inside the card: the field ends
+/// where it starts however long the query is, and without one the field fills the row.
+#[test]
+fn a_trailing_control_takes_its_own_room_and_a_long_query_never_runs_under_it() {
+    let mut harness = Harness::new(
+        WithTrailing,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    harness.advance(ms(150));
+    let card = harness.rect("#card").expect("card");
+    let field = harness.rect("#card .ds-text-field").expect("field");
+    let control = harness.rect("#switch").expect("control");
+    assert!((control.size.width.0 - 72.0).abs() < 0.5, "{control:?}");
+    assert!(
+        field.origin.x.0 + field.size.width.0 <= control.origin.x.0 + 0.5,
+        "the field {field:?} ends before the control {control:?}"
+    );
+    assert!(
+        control.origin.x.0 + control.size.width.0 <= card.origin.x.0 + card.size.width.0 + 0.5,
+        "the control {control:?} is inside the card {card:?}"
+    );
+    let mut bare = Harness::new(
+        WithoutTrailing,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    bare.advance(ms(150));
+    assert_eq!(bare.count(".ds-palette-head"), 0, "no row without one");
+    let whole = bare.rect("#card .ds-text-field").expect("field");
+    assert!(
+        whole.size.width.0 >= field.size.width.0 + 72.0 - 0.5,
+        "the field gave up the control's width: {whole:?} against {field:?}"
+    );
+}

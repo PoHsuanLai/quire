@@ -26,7 +26,7 @@ use crate::focus::press_focus::on_click;
 use crate::root::common::Common;
 use crate::stack::roving::{Rove, Roving, Wrap};
 use dioxus::prelude::*;
-use ds_core::vocab::{Availability, Check, Selection};
+use ds_core::vocab::{Availability, Check, Selection, Shortcut};
 use ds_core::word::Word;
 use ds_motion::detail::touch::Touch;
 use ds_motion::{
@@ -94,6 +94,12 @@ fn rove_to(availability: &[Availability], at: usize, rove: Rove) -> Option<usize
 }
 
 /// One choice out of a few, or several, or none held.
+///
+/// `title` is the hover hint of the group as a whole: a Mac tooltip through the hover hub, as a
+/// `Button`'s is (`title_tip`), written `Name  ⌘K` with `title_shortcut`; the group's accessible
+/// name stays `label` in full. A segment with its own tip (an image-only one) keeps it, and the
+/// group's shows over the others; inside a `Tooltip` it draws nothing, and outside a `Ds` it is
+/// the plain `title` attribute.
 #[component]
 pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
     label: String,
@@ -101,9 +107,13 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
     tracking: Tracking<T>,
     #[props(default)] size: ControlSize,
     #[props(default)] availability: Availability,
+    #[props(default)] title: Option<String>,
+    #[props(default)] title_shortcut: Option<Shortcut>,
     onchange: EventHandler<T>,
     #[props(default)] common: Common,
 ) -> Element {
+    let name = common.aria_label.clone().unwrap_or(label);
+    let tip = use_tip(title.map(|title| TipText::new(title).with_shortcut_opt(title_shortcut)));
     let values: Vec<T> = choices.iter().map(|choice| choice.value.clone()).collect();
     let lives: Vec<Availability> = choices.iter().map(|choice| choice.availability).collect();
     let at = match &tracking {
@@ -128,7 +138,10 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
             id: common.id.clone(),
             class,
             role: if one { "radiogroup" } else { "group" },
-            "aria-label": common.aria_label.clone().unwrap_or(label),
+            "aria-label": "{name}",
+            title: tip.native(),
+            "aria-description": tip.description(&name),
+            "data-tip": tip.marker(&name),
             "data-size": size.slug(),
             "data-tracking": word.slug(),
             "data-availability": availability.slug(),
@@ -149,7 +162,25 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
                     }
                 }
             },
-            onmounted: move |event| common.mounted(event),
+            onpointerdown: {
+                let tip = tip.clone();
+                move |_| tip.press()
+            },
+            onmouseover: {
+                let tip = tip.clone();
+                move |event| tip.over(&event)
+            },
+            onmouseleave: {
+                let tip = tip.clone();
+                move |_| tip.out()
+            },
+            onmounted: {
+                let tip = tip.clone();
+                move |event| {
+                    tip.mounted(&event);
+                    common.mounted(event);
+                }
+            },
             ..data,
             for (index , choice) in choices.into_iter().enumerate() {
                 Segment {
@@ -175,6 +206,7 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
                 span { class: "ds-segmented-indicator", "aria-hidden": "true" }
             }
         }
+        {tip.surface()}
     }
 }
 

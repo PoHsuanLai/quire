@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::segmented::Tracking;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
@@ -41,6 +42,25 @@ fn Titled() -> Element {
             div { style: "position:absolute;left:100px;top:100px;display:flex;gap:8px",
                 {icon("first", Some("Archive"), Icon::Archive)}
                 {icon("second", Some("Reply"), Icon::Reply)}
+            }
+        }
+    }
+}
+
+/// A segmented control with a hint for the whole group.
+#[allow(non_snake_case)]
+fn Group() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
+            div { style: "position:absolute;left:100px;top:100px",
+                SegmentedControl::<u8> {
+                    label: "View",
+                    title: Some("View Mode".to_owned()),
+                    choices: Choice::pairs(vec![(0u8, "Day".to_owned()), (1, "Week".to_owned())]),
+                    tracking: Tracking::SelectOne(0),
+                    onchange: |_| {},
+                    common: Common { id: Some("view".to_owned()), ..Common::default() },
+                }
             }
         }
     }
@@ -183,4 +203,26 @@ fn wrapping_an_item_in_its_tip_changes_neither_its_size_nor_its_neighbours() {
             "{item}: place across the row"
         );
     }
+}
+
+#[test]
+fn a_segmented_controls_title_is_one_tip_for_the_group_and_its_name_stays_whole() {
+    let mut harness = started(Group);
+    assert_eq!(harness.count(".ds-tooltip"), 0);
+    assert_eq!(harness.attr("#view", "title"), None, "no native tip");
+    assert_eq!(harness.attr("#view", "aria-label").as_deref(), Some("View"));
+    assert_eq!(
+        harness.attr("#view", "aria-description").as_deref(),
+        Some("View Mode")
+    );
+    let day = harness
+        .centre("#view .ds-segmented-segment:nth-of-type(1)")
+        .expect("a segment");
+    harness.send(Input::pointer_move(day));
+    harness.advance(ms(50));
+    assert_eq!(harness.count(".ds-tooltip"), 1);
+    assert_eq!(tip_text(&harness).as_deref(), Some("View Mode"));
+    harness.send(Input::pointer_down(day));
+    harness.advance(ms(300));
+    assert_eq!(harness.count(".ds-tooltip"), 0, "hidden on press");
 }
