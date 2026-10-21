@@ -3,6 +3,38 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.38
+
+A new fontique-only emoji crate, a caret that blinks, sheets that take the keyboard, and the toast
+clear of a sheet. Additive: every old path still resolves; no pin moves (Blitz, blitz-kit and
+chordkit stay where v0.3.37 had them).
+
+**quire-emoji (new crate)**
+- The colour emoji face detection moves out of `ds-blitz` into `quire-emoji`, which needs only
+  `fontique`: `prefer_colour(&mut Fonts, &EmojiChoice)`, `EmojiChoice`, `EMOJI_FAMILY_ENV`,
+  `colrv1_emoji_file`, `table_listed`. A program without Blitz (temor's terminal) shares the one
+  detection. `ds_blitz::{EmojiChoice, EMOJI_FAMILY_ENV, colrv1_emoji_file}` re-export it.
+- The COLRv1 file is found and read once per process and its `Blob` shared: calling
+  `prefer_colour` per pane or per window no longer walks the font folders and reads ~10 MB each
+  time. A font installed while the program runs is seen after a restart.
+
+**ds**
+- A focused `TextField`'s caret blinks: 500 ms shown, 500 ms hidden, shown again at every key,
+  input and press; after ten idle seconds it holds still, shown, and the field paints no more
+  frames (design/26 R3); never under Reduced motion. Plain, multi-line and secure fields.
+  Markup: the field's wrap carries `data-blink=off` during the hidden half (issue #13).
+- `Sheet` takes the keyboard a frame after it comes up when nothing inside it took it, as a Mac
+  sheet becomes key; a first stop the caller asks for (`FieldFocus`/`ButtonFocus::OnMount`, an
+  alert's default button) still wins. A sheet opened from a context menu's pick no longer leaves
+  the keyboard nowhere. Markup: the sheet panel has `tabindex="-1"`.
+- While a sheet or a peek is up, the toast sits at the top right instead of over the sheet's
+  buttons (`data-place=top`).
+
+**Consumers**
+- SSR goldens that hold a sheet gain `tabindex="-1"` on `.ds-sheet`; a stylesheet golden picks up
+  the blink and toast rules. Re-bless.
+- A lock that reaches `ds-blitz` gains `quire-emoji`; relock.
+
 ## v0.3.37
 
 The settings target gets a pure home, a hidden page, and the lock clock follows the region. Additive
