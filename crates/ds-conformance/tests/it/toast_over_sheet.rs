@@ -1,11 +1,14 @@
 //! A toast pushed from a sheet's own button keeps clear of that button (design/30 section 2.9):
 //! while a sheet is up the toast sits at the top right, so a second press on the button reaches
 //! the button and not the toast (whose hold pauses under a still pointer). With no sheet it stays
-//! at the bottom right.
+//! at the bottom right. A toast that appears under a still pointer is transparent to it until the
+//! pointer moves: a press there reaches the button below and the hold runs; after a move onto it
+//! the toast holds and its Undo takes the press.
 
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::root::common::Common;
+use ds::stack::toast_hub::UndoToken;
 use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
@@ -51,6 +54,43 @@ fn NoSheet() -> Element {
             label: "Add",
             common: Common { id: Some("add".to_string()), ..Common::default() },
             onclick: move |_| toasts.push("Added".into(), None),
+        }
+    }
+}
+
+/// A button at the bottom right, where the toast lands, that pushes an undoable toast and counts
+/// its presses and the undos.
+#[allow(non_snake_case)]
+fn UnderToast() -> Element {
+    let toasts = use_toasts();
+    let mut presses = use_signal(|| 0u32);
+    let mut undos = use_signal(|| 0u32);
+    rsx! {
+        div { style: "position:fixed; right:20px; bottom:20px; width:140px",
+            Button {
+                label: "Add computer",
+                common: Common { id: Some("add".to_string()), ..Common::default() },
+                onclick: move |_| {
+                    presses += 1;
+                    toasts
+                        .push_undoable(
+                            "Added".into(),
+                            UndoToken(1),
+                            EventHandler::new(move |_| undos += 1),
+                        );
+                },
+            }
+        }
+        p { class: "presses", "{presses}" }
+        p { class: "undos", "{undos}" }
+    }
+}
+
+#[allow(non_snake_case)]
+fn UnderPage() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
+            UnderToast {}
         }
     }
 }
@@ -112,4 +152,54 @@ fn with_no_sheet_the_toast_stays_at_the_bottom() {
     );
     let toast = harness.rect(".ds-toast").expect("the toast");
     assert!(toast.origin.y.0 > VIEW.height as f32 / 2.0, "{toast:?}");
+}
+
+#[test]
+fn a_toast_under_a_still_pointer_lets_the_press_through_and_is_not_held() {
+    let mut harness = start(UnderPage);
+    let at = harness.centre("#add").expect("the button");
+    harness.send(Input::click(at));
+    harness.advance(ms(400));
+    assert_eq!(
+        harness.attr(".ds-toast", "data-armed").as_deref(),
+        Some("waiting")
+    );
+    let toast = harness.rect(".ds-toast").expect("the toast");
+    assert!(
+        toast.origin.x.0 < at.x.0 && at.x.0 < toast.origin.x.0 + toast.size.width.0,
+        "the toast {toast:?} is over the pointer {at:?}"
+    );
+    harness.send(Input::click(at));
+    harness.advance(ms(100));
+    assert_eq!(harness.text_of(".presses").as_deref(), Some("2"));
+    assert_eq!(harness.text_of(".undos").as_deref(), Some("0"));
+    harness.advance(ms(6000));
+    assert_eq!(harness.count(".ds-toast"), 0, "the hold ran out");
+}
+
+#[test]
+fn after_a_move_onto_the_toast_it_holds_and_undo_takes_the_press() {
+    let mut harness = start(UnderPage);
+    let at = harness.centre("#add").expect("the button");
+    harness.send(Input::click(at));
+    harness.advance(ms(400));
+    let action = harness.centre(".ds-toast-action").expect("the action");
+    // The first move arms the toast; the second lands on it as a live surface.
+    harness.send(Input::pointer_move(action));
+    harness.advance(ms(50));
+    harness.send(Input::pointer_move(Point {
+        x: Px(action.x.0 + 1.0),
+        y: action.y,
+    }));
+    harness.advance(ms(50));
+    assert_eq!(
+        harness.attr(".ds-toast", "data-armed").as_deref(),
+        Some("live")
+    );
+    harness.advance(ms(6000));
+    assert_eq!(harness.count(".ds-toast"), 1, "held under the pointer");
+    harness.send(Input::click(action));
+    harness.advance(ms(20));
+    assert_eq!(harness.text_of(".undos").as_deref(), Some("1"));
+    assert_eq!(harness.text_of(".presses").as_deref(), Some("1"));
 }

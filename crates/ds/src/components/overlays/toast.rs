@@ -8,6 +8,10 @@
 //! `ToastHold` (5 s), and the pointer over the toast pauses it. A toast pushed with an undo has
 //! an action button (`Undo`, or the consumer's own: [`ToastHub::push_action`]); a swipe to the right dismisses it, from where the hand let go.
 //!
+//! A toast that appears under a still pointer does not take it: `data-armed=waiting` makes it
+//! transparent to the pointer (so a press reaches the button below and nothing counts as a hover,
+//! so the hold runs) until a move of the pointer arrives (`Ds` tells the hub), then `live`.
+//!
 //! While a sheet or a peek is up the toast sits at the top right, where the Mac's banners sit,
 //! instead of the bottom right: a sheet's buttons are at its bottom, and a toast over them would
 //! take the next press (its hold pauses under a still pointer).
@@ -78,6 +82,7 @@ pub fn ToastHost() -> Element {
                 "data-pulse": alias.slug(),
                 "data-swipe": swipe.look(),
                 "data-place": place,
+                "data-armed": hub.armed().slug(),
                 style: swipe.style(),
                 onmouseenter: move |_| hub.pause(),
                 onmouseleave: move |_| {

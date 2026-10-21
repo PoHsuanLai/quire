@@ -49,6 +49,28 @@ impl ToastAction {
     }
 }
 
+/// Whether the toast answers the pointer yet. A toast that appears under a still pointer does
+/// not take it (the Mac's banners don't): a press there reaches what is below, and the toast
+/// neither counts as hovered nor holds. A move of the pointer arms it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Armed {
+    /// It just appeared and the pointer has not moved since: transparent to the pointer.
+    #[default]
+    Waiting,
+    /// The pointer has moved: it holds while hovered and its button takes presses.
+    Live,
+}
+
+impl Armed {
+    /// The attribute value on the toast: `data-armed`.
+    pub fn slug(self) -> &'static str {
+        match self {
+            Armed::Waiting => "waiting",
+            Armed::Live => "live",
+        }
+    }
+}
+
 /// The toast as it is now.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum ToastState {
@@ -74,6 +96,7 @@ pub struct ToastHub {
     on_undo: Signal<Option<EventHandler<UndoToken>>>,
     on_action: Signal<Option<EventHandler<()>>>,
     hold: Signal<Option<Task>>,
+    armed: Signal<Armed>,
     scope: ScopeId,
 }
 
@@ -119,6 +142,7 @@ impl ToastHub {
         };
         try_set(self.on_undo, on_undo)?;
         try_set(self.on_action, on_action)?;
+        try_set(self.armed, Armed::Waiting)?;
         try_set(self.state, ToastState::Shown { text, undo, action })?;
         self.start_hold()
     }
@@ -154,6 +178,19 @@ impl ToastHub {
             }
         });
         try_set(self.hold, Some(started))
+    }
+
+    /// Whether the toast answers the pointer yet.
+    pub fn armed(&self) -> Armed {
+        *self.armed.read()
+    }
+
+    /// The root heard the pointer move somewhere (not a replayed move to where it was): a toast
+    /// that appeared under the pointer is armed.
+    pub(crate) fn pointer_moved(&self) {
+        if *self.armed.peek() == Armed::Waiting {
+            let _ = try_set(self.armed, Armed::Live);
+        }
     }
 
     /// The pointer came over the toast: the hold stops, so it stays up while it is read.
@@ -231,6 +268,7 @@ pub fn use_toast_hub_provider() -> ToastHub {
         on_undo: Signal::new(None),
         on_action: Signal::new(None),
         hold: Signal::new(None),
+        armed: Signal::new(Armed::Waiting),
         scope,
     })
 }

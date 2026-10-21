@@ -6,6 +6,11 @@ first, with what a consumer has to change.
 ## Unreleased
 
 **ds**
+- A toast that appears under a still pointer no longer takes the press (the Mac's banners
+  don't). The toast carries `data-armed`: `waiting` while the pointer has not moved since it
+  appeared (`pointer-events: none`, not hovered, so its hold runs), `live` after a move, when it
+  holds while hovered and its button takes presses as before. New `ds::stack::toast_hub::Armed`
+  and `ToastHub::armed()`. Fixes detent's "Add computer" press under the toast.
 - `Row { line_height: Some(Px(..)) }`: a flush row for text laid over a grid (a terminal's block
   header). The title and detail are each exactly `px` tall, the words start at the row's left
   edge, and the row has no padding, gap, minimum height or rounding; `size` is ignored. It sets

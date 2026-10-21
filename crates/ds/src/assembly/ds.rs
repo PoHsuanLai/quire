@@ -62,11 +62,12 @@ use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::title_tips::use_title_tips_provider;
 use crate::components::overlays::toast::ToastHost;
 use crate::focus::click::ClickRoot;
+use crate::host::event_point::pointer_point;
 use crate::host::signals::HostSignals;
 use crate::keys::use_keys_provider;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
 use crate::root::extent::RootExtent;
-use crate::root::pointer_trail::PointerTrail;
+use crate::root::pointer_trail::{Movement, PointerTrail};
 use crate::root::typeface::{use_typeface, use_typeface_provider};
 use crate::stack::host::{OverlayHost, use_overlays_provider};
 use crate::stack::hover_hub::use_hover_hub_provider;
@@ -153,7 +154,7 @@ pub fn Ds(
     use_space_look_provider(&look);
     let hover = use_hover_hub_provider(env, tip_delay);
     use_title_tips_provider();
-    use_toast_hub_provider();
+    let toasts = use_toast_hub_provider();
     use_context_provider(|| Signal::new(LayerStack::default()));
     use_overlays_provider();
     let frame = FrameVars::of(&look, resolved.scheme);
@@ -211,7 +212,13 @@ pub fn Ds(
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
             onclick: move |event: MouseEvent| click_root.clicked(&event),
             // Last to hear a move: where the pointer is, for a list asking whether it moved.
-            onpointermove: move |event: PointerEvent| trail.heard(&event),
+            onpointermove: move |event: PointerEvent| {
+                // A replayed move (Blitz's hover repair) is not one: it arms nothing.
+                if let Movement::Moved = trail.movement(pointer_point(&event)) {
+                    toasts.pointer_moved();
+                }
+                trail.heard(&event);
+            },
             if stylesheet == Inject::Inline {
                 style { {sheet.unwrap_or_else(crate::assembly::stylesheet::stylesheet)} }
             }
