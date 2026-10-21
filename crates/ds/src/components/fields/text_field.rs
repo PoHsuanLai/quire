@@ -16,6 +16,7 @@ use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::progress::busy::use_busy;
 use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;
+use crate::components::fields::text_field_blink::CaretBlink;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_ime::FieldIme;
 use crate::components::fields::text_field_mask::MaskCaret;
@@ -175,6 +176,7 @@ pub fn TextField(
 ) -> Element {
     let focuser = FieldFocuser::use_new(handle);
     let caret = MaskCaret::use_new();
+    let blink = CaretBlink::use_new();
     let ime = FieldIme::use_new();
     let mut typed = use_signal(String::new);
     let mut holds = use_signal(|| Holds::Elsewhere);
@@ -195,10 +197,12 @@ pub fn TextField(
     let blurred = held_text.clone();
     let focus_in = EventHandler::new(move |()| {
         holds.set(Holds::Caret);
+        blink.restart();
         onfocus.call(());
     });
     let focus_out = EventHandler::new(move |()| {
         holds.set(Holds::Elsewhere);
+        blink.stop();
         onblur.call(());
     });
     let told = Told {
@@ -234,6 +238,7 @@ pub fn TextField(
         focus: round.focus(focus),
         focuser: focuser.clone(),
         caret,
+        blink,
         handlers: Handlers {
             oninput: EventHandler::new(move |next: String| {
                 if kind == FieldKind::Secure && text == FieldText::Own {

@@ -11,6 +11,7 @@ mod button_click;
 mod button_heights;
 mod button_propagation;
 mod capsule;
+mod caret_blink;
 mod cc_pane_switcher;
 mod chip_pressable;
 mod collapse;

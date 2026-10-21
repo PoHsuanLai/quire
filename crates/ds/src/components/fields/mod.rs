@@ -8,6 +8,7 @@ pub mod shortcut_field_model;
 pub mod stepper;
 pub mod text_field;
 pub(crate) mod text_field_area;
+pub(crate) mod text_field_blink;
 pub mod text_field_focus;
 pub(crate) mod text_field_ime;
 pub(crate) mod text_field_mask;

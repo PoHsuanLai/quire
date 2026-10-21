@@ -24,6 +24,7 @@ pub(crate) fn area(field: Field, value: &str) -> Element {
         handlers,
         told,
         ime,
+        blink,
     } = field;
     let shown = placeholder_shown(value, &placeholder, ime.composition());
     rsx! {
@@ -33,6 +34,7 @@ pub(crate) fn area(field: Field, value: &str) -> Element {
             "data-size": size.slug(),
             "data-kind": "multiline",
             "data-rows": rows.slug(),
+            "data-blink": blink.phase().attr(),
             textarea {
                 id,
                 class: "ds-input",
@@ -59,12 +61,15 @@ pub(crate) fn area(field: Field, value: &str) -> Element {
                     handlers.onchange.call(());
                     handlers.onblur.call(());
                 },
+                onmousedown: move |_| blink.restart(),
                 oninput: move |event| {
+                    blink.restart();
                     if availability == Availability::Enabled {
                         handlers.oninput.call(event.value());
                     }
                 },
                 onkeydown: move |event: KeyboardEvent| {
+                    blink.restart();
                     // Enter is this field's newline: no outer default button takes it.
                     if event.key() == Key::Enter {
                         event.stop_propagation();

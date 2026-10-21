@@ -2,6 +2,7 @@
 //! secure field, the dots and the caret that replace what the renderer would draw.
 
 use crate::components::fields::text_field_area::area;
+use crate::components::fields::text_field_blink::CaretBlink;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_ime::{Composition, FieldIme};
 use crate::components::fields::text_field_mask::{CaretMark, MaskCaret, MaskParts};
@@ -45,6 +46,8 @@ pub(crate) struct Field {
     pub focuser: FieldFocuser,
     /// A masked field's own caret over its dots.
     pub caret: MaskCaret,
+    /// The caret's blink: shown again at every key, input and press.
+    pub blink: CaretBlink,
     pub handlers: Handlers,
     /// What a host's focus write tells the field, which no renderer event will.
     pub told: Told,
@@ -93,6 +96,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
         handlers,
         told,
         ime,
+        blink,
     } = field;
     let count = kind.mask(&value).map_or(0, |dots| dots.chars().count());
     let owner = caret.owner(count);
@@ -110,6 +114,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
             class: "ds-input-wrap",
             "data-variant": bezel.slug(),
             "data-size": size.slug(),
+            "data-blink": blink.phase().attr(),
             input {
                 id,
                 class: "ds-input",
@@ -141,10 +146,14 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
                     handlers.onchange.call(());
                     handlers.onblur.call(());
                 },
-                onmousedown: move |_| caret.refresh(),
+                onmousedown: move |_| {
+                    caret.refresh();
+                    blink.restart();
+                },
                 onmouseup: move |_| caret.refresh(),
                 oninput: move |event| {
                     caret.refresh();
+                    blink.restart();
                     if availability == Availability::Enabled {
                         handlers.oninput.call(event.value());
                     }
@@ -161,6 +170,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
                 },
                 onkeydown: move |event: KeyboardEvent| {
                     caret.refresh();
+                    blink.restart();
                     if secret
                         && keys.with_keymap(|keymap| {
                             takes_text_out(keymap, &event.key(), event.modifiers())

@@ -2901,8 +2901,8 @@ html,body{margin:0;padding:0;background:transparent}
    the Inter dots tracked .1em (two dots short at eleven). Where the host reads the selection
    (ds-native) the field draws its own caret among the dots: the input's is transparent
    (`data-caret=drawn`) and `.ds-input-caret` is Blitz's caret redrawn, 1.5 px wide, the height of
-   the line, in the dots' ink (`--ink`; the lock pill repeats its own), not blinking (Blitz's does not blink either), shown only while the
-   field has the keyboard and nothing is selected. A selected range is `.ds-input-mask-selected`,
+   the line, in the dots' ink (`--ink`; the lock pill repeats its own), blinking with the renderer's (below), shown only while
+   the field has the keyboard and nothing is selected. A selected range is `.ds-input-mask-selected`,
    the plan's `--accent-soft` behind its dots. */
 .ds-input[*|data-kind=secure]{ color:transparent; caret-color:var(--ink); }
 .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
@@ -2915,6 +2915,10 @@ html,body{margin:0;padding:0;background:transparent}
    gap's centre; the caret after the last dot keeps the same place, half a gap after it. */
 .ds-input-caret::before{ content:""; position:absolute; left:calc(-.05em - .75px); top:-1.139em; width:1.5px; height:1.55em; background:var(--ink); }
 .ds-input-mask-selected{ background:var(--accent-soft); }
+/* The caret's blink (text_field_blink.rs): Blitz has none, so the field hides its caret for the off
+   half by making it transparent; the drawn caret of a secure field hides with it. */
+.ds-input-wrap[*|data-blink=off] .ds-input{ caret-color:transparent; }
+.ds-input-wrap[*|data-blink=off] .ds-input-caret::before{ background:transparent; }
 .ds-input-mask{
   position:absolute; left:0; top:0; right:0; pointer-events:none; white-space:nowrap; overflow:hidden;
   font:inherit; font-size:var(--tf-fs); line-height:1.55; color:var(--ink); letter-spacing:.1em;
