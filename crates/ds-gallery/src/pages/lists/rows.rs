@@ -146,6 +146,11 @@ fn Leadings() -> Element {
                         }
                     }
                 }
+                Specimen { name: "Flush (line_height 18)",
+                    div { class: "g-list g-stage-pad", style: "width:300px",
+                        Row { title: "A title on its grid", detail: TextLine::from("A detail on the next line"), line_height: Px(18.0) }
+                    }
+                }
                 Specimen { name: "Settings",
                     div { class: "g-list g-stage-pad", style: "width:300px",
                         List::<&'static str> {
