@@ -229,6 +229,10 @@ pub(crate) const SHEETS: [(&str, &str); 100] = [
         include_str!("../components/fields/stepper/stepper.css"),
     ),
     (
+        "status_bar",
+        include_str!("../components/chrome/status_bar.css"),
+    ),
+    (
         "status_glyph",
         include_str!("../components/content/status_glyph.css"),
     ),

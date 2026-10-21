@@ -1,0 +1,13 @@
+/* Status bar (design/27 section 5.10): a thin row at the bottom of a window's content. The text is
+   centred between two slots of equal basis, so it stays centred when only one slot is used. Small
+   type in the secondary ink, a hairline on top; the slots hold small controls. */
+
+.ds-status-bar{
+  display:flex; align-items:center; box-sizing:border-box; flex:none; min-height:var(--s-24); padding:var(--s-4) var(--s-12);
+  gap:var(--s-8); min-width:0; border-top:var(--hairline) solid var(--line); color:var(--ink-soft);
+  font-size:var(--fs-help); user-select:none;
+}
+.ds-status-bar-leading,
+.ds-status-bar-trailing{ display:flex; align-items:center; flex:1 1 0; min-width:0; gap:var(--s-8); }
+.ds-status-bar-trailing{ justify-content:flex-end; }
+.ds-status-bar-text{ flex:0 1 auto; min-width:0; overflow:hidden; white-space:nowrap; text-align:center; }

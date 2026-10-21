@@ -47,6 +47,7 @@ mod sheet_hygiene;
 mod snippet_forms;
 mod space_editor_ssr;
 mod standard_action;
+mod status_bar_ssr;
 mod status_tables;
 mod support;
 mod surface;

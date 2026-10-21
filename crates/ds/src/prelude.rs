@@ -145,6 +145,8 @@ pub use crate::components::app::space_editor::colour::SpaceColour;
 pub use crate::components::app::space_editor::dot::{DotFace, SpaceDot};
 
 // Chrome
+pub use crate::components::chrome::status_bar::StatusBar;
+pub use crate::components::chrome::status_bar_model::item_count_text;
 pub use crate::components::chrome::window_frame::TrafficLights;
 pub use crate::components::chrome::window_frame::WindowFrame;
 pub use crate::window::host::WindowHost;

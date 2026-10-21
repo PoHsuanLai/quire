@@ -9,6 +9,7 @@ mod menu_bar;
 mod sidebar;
 mod sidebar_sections;
 mod split_view;
+mod status_bar;
 mod stepper;
 mod tab_view;
 mod table;
@@ -30,6 +31,7 @@ pub fn StructurePage() -> Element {
         split_view::SplitViewPeekSection {}
         sidebar::SidebarListSection {}
         sidebar_sections::SidebarSectionsSection {}
+        status_bar::StatusBarSection {}
         tab_view::TabViewSection {}
         field_row::FieldRowSection {}
         menu_bar::MenuBarSection {}

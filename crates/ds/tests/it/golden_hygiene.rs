@@ -7,6 +7,7 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
         crate::alert_ssr::hygiene_failures(),
         crate::launcher_parts_ssr::hygiene_failures(),
         crate::pdf_thumb_ssr::hygiene_failures(),
+        crate::status_bar_ssr::hygiene_failures(),
         crate::voice_orb_ssr::hygiene_failures(),
     ]
     .concat();
