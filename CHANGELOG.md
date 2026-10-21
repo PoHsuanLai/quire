@@ -3,6 +3,45 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.39
+
+The files batch: a windowed icon view, a middle cut for names, and the virtual table opens rows
+and leaves chorded keys to the app. chordkit moves to ae28c23 (Find Next and Find Previous are
+offered, not universal); Blitz and blitz-kit stay where v0.3.38 had them.
+
+**ds**
+- `CollectionView` (new, `ds::components::lists::collection_view`): Finder's icon view, a grid of
+  tiles (`CollectionItem { key, caption, thumbnail }`, `Thumbnail::{Image, Icon}`) that mounts
+  only the rows near the viewport. `CollectionSize::{Small, Medium, Large}` (48, 64 and 96 px
+  thumbnails), `Flow::{Fit, Columns(n)}`. Arrows move in two dimensions, Home and End go to the
+  ends, Shift extends, the primary modifier toggles on a click, letters type-select. A double
+  click or Command-Down asks `onopen`; Return, Space and every key with a modifier besides Shift
+  go on to the app's keymap (Finder's Rename and Quick Look). Tiles fade in and out through the
+  list roster; `CollectionItem::editing(Element)` is the rename slot. Captions are one line, cut
+  from the middle.
+- `VirtualTable` and its split panes: `onopen: Option<EventHandler<usize>>` hears a double click
+  on a row and Command-Down on the cursor's row (consumed only when `onopen` is given). Return
+  stays `onpick`'s. Any key with Control, Option, Command or Meta now goes on to the app instead
+  of moving the cursor or picking: Command-Up reaches the app's Enclosing Folder.
+- `.ds-vtable-rows` and `.ds-vtable-track` are styled (`display:block`); before, they had no rule
+  and laid out inline.
+
+**ds-core**
+- `text::clip::Truncate { End, Middle }` with `clip(text, chars)`; `Middle` keeps the extension
+  (design/27 section 5.24).
+
+**chordkit (eb0deff → ae28c23)**
+- Find Next and Find Previous are `Reach::IfOffered`: an app with no found text to step through
+  (a file manager) gives them up with `forgo_all` and takes ⇧⌘G, as Finder's Go to Folder does.
+  Find stays universal.
+
+**Consumers**
+- Move every chordkit pin to ae28c23 together with quire (one chordkit in the lock); relock.
+- A stylesheet golden picks up the collection view and vtable rules; a self-lint or token test
+  that lists per-element custom properties adds `--cv-thumb` and `--cv-pitch`. Re-bless.
+- A table owner that read Command-arrows from the table's cursor moves now hears them in its own
+  keymap.
+
 ## v0.3.38
 
 A new fontique-only emoji crate, a caret that blinks, sheets that take the keyboard, and the toast
