@@ -167,6 +167,7 @@ mod virtual_list_heights;
 mod virtual_list_return;
 mod virtual_list_set;
 mod virtual_table;
+mod virtual_table_open;
 mod voice_orb;
 mod window_frame_controls;
 mod window_layout_shots;

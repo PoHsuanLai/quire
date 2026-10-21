@@ -82,6 +82,8 @@ pub(super) struct Panes {
     pub(super) across: Signal<Px>,
     /// The row the pointer is over.
     pub(super) hovered: Signal<Option<usize>>,
+    /// Hears a row being opened by a double click.
+    pub(super) onopen: Option<EventHandler<usize>>,
 }
 
 /// The body of a table that holds columns: the two headers, then the `Scroller` of the two
@@ -99,6 +101,7 @@ pub(super) fn body(panes: Panes) -> Element {
         height,
         across,
         hovered,
+        onopen,
     } = panes;
     let (held_width, held_template) = (held.width.0, held.template);
     let (side_width, side_template) = (scrolling.width.0, scrolling.template);
@@ -133,6 +136,7 @@ pub(super) fn body(panes: Panes) -> Element {
                                 key: "{line.row}",
                                 row: line.row,
                                 hovered,
+                                onopen,
                                 selection: line.selection,
                                 stripe: line.stripe,
                                 height,
@@ -165,6 +169,7 @@ pub(super) fn body(panes: Panes) -> Element {
                                         key: "{line.row}",
                                         row: line.row,
                                         hovered,
+                                        onopen,
                                         selection: line.selection,
                                         stripe: line.stripe,
                                         height,
@@ -188,6 +193,7 @@ pub(super) fn body(panes: Panes) -> Element {
 fn HeldItem(
     row: usize,
     hovered: Signal<Option<usize>>,
+    onopen: Option<EventHandler<usize>>,
     selection: Selection,
     stripe: Option<&'static str>,
     height: f32,
@@ -212,6 +218,11 @@ fn HeldItem(
             "data-stripe": stripe,
             "data-hover": over,
             style: "height:{height}px",
+            ondoubleclick: move |_| {
+                if let Some(onopen) = onopen {
+                    onopen.call(row);
+                }
+            },
             onpointerenter: move |_| hovered.set(Some(row)),
             onpointerleave: move |_| {
                 if *hovered.peek() == Some(row) {

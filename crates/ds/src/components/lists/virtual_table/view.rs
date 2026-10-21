@@ -12,6 +12,15 @@
 //! Page Down ask `onselect` to move the cursor and stop at the ends; Enter and Space ask
 //! `onpick`.
 //!
+//! `onopen` hears the row to open (Finder's Open): a double click on a row, and Command-Down (the
+//! primary modifier with Down) on the cursor's row. Return stays `onpick`'s, as in Finder, where
+//! it renames and does not open. Command-Down is Finder's Open and is taken only when the owner gave `onopen`; it is then consumed, so the
+//! app's keymap does not open the row a second time. Every other key with a modifier besides
+//! Shift is left alone and goes on to the app's keymap (Command-Up is Enclosing Folder, so the
+//! table must not move its cursor on it). Plain arrows move the cursor and Shift with an arrow
+//! extends the selection, which `onreach` reports as `PickHow::Extend`; a click reports
+//! `Replace`, `Toggle` or `Extend` the same way, so an owner never reads a modifier.
+//!
 //! Which rows are selected is the cursor's row alone, unless the owner gives a `selection` (a
 //! `RowSelection`, ranges and never a key per row, so a million selected rows cost the same as
 //! one). Then a row is selected when `selection.contains(row)`. The owner who wants several rows
@@ -85,6 +94,7 @@ struct Reach {
     platform: Platform,
     onreach: Option<EventHandler<Pick>>,
     onselect: Option<EventHandler<usize>>,
+    onopen: Option<EventHandler<usize>>,
 }
 
 impl Reach {
@@ -99,6 +109,13 @@ impl Reach {
             (Some(onreach), _) => onreach.call(pick),
             (None, Some(onselect)) => onselect.call(pick.row),
             (None, None) => {}
+        }
+    }
+
+    /// The owner is asked to open `row`, if it listens.
+    fn opened(self, row: usize) {
+        if let Some(onopen) = self.onopen {
+            onopen.call(row);
         }
     }
 
@@ -136,7 +153,8 @@ fn row_content<C>(
 /// to a row. `sort` is the sorted column and `on_sort` hears what a header press asks for.
 /// `cursor` is the row the keys rest on, kept in view; `onselect` hears a click, an arrow, Home,
 /// End, Page Up or Page Down asking for another row, and `onpick` hears Enter or Space on the
-/// cursor. `selection`, when given, says which rows are selected (the cursor's row alone
+/// cursor. `onopen` hears the index of the row to open: a double click on it, or
+/// Command-Down on the cursor's row. `selection`, when given, says which rows are selected (the cursor's row alone
 /// otherwise), and `onreach` hears the same asks with how the row was reached (`Pick`) in place
 /// of `onselect`: Shift with a click or an arrow extends, the primary modifier with a click
 /// toggles. `pinned` is how many leading columns are held in place while the others scroll
@@ -165,6 +183,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     #[props(default)] onselect: Option<EventHandler<usize>>,
     #[props(default)] onreach: Option<EventHandler<Pick>>,
     #[props(default)] onpick: Option<EventHandler<usize>>,
+    #[props(default)] onopen: Option<EventHandler<usize>>,
     #[props(default)] pinned: usize,
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
     #[props(default)] look: TableLook,
@@ -193,6 +212,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
         platform: use_platform(),
         onreach,
         onselect,
+        onopen,
     };
     let kept = held_columns(pinned, columns.len());
     let selected = |row: usize| {
@@ -214,14 +234,22 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
         })
         .collect();
     let onkeydown = move |event: KeyboardEvent| {
-        let Some(act) = table_key(&event.key(), event.modifiers()) else {
+        let Some(act) = table_key(&event.key(), event.modifiers(), reach.platform) else {
             return;
         };
+        let resting = cursor.filter(|at| *at < rows);
         match act {
             TableKey::Pick => {
-                if let (Some(at), Some(onpick)) = (cursor.filter(|at| *at < rows), onpick) {
+                if let (Some(at), Some(onpick)) = (resting, onpick) {
                     event.prevent_default();
                     onpick.call(at);
+                }
+            }
+            TableKey::Open => {
+                if let (Some(at), Some(_)) = (resting, onopen) {
+                    event.prevent_default();
+                    event.stop_propagation();
+                    reach.opened(at);
                 }
             }
             TableKey::Move(_) | TableKey::Page(_) => {
@@ -276,6 +304,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                                     "data-selected": (selected(row) == Selection::Selected).then_some("yes"),
                                     "data-stripe": look.striped(row).then_some("odd"),
                                     style: "height:{height}px",
+                                    ondoubleclick: move |_| reach.opened(row),
                                     {content}
                                 }
                             }
@@ -327,6 +356,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                 height,
                 across,
                 hovered,
+                onopen,
             });
             let ahead = Some(Scrolled::at(across()).slug());
             (body, None, Some("yes"), ahead)

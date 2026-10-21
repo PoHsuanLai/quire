@@ -3,7 +3,9 @@
 use crate::components::lists::list::keys::{ListKey, list_key};
 use crate::components::lists::virtual_list::model::roved;
 use crate::stack::roving::{Rove, Step};
+use chordkit::Platform;
 use dioxus::prelude::{Key, Modifiers};
+use ds_core::command::holds_primary;
 use ds_core::selection::PickHow;
 
 /// What a key asks of a virtual table.
@@ -13,13 +15,28 @@ pub(crate) enum TableKey {
     Move(Rove),
     /// The cursor moves by a page.
     Page(Step),
-    /// The row under the cursor is picked.
+    /// The row under the cursor is picked (Return or Space).
     Pick,
+    /// The primary modifier with Down (Command-Down, Finder's Open): the row under the cursor is
+    /// opened.
+    Open,
 }
 
-/// The table's reading of `key`; `None` for a key it leaves alone. Letters are not read: the rows
-/// are not at hand to match a label against.
-pub(crate) fn table_key(key: &Key, modifiers: Modifiers) -> Option<TableKey> {
+/// Whether `modifiers` hold a modifier that makes a key a command and not a movement.
+fn chorded(modifiers: Modifiers) -> bool {
+    modifiers.intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::SUPER | Modifiers::META)
+}
+
+/// The table's reading of `key` on `platform`; `None` for a key it leaves alone. Letters are not
+/// read: the rows are not at hand to match a label against. Shift alone still moves (and extends);
+/// any other modifier makes the key the app's, so Command-Up (Enclosing Folder) goes on to the
+/// app's keymap. The one exception is the primary modifier with Down, Finder's Open.
+pub(crate) fn table_key(key: &Key, modifiers: Modifiers, platform: Platform) -> Option<TableKey> {
+    if chorded(modifiers) {
+        let primary_alone = holds_primary(platform, modifiers)
+            && !modifiers.intersects(Modifiers::SHIFT | Modifiers::ALT);
+        return (primary_alone && *key == Key::ArrowDown).then_some(TableKey::Open);
+    }
     match key {
         Key::PageDown => Some(TableKey::Page(Step::Down)),
         Key::PageUp => Some(TableKey::Page(Step::Up)),
@@ -41,7 +58,7 @@ pub(crate) fn target(at: Option<usize>, len: usize, key: TableKey, page: usize) 
         TableKey::Move(rove) => roved(at, len, rove),
         TableKey::Page(Step::Down) => Some(at.map_or(0, |at| (at + page).min(last)).min(last)),
         TableKey::Page(Step::Up) => Some(at.map_or(last, |at| at.saturating_sub(page)).min(last)),
-        TableKey::Pick => None,
+        TableKey::Pick | TableKey::Open => None,
     }
 }
 
@@ -72,6 +89,7 @@ pub(crate) fn page_rows(height: f32, pitch: f32) -> usize {
 mod tests {
     use super::{TableKey, held_columns, key_how, page_rows, table_key, target};
     use crate::stack::roving::{Edge, Rove, Step};
+    use chordkit::Platform;
     use dioxus::prelude::{Key, Modifiers};
     use ds_core::selection::PickHow;
 
@@ -114,11 +132,41 @@ mod tests {
             (Key::ArrowDown, Some(TableKey::Move(Rove::Step(Step::Down)))),
             (Key::Home, Some(TableKey::Move(Rove::Edge(Edge::First)))),
             (Key::Enter, Some(TableKey::Pick)),
+            (Key::Character(" ".to_owned()), Some(TableKey::Pick)),
             (Key::Character("a".to_owned()), None),
             (Key::Tab, None),
         ];
         for (key, want) in cases {
-            assert_eq!(table_key(key, Modifiers::empty()), *want, "{key:?}");
+            let read = table_key(key, Modifiers::empty(), Platform::MacOs);
+            assert_eq!(read, *want, "{key:?}");
+        }
+    }
+
+    #[test]
+    fn a_modified_arrow_is_the_apps_except_shift_and_the_primary_modifier_with_down() {
+        let mac = Platform::MacOs;
+        let down = Key::ArrowDown;
+        let up = Key::ArrowUp;
+        let (home, page_down, enter) = (Key::Home, Key::PageDown, Key::Enter);
+        let step_down = Some(TableKey::Move(Rove::Step(Step::Down)));
+        // (key, modifiers, wanted)
+        let cases: &[(&Key, Modifiers, Option<TableKey>)] = &[
+            (&down, Modifiers::SHIFT, step_down),
+            (&down, Modifiers::SUPER, Some(TableKey::Open)),
+            (&up, Modifiers::SUPER, None),
+            (&down, Modifiers::SUPER | Modifiers::SHIFT, None),
+            (&down, Modifiers::ALT, None),
+            (&down, Modifiers::CONTROL, None),
+            (&home, Modifiers::SUPER, None),
+            (&page_down, Modifiers::ALT, None),
+            (&enter, Modifiers::SUPER, None),
+        ];
+        for &(key, modifiers, want) in cases {
+            assert_eq!(
+                table_key(key, modifiers, mac),
+                want,
+                "{key:?} {modifiers:?}"
+            );
         }
     }
 
