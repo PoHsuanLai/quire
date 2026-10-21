@@ -790,7 +790,7 @@ the row's own box from the same tokens as its CSS, at scale 1) and the gap below
 `thread_card_gap()`, so a `VirtualList`'s pitch is their sum. Everything else that lists uses `List`
 of `Row`s: `Row { leading: RowLeading::Icon(..), title, detail, accessory: Accessory::Chevron,
 state: RowState { selection, ..RowState::default() }, size: RowSize::Settings, onclick }`, where
-`Accessory` is `None`, `Check`, `Toggle`, `Chevron`, `Text`, `Glyph`, `Battery`, `Spinner`, `Badge`
+`Row { line_height: Some(px) }` is a flush row whose title and detail lines are exactly `px` tall with no padding, gap or minimum height (text over a caller's grid), and `Accessory` is `None`, `Check`, `Toggle`, `Chevron`, `Text`, `Glyph`, `Battery`, `Spinner`, `Badge`
 or `Slot`; a busy row (`Availability::Busy`) shows the spinner in place of its accessory.
 `List { label, items: Vec<ListItem<K>>, style: ListStyle }` roves with the arrows and Home/End.
 `Table { label, columns, rows, sort, on_sort, selection, cursor, onselect }` (`TableColumn::new(id, title, width)`, `TableRow::new(key, label, cells)`) is a header of sortable, resizable columns over a `List`.

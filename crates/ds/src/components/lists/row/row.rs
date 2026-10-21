@@ -110,6 +110,11 @@ fn title_words(title: &TextLine, marks: &[usize]) -> Element {
 /// hooks hand the row's own pointer events to the caller (a drag over the sidebar). `motion` is
 /// the row's part in a motion of its list's rows (a palette group's Show More or Less).
 /// `onmounted` hears the row's element as it mounts (see [`RowMounted`]).
+///
+/// `line_height` (CSS px) sets a flush row, one that lays text on a grid of its own: the title and
+/// the detail are each exactly that tall, the words start at the row's left edge, and the row has
+/// no padding, gap, minimum height or rounding, so its height is its lines' and `size` is
+/// ignored. A value that is not finite and positive is ignored.
 #[component]
 pub fn Row(
     #[props(default)] leading: RowLeading,
@@ -125,6 +130,7 @@ pub fn Row(
     #[props(default)] shape: RowShape,
     #[props(default)] state: RowState,
     #[props(default)] size: RowSize,
+    #[props(default)] line_height: Option<f32>,
     #[props(default)] outline: Outline,
     #[props(default)] motion: RowMotion,
     #[props(default)] onmounted: Option<RowMounted>,
@@ -191,6 +197,13 @@ pub fn Row(
             RowDisclosure { shown, on_toggle }
         },
     };
+    let flush = line_height.filter(|px| px.is_finite() && *px > 0.0);
+    let density = if flush.is_some() {
+        "lines"
+    } else {
+        size.slug()
+    };
+    let line_style = flush.map(|px| format!("--row-line:{px}px"));
     let name = title.plain_text();
     let data = common.data_attributes();
     let mounted = common.clone();
@@ -205,7 +218,8 @@ pub fn Row(
             "aria-expanded": expanded,
             "aria-disabled": availability.aria_disabled(),
             "aria-busy": availability.aria_busy(),
-            "data-density": size.slug(),
+            "data-density": density,
+            style: line_style,
             "data-leading": leading::row_slug(&leading, &shape),
             "data-emphasis": emphasis_slug(emphasis),
             "data-focus": FocusStyle::Highlight.slug(),

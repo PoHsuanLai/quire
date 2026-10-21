@@ -3,6 +3,15 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## Unreleased
+
+**ds**
+- `Row { line_height: Some(px) }`: a flush row for text laid over a grid (a terminal's block
+  header). The title and detail are each exactly `px` tall, the words start at the row's left
+  edge, and the row has no padding, gap, minimum height or rounding; `size` is ignored. It sets
+  `data-density="lines"` and the declared custom property `--row-line` inline. `None` (the
+  default) changes nothing.
+
 ## v0.3.39
 
 The files batch: a windowed icon view, a middle cut for names, and the virtual table opens rows
