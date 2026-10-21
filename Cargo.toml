@@ -16,6 +16,7 @@ members = [
   "crates/ds-shell",
   "crates/ds-settings-page",
   "crates/ds-settings-derive",
+  "crates/quire-emoji",
   "crates/ds-blitz",
   "crates/ds-harness",
   "crates/ds-conformance",
@@ -51,6 +52,7 @@ ds-shell           = { path = "crates/ds-shell" }
 ds-settings-page   = { path = "crates/ds-settings-page" }
 ds-core-derive     = { path = "crates/ds-core-derive" }
 ds-settings-derive = { path = "crates/ds-settings-derive" }
+quire-emoji        = { path = "crates/quire-emoji" }
 ds-blitz           = { path = "crates/ds-blitz", default-features = false }
 ds-harness         = { path = "crates/ds-harness", default-features = false }
 
@@ -127,6 +129,8 @@ wgpu_context = "0.9"
 rustc-hash = "2"
 vello_common = "0.1"
 parley = { version = "0.11.1", default-features = false, features = ["std", "complex-scripts"] }
+# parley's font backend, named for the crates that need only the collection (quire-emoji).
+fontique = { version = "0.11.1", default-features = false, features = ["std", "system"] }
 image = { version = "0.25.6", default-features = false, features = ["png", "jpeg"] }
 
 # Wayland client (shell-host and sill share one sctk major).

@@ -1353,7 +1353,7 @@ What Blitz at the pinned rev paints (48 px, headless):
   `big_colr`) and the named-family rows above prove it. Parley (`shape/mod.rs`, `select_font`)
   asks the element's stack, then the `emoji` generic, and `system-ui`/`sans-serif` expand to the
   whole fontconfig match list (`fc-match -s`), which reaches Symbola before the `emoji` generic
-  is consulted. Fix: `ds_blitz::font_context` (`emoji_face.rs`) detects the first COLR family of
+  is consulted. Fix: `ds_blitz::font_context` (`quire-emoji`, `face.rs`; shared with temor's terminal) detects the first COLR family of
   the `emoji` generic, else the COLRv1 file, else the first `sbix` or `CBDT` family, and inserts it into each generic list
   just before the first family mapping U+1F600, so text fonts earlier in the list keep digits and
   spaces. `QUIRE_EMOJI_FAMILY=<name>` (`EmojiChoice::Named`) overrides the detection. Not

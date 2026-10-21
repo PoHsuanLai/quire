@@ -1721,6 +1721,7 @@ dependencies = [
  "pdfrum-edit",
  "peephole-bus",
  "peniko",
+ "quire-emoji",
  "raw-window-handle",
  "serde",
  "skrifa 0.44.0",
@@ -4557,6 +4558,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e660451e55124f798a69a5af3f49ccfbefbd41910eefd25caf2393e1f3473ec1"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "quire-emoji"
+version = "0.1.0"
+dependencies = [
+ "fontique",
 ]
 
 [[package]]

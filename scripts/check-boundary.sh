@@ -32,6 +32,8 @@ cd "$(dirname "$0")/.."
 # from the pdfrum repo) is not an in-tree edge, so it is not listed there. wgpu is a renderer
 # dependency like anyrender: only ds-blitz (the texture layer's device) and ds-harness (the
 # hybrid painter) name it; every other crate stays device-free.
+# quire-emoji finds the colour emoji face in a fontique collection for ds-blitz and for temor's terminal,
+# which has no toolkit: only fontique, so no renderer, no toolkit, no D-Bus and not even parley.
 RULES=(
   "ds-core: chordkit-kde chordkit-gnome zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-behaviour: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
@@ -45,6 +47,7 @@ RULES=(
   "ds-settings-page: zbus tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-helpers: dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-desktop: zbus dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
+  "quire-emoji: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context parley"
   "ds-blitz: zbus memfd pdfrum-anyrender pdfrum pdfrum-edit"
   "ds-harness: zbus memfd pdfrum-anyrender pdfrum pdfrum-edit"
   "ds-peer: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
@@ -95,7 +98,7 @@ EDGES=(
   "ds-peer:"
   "ds-helpers: ds-peer"
   "ds-desktop: ds-peer"
-  "ds-blitz: blitz-kit ds ds-desktop ds-helpers ds-peer"
+  "ds-blitz: blitz-kit ds ds-desktop ds-helpers ds-peer quire-emoji"
   "ds-harness: blitz-kit ds ds-blitz ds-core"
   "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"
   "ds-conformance:"

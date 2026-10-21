@@ -1,14 +1,14 @@
 //! Registering `ds::style::fonts::FACES` with the renderer's shared font context, once (spike S11), through
 //! `blitz_kit::fonts::SharedFonts`.
 //!
-//! The base context (system fonts with a colour emoji face ahead of the monochrome ones (`emoji_face`), blitz's
+//! The base context (system fonts with a colour emoji face ahead of the monochrome ones (`quire_emoji`), blitz's
 //! list-bullet face and every quire face) is built once
 //! and cloned: its collection and source cache are shared, so every window, snapshot and harness
 //! document resolves the same registered families without registering or parsing them again.
 
-use crate::emoji_face::{EmojiChoice, prefer_colour};
 use blitz_kit::fonts::{FontFaces, SharedFonts};
 use ds::style::fonts::FACES;
+use quire_emoji::{EmojiChoice, Fonts, prefer_colour};
 use std::sync::LazyLock;
 
 /// The context every document starts from, built on first use.
@@ -16,7 +16,12 @@ static BASE: LazyLock<SharedFonts> = LazyLock::new(|| {
     let fonts = SharedFonts::system_with(&faces());
     // The collection is shared, so preferring the colour emoji face through one clone
     // changes the generic lists every later clone reads.
-    prefer_colour(&mut fonts.for_document(), &EmojiChoice::from_env());
+    let mut context = fonts.for_document();
+    let mut fonts_of = Fonts {
+        collection: &mut context.collection,
+        source_cache: &mut context.source_cache,
+    };
+    prefer_colour(&mut fonts_of, &EmojiChoice::from_env());
     fonts
 });
 
