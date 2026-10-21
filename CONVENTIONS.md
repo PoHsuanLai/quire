@@ -277,6 +277,10 @@ remembers.
 - One acceptance script per surface or feature, with flags for variants (`--real-input`), not a
   family of near-copies.
 - Scripts obey §8's rules: private system and session buses, scratch HOME/XDG, fake hardware.
+- Under `set -o pipefail`, never pipe into `grep -q` (or `head`): `grep -q` exits at the first
+  match, the writer dies of SIGPIPE, and pipefail turns a match into a failure, at random. A
+  check then passes what it should refuse. Test captured text instead: `grep -q x <<<"$rows"`,
+  or `[ -n "$(cmd)" ]` for "printed anything".
 
 ## 12. Derives and serde
 

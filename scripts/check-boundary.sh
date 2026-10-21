@@ -67,7 +67,7 @@ for rule in "${RULES[@]}"; do
   fi
   leaked=0
   for dep in "${forbidden[@]}"; do
-    if cargo tree -p "$crate" -i "$dep" -e normal,build 2>/dev/null | grep -q .; then
+    if [ -n "$(cargo tree -p "$crate" -i "$dep" -e normal,build 2>/dev/null)" ]; then
       echo "LEAK: $crate depends on $dep"
       cargo tree -p "$crate" -i "$dep" -e normal,build 2>/dev/null | head -20
       leaked=1
