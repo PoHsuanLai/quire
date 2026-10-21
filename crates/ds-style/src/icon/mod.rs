@@ -29,6 +29,7 @@ pub(crate) mod geometry_files;
 pub(crate) mod geometry_format;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
+pub mod mime;
 pub mod native;
 pub mod parts;
 pub(crate) mod plate;
