@@ -3,6 +3,13 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## Unreleased
+
+Blitz moves to 0be21979 (blitz-kit 264b7fd): a pointer press whose default action is cancelled (a
+pop-up menu's items cancel `mousedown`) resets the drag state, so its click is no longer taken by a
+stale text-selection drag. On macOS a menu item now picks on its first click. Consumers bump the
+blitz and blitz-kit revs with quire's.
+
 ## v0.3.39
 
 The files batch: a windowed icon view, a middle cut for names, and the virtual table opens rows
