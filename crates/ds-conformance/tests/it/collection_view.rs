@@ -1,9 +1,13 @@
 //! `CollectionView` over 1,000 tiles builds the tiles of the rows near the viewport only, moves
 //! its cursor in two dimensions with the arrows, Home and End, extends it with Shift, opens the
 //! cursor's tile on Command-Down, jumps to a caption by type-select, clips a long file name from the
-//! middle and keeps its extension, and fades a tile the owner removes while it is mounted.
+//! middle and keeps its extension, and fades a tile the owner removes while it is mounted. A right
+//! click selects the tile it lands on unless it is selected and reports its index, where one on
+//! empty space reaches the page; a tile that accepts a drop reports the pointer over it and its
+//! release, where one that does not stays silent; a badge sits under the caption without moving it.
 
 use dioxus::prelude::*;
+use ds::base::press::PointerButton;
 use ds::base::selection::{Pick, PickHow};
 use ds::components::content::icon_source::IconSource;
 use ds::components::lists::collection_view::{CollectionItem, CollectionView, Flow, Thumbnail};
@@ -223,5 +227,171 @@ fn a_tile_removed_while_mounted_fades_where_it_stood_and_is_gone_once_it_settles
             .as_deref(),
         Some(caption(4).as_str()),
         "the tile after it took its place"
+    );
+}
+
+/// The tile that accepts a drop.
+const FOLDER: u32 = 0;
+/// The tile that does not.
+const FILE: u32 = 1;
+/// The tile with a badge.
+const TAGGED: u32 = 2;
+
+/// Three tiles in four columns, the fourth column empty, logging what the owner hears.
+#[allow(non_snake_case)]
+fn FewPage() -> Element {
+    let mut log = use_signal(Vec::<String>::new);
+    let mut cursor = use_signal(|| None::<usize>);
+    let mut over = use_signal(|| None::<usize>);
+    let items: Vec<CollectionItem<u32>> = (FOLDER..=TAGGED)
+        .map(|n| {
+            let item = CollectionItem::new(
+                n,
+                format!("Item {n}"),
+                Thumbnail::Icon(IconSource::Glyph(Icon::File)),
+            );
+            match n {
+                FOLDER => item.in_drag(match over() {
+                    Some(_) => DropState::Target,
+                    None => DropState::Accepts,
+                }),
+                TAGGED => item.badged(rsx! {
+                    span { class: "tag-dot", style: "width:8px; height:8px" }
+                }),
+                _ => item,
+            }
+        })
+        .collect();
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div {
+                class: "few",
+                style: "height:200px; width:400px; display:flex; flex-direction:column",
+                oncontextmenu: move |_| log.with_mut(|log| log.push("background".to_owned())),
+                CollectionView::<u32> {
+                    label: "Few",
+                    items,
+                    flow: Flow::Columns(COLUMNS as u8),
+                    cursor: cursor(),
+                    onselect: move |at| {
+                        cursor.set(Some(at));
+                        log.with_mut(|log| log.push(format!("pick:{at}")));
+                    },
+                    oncontextmenu: move |(at, _): (usize, MouseEvent)| {
+                        log.with_mut(|log| log.push(format!("menu:{at}")));
+                    },
+                    ondropenter: move |at| {
+                        over.set(Some(at));
+                        log.with_mut(|log| log.push(format!("enter:{at}")));
+                    },
+                    ondropleave: move |at| {
+                        over.set(None);
+                        log.with_mut(|log| log.push(format!("leave:{at}")));
+                    },
+                    ondrop: move |at| log.with_mut(|log| log.push(format!("drop:{at}"))),
+                }
+            }
+            p { class: "log", {log().join(",")} }
+        }
+    }
+}
+
+fn few() -> Harness {
+    Harness::new(FewPage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+}
+
+fn log_of(harness: &Harness) -> String {
+    harness.text_of(".log").unwrap_or_default()
+}
+
+fn move_over(harness: &mut Harness, selector: &str) -> Point {
+    let at = harness.centre(selector).expect("laid out");
+    harness.send(Input::pointer_move(at));
+    harness.send(Input::pointer_move(Point {
+        x: Px(at.x.0 + 4.0),
+        ..at
+    }));
+    at
+}
+
+#[test]
+fn a_right_click_selects_an_unselected_tile_and_reports_it_where_empty_space_is_the_pages() {
+    let mut harness = few();
+    let at = harness.centre(&tile(FILE as usize)).expect("laid out");
+    harness.send(Input::press(at, PointerButton::Secondary));
+    assert_eq!(
+        log_of(&harness),
+        "pick:1,menu:1",
+        "selected first, then reported"
+    );
+    assert_eq!(harness.count(".ds-cv-item[aria-selected=true]"), 1);
+    harness.send(Input::press(at, PointerButton::Secondary));
+    assert_eq!(
+        log_of(&harness),
+        "pick:1,menu:1,menu:1",
+        "a selected tile is reported without being picked again, and the page's menu is not asked"
+    );
+    let view = harness.centre(".few").expect("laid out");
+    let empty = Point {
+        x: Px(view.x.0 + 150.0),
+        y: Px(view.y.0 - 60.0),
+    };
+    harness.send(Input::press(empty, PointerButton::Secondary));
+    assert_eq!(
+        log_of(&harness),
+        "pick:1,menu:1,menu:1,background",
+        "empty space is the page's"
+    );
+}
+
+#[test]
+fn a_tile_that_accepts_a_drop_hears_the_pointer_and_release_and_one_that_does_not_stays_silent() {
+    let mut harness = few();
+    assert_eq!(
+        harness.attr(&tile(FOLDER as usize), "data-drop").as_deref(),
+        Some("accepts")
+    );
+    assert_eq!(harness.attr(&tile(FILE as usize), "data-drop"), None);
+    let folder = move_over(&mut harness, &tile(FOLDER as usize));
+    harness.send(Input::pointer_up(folder));
+    harness.advance(Duration::from_millis(50));
+    assert_eq!(log_of(&harness), "enter:0,drop:0");
+    assert_eq!(
+        harness.attr(&tile(FOLDER as usize), "data-drop").as_deref(),
+        Some("target"),
+        "the owner lit the tile under the pointer"
+    );
+    let file = move_over(&mut harness, &tile(FILE as usize));
+    harness.send(Input::pointer_up(file));
+    let log = log_of(&harness);
+    assert!(
+        log.starts_with("enter:0,drop:0,leave:0")
+            && !log.contains("enter:1")
+            && !log.contains("drop:1"),
+        "the tile that does not accept heard no drop: {log}"
+    );
+}
+
+#[test]
+fn a_badge_sits_centred_under_the_caption_without_moving_it() {
+    let harness = few();
+    let caption_of = |n: u32| format!("{} .ds-cv-caption", tile(n as usize));
+    let badge = harness
+        .centre(&format!("{} .ds-cv-badge", tile(TAGGED as usize)))
+        .expect("the badge is drawn");
+    let caption = harness.centre(&caption_of(TAGGED)).expect("laid out");
+    assert!(badge.y.0 > caption.y.0, "under it: {badge:?} {caption:?}");
+    assert!(
+        (badge.x.0 - caption.x.0).abs() < 1.0,
+        "centred: {badge:?} {caption:?}"
+    );
+    let plain = harness.centre(&caption_of(FILE)).expect("laid out");
+    assert_eq!(
+        caption.y, plain.y,
+        "the caption stays where an untagged tile's is"
+    );
+    assert_eq!(
+        harness.count(&format!("{} .ds-cv-badge", tile(FILE as usize))),
+        0
     );
 }

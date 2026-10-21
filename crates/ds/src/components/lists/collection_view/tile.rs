@@ -63,5 +63,8 @@ pub(crate) fn content<K>(item: &CollectionItem<K>, size: CollectionSize) -> Elem
     rsx! {
         span { class: "ds-cv-thumb", "aria-hidden": "true", {picture(&item.thumbnail, size)} }
         {words}
+        if let Some(badge) = &item.badge {
+            span { class: "ds-cv-badge", {badge.clone()} }
+        }
     }
 }

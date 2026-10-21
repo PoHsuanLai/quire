@@ -1,3 +1,4 @@
+pub mod collection;
 pub mod headers;
 pub mod overview;
 pub mod row_actions;

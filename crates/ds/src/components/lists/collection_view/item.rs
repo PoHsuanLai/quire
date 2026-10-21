@@ -3,6 +3,7 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::image_source::ImageSource;
 use dioxus::prelude::Element;
+use ds_core::vocab::DropState;
 
 /// The picture on a tile.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -32,6 +33,15 @@ pub struct CollectionItem<K> {
     /// meanwhile (`data-editing`), and the keys, presses and drags inside the field stay the
     /// field's.
     pub edit: Option<Element>,
+    /// What sits centred under the caption (Finder's tag dots). It takes the room the tile
+    /// already keeps under the caption, so a tile with and a tile without one have the same
+    /// pitch.
+    pub badge: Option<Element>,
+    /// The tile's part in a drag, as `Row`'s `RowState::drop`: `Accepts` and `Target` make it
+    /// a place that takes a drop (it writes `data-drop` and the view reports the pointer over
+    /// it), `Source` dims it as the thing being dragged, `Idle` is neither. The owner sets
+    /// `Target` on the tile under the pointer.
+    pub drop: DropState,
 }
 
 impl<K> CollectionItem<K> {
@@ -42,6 +52,8 @@ impl<K> CollectionItem<K> {
             caption: caption.into(),
             thumbnail,
             edit: None,
+            badge: None,
+            drop: DropState::Idle,
         }
     }
 
@@ -51,5 +63,18 @@ impl<K> CollectionItem<K> {
             edit: Some(field),
             ..self
         }
+    }
+
+    /// The same tile with `badge` centred under its caption.
+    pub fn badged(self, badge: Element) -> Self {
+        CollectionItem {
+            badge: Some(badge),
+            ..self
+        }
+    }
+
+    /// The same tile with `drop` as its part in a drag.
+    pub fn in_drag(self, drop: DropState) -> Self {
+        CollectionItem { drop, ..self }
     }
 }

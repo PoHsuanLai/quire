@@ -31,13 +31,15 @@
 //! Markup: `div.ds-cv[role=listbox]` (`--cv-thumb`, `--cv-tile` and `--cv-pitch` inline) of a
 //! `Scroller` of a spacer, `div.ds-cv-grid` of `div.ds-cv-item[role=option]` (`aria-selected`,
 //! `data-index`, `data-presence`, `data-exit` while leaving, `data-editing` while a field holds
-//! the caption) of `span.ds-cv-thumb` and `span.ds-cv-caption`, and a spacer.
+//! the caption, `data-drop` and `data-drag` as a drag puts them) of `span.ds-cv-thumb`,
+//! `span.ds-cv-caption` and, when the item has one, `span.ds-cv-badge`, and a spacer.
 //! `data-focus=away` marks a view that does not hold the keyboard.
 
 use crate::components::controls::scroller::handle::use_scroller;
 use crate::components::controls::scroller::view::Scroller;
 use crate::components::lists::collection_view::act::Act;
 use crate::components::lists::collection_view::item::CollectionItem;
+use crate::components::lists::collection_view::landing::{Drops, Landing};
 use crate::components::lists::collection_view::model::{
     CollectionKey, collection_key, target, tiles_in,
 };
@@ -81,6 +83,14 @@ enum Held {
 /// (2 by default). `change` says whether a change of `items` is an edit (removed tiles fade out)
 /// or a replacement (they are gone at once).
 ///
+/// `oncontextmenu` hears a right click on a tile with its index and the event, after the tile is
+/// selected through `onreach` or `onselect` unless it already is selected; a right click on
+/// empty space is not reported, so the page's own menu gets it. A tile whose `CollectionItem::drop`
+/// is `Accepts` or `Target` is a place that takes a drop: `ondropenter` and `ondropleave` hear the
+/// pointer come and go, `ondrop` hears it released there, each with the tile's index, and the
+/// owner marks the tile under the pointer `Target` and the thing being dragged `Source`, as a
+/// `Row`'s `RowState::drop` is driven.
+///
 /// `items` is read on every render and its captions are cloned for type-to-select only when
 /// letters are typed; the keys are collected on every render, so an owner of a million tiles keeps
 /// its `items` in a memo.
@@ -95,6 +105,10 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
     #[props(default)] onselect: Option<EventHandler<usize>>,
     #[props(default)] onreach: Option<EventHandler<Pick>>,
     #[props(default)] onopen: Option<EventHandler<usize>>,
+    #[props(default)] oncontextmenu: Option<EventHandler<(usize, MouseEvent)>>,
+    #[props(default)] ondropenter: Option<EventHandler<usize>>,
+    #[props(default)] ondropleave: Option<EventHandler<usize>>,
+    #[props(default)] ondrop: Option<EventHandler<usize>>,
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
     #[props(default)] change: Change,
     #[props(default)] common: Common,
@@ -143,6 +157,11 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
         onselect,
         onopen,
     };
+    let drops = Drops {
+        enter: ondropenter,
+        leave: ondropleave,
+        drop: ondrop,
+    };
     let selected = |at: usize| {
         let on = match &selection {
             Some(chosen) => chosen.contains(at),
@@ -155,7 +174,7 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
     };
     let tiles: Vec<Tile> = drawn
         .into_iter()
-        .map(|tile| Tile::of(tile, &items, &selected, reach))
+        .map(|tile| Tile::of(tile, &items, &selected, reach, oncontextmenu, drops))
         .collect();
     let onkeydown = move |event: KeyboardEvent| {
         let Some(act) = collection_key(&event.key(), event.modifiers(), reach.platform) else {
@@ -233,9 +252,34 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
                             "data-presence": tile.presence,
                             "data-exit": tile.exit,
                             "data-editing": tile.editing,
+                            "data-drop": tile.drop,
+                            "data-drag": tile.drag,
                             onclick: move |event| {
+                                if tile.landing.is_some_and(Landing::lit) {
+                                    return;
+                                }
                                 if let Some(act) = tile.act {
                                     act.click(&event);
+                                }
+                            },
+                            oncontextmenu: move |event| {
+                                if let Some(act) = tile.act {
+                                    act.context_menu(&event);
+                                }
+                            },
+                            onpointerenter: move |_| {
+                                if let Some(landing) = tile.landing {
+                                    landing.enter();
+                                }
+                            },
+                            onpointerleave: move |_| {
+                                if let Some(landing) = tile.landing {
+                                    landing.leave();
+                                }
+                            },
+                            onpointerup: move |_| {
+                                if let Some(landing) = tile.landing {
+                                    landing.release();
                                 }
                             },
                             ondoubleclick: move |_| {
@@ -263,7 +307,10 @@ struct Tile {
     exit: Option<&'static str>,
     leaving: Option<&'static str>,
     editing: Option<&'static str>,
+    drop: Option<&'static str>,
+    drag: Option<&'static str>,
     act: Option<Act>,
+    landing: Option<Landing>,
     content: Element,
 }
 
@@ -275,6 +322,8 @@ impl Tile {
         items: &[CollectionItem<K>],
         selected: &impl Fn(usize) -> Selection,
         reach: Reach,
+        menu: Option<EventHandler<(usize, MouseEvent)>>,
+        drops: Drops,
     ) -> Tile {
         let Shown {
             node,
@@ -288,16 +337,26 @@ impl Tile {
         };
         let item = place.map(|at| &items[at]);
         let editing = item.is_some_and(|item| item.edit.is_some());
+        let state = item.map(|item| item.drop).unwrap_or_default();
+        let selection = place.map_or(Selection::Unselected, selected);
         Tile {
             node,
             place,
             label: item.map(|item| item.caption.clone()),
-            selection: place.map_or(Selection::Unselected, selected),
+            selection,
             presence,
             exit,
             leaving: exit.map(|_| "true"),
             editing: editing.then_some("true"),
-            act: place.filter(|_| !editing).map(|at| Act { at, reach }),
+            drop: state.drop_attr(),
+            drag: state.drag_attr(),
+            act: place.filter(|_| !editing).map(|at| Act {
+                at,
+                reach,
+                menu,
+                selection,
+            }),
+            landing: place.and_then(|at| Landing::of(at, state, drops)),
             content,
         }
     }

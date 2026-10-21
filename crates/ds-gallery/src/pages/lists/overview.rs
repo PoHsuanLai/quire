@@ -100,6 +100,7 @@ pub fn ListsPage() -> Element {
         crate::pages::lists::rows::RowGallery {}
         crate::pages::lists::headers::HeaderGallery {}
         crate::pages::lists::virtual_rows::VirtualGallery {}
+        crate::pages::lists::collection::CollectionGallery {}
         crate::pages::lists::search::SearchRows {}
         crate::pages::lists::strip::StripPress {}
         crate::pages::lists::sidebar::Sidebar {}

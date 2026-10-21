@@ -11,6 +11,19 @@ first, with what a consumer has to change.
   edge, and the row has no padding, gap, minimum height or rounding; `size` is ignored. It sets
   `data-density="lines"` and the declared custom property `--row-line` inline. `None` (the
   default) changes nothing.
+- `CollectionView { oncontextmenu: EventHandler<(usize, MouseEvent)> }`: a right click on a tile
+  selects it through `onreach` or `onselect` unless it is already selected, then reports the
+  tile's index and the event; the click does not reach the page's own menu. A right click on
+  empty space is not reported and reaches it.
+- `CollectionItem::in_drag(DropState)` (field `drop`) makes a tile a place that takes a drop, as
+  `RowState::drop` does for a row: `Accepts` and `Target` write `data-drop` and make the view
+  report the pointer through the new `CollectionView { ondropenter, ondropleave, ondrop }`
+  (each `EventHandler<usize>`, heard only for accepting tiles); `Source` writes `data-drag` and
+  dims the tile. The owner sets `Target` on the tile under the pointer. The thumbnail of a
+  `Target` tile is washed and ringed in the accent, an `Accepts` one is outlined.
+- `CollectionItem::badged(Element)` (field `badge`): a slot centred under the caption
+  (`span.ds-cv-badge`), for Finder's tag dots. It sits in the room the caption band already
+  keeps, so the tile pitch is the same with and without one.
 
 ## v0.3.39
 
