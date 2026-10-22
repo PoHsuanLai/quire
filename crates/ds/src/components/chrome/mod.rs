@@ -5,9 +5,6 @@ pub mod capsule;
 pub mod column;
 pub mod document_tabs;
 pub mod document_tabs_model;
-
-pub mod path_control;
-
 pub(crate) mod light_mark;
 pub mod path_control;
 pub(crate) mod resize_edges;
