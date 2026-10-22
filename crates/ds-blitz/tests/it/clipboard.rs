@@ -134,3 +134,100 @@ fn the_primary_selection_and_the_clipboard_are_separate_slots() {
     harness.send(Input::click(paste));
     assert_eq!(harness.text_of(".primary").as_deref(), Some("primary text"));
 }
+
+mod files {
+    use ds_blitz::clipboard::{Clipboard, ClipboardFiles, FileOp, Memory};
+    use ds_blitz::seam::MemoryShell;
+    use std::path::PathBuf;
+    use std::sync::Arc;
+
+    fn memory() -> (Arc<MemoryShell>, Memory) {
+        let shell = Arc::new(MemoryShell::default());
+        (Arc::clone(&shell), Memory(shell))
+    }
+
+    fn odd_paths() -> Vec<PathBuf> {
+        ["/home/ada/My Photos/日本 100%.png", "/tmp/a#b?c.txt"]
+            .map(PathBuf::from)
+            .to_vec()
+    }
+
+    #[test]
+    fn names_with_spaces_non_ascii_and_percent_round_trip() {
+        let files = ClipboardFiles::new(FileOp::Copy, odd_paths());
+        let list = files.to_uri_list();
+        assert!(list.starts_with("file:///home/ada/My%20Photos/%E6%97%A5"));
+        assert!(list.contains("100%25.png"));
+        assert_eq!(ClipboardFiles::from_uri_list(&list), Some(files));
+    }
+
+    #[test]
+    fn a_copy_is_written_in_both_formats_and_read_back() {
+        let (shell, clipboard) = memory();
+        let files = ClipboardFiles::new(FileOp::Copy, odd_paths());
+        clipboard.write_files(&files).unwrap();
+        assert!(shell.gnome_copied().unwrap().starts_with("copy\nfile:///"));
+        assert!(shell.uri_list().unwrap().starts_with("file:///"));
+        assert_eq!(clipboard.read_files(), Some(files));
+    }
+
+    #[test]
+    fn a_cut_from_another_app_reads_as_cut() {
+        let (shell, clipboard) = memory();
+        shell.put_gnome_copied("cut\nfile:///tmp/a%20b.txt\nfile:///tmp/c.txt".to_owned());
+        assert_eq!(
+            clipboard.read_files(),
+            Some(ClipboardFiles::new(
+                FileOp::Cut,
+                ["/tmp/a b.txt", "/tmp/c.txt"]
+            ))
+        );
+    }
+
+    #[test]
+    fn a_bare_uri_list_is_a_copy_and_skips_comments_and_remote_uris() {
+        let (shell, clipboard) = memory();
+        shell.put_uri_list(
+            "# copied\r\nfile://localhost/tmp/x.txt\r\nhttps://example.org/y\r\nfile://other/z\r\n"
+                .to_owned(),
+        );
+        assert_eq!(
+            clipboard.read_files(),
+            Some(ClipboardFiles::new(FileOp::Copy, ["/tmp/x.txt"]))
+        );
+    }
+
+    #[test]
+    fn plain_text_of_paths_is_files_and_other_text_is_not() {
+        let (shell, clipboard) = memory();
+        shell.put("/tmp/a.txt\nfile:///tmp/b%20c.txt\n".to_owned());
+        assert_eq!(
+            clipboard.read_files(),
+            Some(ClipboardFiles::new(
+                FileOp::Copy,
+                ["/tmp/a.txt", "/tmp/b c.txt"]
+            ))
+        );
+        shell.put("hello quire".to_owned());
+        assert_eq!(clipboard.read_files(), None);
+    }
+
+    #[test]
+    fn a_text_copy_replaces_the_files_and_a_bad_first_line_is_refused() {
+        let (shell, clipboard) = memory();
+        clipboard
+            .write_files(&ClipboardFiles::new(FileOp::Cut, ["/tmp/a"]))
+            .unwrap();
+        clipboard.write_text("words").unwrap();
+        assert_eq!(clipboard.read_files(), None);
+        assert_eq!(shell.gnome_copied(), None);
+        assert_eq!(ClipboardFiles::from_gnome_copied("move\nfile:///tmp/a"), None);
+    }
+
+    #[test]
+    fn the_app_matches_a_paste_to_its_cut_set_in_any_order() {
+        let cut = ClipboardFiles::new(FileOp::Cut, ["/tmp/a", "/tmp/b"]);
+        assert!(cut.same_files(&[PathBuf::from("/tmp/b"), PathBuf::from("/tmp/a")]));
+        assert!(!cut.same_files(&[PathBuf::from("/tmp/a")]));
+    }
+}

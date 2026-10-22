@@ -7,6 +7,11 @@
 //! `arboard`), or [`Memory`], the harness's, so a test copies and pastes without touching the
 //! desktop's clipboard.
 //!
+//! Files ride the same clipboard: `write_files` / `read_files` take a typed [`ClipboardFiles`]
+//! (an operation and paths). The system clipboard carries them as `text/uri-list`, so another
+//! app sees a copy; a cut is the app's own state. The harness's memory clipboard holds both
+//! `text/uri-list` and `x-special/gnome-copied-files`.
+//!
 //! `text/html` (an edit surface's paste) is not in blitz's `ShellProvider`, so the window reads it
 //! from `arboard` itself and the harness from its memory clipboard's HTML slot.
 //!
@@ -16,8 +21,11 @@
 //! selection with the window's own connection and does not use the privileged data-control
 //! protocol (FINDINGS "Clipboard"), which would let a client read the clipboard unfocused.
 
+mod files;
 mod primary;
 mod read;
+
+pub use self::files::{ClipboardFiles, FileOp};
 
 use self::read::Reader;
 use crate::memory_shell::MemoryShell;
@@ -80,6 +88,16 @@ pub trait Clipboard {
     fn write_text(&self, text: &str) -> Result<(), ClipboardError> {
         self.write_to(ClipboardTarget::Clipboard, text)
     }
+    /// The files on the regular clipboard: a file list, else text that is only paths or URIs.
+    fn read_files(&self) -> Option<ClipboardFiles> {
+        self.read_text()
+            .and_then(|text| ClipboardFiles::from_text(&text))
+    }
+    /// Put `files` on the regular clipboard, or say why it was not put. The default writes their
+    /// paths as text.
+    fn write_files(&self, files: &ClipboardFiles) -> Result<(), ClipboardError> {
+        self.write_text(&files.to_text())
+    }
 }
 
 /// The desktop's clipboard, through the window's shell: the shell is reached once the window's
@@ -131,6 +149,18 @@ impl Clipboard for System {
         .ok_or(ClipboardError::Unavailable)
     }
 
+    fn read_files(&self) -> Option<ClipboardFiles> {
+        let list = self.reader.text(files::read_system);
+        list.as_deref()
+            .and_then(ClipboardFiles::from_uri_list)
+            .or_else(|| self.read_text().and_then(|text| ClipboardFiles::from_text(&text)))
+    }
+
+    fn write_files(&self, set: &ClipboardFiles) -> Result<(), ClipboardError> {
+        let paths = set.paths.clone();
+        guarded(move || files::write_system(&paths).ok()).ok_or(ClipboardError::Unavailable)
+    }
+
     fn read_html(&self) -> Option<Pasted> {
         let html = self.reader.text(|| {
             arboard::Clipboard::new()
@@ -158,6 +188,19 @@ impl Clipboard for Memory {
             ClipboardTarget::Clipboard => self.0.put(text.to_owned()),
             ClipboardTarget::Primary => self.0.put_primary(text.to_owned()),
         }
+        Ok(())
+    }
+
+    fn read_files(&self) -> Option<ClipboardFiles> {
+        self.0.files().or_else(|| {
+            self.0
+                .text()
+                .and_then(|text| ClipboardFiles::from_text(&text))
+        })
+    }
+
+    fn write_files(&self, files: &ClipboardFiles) -> Result<(), ClipboardError> {
+        self.0.put_files(files);
         Ok(())
     }
 
@@ -193,6 +236,20 @@ pub fn read_from(target: ClipboardTarget) -> Result<String, ClipboardError> {
 /// The text on the clipboard. Call it from a handler inside a ds-blitz document.
 pub fn read_text() -> Result<String, ClipboardError> {
     host()?.read_text().ok_or(ClipboardError::Unavailable)
+}
+
+/// Put `files` on the clipboard. Call it from a handler inside a ds-blitz document. Another app
+/// sees a copy of these files; a cut is the app's own state (see `CONSUMING.md`).
+///
+/// # Errors
+/// As [`write_text`].
+pub fn write_files(files: &ClipboardFiles) -> Result<(), ClipboardError> {
+    host()?.write_files(files)
+}
+
+/// The files on the clipboard. Call it from a handler inside a ds-blitz document.
+pub fn read_files() -> Result<ClipboardFiles, ClipboardError> {
+    host()?.read_files().ok_or(ClipboardError::Unavailable)
 }
 
 /// The clipboard's `text/html`. Call it from a handler inside a ds-blitz document.

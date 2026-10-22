@@ -3,6 +3,16 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.42 (unreleased)
+
+### Lane E
+
+- A file clipboard: `ds_blitz::clipboard::{write_files, read_files, ClipboardFiles, FileOp}` and
+  `Clipboard::{read_files, write_files}`. Files go to the system clipboard as `text/uri-list`, so
+  ⌘C in an app reaches other apps; reading accepts `text/uri-list`, `x-special/gnome-copied-files`
+  (with its `cut`) and plain paths. A cut is the app's own state (`same_files` turns a paste of
+  the cut set into a move). The harness's memory clipboard holds both file formats.
+
 ## v0.3.41
 
 The files batch, third part, and hot corners beyond the Mac. A hot corner holds several bindings

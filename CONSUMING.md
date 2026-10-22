@@ -1004,6 +1004,15 @@ A few props worth knowing about before you read the signatures:
   primary selection (Linux only; elsewhere a write is `Unavailable`), read back with `Harness::primary_text()`.
   A custom `Clipboard` implements `read_from` and `write_to`; `read_text`/`write_text` are provided.
   ds-shell has no clipboard of its own.
+- Files on the clipboard: `ds_blitz::clipboard::write_files(&ClipboardFiles::new(FileOp::Copy, paths))` on
+  ⌘C/⌘X and `read_files()` on ⌘V (`ClipboardFiles { op, paths }`; `uris()` for the `file://` form). The system
+  clipboard carries a `text/uri-list` only, so another app pastes a copy and reads back as `FileOp::Copy`.
+  A **cut cannot cross apps**: on ⌘X keep the cut set in your own state, write it (as `Cut`), and on paste
+  compare with `files.same_files(&cut_paths)`: the same set is a move, anything else is a copy. This matches
+  the Mac, where nothing is cut across apps (⌘C then ⌥⌘V moves). The parser still reads
+  `x-special/gnome-copied-files` (`from_gnome_copied`, a `cut` first line gives `FileOp::Cut`), and the harness's
+  memory clipboard holds both formats (`MemoryShell::put_gnome_copied`, `put_uri_list`, `put_files`).
+  Names with spaces, non-ASCII and `%` are percent-encoded and decoded for you.
 - A settings enum key's menu is built by the caller from `KeySpec::grouped_choices()`: a
   `MenuItem::Header(group)` over each group's items, an unavailable choice as `MenuItem::new(..)
   .with_availability(Availability::Disabled)` with `MenuItem::Info { title: reason, detail: None }` right
