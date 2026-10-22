@@ -870,7 +870,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-colbrowser-column{ position:relative; display:flex; flex-direction:column; flex:none; box-sizing:border-box; height:100%; min-height:0; border-right:var(--hair) solid var(--line); }
 .ds-colbrowser-column > .ds-scroller{ flex:1 1 0; min-height:0; }
 .ds-colbrowser-item{ box-sizing:border-box; padding:0 var(--s-6); }
-.ds-colbrowser .ds-row{ height:var(--row-compact-h); min-height:var(--row-compact-h); padding:0 var(--s-6); }
+.ds-colbrowser .ds-row{ height:var(--row-compact-h); min-height:var(--row-compact-h); padding:0 var(--s-8); }
 .ds-colbrowser .ds-row-words{ flex:1 1 auto; min-width:0; overflow:hidden; }
 .ds-colbrowser-divider{ position:absolute; top:0; bottom:0; right:-3px; width:6px; z-index:var(--z-raise); cursor:ew-resize; }
 .ds-colbrowser-preview{ display:flex; flex-direction:column; flex:1 1 220px; min-width:220px; box-sizing:border-box; padding:var(--s-16); min-height:0; overflow:hidden; }
