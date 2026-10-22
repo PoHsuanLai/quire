@@ -16,6 +16,7 @@ mod cc_pane_switcher;
 mod chip_pressable;
 mod collapse;
 mod collection_view;
+mod column_browser;
 mod column_layout;
 mod component_faces;
 mod component_geometry;

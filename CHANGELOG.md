@@ -13,6 +13,15 @@ first, with what a consumer has to change.
   (with its `cut`) and plain paths. A cut is the app's own state (`same_files` turns a paste of
   the cut set into a move). The harness's memory clipboard holds both file formats.
 
+### Lane B
+
+- `ColumnBrowser`: Finder's column view. An app lists the `columns` (rows of a glyph, a name cut
+  from the middle and a chevron on a folder, with each column's `RowSelection`) and answers each
+  `onpick` by cutting the columns after the picked one and supplying the next; Up, Down, Home,
+  End, Right (enter), Left (back) and type-to-select move the keys, Command-Down and a
+  double-click ask `onopen`, a selected leaf shows the `preview` slot, and a divider drag resizes
+  the columns. New classes: `ds-colbrowser`, `-strip`, `-column`, `-item`, `-divider`, `-preview`.
+
 ## v0.3.41
 
 The files batch, third part, and hot corners beyond the Mac. A hot corner holds several bindings

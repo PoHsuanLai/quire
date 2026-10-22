@@ -1,4 +1,5 @@
 pub mod collection;
+pub mod column_browser;
 pub mod file_table;
 pub mod headers;
 pub mod overview;
