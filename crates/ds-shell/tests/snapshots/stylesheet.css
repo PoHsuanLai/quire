@@ -1040,7 +1040,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-document-tab-close:hover{ background:var(--line); color:var(--ink); }
 
 .ds-document-tabs-new{
-  display:grid; place-items:center; box-sizing:border-box; flex:none; width:var(--s-28); height:100%; margin:0; padding:0; border:0;
+  display:grid; place-items:center; box-sizing:border-box; flex:none; width:var(--s-32); height:100%; margin:0; padding:0; border:0;
   background:transparent; color:var(--ink-soft); line-height:0; cursor:default;
 }
 .ds-document-tabs-new:hover{ background:var(--hover-wash); color:var(--ink); }
