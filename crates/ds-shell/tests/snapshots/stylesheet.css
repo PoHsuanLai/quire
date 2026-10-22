@@ -1472,6 +1472,27 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-list[*|data-style=source-list][*|data-sidebar-size=small] .ds-row-leading[*|data-leading=tile] > .ds-icon-tile{ width:var(--sidebar-tile-s); height:var(--sidebar-tile-s); }
 .ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row-leading[*|data-leading=tile]{ width:var(--sidebar-tile-l); }
 .ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row-leading[*|data-leading=tile] > .ds-icon-tile{ width:var(--sidebar-tile-l); height:var(--sidebar-tile-l); }
+/* -- marquee -- */
+/* Marquee (Finder's rubber band, shared by CollectionView and VirtualTable): a drag that begins on
+   empty space draws a rectangle in the accent's translucent wash with a hairline of the accent, and
+   selects what it touches. The band sits in a layer of no height at the top of the view's
+   scroller content, placed in the content's own coordinates, so it grows and scrolls with the
+   content. The layer, not the scroller, is its containing box: a positioned scroller would be
+   hit over the table's header. It never takes the pointer. */
+
+.ds-marquee-layer{ position:relative; height:0; }
+.ds-marquee{
+  position:absolute; box-sizing:border-box; pointer-events:none; z-index:var(--z-raise);
+  background:var(--accent-soft); border:var(--hair) solid var(--accent); border-radius:var(--r-tiny);
+}
+/* -- name_cell -- */
+/* NameCell (design/27-HIG-PARITY.md section 5.24, Finder's list view): a glyph beside the name on
+   one line. The glyph is its own width and the name takes the rest, clipped at its end when no room
+   was given to cut it from the middle by (name_cell/view.rs). */
+
+.ds-name-cell{ display:flex; align-items:center; gap:var(--s-6); min-width:0; }
+.ds-name-icon{ display:inline-flex; flex:none; align-items:center; justify-content:center; color:var(--ink-soft); }
+.ds-name-text{ min-width:0; overflow:hidden; white-space:nowrap; }
 /* -- loadable -- */
 /* Loadable (design/30 sections 1.3 and 2.9): a column that fills its container and holds one
    layer, the placeholder, the content or the failure. The layer that arrives on a change of phase
@@ -3387,6 +3408,18 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-vtable-held-head::after{ content:""; position:absolute; top:0; bottom:0; right:0; width:var(--hair); background:var(--line); opacity:0; pointer-events:none; }
 .ds-vtable[*|data-across=yes] .ds-vtable-held::after,
 .ds-vtable[*|data-across=yes] .ds-vtable-held-head::after{ opacity:1; }
+
+/* The outline (`outline` given; outline.rs): the first column's cell is indented by its depth (the
+   inline `padding-left`) and starts with a disclosure triangle, or with a gap of the same width on
+   a row that has no children so the names line up. The triangle is the disclosure's own, turned
+   a quarter when open; it is quiet until the pointer is over it and in the selected ink on a
+   selected row. */
+.ds-vtable-outline{ display:flex; align-items:center; min-width:0; }
+.ds-vtable-twisty,
+.ds-vtable-twisty-gap{ display:inline-flex; flex:none; align-items:center; justify-content:center; width:16px; height:16px; }
+.ds-vtable-twisty{ color:var(--ink-faint); cursor:default; }
+.ds-vtable-twisty:hover{ color:var(--ink-soft); }
+.ds-vtable-outline-cell{ display:block; flex:1 1 auto; min-width:0; overflow:hidden; white-space:nowrap; }
 /* -- voice_orb -- */
 /* The voice orb (design/30 section 2.9). Three glows, six conic gradients turning at different
    speeds and directions about their own centres, behind a fine dot grid. The turn `--orb-turn`

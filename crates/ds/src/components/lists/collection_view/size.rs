@@ -41,6 +41,9 @@ pub enum CollectionExtent {
     Content,
 }
 
+/// The padding on each side of the grid: the stylesheet's `--s-6`.
+pub(crate) const GRID_INSET: Px = Px(6.0);
+
 /// Finder's icon sizes: how large the thumbnail is drawn.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum CollectionSize {

@@ -2,11 +2,13 @@
 
 use crate::components::lists::list::keys::{ListKey, list_key};
 use crate::components::lists::virtual_list::model::roved;
+use crate::components::lists::virtual_table::outline::{ToggleReach, reach_of};
 use crate::stack::roving::{Rove, Step};
 use chordkit::Platform;
 use dioxus::prelude::{Key, Modifiers};
 use ds_core::command::holds_primary;
 use ds_core::selection::PickHow;
+use ds_core::vocab::Shown;
 
 /// What a key asks of a virtual table.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,6 +22,9 @@ pub(crate) enum TableKey {
     /// The primary modifier with Down (Command-Down, Finder's Open): the row under the cursor is
     /// opened.
     Open,
+    /// Right or Left in an outline: the cursor's branch opens or closes (`to`), and with Option
+    /// held the whole subtree does.
+    Disclose { to: Shown, reach: ToggleReach },
 }
 
 /// Whether `modifiers` hold a modifier that makes a key a command and not a movement.
@@ -30,8 +35,22 @@ fn chorded(modifiers: Modifiers) -> bool {
 /// The table's reading of `key` on `platform`; `None` for a key it leaves alone. Letters are not
 /// read: the rows are not at hand to match a label against. Shift alone still moves (and extends);
 /// any other modifier makes the key the app's, so Command-Up (Enclosing Folder) goes on to the
-/// app's keymap. The one exception is the primary modifier with Down, Finder's Open.
+/// app's keymap. The exceptions are the primary modifier with Down, Finder's Open, and Right and
+/// Left, which open and close an outline's branch (Option widens them to the subtree).
 pub(crate) fn table_key(key: &Key, modifiers: Modifiers, platform: Platform) -> Option<TableKey> {
+    let to = match key {
+        Key::ArrowRight => Some(Shown::Visible),
+        Key::ArrowLeft => Some(Shown::Hidden),
+        _ => None,
+    };
+    let plain_or_option = !modifiers
+        .intersects(Modifiers::CONTROL | Modifiers::SUPER | Modifiers::META | Modifiers::SHIFT);
+    if let (Some(to), true) = (to, plain_or_option) {
+        return Some(TableKey::Disclose {
+            to,
+            reach: reach_of(modifiers),
+        });
+    }
     if chorded(modifiers) {
         let primary_alone = holds_primary(platform, modifiers)
             && !modifiers.intersects(Modifiers::SHIFT | Modifiers::ALT);
@@ -58,7 +77,7 @@ pub(crate) fn target(at: Option<usize>, len: usize, key: TableKey, page: usize) 
         TableKey::Move(rove) => roved(at, len, rove),
         TableKey::Page(Step::Down) => Some(at.map_or(0, |at| (at + page).min(last)).min(last)),
         TableKey::Page(Step::Up) => Some(at.map_or(last, |at| at.saturating_sub(page)).min(last)),
-        TableKey::Pick | TableKey::Open => None,
+        TableKey::Pick | TableKey::Open | TableKey::Disclose { .. } => None,
     }
 }
 
@@ -87,11 +106,12 @@ pub(crate) fn page_rows(height: f32, pitch: f32) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::{TableKey, held_columns, key_how, page_rows, table_key, target};
+    use super::{TableKey, ToggleReach, held_columns, key_how, page_rows, table_key, target};
     use crate::stack::roving::{Edge, Rove, Step};
     use chordkit::Platform;
     use dioxus::prelude::{Key, Modifiers};
     use ds_core::selection::PickHow;
+    use ds_core::vocab::Shown;
 
     #[test]
     fn the_cursor_moves_by_a_row_an_end_or_a_page_and_stops_at_the_ends() {
@@ -135,6 +155,20 @@ mod tests {
             (Key::Character(" ".to_owned()), Some(TableKey::Pick)),
             (Key::Character("a".to_owned()), None),
             (Key::Tab, None),
+            (
+                Key::ArrowRight,
+                Some(TableKey::Disclose {
+                    to: Shown::Visible,
+                    reach: ToggleReach::Row,
+                }),
+            ),
+            (
+                Key::ArrowLeft,
+                Some(TableKey::Disclose {
+                    to: Shown::Hidden,
+                    reach: ToggleReach::Row,
+                }),
+            ),
         ];
         for (key, want) in cases {
             let read = table_key(key, Modifiers::empty(), Platform::MacOs);
@@ -149,6 +183,11 @@ mod tests {
         let up = Key::ArrowUp;
         let (home, page_down, enter) = (Key::Home, Key::PageDown, Key::Enter);
         let step_down = Some(TableKey::Move(Rove::Step(Step::Down)));
+        let right = Key::ArrowRight;
+        let option_right = Some(TableKey::Disclose {
+            to: Shown::Visible,
+            reach: ToggleReach::Subtree,
+        });
         // (key, modifiers, wanted)
         let cases: &[(&Key, Modifiers, Option<TableKey>)] = &[
             (&down, Modifiers::SHIFT, step_down),
@@ -160,6 +199,9 @@ mod tests {
             (&home, Modifiers::SUPER, None),
             (&page_down, Modifiers::ALT, None),
             (&enter, Modifiers::SUPER, None),
+            (&right, Modifiers::ALT, option_right),
+            (&right, Modifiers::SUPER, None),
+            (&right, Modifiers::SHIFT, None),
         ];
         for &(key, modifiers, want) in cases {
             assert_eq!(

@@ -823,6 +823,19 @@ Without `selection` and `onreach` nothing changes: `cursor` is the selected row 
 under them (at least one column always scrolls); a faint line marks the seam once they are scrolled. To
 scroll such a table sideways yourself, name the box `ds::components::lists::virtual_table::columns_id(id)`
 (`id` being the `common.id` you gave) instead of the root.
+**Rubber band, outline and a Name cell.** `VirtualTable` and `CollectionView` take `onmarquee:
+EventHandler<RowSelection>`: a drag that begins on empty space (not on a row or tile) draws a rubber
+band in the accent tint and hands you the whole selection as the band changes it; store it as `selection`.
+No modifier replaces the selection (a click on empty space clears it), Shift or Command adds to it. Without
+`onmarquee` nothing changes. `VirtualTable { outline: Callback<usize, OutlineRow>, ontoggle }` makes the first
+column an outline: `OutlineRow::leaf(depth)` or `OutlineRow::branch(depth, Shown)` for each mounted row, and
+you hear `OutlineToggle { row, shown, reach }` from a press on the triangle or Right and Left on the cursor's
+row (`reach` is `ToggleReach::Subtree` with Option held). You list the rows that show and keep which
+branches are open; the table keeps nothing. `ds::components::lists::name_cell::NameCell { icon, name, room }`
+is the Name cell: a glyph and a name cut from the middle to `room` (the column's width less padding).
+Files dropped from outside carry `FileDrop::modifiers`, and `files.operation(platform)` is
+`Some(DropOperation::{Copy, Move, Link})` when Option, Command or both were held (`None`: you choose);
+`FileDragInput::Dropped` became `Dropped { modifiers }`.
 `Disclosure { title, shown, ontoggle, children }` collapses a body; `SectionHeader { title, value,
 actions: Vec<HeaderAction>, collapse }` heads a group (`HeaderAction::new(label, onclick)`, any
 number of them at its end).

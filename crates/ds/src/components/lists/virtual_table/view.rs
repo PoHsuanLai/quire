@@ -46,9 +46,18 @@
 //! together. With `pinned` columns the root carries `data-pinned=yes` and `data-across=yes|no`
 //! (the other columns are scrolled sideways or not), and the body is `split::body`'s: see there.
 //! `columns_id(id)` names the box that scrolls sideways then.
+//!
+//! With `outline` the first cell is `span.ds-vtable-outline` (its `padding-left` the depth's
+//! indent) of a `span.ds-vtable-twisty[role=button]` (or `span.ds-vtable-twisty-gap` on a leaf) and
+//! `span.ds-vtable-outline-cell`, and the item carries `aria-level` and, on a branch,
+//! `aria-expanded`. While a rubber band is dragged a `div.ds-marquee` is the scroller's first
+//! child, placed in the content's coordinates.
 
 use crate::components::controls::scroller::handle::ScrollerRef;
 use crate::components::controls::scroller::view::Scroller;
+use crate::components::lists::marquee::band::MarqueeBand;
+use crate::components::lists::marquee::hook::use_marquee;
+use crate::components::lists::marquee::model::rows_in;
 use crate::components::lists::reach::Reach;
 use crate::components::lists::row::row::Row;
 use crate::components::lists::table::head::{cells, use_resize};
@@ -59,6 +68,9 @@ use crate::components::lists::virtual_list::layout::Layout;
 use crate::components::lists::virtual_list::view::use_cursor_reveal;
 use crate::components::lists::virtual_table::model::{
     TableKey, held_columns, key_how, page_rows, table_key, target,
+};
+use crate::components::lists::virtual_table::outline::{
+    OutlineKind, OutlineRow, OutlineToggle, outline_cell,
 };
 use crate::components::lists::virtual_table::split::{self, Line, Pane, Panes};
 use crate::keys::use_platform;
@@ -121,6 +133,21 @@ fn row_content<C>(
 /// of `onselect`: Shift with a click or an arrow extends, the primary modifier with a click
 /// toggles. `pinned` is how many leading columns are held in place while the others scroll
 /// sideways under them (none by default; at least one column always scrolls).
+/// A drag that begins on empty space below the rows draws a rubber band in the accent tint and
+/// selects the rows it touches; `onmarquee` hears the whole selection (a `RowSelection`, to store
+/// as the owner's `selection`) as the band changes it. With no modifier the band's rows are the
+/// selection and a click on empty space clears it; Shift or the primary modifier adds them to
+/// the selection the drag began with (`selection`, or the cursor's row). The band scrolls the
+/// table when the pointer moves near the top or bottom edge. Without `onmarquee` such a drag does
+/// nothing.
+///
+/// `outline`, given, makes the first column an outline (Finder's list view): it is asked for each
+/// mounted row's depth and whether it is a branch, open or closed ([`OutlineRow`]), and the first
+/// cell is drawn indented with a disclosure triangle. A press on the triangle, and Right or Left
+/// on the cursor's row, ask `ontoggle` for an [`OutlineToggle`]; with Option held the toggle
+/// reaches the whole subtree. The table keeps no open state: the app lists the rows that show and
+/// remembers which branches are open.
+///
 /// `overscan` is how many rows are mounted beyond the visible ones on each side (4 by default).
 /// `look` dresses the table (`TableLook::Plain`, the grid, by default; `Striped` and `Unstriped`
 /// are Finder's list view). `rules` draws a hairline between the columns; `header_rule` draws one under the
@@ -146,6 +173,9 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     #[props(default)] onreach: Option<EventHandler<Pick>>,
     #[props(default)] onpick: Option<EventHandler<usize>>,
     #[props(default)] onopen: Option<EventHandler<usize>>,
+    #[props(default)] onmarquee: Option<EventHandler<RowSelection>>,
+    #[props(default)] outline: Option<Callback<usize, OutlineRow>>,
+    #[props(default)] ontoggle: Option<EventHandler<OutlineToggle>>,
     #[props(default)] pinned: usize,
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
     #[props(default)] look: TableLook,
@@ -167,6 +197,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
         cursor.filter(|at| *at < rows).map(|at| layout.span(at)),
     );
     let resize = use_resize();
+    let marquee = use_marquee(scroller);
     let mut held = use_signal(|| Held::No);
     let hovered = use_signal(|| None::<usize>);
     let across = use_signal(|| Px(0.0));
@@ -187,14 +218,25 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             false => Selection::Unselected,
         }
     };
+    let steps: Vec<Option<OutlineRow>> = (start..end)
+        .map(|row| outline.map(|outline| outline.call(row)))
+        .collect();
     let drawn_rows: Vec<(usize, Vec<Element>)> = (start..end)
-        .map(|row| {
+        .zip(&steps)
+        .map(|(row, step)| {
             let drawn = (0..columns.len())
-                .map(|column| cell.call((row, column)))
+                .map(|column| {
+                    let content = cell.call((row, column));
+                    match (column, step) {
+                        (0, Some(step)) => outline_cell(*step, row, ontoggle, content),
+                        _ => content,
+                    }
+                })
                 .collect();
             (row, drawn)
         })
         .collect();
+    let step_of = |row: usize| steps.get(row - start).copied().flatten();
     let onkeydown = move |event: KeyboardEvent| {
         let Some(act) = table_key(&event.key(), event.modifiers(), reach.platform) else {
             return;
@@ -214,6 +256,19 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                     reach.opened(at);
                 }
             }
+            TableKey::Disclose { to, reach } => {
+                let branch = resting.and_then(|at| outline.map(|outline| (at, outline.call(at))));
+                if let (Some((row, step)), Some(ontoggle)) = (branch, ontoggle)
+                    && step.kind == OutlineKind::Branch(to.flipped())
+                {
+                    event.prevent_default();
+                    ontoggle.call(OutlineToggle {
+                        row,
+                        shown: to,
+                        reach,
+                    });
+                }
+            }
             TableKey::Move(_) | TableKey::Page(_) => {
                 let shown = scroller.scroll().read().viewport.0;
                 let page = page_rows(shown, pitch.0);
@@ -228,6 +283,9 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
         }
     };
     let move_columns = columns.clone();
+    let began_with = selection
+        .clone()
+        .unwrap_or_else(|| cursor.map_or_else(RowSelection::none, RowSelection::single));
     let data = common.data_attributes();
     let mounted = common.clone();
     let away = (held() == Held::No).then_some("away");
@@ -239,33 +297,37 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             let header = resize.header(&columns, sort.as_ref(), on_sort);
             let template = resize.template(&columns);
             let wide = resize.total(&columns).0;
-            let items: Vec<(usize, Element)> = drawn_rows
+            let items: Vec<(usize, Element, Option<OutlineRow>)> = drawn_rows
                 .iter()
                 .map(|(row, drawn)| {
                     let content = row_content(&columns, drawn, *row, selected(*row), reach);
-                    (*row, content)
+                    (*row, content, step_of(*row))
                 })
                 .collect();
             let body = rsx! {
                 div { class: "ds-vtable-body", style: "min-width:{wide}px",
                     {header}
-                    Scroller { scroller,
+                    Scroller { scroller, common: marquee.common(),
+                        MarqueeBand { marquee }
                         div { class: "ds-vtable-spacer", style: "height:{above}px" }
                         div {
                             class: "ds-vtable-rows",
                             role: "listbox",
                             "aria-label": label.clone(),
-                            for (row , content) in items {
+                            for (row , content , step) in items {
                                 div {
                                     key: "{row}",
                                     class: "ds-vtable-item",
                                     role: "none",
                                     "aria-posinset": (row + 1).to_string(),
                                     "aria-setsize": rows.to_string(),
+                                    "aria-level": step.map(|step| step.level()),
+                                    "aria-expanded": step.and_then(OutlineRow::expanded),
                                     "data-row": row.to_string(),
                                     "data-selected": (selected(row) == Selection::Selected).then_some("yes"),
                                     "data-stripe": look.striped(row).then_some("odd"),
                                     style: "height:{height}px",
+                                    onpointerdown: move |_| marquee.item_pressed(),
                                     ondoubleclick: move |_| reach.opened(row),
                                     {content}
                                 }
@@ -286,6 +348,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                         row: *row,
                         selection: selected(*row),
                         stripe: look.striped(*row).then_some("odd"),
+                        outline: step_of(*row),
                         content: row_content(
                             &columns[span.clone()],
                             &drawn[span.clone()],
@@ -319,6 +382,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                 across,
                 hovered,
                 onopen,
+                marquee,
             });
             let ahead = Some(Scrolled::at(across()).slug());
             (body, None, Some("yes"), ahead)
@@ -343,9 +407,21 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             onfocus: move |_| held.set(Held::Yes),
             onblur: move |_| held.set(Held::No),
             onkeydown,
-            onpointermove: move |event: PointerEvent| resize.drag(&move_columns, &event),
-            onpointerup: move |_| resize.release(),
-            onpointerleave: move |_| resize.release(),
+            onpointerdown: move |event: PointerEvent| {
+                marquee.pressed(&event, began_with.clone(), onmarquee);
+            },
+            onpointermove: move |event: PointerEvent| {
+                resize.drag(&move_columns, &event);
+                marquee.moved(&event, &|band| vec![rows_in(band, pitch, rows)], onmarquee);
+            },
+            onpointerup: move |_| {
+                resize.release();
+                marquee.end();
+            },
+            onpointerleave: move |_| {
+                resize.release();
+                marquee.end();
+            },
             ..data,
             {body}
         }

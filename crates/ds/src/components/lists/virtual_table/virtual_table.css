@@ -71,3 +71,15 @@
 .ds-vtable-held-head::after{ content:""; position:absolute; top:0; bottom:0; right:0; width:var(--hair); background:var(--line); opacity:0; pointer-events:none; }
 .ds-vtable[*|data-across=yes] .ds-vtable-held::after,
 .ds-vtable[*|data-across=yes] .ds-vtable-held-head::after{ opacity:1; }
+
+/* The outline (`outline` given; outline.rs): the first column's cell is indented by its depth (the
+   inline `padding-left`) and starts with a disclosure triangle, or with a gap of the same width on
+   a row that has no children so the names line up. The triangle is the disclosure's own, turned
+   a quarter when open; it is quiet until the pointer is over it and in the selected ink on a
+   selected row. */
+.ds-vtable-outline{ display:flex; align-items:center; min-width:0; }
+.ds-vtable-twisty,
+.ds-vtable-twisty-gap{ display:inline-flex; flex:none; align-items:center; justify-content:center; width:16px; height:16px; }
+.ds-vtable-twisty{ color:var(--ink-faint); cursor:default; }
+.ds-vtable-twisty:hover{ color:var(--ink-soft); }
+.ds-vtable-outline-cell{ display:block; flex:1 1 auto; min-width:0; overflow:hidden; white-space:nowrap; }

@@ -1,9 +1,11 @@
 //! CollectionView: a dozen tiles of Finder's icon view. A badge (tag dots) sits under some
-//! captions, and a right click selects the tile and names the one a menu would open for.
+//! captions, a right click selects the tile and names the one a menu would open for, and a drag
+//! from empty space draws a rubber band that selects the tiles it touches.
 
 use crate::pages::Section;
 use crate::pages::content::picture::wide_image;
 use dioxus::prelude::*;
+use ds::base::selection::RowSelection;
 use ds::components::content::icon_source::IconSource;
 use ds::components::lists::collection_view::{
     CollectionExtent, CollectionItem, CollectionSize, CollectionView, Flow, ThumbAspect, Thumbnail,
@@ -49,6 +51,7 @@ fn wallpapers() -> Vec<CollectionItem<usize>> {
 pub fn CollectionGallery() -> Element {
     let mut cursor = use_signal(|| None::<usize>);
     let mut menu = use_signal(|| None::<usize>);
+    let mut chosen = use_signal(RowSelection::none);
     let items: Vec<CollectionItem<usize>> = (0..TILES)
         .map(|at| {
             let item =
@@ -65,7 +68,7 @@ pub fn CollectionGallery() -> Element {
     rsx! {
         Section {
             title: "CollectionView",
-            note: "Tiles of a thumbnail over a one-line caption. Every third tile carries a badge centred under its caption (Finder's tag dots) in the room the tile already keeps there, so the rows stay the same height. A right click selects the tile unless it is selected, then asks for its menu with the tile's index; a right click on empty space is the page's.",
+            note: "Tiles of a thumbnail over a one-line caption. Every third tile carries a badge centred under its caption (Finder's tag dots) in the room the tile already keeps there, so the rows stay the same height. A right click selects the tile unless it is selected, then asks for its menu with the tile's index; a right click on empty space is the page's. A drag from empty space draws a rubber band in the accent tint and selects the tiles it touches (Shift or Command adds to the selection); a click on empty space clears it.",
             div { class: "g-row g-row-top",
                 div { class: "g-list", style: "width:420px; height:300px; display:flex; flex-direction:column",
                     CollectionView::<usize> {
@@ -73,7 +76,15 @@ pub fn CollectionGallery() -> Element {
                         items,
                         flow: Flow::Columns(4),
                         cursor: cursor(),
-                        onselect: move |at| cursor.set(Some(at)),
+                        selection: Some(chosen()),
+                        onselect: move |at| {
+                            cursor.set(Some(at));
+                            chosen.set(RowSelection::single(at));
+                        },
+                        onmarquee: move |next: RowSelection| {
+                            cursor.set(next.cursor());
+                            chosen.set(next);
+                        },
                         oncontextmenu: move |(at, _): (usize, MouseEvent)| menu.set(Some(at)),
                     }
                 }

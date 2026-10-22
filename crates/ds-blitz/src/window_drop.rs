@@ -16,6 +16,7 @@ use dioxus_native::winit::event::WindowEvent;
 use dioxus_native::winit::event_loop::{ActiveEventLoop, DndAction};
 use ds::file_drop::drag::{DropAcceptance, FileDragInput, Offer};
 use ds::prelude::*;
+use keyboard_types::Modifiers;
 use std::io::ErrorKind;
 
 /// The drag over this window, and what the platform was last told about it.
@@ -26,13 +27,15 @@ pub(crate) struct WindowDrop {
 }
 
 impl WindowDrop {
-    /// The inputs `event` makes, at `scale` device pixels per logical pixel. Entering asks the
-    /// platform for the paths.
+    /// The inputs `event` makes, at `scale` device pixels per logical pixel, with `held` the
+    /// modifier keys the window tracks (a drop event carries none). Entering asks the platform
+    /// for the paths.
     pub(crate) fn inputs(
         &mut self,
         event: &WindowEvent,
         event_loop: &dyn ActiveEventLoop,
         scale: f64,
+        held: Modifiers,
     ) -> Vec<FileDragInput> {
         let logical = |x: f64, y: f64| Point {
             x: Px((x / scale) as f32),
@@ -63,7 +66,7 @@ impl WindowDrop {
                 }]
             }
             WindowEvent::DragDropped { id, .. } if self.transfer == Some(*id) => {
-                vec![FileDragInput::Dropped]
+                vec![FileDragInput::Dropped { modifiers: held }]
             }
             WindowEvent::DragLeft { id } if self.transfer == Some(*id) => {
                 self.transfer = None;

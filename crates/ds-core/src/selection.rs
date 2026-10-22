@@ -100,6 +100,52 @@ impl RowSelection {
         }
     }
 
+    /// Exactly the rows in `ranges`, in any order, overlapping or touching ones joined, with the
+    /// given anchor and cursor kept as they are. A selection of many rows costs its ranges, not
+    /// its rows.
+    pub fn of_ranges(
+        anchor: Option<usize>,
+        cursor: Option<usize>,
+        ranges: impl IntoIterator<Item = Range<usize>>,
+    ) -> Self {
+        let mut ranges: Vec<Range<usize>> = ranges
+            .into_iter()
+            .filter(|range| range.start < range.end)
+            .collect();
+        ranges.sort_by_key(|range| range.start);
+        let mut joined: Vec<Range<usize>> = Vec::with_capacity(ranges.len());
+        for range in ranges {
+            match joined.last_mut() {
+                Some(last) if range.start <= last.end => last.end = last.end.max(range.end),
+                Some(_) | None => joined.push(range),
+            }
+        }
+        RowSelection {
+            anchor,
+            cursor,
+            ranges: joined,
+        }
+    }
+
+    /// This selection with the rows in `more` added. The anchor stays (the first added row when
+    /// there was none) and the cursor becomes the last added row's, as a drag across rows leaves
+    /// them.
+    #[must_use]
+    pub fn united(self, more: &[Range<usize>]) -> Self {
+        let added: Vec<Range<usize>> = more
+            .iter()
+            .filter(|range| range.start < range.end)
+            .cloned()
+            .collect();
+        let first = added.iter().map(|range| range.start).min();
+        let last = added.iter().map(|range| range.end - 1).max();
+        RowSelection::of_ranges(
+            self.anchor.or(first),
+            last.or(self.cursor),
+            self.ranges.into_iter().chain(added),
+        )
+    }
+
     /// Every one of `len` rows. The anchor and the cursor stay where they were, else they are
     /// the first row; no rows select nothing.
     #[must_use]
@@ -484,5 +530,26 @@ mod tests {
         for (held, want) in cases {
             assert_eq!(PickHow::of_press(Platform::MacOs, held), want, "{held:?}");
         }
+    }
+
+    #[test]
+    fn ranges_are_joined_and_a_union_keeps_the_anchor_and_moves_the_cursor_to_the_last_added() {
+        let joined = RowSelection::of_ranges(None, None, [5..8, 1..3, 3..4, 7..10, 12..12]);
+        assert_eq!(
+            ranges(&joined),
+            vec![1..4, 5..10],
+            "touching and overlapping join"
+        );
+        let base = RowSelection::of_rows(Some(2), Some(2), [2]);
+        let added = base.united(&[6..8, 4..5]);
+        assert_eq!(ranges(&added), vec![2..3, 4..5, 6..8]);
+        assert_eq!((added.anchor(), added.cursor()), (Some(2), Some(7)));
+        let from_nothing = RowSelection::none().united(&[3..5]);
+        assert_eq!(
+            (from_nothing.anchor(), from_nothing.cursor()),
+            (Some(3), Some(4))
+        );
+        let nothing_added = RowSelection::single(1).united(&[]);
+        assert_eq!(ranges(&nothing_added), vec![1..2]);
     }
 }

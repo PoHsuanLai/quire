@@ -26,6 +26,9 @@
 
 use crate::components::controls::scroller::handle::ScrollerRef;
 use crate::components::controls::scroller::view::Scroller;
+use crate::components::lists::marquee::band::MarqueeBand;
+use crate::components::lists::marquee::hook::Marquee;
+use crate::components::lists::virtual_table::outline::OutlineRow;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Selection;
@@ -52,6 +55,8 @@ pub(super) struct Line {
     pub(super) row: usize,
     pub(super) selection: Selection,
     pub(super) stripe: Option<&'static str>,
+    /// Where the row stands in the outline, when the table is one.
+    pub(super) outline: Option<OutlineRow>,
     pub(super) content: Element,
 }
 
@@ -84,6 +89,8 @@ pub(super) struct Panes {
     pub(super) hovered: Signal<Option<usize>>,
     /// Hears a row being opened by a double click.
     pub(super) onopen: Option<EventHandler<usize>>,
+    /// The table's rubber band.
+    pub(super) marquee: Marquee,
 }
 
 /// The body of a table that holds columns: the two headers, then the `Scroller` of the two
@@ -102,6 +109,7 @@ pub(super) fn body(panes: Panes) -> Element {
         across,
         hovered,
         onopen,
+        marquee,
     } = panes;
     let (held_width, held_template) = (held.width.0, held.template);
     let (side_width, side_template) = (scrolling.width.0, scrolling.template);
@@ -124,7 +132,8 @@ pub(super) fn body(panes: Panes) -> Element {
                     }
                 }
             }
-            Scroller { scroller,
+            Scroller { scroller, common: marquee.common(),
+                MarqueeBand { marquee }
                 div { class: "ds-vtable-split",
                     div {
                         class: "ds-vtable-held",
@@ -137,8 +146,10 @@ pub(super) fn body(panes: Panes) -> Element {
                                 row: line.row,
                                 hovered,
                                 onopen,
+                                marquee,
                                 selection: line.selection,
                                 stripe: line.stripe,
+                                outline: line.outline,
                                 height,
                                 place: Place::Hidden,
                                 content: line.content,
@@ -170,8 +181,10 @@ pub(super) fn body(panes: Panes) -> Element {
                                         row: line.row,
                                         hovered,
                                         onopen,
+                                        marquee,
                                         selection: line.selection,
                                         stripe: line.stripe,
+                                        outline: line.outline,
                                         height,
                                         place: Place::Listed(rows),
                                         content: line.content,
@@ -194,8 +207,10 @@ fn HeldItem(
     row: usize,
     hovered: Signal<Option<usize>>,
     onopen: Option<EventHandler<usize>>,
+    marquee: Marquee,
     selection: Selection,
     stripe: Option<&'static str>,
+    outline: Option<OutlineRow>,
     height: f32,
     place: Place,
     content: Element,
@@ -213,11 +228,14 @@ fn HeldItem(
             "aria-hidden": hidden,
             "aria-posinset": posinset,
             "aria-setsize": setsize,
+            "aria-level": outline.map(|step| step.level()),
+            "aria-expanded": outline.and_then(OutlineRow::expanded),
             "data-row": row.to_string(),
             "data-selected": (selection == Selection::Selected).then_some("yes"),
             "data-stripe": stripe,
             "data-hover": over,
             style: "height:{height}px",
+            onpointerdown: move |_| marquee.item_pressed(),
             ondoubleclick: move |_| {
                 if let Some(onopen) = onopen {
                     onopen.call(row);

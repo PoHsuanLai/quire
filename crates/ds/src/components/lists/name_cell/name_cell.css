@@ -1,0 +1,7 @@
+/* NameCell (design/27-HIG-PARITY.md section 5.24, Finder's list view): a glyph beside the name on
+   one line. The glyph is its own width and the name takes the rest, clipped at its end when no room
+   was given to cut it from the middle by (name_cell/view.rs). */
+
+.ds-name-cell{ display:flex; align-items:center; gap:var(--s-6); min-width:0; }
+.ds-name-icon{ display:inline-flex; flex:none; align-items:center; justify-content:center; color:var(--ink-soft); }
+.ds-name-text{ min-width:0; overflow:hidden; white-space:nowrap; }

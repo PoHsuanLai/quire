@@ -288,7 +288,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
                 sink.call(ime);
             }
         }
-        let inputs = dragged.borrow_mut().inputs(event, event_loop, factor);
+        let inputs = dragged.borrow_mut().inputs(event, event_loop, factor, held);
         for input in inputs {
             let answer = file_drop.feed(input);
             dragged.borrow_mut().answer(event_loop, answer);

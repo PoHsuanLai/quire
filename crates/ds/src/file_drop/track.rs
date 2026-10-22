@@ -3,6 +3,7 @@
 //! view and the window's acceptance follow from it and from the target under the pointer.
 
 use crate::file_drop::drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop, Offer};
+use dioxus::prelude::Modifiers;
 use ds_core::geometry::units::Point;
 use ds_core::vocab::DropState;
 use std::path::PathBuf;
@@ -40,7 +41,10 @@ pub(crate) enum DragTrack {
         point: Option<Point>,
     },
     /// Let go before the platform said what it carries: the files land when it does.
-    Released { point: Option<Point> },
+    Released {
+        point: Option<Point>,
+        modifiers: Modifiers,
+    },
 }
 
 impl DragTrack {
@@ -68,10 +72,14 @@ impl Step {
         }
     }
 
-    fn landing(paths: Vec<PathBuf>, point: Point) -> Step {
+    fn landing(paths: Vec<PathBuf>, point: Point, modifiers: Modifiers) -> Step {
         Step {
             track: DragTrack::Idle,
-            landed: Some(FileDrop { paths, point }),
+            landed: Some(FileDrop {
+                paths,
+                point,
+                modifiers,
+            }),
         }
     }
 }
@@ -96,27 +104,27 @@ pub(crate) fn step(track: DragTrack, input: FileDragInput) -> Step {
                 point: Some(point),
             })
         }
-        (DragTrack::Dragging { contents, point }, FileDragInput::Dropped) => {
-            dropped(contents, point)
+        (DragTrack::Dragging { contents, point }, FileDragInput::Dropped { modifiers }) => {
+            dropped(contents, point, modifiers)
         }
-        (DragTrack::Released { point }, FileDragInput::Offered(offer)) => {
+        (DragTrack::Released { point, modifiers }, FileDragInput::Offered(offer)) => {
             match (Contents::of(offer), point) {
-                (Contents::Files(paths), Some(point)) => Step::landing(paths, point),
+                (Contents::Files(paths), Some(point)) => Step::landing(paths, point, modifiers),
                 _ => Step::to(DragTrack::Idle),
             }
         }
         (
             track,
-            FileDragInput::Offered(_) | FileDragInput::Moved { .. } | FileDragInput::Dropped,
+            FileDragInput::Offered(_) | FileDragInput::Moved { .. } | FileDragInput::Dropped { .. },
         ) => Step::to(track),
     }
 }
 
 /// A release while dragging: the files land now, or once the platform says what they are.
-fn dropped(contents: Contents, point: Option<Point>) -> Step {
+fn dropped(contents: Contents, point: Option<Point>, modifiers: Modifiers) -> Step {
     match (contents, point) {
-        (Contents::Files(paths), Some(point)) => Step::landing(paths, point),
-        (Contents::Waiting, point) => Step::to(DragTrack::Released { point }),
+        (Contents::Files(paths), Some(point)) => Step::landing(paths, point, modifiers),
+        (Contents::Waiting, point) => Step::to(DragTrack::Released { point, modifiers }),
         (Contents::Files(_) | Contents::Other, _) => Step::to(DragTrack::Idle),
     }
 }
@@ -136,6 +144,7 @@ pub(crate) fn target_view(track: &DragTrack, over: Over) -> TargetView {
             drag: FileDrag::Over(FileDrop {
                 paths: paths.clone(),
                 point: *point,
+                modifiers: Modifiers::empty(),
             }),
             place: DropState::Target,
         },
@@ -190,6 +199,12 @@ mod tests {
         Point { x: Px(x), y: Px(y) }
     }
 
+    fn dropped() -> FileDragInput {
+        FileDragInput::Dropped {
+            modifiers: Modifiers::empty(),
+        }
+    }
+
     fn files() -> Vec<PathBuf> {
         vec![PathBuf::from("/tmp/a.pdf"), PathBuf::from("/tmp/b.png")]
     }
@@ -207,7 +222,7 @@ mod tests {
 
     #[test]
     fn a_drag_ends_as_its_inputs_say() {
-        use FileDragInput::{Dropped, Entered, Left, Moved, Offered};
+        use FileDragInput::{Entered, Left, Moved, Offered};
         let cases: Vec<(&str, Vec<FileDragInput>, DragTrack, Vec<FileDrop>)> = vec![
             (
                 "files dropped after moving",
@@ -217,12 +232,13 @@ mod tests {
                     Moved {
                         point: at(5.0, 6.0),
                     },
-                    Dropped,
+                    dropped(),
                 ],
                 DragTrack::Idle,
                 vec![FileDrop {
                     paths: files(),
                     point: at(5.0, 6.0),
+                    modifiers: Modifiers::empty(),
                 }],
             ),
             (
@@ -231,13 +247,32 @@ mod tests {
                     Entered {
                         point: Some(at(1.0, 2.0)),
                     },
-                    Dropped,
+                    dropped(),
                     Offered(Offer::Files(files())),
                 ],
                 DragTrack::Idle,
                 vec![FileDrop {
                     paths: files(),
                     point: at(1.0, 2.0),
+                    modifiers: Modifiers::empty(),
+                }],
+            ),
+            (
+                "released with Option held before the paths came: the modifiers land with them",
+                vec![
+                    Entered {
+                        point: Some(at(1.0, 2.0)),
+                    },
+                    FileDragInput::Dropped {
+                        modifiers: Modifiers::ALT,
+                    },
+                    Offered(Offer::Files(files())),
+                ],
+                DragTrack::Idle,
+                vec![FileDrop {
+                    paths: files(),
+                    point: at(1.0, 2.0),
+                    modifiers: Modifiers::ALT,
                 }],
             ),
             (
@@ -247,7 +282,7 @@ mod tests {
                         point: Some(at(1.0, 2.0)),
                     },
                     Offered(Offer::Other),
-                    Dropped,
+                    dropped(),
                 ],
                 DragTrack::Idle,
                 vec![],
@@ -259,7 +294,7 @@ mod tests {
                         point: Some(at(1.0, 2.0)),
                     },
                     Offered(Offer::Files(vec![])),
-                    Dropped,
+                    dropped(),
                 ],
                 DragTrack::Idle,
                 vec![],
@@ -273,7 +308,7 @@ mod tests {
                         point: at(5.0, 6.0),
                     },
                     Left,
-                    Dropped,
+                    dropped(),
                 ],
                 DragTrack::Idle,
                 vec![],
@@ -298,7 +333,7 @@ mod tests {
                 vec![
                     Entered { point: None },
                     Offered(Offer::Files(files())),
-                    Dropped,
+                    dropped(),
                 ],
                 DragTrack::Idle,
                 vec![],
@@ -330,6 +365,7 @@ mod tests {
                 FileDrag::Over(FileDrop {
                     paths: files(),
                     point: at(3.0, 4.0),
+                    modifiers: Modifiers::empty(),
                 }),
                 DropState::Target,
                 DropAcceptance::Copy,

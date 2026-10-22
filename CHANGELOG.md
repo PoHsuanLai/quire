@@ -63,6 +63,29 @@ first, with what a consumer has to change.
 - `MenuImage::Swatch(TagColour)`: a coloured dot in a menu row, for a Finder tag. Not yet: the
   single row of tag dots in a context menu (needs several picks on one menu line).
 
+### Tables and selection
+
+- `CollectionView { onmarquee }` and `VirtualTable { onmarquee }`: a drag that begins on empty
+  space draws a rubber band in the accent tint and selects the tiles or rows it touches. The
+  owner hears the whole selection as a `RowSelection` (store it as `selection`). No modifier
+  replaces the selection and a click on empty space clears it; Shift or the primary modifier adds
+  to the selection the drag began with. The band scrolls the view when the pointer moves near the
+  top or bottom edge. New `RowSelection::of_ranges` and `RowSelection::united`.
+- `VirtualTable { outline, ontoggle }`: the first column as an outline. `outline` answers each
+  mounted row's `OutlineRow` (depth, leaf or `Branch(Shown)`); the table draws the indent and a
+  disclosure triangle and reports `OutlineToggle { row, shown, reach }`. Option widens the reach
+  to the `Subtree`; Right and Left on the cursor's row toggle it from the keyboard. The app keeps
+  which branches are open. Dragging the header edge already resizes a column, held at
+  `TableColumn::min_width`; double-click to fit is not built, as the table has no measure of a
+  column's content.
+- `NameCell { icon, name, room }`: a glyph and a name cut from the middle, for the Name column of a
+  file list; `name_chars(room)` turns the room into the character budget.
+- `FileDrop` carries `modifiers` (the keys held at the release) and `FileDragInput::Dropped`
+  became `Dropped { modifiers }`. New `DropOperation { Copy, Move, Link }` and
+  `FileDrop::operation(platform)`: Option forces a copy, the primary modifier (Command) a move, both a
+  link, and `None` leaves the choice to the app. ds-blitz reads the modifiers from the keyboard
+  state the window already tracks, since the platform's drop event carries none.
+
 ## v0.3.40
 
 The files batch, second part: the icon view's tiles take a context menu, a drop and a badge; a

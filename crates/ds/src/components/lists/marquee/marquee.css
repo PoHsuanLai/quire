@@ -1,0 +1,12 @@
+/* Marquee (Finder's rubber band, shared by CollectionView and VirtualTable): a drag that begins on
+   empty space draws a rectangle in the accent's translucent wash with a hairline of the accent, and
+   selects what it touches. The band sits in a layer of no height at the top of the view's
+   scroller content, placed in the content's own coordinates, so it grows and scrolls with the
+   content. The layer, not the scroller, is its containing box: a positioned scroller would be
+   hit over the table's header. It never takes the pointer. */
+
+.ds-marquee-layer{ position:relative; height:0; }
+.ds-marquee{
+  position:absolute; box-sizing:border-box; pointer-events:none; z-index:var(--z-raise);
+  background:var(--accent-soft); border:var(--hair) solid var(--accent); border-radius:var(--r-tiny);
+}

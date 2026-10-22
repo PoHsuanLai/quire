@@ -35,6 +35,8 @@
 //! `span.ds-cv-caption` and, when the item has one, `span.ds-cv-badge`, and a spacer.
 //! `data-focus=away` marks a view that does not hold the keyboard; `data-aspect=landscape` and
 //! `data-extent=content` mark the non-default shapes (`--cv-thumb-h` is then the thumbnail's height).
+//! While a rubber band is dragged a `div.ds-marquee-layer` holding a `div.ds-marquee` is the
+//! scroller's first child, placed in the content's coordinates.
 
 use crate::components::controls::scroller::handle::use_scroller;
 use crate::components::controls::scroller::view::Scroller;
@@ -45,9 +47,12 @@ use crate::components::lists::collection_view::model::{
     CollectionKey, collection_key, target, tiles_in,
 };
 use crate::components::lists::collection_view::size::{
-    CollectionExtent, CollectionSize, Flow, ThumbAspect,
+    CollectionExtent, CollectionSize, Flow, GRID_INSET, ThumbAspect,
 };
 use crate::components::lists::collection_view::window::{Memory, Shown, Stand, reconcile, shown};
+use crate::components::lists::marquee::band::MarqueeBand;
+use crate::components::lists::marquee::hook::use_marquee;
+use crate::components::lists::marquee::model::{GridShape, tiles_in as band_tiles};
 use crate::components::lists::reach::Reach;
 use crate::components::lists::virtual_list::layout::Layout;
 use crate::components::lists::virtual_list::model::Change;
@@ -100,6 +105,14 @@ enum Held {
 /// owner gives it; `Content` makes it as tall as all its rows (`ceil(len / columns)` of them)
 /// and mounts every tile, for a page that scrolls instead.
 ///
+/// A drag that begins on empty space (not on a tile) draws a rubber band in the accent tint and
+/// selects the tiles it touches; `onmarquee` hears the whole selection as the band changes it
+/// (a `RowSelection` of tile indexes, to store as the owner's `selection`). With no modifier the
+/// band's tiles are the selection and a click on empty space clears it; Shift or the primary
+/// modifier adds them to the selection the drag began with (`selection`, or the cursor's tile).
+/// The band scrolls the grid when the pointer moves near the top or bottom edge. Without
+/// `onmarquee` a drag on empty space does nothing.
+///
 /// `items` is read on every render and its captions are cloned for type-to-select only when
 /// letters are typed; the keys are collected on every render, so an owner of a million tiles keeps
 /// its `items` in a memo.
@@ -120,6 +133,7 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
     #[props(default)] ondropenter: Option<EventHandler<usize>>,
     #[props(default)] ondropleave: Option<EventHandler<usize>>,
     #[props(default)] ondrop: Option<EventHandler<usize>>,
+    #[props(default)] onmarquee: Option<EventHandler<RowSelection>>,
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
     #[props(default)] change: Change,
     #[props(default)] common: Common,
@@ -164,6 +178,7 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
             .filter(|at| *at < len)
             .map(|at| layout.span(at / columns)),
     );
+    let marquee = use_marquee(scroller);
     let mut held = use_signal(|| Held::No);
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let reach = Reach {
@@ -227,6 +242,9 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
             }
         }
     };
+    let began_with = selection
+        .clone()
+        .unwrap_or_else(|| cursor.map_or_else(RowSelection::none, RowSelection::single));
     let data = common.data_attributes();
     let mounted = common.clone();
     let away = (held() == Held::No).then_some("away");
@@ -257,8 +275,25 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
             onfocus: move |_| held.set(Held::Yes),
             onblur: move |_| held.set(Held::No),
             onkeydown,
+            onpointerdown: move |event: PointerEvent| {
+                marquee.pressed(&event, began_with.clone(), onmarquee);
+            },
+            onpointermove: move |event: PointerEvent| {
+                let width = probe.rect().map_or(Px(0.0), |rect| rect.size.width);
+                let shape = GridShape {
+                    columns,
+                    width,
+                    inset: GRID_INSET,
+                    pitch: size.pitch_for(aspect),
+                    tile: size.tile(),
+                };
+                marquee.moved(&event, &|band| band_tiles(band, shape, len), onmarquee);
+            },
+            onpointerup: move |_| marquee.end(),
+            onpointerleave: move |_| marquee.end(),
             ..data,
-            Scroller { scroller,
+            Scroller { scroller, common: marquee.common(),
+                MarqueeBand { marquee }
                 div { class: "ds-cv-spacer", style: "height:{above}px" }
                 div { class: "ds-cv-grid", style: grid,
                     for tile in tiles {
@@ -277,6 +312,7 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
                             "data-editing": tile.editing,
                             "data-drop": tile.drop,
                             "data-drag": tile.drag,
+                            onpointerdown: move |_| marquee.item_pressed(),
                             onclick: move |event| {
                                 if tile.landing.is_some_and(Landing::lit) {
                                     return;

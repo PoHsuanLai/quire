@@ -4,6 +4,8 @@
 pub mod collection_view;
 pub mod emoji_grid;
 pub mod list;
+pub(crate) mod marquee;
+pub mod name_cell;
 pub mod preview;
 pub(crate) mod reach;
 pub mod row;

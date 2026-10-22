@@ -178,7 +178,9 @@ fn a_release_on_a_target_hands_it_the_paths() {
     harness.send(Input::FileDrag(FileDragInput::Moved { point: composer }));
     let before = log(&harness);
 
-    harness.send(Input::FileDrag(FileDragInput::Dropped));
+    harness.send(Input::FileDrag(FileDragInput::Dropped {
+        modifiers: Modifiers::empty(),
+    }));
 
     assert_eq!(before, "", "nothing dropped before the release");
     assert_eq!(log(&harness), "composer:report.pdf,photo.jpg");
@@ -205,7 +207,9 @@ fn the_innermost_target_takes_the_drop() {
     ))));
     assert_eq!(lights(&harness), (some("accepts"), some("target")));
 
-    harness.send(Input::FileDrag(FileDragInput::Dropped));
+    harness.send(Input::FileDrag(FileDragInput::Dropped {
+        modifiers: Modifiers::empty(),
+    }));
 
     assert_eq!(
         log(&harness),
@@ -221,7 +225,9 @@ fn a_release_before_the_paths_arrive_lands_when_they_do() {
     harness.send(Input::FileDrag(FileDragInput::Entered {
         point: Some(composer),
     }));
-    harness.send(Input::FileDrag(FileDragInput::Dropped));
+    harness.send(Input::FileDrag(FileDragInput::Dropped {
+        modifiers: Modifiers::empty(),
+    }));
     let before = log(&harness);
 
     harness.send(Input::FileDrag(FileDragInput::Offered(Offer::Files(
@@ -244,7 +250,9 @@ fn a_dragged_url_lights_nothing_and_drops_nothing() {
     assert_eq!(offered, DropAcceptance::Refuse);
     assert_eq!(lights(&harness), (None, None));
 
-    harness.send(Input::FileDrag(FileDragInput::Dropped));
+    harness.send(Input::FileDrag(FileDragInput::Dropped {
+        modifiers: Modifiers::empty(),
+    }));
 
     assert_eq!(log(&harness), "");
 }
