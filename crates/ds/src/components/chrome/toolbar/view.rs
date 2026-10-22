@@ -9,7 +9,7 @@
 //! `span.ds-toolbar-center` (only with a title and a centre item together) and
 //! `span.ds-toolbar-trailing`.
 
-use crate::components::chrome::path_control::model::{PathSegment, rows};
+use crate::components::chrome::path_control::model::{self as path_model, PathSegment};
 use crate::components::chrome::toolbar::model::{
     Expansion, Kept, Picked, ToolbarItem, ToolbarRoom, search_fit, search_room,
 };
@@ -280,7 +280,7 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
             Menu::<usize> {
                 placement: MenuPlacement::Popup,
                 anchor,
-                items: rows(&title_menu, 0),
+                items: path_model::rows(&title_menu, 0),
                 onpick: move |at: usize| {
                     title_open.set(Shown::Hidden);
                     if let Some(hear) = ontitlemenu {

@@ -195,7 +195,10 @@ mod tests {
                 .sidebar()
                 .any(|page| page.id.as_str() == "assistant-model")
         );
-        assert_eq!(table.resolve("accounts_setup"), Some(PageId::new("accounts-setup")));
+        assert_eq!(
+            table.resolve("accounts_setup"),
+            Some(PageId::new("accounts-setup"))
+        );
         assert_eq!(
             table.title_of(&Page::declared("accounts-setup")).0,
             "Sign in to Your Accounts"

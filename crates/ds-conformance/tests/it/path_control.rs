@@ -57,7 +57,10 @@ fn click(harness: &mut Harness, selector: &str) {
 fn a_long_path_collapses_its_middle_and_keeps_both_ends() {
     let harness = start();
     let html = harness.html();
-    assert!(harness.centre(".ds-path-more").is_some(), "one collapse button");
+    assert!(
+        harness.centre(".ds-path-more").is_some(),
+        "one collapse button"
+    );
     assert!(html.contains("Root") && html.contains("Notes"));
     assert!(!html.contains("Users"), "the middle is behind the button");
 }
@@ -73,7 +76,10 @@ fn a_click_on_a_segment_reports_its_index_in_the_whole_path() {
 fn a_hidden_segment_is_picked_from_the_collapse_button() {
     let mut harness = start();
     click(&mut harness, ".ds-path-more");
-    assert!(harness.centre(".ds-menu").is_some(), "the menu lists the middle");
+    assert!(
+        harness.centre(".ds-menu").is_some(),
+        "the menu lists the middle"
+    );
     click(&mut harness, ".ds-menu-item:nth-of-type(2)");
     assert!(harness.html().contains("picked 2"));
 }

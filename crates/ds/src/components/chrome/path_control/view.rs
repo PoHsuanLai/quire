@@ -22,7 +22,8 @@ use crate::host::measure::{Anchor, MountedRef};
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
-use ds_style::icon::{Icon, IconSize};
+use ds_style::icon::Icon;
+use ds_style::icon::render::IconSize;
 
 /// The button for `segment`, at index `at` of a path of `len`.
 fn draw(
