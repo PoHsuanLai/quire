@@ -3,6 +3,22 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.41 (unreleased)
+
+### Hot corners
+- A hot corner is now a list of bindings, each holding exactly a set of modifier keys
+  (`CornerKeys`, written as a list of `command`, `option`, `control`, `shift`) and what it does
+  (`CornerDo`: a desktop action, an app's action, open an app, file, folder or web address, or a
+  command). New in `ds_settings::schema`: `CornerBinding`, `CornerBindings`, `CornerDo`,
+  `CornerKey`, `CornerKeys`, `OpenItem`, `Control::Corners`. `CornerAction` gains `AppWindows`,
+  `DisplaySleep` and `Assistant` and loses `None` (an empty list) and `Command` (`CornerDo::Command`).
+  `HotCornerSettings::{top_left, top_right, bottom_left, bottom_right}` are `CornerBindings` and the
+  `*_command` fields are gone. Older files (`top_left = "lock"`, `top_left_command`) are read and
+  never written back; a bad or repeated binding is dropped and reported, the rest kept. The four
+  corner rows are Basic and carry `control = "corners"`, for one custom control.
+- The lenient reader reports a list whose entries were dropped on reading, and accepts a key the
+  type no longer writes when it changed what the type means (an older spelling).
+
 ## v0.3.40
 
 The files batch, second part: the icon view's tiles take a context menu, a drop and a badge; a

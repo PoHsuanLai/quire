@@ -191,6 +191,7 @@ where
     let mut clamped = Vec::new();
     for (path, value) in leaves {
         let value = within::<W>(&path, value, limits, &mut clamped);
+        let given_len = W::value_len(&value);
         let mut candidate = tree.clone();
         W::set(&mut candidate, &path, value);
         match W::decode::<D>(&candidate) {
@@ -205,7 +206,21 @@ where
                         unknown.push(UnknownKey(prefix));
                     }
                 }
-                _ => tree = candidate,
+                Some(stored) => {
+                    if let (Some(given), Some(kept)) = (given_len, W::list_len(&stored, &path))
+                        && kept < given
+                    {
+                        invalid.push(InvalidKey {
+                            path: path.join("."),
+                            reason: format!(
+                                "{} of {given} entries are not valid and were dropped",
+                                given - kept
+                            ),
+                        });
+                    }
+                    tree = candidate;
+                }
+                None => tree = candidate,
             },
         }
     }

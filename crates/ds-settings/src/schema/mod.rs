@@ -10,6 +10,8 @@ mod agent;
 mod behaviour;
 mod column;
 mod control;
+mod corners;
+pub(crate) mod corners_stored;
 mod deep_link;
 mod doc_table;
 mod key;
@@ -27,6 +29,7 @@ pub use agent::{
 pub use behaviour::{CornerAction, HotCornerSettings, SwitcherSettings};
 pub use column::{Column, ColumnKind, ColumnName};
 pub use control::{Control, ControlName, TogglePair};
+pub use corners::{CornerBinding, CornerBindings, CornerDo, CornerKey, CornerKeys, OpenItem};
 pub use deep_link::{deep_link, deep_link_path};
 pub use doc_table::{DocTableError, key_table, regenerate};
 pub use ds_core::settings::{KeyPath, PageId};

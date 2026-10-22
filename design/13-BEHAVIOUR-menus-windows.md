@@ -249,20 +249,28 @@ square (2 px; `1..=8`), input `Whole`, no material, no paint, never keyboard.
 | Dwell | the pointer rests inside the square for `dwell_ms` before the corner acts; leaving earlier cancels | `hot_corners.dwell_ms` 150 (`0..=2000`) |
 | Re-arm | after acting, the corner is disarmed until the pointer has left the square and `rearm_ms` has passed; a pointer parked in the corner acts once | `hot_corners.rearm_ms` 500 (`0..=5000`) |
 | Toggle | an action that opens a shell surface closes it when it is already open (Launcher, NotificationCenter, ControlCenter, Workspaces, ShowDesktop); Lock and Command never toggle | |
-| Corner | `top_left`, `top_right`, `bottom_left`, `bottom_right`, each its own action; the bottom right is free (the reference ships a note there; sill has none until M12) | `hot_corners.<corner>` |
+| Corner | `top_left`, `top_right`, `bottom_left`, `bottom_right`, each its own list of bindings; the bottom right is free (the reference ships a note there; sill has none until M12) | `hot_corners.<corner>` |
 
-Action table (`CornerAction`):
+Action table (`CornerAction`, the desktop's own actions; a corner is a list of bindings, each
+holding exactly a set of modifier keys and one `CornerDo`: `Desktop(CornerAction)`,
+`AppAction { app, intent }`, `Open(OpenItem)` or `Command(String)`; an empty list is inactive):
 
 | Action | Does |
 | --- | --- |
-| `None` | nothing; the corner's surface is not spawned |
 | `Launcher` | `sill launcher toggle` |
 | `NotificationCenter` | `sill notifications toggle` |
 | `ControlCenter` | `sill control-center toggle` |
 | `ShowDesktop` | the compositor's show-desktop; toggles back |
 | `Lock` | the session's locker (`session.locker`) |
 | `Workspaces` | the workspace overview |
-| `Command` | `/bin/sh -c` of `hot_corners.<corner>_command`; an empty command does nothing and logs once |
+| `AppWindows` | the overview of the focused app's windows |
+| `DisplaySleep` | put the displays to sleep |
+| `Assistant` | summon the companion |
+
+Other bindings: `AppAction` calls an action an app declares in its intents manifest that needs no
+parameters; `Open` opens an app (desktop id), a file or folder (`~` allowed) or a web address;
+`Command` is `/bin/sh -c` of the text. Files that still hold one word per corner (and
+`<corner>_command`) are read, never written back.
 
 State machine (pure, table-tested in sill): `Idle` → pointer enters → `Dwelling { since }` →
 leaves → `Idle`; `since + dwell_ms` elapses → act → `Disarmed { left: None }` → leaves →

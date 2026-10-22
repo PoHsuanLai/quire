@@ -6,6 +6,7 @@ mod appearance_file;
 mod damaged_files;
 mod derive;
 mod doc_tables;
+mod hot_corners;
 mod rows;
 mod schema;
 mod spaces_file;

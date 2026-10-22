@@ -546,18 +546,14 @@ The floating thumbnail after a screenshot and the tool that takes one (design/20
 
 ### 3.23 `hot_corners` (sill/settings.toml)
 
-One invisible square per enabled corner (design/20 §1.16; design/13 §13.3.12 for the dwell, re-arm, modifier and action rules; sill F409). Page Dock, all Advanced.
+One invisible square per enabled corner (design/20 §1.16; design/13 §13.3.12 for the dwell, re-arm, modifier and action rules; sill F409). Page Dock; the four corner keys are drawn by one custom control (`corners`) and the timing keys are Advanced.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `hot_corners.top_left` | `CornerAction::{None,Launcher,NotificationCenter,ControlCenter,ShowDesktop,Lock,Workspaces,Command}` | `None` | what the corner does; `None` spawns no surface | `20-SURFACES.md#1-16-hot-corners-spec-integrated-experience`; F409 | proposed (M10 freeze, 2026-09-26) |
-| `hot_corners.top_right` | `CornerAction` | `None` | as `top_left` | same | proposed (M10 freeze, 2026-09-26) |
-| `hot_corners.bottom_left` | `CornerAction` | `None` | as `top_left` | same | proposed (M10 freeze, 2026-09-26) |
-| `hot_corners.bottom_right` | `CornerAction` | `None` | as `top_left` (macOS ships Quick Note here; sill has none until M12) | same | proposed (M10 freeze, 2026-09-26) |
-| `hot_corners.top_left_command` | `Text` | `""` | run by `/bin/sh -c` when the corner is `Command` | same | proposed (M10 freeze, 2026-09-26) |
-| `hot_corners.top_right_command` | `Text` | `""` | as `top_left_command` | same | proposed (M10 freeze, 2026-09-26) |
-| `hot_corners.bottom_left_command` | `Text` | `""` | as `top_left_command` | same | proposed (M10 freeze, 2026-09-26) |
-| `hot_corners.bottom_right_command` | `Text` | `""` | as `top_left_command` | same | proposed (M10 freeze, 2026-09-26) |
+| `hot_corners.top_left` | `Text`, control `corners`: a list of bindings (`CornerBindings`) | `[]` | what the corner does; empty is inactive. Each binding is a table `{ keys, action, ... }`: `keys` is a list of `command`, `option`, `control`, `shift` held exactly (`[]` when absent), `action` is a `CornerAction` word (`launcher`, `notification_center`, `control_center`, `show_desktop`, `lock`, `workspaces`, `app_windows`, `display_sleep`, `assistant`), or `app_action` (with `app`, `intent`), `open` (with one of `app`, `path`, `url`) or `command` (with `command`, run by `/bin/sh -c`). At most one binding per set of keys; a bad or duplicate binding is dropped and reported. The older `top_left = "none"\|"lock"\|"command"` with `top_left_command` is read and never written back | `20-SURFACES.md#1-16-hot-corners-spec-integrated-experience`; F409; owner 2026-10-22 | proposed (hot corners beyond the Mac, 2026-10-22) |
+| `hot_corners.top_right` | as `top_left` | `[]` | as `top_left` | same | proposed (hot corners beyond the Mac, 2026-10-22) |
+| `hot_corners.bottom_left` | as `top_left` | `[]` | as `top_left` | same | proposed (hot corners beyond the Mac, 2026-10-22) |
+| `hot_corners.bottom_right` | as `top_left` | `[]` | as `top_left` (macOS ships Quick Note here; sill has none until M12) | same | proposed (hot corners beyond the Mac, 2026-10-22) |
 | `hot_corners.dwell_ms` | `Ms` | `150` | `0..=2000`; how long the pointer rests before the corner acts | `20-SURFACES.md#3-open-decisions` item 7; F409 | proposed (M10 freeze, 2026-09-26) |
 | `hot_corners.rearm_ms` | `Ms` | `500` | `0..=5000`; acts again only after the pointer has left and this long | same | proposed (M10 freeze, 2026-09-26) |
 | `hot_corners.size_px` | `Px` | `2` | `1..=8`; the invisible square's side | `20-SURFACES.md#1-16-hot-corners-spec-integrated-experience` (2 x 2 px) | proposed (M10 freeze, 2026-09-26) |
@@ -1453,10 +1449,10 @@ unchanged.
    names its page with `page = Page::declared("wallpaper")`.
 2. **One control vocabulary.** `control = "<id>"` on a key (`#[settings(control = "picture")]`)
    picks a control from the closed set `readout`, `toggle`, `segmented`, `menu`, `slider`, `text`,
-   `colour`, `shortcut`, `rows`, `button`, `picture`. `KeyKind::default_control` is the only
+   `colour`, `shortcut`, `rows`, `button`, `picture`, `corners`. `KeyKind::default_control` is the only
    table from kind to control, `TogglePair` the only on/off rule; an id this build does not know,
    or one that does not fit the kind, is ignored and the default control is drawn. `picture` is a
-   grid of pictures with "Add Picture…" whose value is a path; it fits a text key.
+   grid of pictures with "Add Picture…" whose value is a path; it fits a text key. `corners` is the Hot Corners sheet: its value is the corner's list of bindings; it fits a text key.
 3. **A target for every entrance.** `SettingsTarget` (defined in `ds_core::settings`, pure, so a compositor holds it without `ds-settings`; re-exported as `ds_settings::target::SettingsTarget`) is `Page(PageId)`,
    `Key(KeyPath)` or `Account(AccountRef)`, written `page:wallpaper`, `key:dock.tile_size_px`,
    `account:<id>`. It is the payload of the `settings.page.show` intent. A page may say `listing = "hidden"`

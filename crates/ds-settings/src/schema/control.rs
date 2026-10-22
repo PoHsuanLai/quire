@@ -41,6 +41,9 @@ pub enum Control {
     /// A grid of pictures with "Add Picture…"; the value is the path of the chosen one. A text
     /// key only.
     Picture,
+    /// The four hot corners as one sheet: a screen picture with a menu at each corner. A text
+    /// key only; the value is the corner's list of bindings.
+    Corners,
 }
 
 impl Control {
@@ -59,7 +62,7 @@ impl Control {
     /// schema never makes a slider of a word.
     pub fn fits(self, kind: &KeyKind) -> bool {
         match self {
-            Control::Picture => matches!(kind, KeyKind::Text),
+            Control::Picture | Control::Corners => matches!(kind, KeyKind::Text),
             Control::Menu => matches!(
                 kind,
                 KeyKind::Toggle { .. } | KeyKind::Segmented { .. } | KeyKind::Menu { .. }
@@ -268,6 +271,12 @@ mod tests {
                 },
                 Some("picture"),
                 Control::Slider,
+            ),
+            (
+                "corners on text",
+                KeyKind::Text,
+                Some("corners"),
+                Control::Corners,
             ),
             (
                 "a menu for segments",

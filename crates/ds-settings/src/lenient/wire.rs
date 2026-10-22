@@ -25,6 +25,10 @@ pub(super) trait Wire {
     fn set(table: &mut Self::Table, path: &[String], value: Self::Value);
     /// Whether `path` names a key in `table`.
     fn has(table: &Self::Table, path: &[String]) -> bool;
+    /// How many entries the list at `path` in `table` holds; `None` when `path` is not a list.
+    fn list_len(table: &Self::Table, path: &[String]) -> Option<usize>;
+    /// How many entries `value` holds when it is a list.
+    fn value_len(value: &Self::Value) -> Option<usize>;
     /// `value` brought into `bounds`, or `None` when it is not a number or already inside.
     fn clamp(value: &Self::Value, bounds: LimitBounds) -> Option<Self::Value>;
     /// `value` as the short text a report shows.
@@ -39,7 +43,10 @@ impl Wire for TomlWire {
     type Value = toml::Value;
 
     fn parse(text: &str) -> Result<toml::Table, String> {
-        text.parse::<toml::Table>().map_err(|e| e.to_string())
+        let mut table = text.parse::<toml::Table>().map_err(|e| e.to_string())?;
+        // An older spelling the reader would otherwise drop key by key (design/22 §3.23).
+        crate::schema::corners_stored::fold_older_commands(&mut table);
+        Ok(table)
     }
 
     fn encode<D: Serialize>(value: &D) -> Option<toml::Table> {
@@ -100,6 +107,19 @@ impl Wire for TomlWire {
                 None => false,
             },
         }
+    }
+
+    fn list_len(table: &toml::Table, path: &[String]) -> Option<usize> {
+        let (last, parents) = path.split_last()?;
+        let mut here = table;
+        for key in parents {
+            here = here.get(key)?.as_table()?;
+        }
+        here.get(last).and_then(Self::value_len)
+    }
+
+    fn value_len(value: &toml::Value) -> Option<usize> {
+        value.as_array().map(Vec::len)
     }
 
     fn clamp(value: &toml::Value, bounds: LimitBounds) -> Option<toml::Value> {
@@ -194,6 +214,19 @@ impl Wire for JsonWire {
                 None => false,
             },
         }
+    }
+
+    fn list_len(table: &Object, path: &[String]) -> Option<usize> {
+        let (last, parents) = path.split_last()?;
+        let mut here = table;
+        for key in parents {
+            here = here.get(key)?.as_object()?;
+        }
+        here.get(last).and_then(Self::value_len)
+    }
+
+    fn value_len(value: &serde_json::Value) -> Option<usize> {
+        value.as_array().map(Vec::len)
     }
 
     fn clamp(value: &serde_json::Value, bounds: LimitBounds) -> Option<serde_json::Value> {

@@ -1,7 +1,7 @@
 //! The settings of the machines in `ds-behaviour`: `switcher.*` (design/22 §3.11; design/13
 //! §13.3.5) and `hot_corners.*` (design/13 §13.3.12). They live here, beside the schema, so the
 //! shell and the compositor read one definition of each key; the keys stay in
-//! `sill/settings.toml`. All Advanced.
+//! `sill/settings.toml`. All Advanced, except the four hot corners, which one custom control draws.
 
 use std::time::Duration;
 
@@ -11,6 +11,8 @@ use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 use crate::schema::Page;
+use crate::schema::corners::CornerBindings;
+use crate::schema::corners_stored::StoredHotCorners;
 use crate::units::{Ms, Px};
 
 /// `switcher.*`: the app switcher's timing and cells.
@@ -87,15 +89,12 @@ impl SwitcherSettings {
     }
 }
 
-/// What a hot corner does.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
+/// One of the desktop's own actions a hot corner can run.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 #[word(case = snake)]
 #[non_exhaustive]
 pub enum CornerAction {
-    /// Nothing; the corner is inactive.
-    #[default]
-    None,
     /// Open the launcher.
     Launcher,
     /// Open the notification center.
@@ -108,13 +107,20 @@ pub enum CornerAction {
     Lock,
     /// The overview of the Spaces.
     Workspaces,
-    /// The corner's `*_command`, run by `/bin/sh -c`.
-    Command,
+    /// The overview of the focused app's windows.
+    AppWindows,
+    /// Put the displays to sleep.
+    DisplaySleep,
+    /// Summon the assistant.
+    Assistant,
 }
 
 /// `hot_corners.*`: what each screen corner does when the pointer rests in it, and the timing.
+/// A corner is a list of bindings (an empty list leaves it inactive); a file that still holds the
+/// older one word per corner (`top_left = "lock"`, with `top_left_command`) is read, and saving
+/// writes the list form only.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, crate::SettingsSchema)]
-#[serde(default)]
+#[serde(try_from = "StoredHotCorners")]
 #[settings(file = "sill/settings.toml", domain = "hot_corners", page = Page::Dock)]
 #[non_exhaustive]
 pub struct HotCornerSettings {
@@ -122,58 +128,34 @@ pub struct HotCornerSettings {
         label = "Top left",
         help = "What the top-left corner does.",
         section = "Hot Corners",
-        advanced
+        text,
+        control = "corners"
     )]
-    pub top_left: CornerAction,
+    pub top_left: CornerBindings,
     #[settings(
         label = "Top right",
         help = "What the top-right corner does.",
         section = "Hot Corners",
-        advanced
+        text,
+        control = "corners"
     )]
-    pub top_right: CornerAction,
+    pub top_right: CornerBindings,
     #[settings(
         label = "Bottom left",
         help = "What the bottom-left corner does.",
         section = "Hot Corners",
-        advanced
+        text,
+        control = "corners"
     )]
-    pub bottom_left: CornerAction,
+    pub bottom_left: CornerBindings,
     #[settings(
         label = "Bottom right",
         help = "What the bottom-right corner does.",
         section = "Hot Corners",
-        advanced
+        text,
+        control = "corners"
     )]
-    pub bottom_right: CornerAction,
-    #[settings(
-        label = "Top-left command",
-        help = "The command the top-left corner runs when it is set to Command.",
-        section = "Hot Corners",
-        advanced
-    )]
-    pub top_left_command: String,
-    #[settings(
-        label = "Top-right command",
-        help = "The command the top-right corner runs when it is set to Command.",
-        section = "Hot Corners",
-        advanced
-    )]
-    pub top_right_command: String,
-    #[settings(
-        label = "Bottom-left command",
-        help = "The command the bottom-left corner runs when it is set to Command.",
-        section = "Hot Corners",
-        advanced
-    )]
-    pub bottom_left_command: String,
-    #[settings(
-        label = "Bottom-right command",
-        help = "The command the bottom-right corner runs when it is set to Command.",
-        section = "Hot Corners",
-        advanced
-    )]
-    pub bottom_right_command: String,
+    pub bottom_right: CornerBindings,
     #[settings(
         label = "Corner delay",
         help = "How long the pointer rests in a corner before it acts.",
@@ -206,14 +188,10 @@ pub struct HotCornerSettings {
 impl Default for HotCornerSettings {
     fn default() -> Self {
         HotCornerSettings {
-            top_left: CornerAction::None,
-            top_right: CornerAction::None,
-            bottom_left: CornerAction::None,
-            bottom_right: CornerAction::None,
-            top_left_command: String::new(),
-            top_right_command: String::new(),
-            bottom_left_command: String::new(),
-            bottom_right_command: String::new(),
+            top_left: CornerBindings::default(),
+            top_right: CornerBindings::default(),
+            bottom_left: CornerBindings::default(),
+            bottom_right: CornerBindings::default(),
             dwell_ms: Ms(150),
             rearm_ms: Ms(500),
             size_px: Px(2),
@@ -298,17 +276,6 @@ mod tests {
         assert_eq!(
             toml::from_str::<SwitcherSettings>(&text).ok(),
             Some(switcher)
-        );
-        let corners = HotCornerSettings {
-            top_left: CornerAction::Launcher,
-            bottom_right: CornerAction::Command,
-            bottom_right_command: "foot".to_owned(),
-            ..HotCornerSettings::default()
-        };
-        let text = toml::to_string(&corners).expect("serialises");
-        assert_eq!(
-            toml::from_str::<HotCornerSettings>(&text).ok(),
-            Some(corners)
         );
     }
 
