@@ -34,7 +34,10 @@ fn tree() -> Vec<Node> {
     vec![
         Node {
             name: "Docs",
-            kids: Some(vec![file("a.pdf"), file("Screenshot 2024-05-14 at 14.05.png")]),
+            kids: Some(vec![
+                file("a.pdf"),
+                file("Screenshot 2024-05-14 at 14.05.png"),
+            ]),
         },
         Node {
             name: "Music",
@@ -132,7 +135,11 @@ fn a_click_picks_a_row_and_the_page_answers_with_the_next_column() {
     assert_eq!(harness.count(".ds-colbrowser-column"), 2, "Docs' contents");
     click(&mut harness, &row(0, 1));
     assert_eq!(picked(&harness), "1");
-    assert_eq!(harness.count(".ds-colbrowser-column"), 2, "Music's, not Docs'");
+    assert_eq!(
+        harness.count(".ds-colbrowser-column"),
+        2,
+        "Music's, not Docs'"
+    );
     let chevrons = harness.count(".ds-colbrowser-item .ds-row-trailing");
     assert_eq!(chevrons, 2, "a chevron on each folder");
 }
@@ -154,7 +161,11 @@ fn up_down_right_and_left_walk_the_columns_as_finder_does() {
     assert_eq!(picked(&harness), "1,0", "Music's first row");
     assert_eq!(harness.count(".ds-colbrowser-column"), 2);
     press(&mut harness, ShortcutKey::Left);
-    assert_eq!(picked(&harness), "1", "back in the parent, the columns after it cut");
+    assert_eq!(
+        picked(&harness),
+        "1",
+        "back in the parent, the columns after it cut"
+    );
 }
 
 #[test]

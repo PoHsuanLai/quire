@@ -1,9 +1,7 @@
 //! What a `ColumnBrowser` decides, pure: what a key asks, which column the keys are in and which
 //! row they move to.
 
-use crate::components::lists::column_browser::item::{
-    BrowserColumn, BrowserRowKind, ColumnPick,
-};
+use crate::components::lists::column_browser::item::{BrowserColumn, BrowserRowKind, ColumnPick};
 use crate::components::lists::list::keys::{ListKey, list_key};
 use crate::components::lists::virtual_list::model::roved;
 use crate::stack::roving::Rove;
@@ -152,8 +150,12 @@ mod tests {
     /// Home > (Docs, Music, notes.txt); Docs selected > (a.pdf, b.pdf) with b selected.
     fn two() -> Vec<BrowserColumn<String>> {
         vec![
-            BrowserColumn::new(rows(&[("Docs", true), ("Music", true), ("notes.txt", false)]))
-                .selected(RowSelection::single(0)),
+            BrowserColumn::new(rows(&[
+                ("Docs", true),
+                ("Music", true),
+                ("notes.txt", false),
+            ]))
+            .selected(RowSelection::single(0)),
             BrowserColumn::new(rows(&[("a.pdf", false), ("b.pdf", false)]))
                 .selected(RowSelection::single(1)),
         ]
@@ -175,7 +177,11 @@ mod tests {
                 Modifiers::SHIFT,
                 Some(BrowserKey::Move(Rove::Step(Step::Up))),
             ),
-            (Key::End, plain, Some(BrowserKey::Move(Rove::Edge(Edge::Last)))),
+            (
+                Key::End,
+                plain,
+                Some(BrowserKey::Move(Rove::Edge(Edge::Last))),
+            ),
             (Key::Enter, plain, None),
             (Key::ArrowRight, Modifiers::ALT, None),
             (Key::ArrowDown, Modifiers::SUPER, Some(BrowserKey::Open)),
@@ -187,7 +193,7 @@ mod tests {
         ];
         for (key, modifiers, want) in cases {
             assert_eq!(
-                browser_key(key, *modifiers, Platform::Mac),
+                browser_key(key, *modifiers, Platform::MacOs),
                 *want,
                 "{key:?} {modifiers:?}"
             );
@@ -242,6 +248,6 @@ mod tests {
         assert_eq!((pick.column, pick.pick.row), (1, 1));
         assert!(leaf_selected(&columns));
         assert!(!leaf_selected(&columns[..1]), "a folder is selected");
-        assert!(!leaf_selected(&[]));
+        assert!(!leaf_selected::<u8>(&[]));
     }
 }

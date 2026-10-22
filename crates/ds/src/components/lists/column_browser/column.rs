@@ -9,13 +9,11 @@ use crate::components::controls::edge_grab::EdgeGrab;
 use crate::components::controls::press::{button_of, press_of};
 use crate::components::controls::scroller::handle::use_scroller;
 use crate::components::controls::scroller::view::Scroller;
-use crate::components::lists::column_browser::item::{
-    BrowserRow, BrowserRowKind, ColumnPick,
-};
+use crate::components::lists::column_browser::item::{BrowserRow, BrowserRowKind, ColumnPick};
 use crate::components::lists::column_browser::model::room;
 use crate::components::lists::name_cell::NameCell;
-use crate::components::lists::row::row::Row;
 use crate::components::lists::row::accessory::Accessory;
+use crate::components::lists::row::row::Row;
 use crate::components::lists::virtual_list::view::use_cursor_reveal;
 use crate::components::lists::virtual_table::row_pitch;
 use crate::focus::press_focus::on_click;

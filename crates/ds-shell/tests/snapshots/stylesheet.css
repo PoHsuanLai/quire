@@ -855,6 +855,35 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-column[*|data-extent=fixed][*|data-size=small]{ --column-extent:var(--ctl-h-s); }
 .ds-column[*|data-extent=fixed][*|data-size=large]{ --column-extent:var(--ctl-h-l); }
 .ds-column[*|data-extent=fixed][*|data-size=extra-large]{ --column-extent:var(--ctl-h-xl); }
+/* -- column_browser -- */
+/* ColumnBrowser (design/27-HIG-PARITY.md section 5.24, Finder's column view): columns side by side
+   in a box that scrolls sideways, each a scrolling list of compact rows with a hairline between it
+   and the next. A selected row is the accent while its column holds the keys; a parent column's
+   selection is the quiet wash, as is every selection once the browser loses the keyboard or its
+   window goes inactive (`data-active=no` on a parent column, `data-focus=away` on the browser).
+   The divider is a six-pixel grab across a column's right edge. The preview takes the room after
+   the last column, at least a column's width. The browser takes the keyboard itself and draws no
+   ring. Attribute selectors carry `*|` (spike S2). */
+
+.ds-colbrowser{ display:flex; height:100%; min-height:0; overflow-x:auto; overflow-y:hidden; outline:none; cursor:default; background:var(--surface); }
+.ds-colbrowser-strip{ display:flex; flex:none; min-width:100%; height:100%; }
+.ds-colbrowser-column{ position:relative; display:flex; flex-direction:column; flex:none; box-sizing:border-box; height:100%; min-height:0; border-right:var(--hair) solid var(--line); }
+.ds-colbrowser-column > .ds-scroller{ flex:1 1 0; min-height:0; }
+.ds-colbrowser-item{ box-sizing:border-box; padding:0 var(--s-6); }
+.ds-colbrowser .ds-row{ height:var(--row-compact-h); min-height:var(--row-compact-h); padding:0 var(--s-6); }
+.ds-colbrowser .ds-row-words{ flex:1 1 auto; min-width:0; overflow:hidden; }
+.ds-colbrowser-divider{ position:absolute; top:0; bottom:0; right:-3px; width:6px; z-index:var(--z-raise); cursor:ew-resize; }
+.ds-colbrowser-preview{ display:flex; flex-direction:column; flex:1 1 220px; min-width:220px; box-sizing:border-box; padding:var(--s-16); min-height:0; overflow:hidden; }
+
+.ds-colbrowser-column[*|data-active=no] .ds-row[*|data-focus=highlight][*|aria-selected=true],
+.ds-colbrowser[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-bg-quiet); color:var(--ink); }
+.ds-colbrowser-column[*|data-active=no] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-colbrowser-column[*|data-active=no] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic,
+.ds-colbrowser[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-colbrowser[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic{ color:var(--ink-soft); }
+.ds-colbrowser-column[*|data-active=no] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-name-icon,
+.ds-colbrowser[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-name-icon{ color:var(--ink-soft); }
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-name-icon{ color:var(--sel-ink); }
 /* -- command_line -- */
 /* CommandLine: a command to copy. One selectable line in the data face on a quiet fill, the
    Copy button beside it. Placement (margins) is the parent's. */
