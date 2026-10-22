@@ -221,7 +221,10 @@ mod files {
         clipboard.write_text("words").unwrap();
         assert_eq!(clipboard.read_files(), None);
         assert_eq!(shell.gnome_copied(), None);
-        assert_eq!(ClipboardFiles::from_gnome_copied("move\nfile:///tmp/a"), None);
+        assert_eq!(
+            ClipboardFiles::from_gnome_copied("move\nfile:///tmp/a"),
+            None
+        );
     }
 
     #[test]

@@ -153,7 +153,10 @@ impl Clipboard for System {
         let list = self.reader.text(files::read_system);
         list.as_deref()
             .and_then(ClipboardFiles::from_uri_list)
-            .or_else(|| self.read_text().and_then(|text| ClipboardFiles::from_text(&text)))
+            .or_else(|| {
+                self.read_text()
+                    .and_then(|text| ClipboardFiles::from_text(&text))
+            })
     }
 
     fn write_files(&self, set: &ClipboardFiles) -> Result<(), ClipboardError> {
