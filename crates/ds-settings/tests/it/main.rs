@@ -15,6 +15,7 @@ mod store;
 mod support;
 mod user_style;
 mod watch;
+mod when;
 mod writer;
 
 #[path = "../../../ds/tests/it/support/module_guard.rs"]

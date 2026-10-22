@@ -103,14 +103,14 @@ impl MarkProvider {
     }
 }
 
-/// The folder glyph inside a local mark: the chip less its padding (11, 13, 14 becomes 8, 9, 10).
+/// The folder glyph inside a local mark: the chip less its padding (11, 13, 14 becomes 8, 9, 10;
+/// the 64 px chip takes 32).
 fn folder_glyph(size: ControlSize) -> IconSize {
     match size {
         ControlSize::Mini => IconSize::Px(IconPx(8)),
         ControlSize::Small => IconSize::Px(IconPx(9)),
-        ControlSize::Regular | ControlSize::Large | ControlSize::ExtraLarge => {
-            IconSize::Px(IconPx(10))
-        }
+        ControlSize::Regular | ControlSize::ExtraLarge => IconSize::Px(IconPx(10)),
+        ControlSize::Large => IconSize::Px(IconPx(32)),
     }
 }
 
@@ -171,8 +171,8 @@ fn face_mark(drawn: DrawnFace, size: ControlSize, common: Common, tip: Tip) -> E
 }
 
 /// A provider mark: the provider's glyph on a tile of the control ladder (Mini 11, Small 13,
-/// Regular 14; Large repeats Regular). Static: no hover, focus or motion. A `face` (a letter
-/// and a colour supplied as data) is drawn first; without one the named `provider` stands,
+/// Regular 14; Large 64, the avatar of an account's detail header). Static: no hover, focus or
+/// motion. A `face` (a letter and a colour supplied as data) is drawn first; without one the named `provider` stands,
 /// and the `@` of the neutral variant is the last resort.
 #[component]
 pub fn ProviderMark(

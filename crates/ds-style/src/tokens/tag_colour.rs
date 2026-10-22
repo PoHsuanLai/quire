@@ -1,7 +1,7 @@
-//! The twelve colours a person can give a tag (`--tag-red` … `--tag-brown`): Apple's system
+//! The thirteen colours a person can give a tag (`--tag-red` … `--tag-gray`): Apple's system
 //! hues in their order, light and dark, resolved like the accents.
 //!
-//! A tag's colour is a choice the person made, so it stays one of these twelve and never a
+//! A tag's colour is a choice the person made, so it stays one of these thirteen and never a
 //! value of the app's own; an app stores the hue and paints `var(--tag-<hue>)`.
 
 use crate::appearance::system::Contrast;
@@ -38,6 +38,8 @@ pub enum TagColour {
     Pink,
     /// `--tag-brown`.
     Brown,
+    /// `--tag-gray`: Finder's Gray tag.
+    Gray,
 }
 
 impl TagColour {

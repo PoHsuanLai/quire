@@ -2,7 +2,9 @@
    px band: the leading items at the start, the title centred in what is left, the trailing items
    at the end, `--s-12` in from each edge. The title is 13 pt semibold over an optional subtitle
    in the faint ink; a control put in its place is centred the same way. Items are toolbar
-   buttons, each 40 px with its gap (the pitch the overflow rule counts by). */
+   buttons, each 40 px with its gap (the pitch the overflow rule counts by). A title and a centre
+   item together (Finder): the title keeps its own width at the start, the item is centred in the
+   room that is left. */
 
 .ds-toolbar{
   display:flex; align-items:center; box-sizing:border-box; flex:none; height:52px; padding:0 var(--s-12); gap:var(--s-8);
@@ -14,6 +16,8 @@
 .ds-toolbar-title{ display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1 1 0; min-width:0; line-height:1.25; }
 .ds-toolbar-heading{ max-width:100%; overflow:hidden; white-space:nowrap; font-size:var(--fs-control); font-weight:600; color:var(--ink); }
 .ds-toolbar-subtitle{ max-width:100%; overflow:hidden; white-space:nowrap; font-size:var(--fs-help); color:var(--ink-faint); }
+.ds-toolbar-title[*|data-with-center]{ flex:0 1 auto; align-items:flex-start; }
+.ds-toolbar-center{ display:flex; align-items:center; justify-content:center; flex:1 1 0; min-width:0; }
 /* The search item: the field at its minimum width, drawn where the magnifier button would be. */
 .ds-toolbar-search{ display:flex; flex:none; min-width:0; max-width:100%; }
 .ds-toolbar-search > .ds-text-field{ flex:1 1 auto; min-width:0; }

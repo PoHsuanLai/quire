@@ -15,7 +15,9 @@ use crate::blitz_host::FindDocument;
 use crate::node_ref::{DocRef, FoundNode, NodeRef, Written};
 use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
 use dioxus::prelude::*;
-use ds::host::caret::{Caret, CaretOwed, Collapsed, FieldSelection, InitialCaret, caret_at};
+use ds::host::caret::{
+    Caret, CaretOwed, Collapsed, FieldSelection, InitialCaret, caret_at, stem_end,
+};
 use ds::host::found::Found;
 use ds::prelude::*;
 use std::rc::Rc;
@@ -94,15 +96,26 @@ pub(crate) fn focus_placing(element: &MountedData, caret: InitialCaret) -> Focus
         Some(Some((Held::Already, Field::NotLaidOut | Field::Absent))) => Focused::Done,
         Some(Some((Held::Not, Field::Editable))) => done(node.write(|doc| {
             doc.set_focus_to(node.node);
-            doc.with_text_input(node.node, |mut driver| match caret {
-                InitialCaret::SelectAll => driver.select_all(),
-                InitialCaret::End => driver.move_to_text_end(),
-                InitialCaret::Start => driver.move_to_text_start(),
-            });
+            put_caret(doc, node.node, caret);
             doc.shell_provider.request_redraw();
         })),
         Some(Some((Held::Not, Field::NotLaidOut | Field::Absent))) => focus(element),
     }
+}
+
+/// Put the caret of the text field `node` at `caret`.
+fn put_caret(doc: &mut BaseDocument, node: NodeId, caret: InitialCaret) {
+    let stem = doc
+        .get_node(node)
+        .and_then(Node::element_data)
+        .and_then(|element| element.text_input_data())
+        .map_or(0, |input| stem_end(input.editor.raw_text()));
+    doc.with_text_input(node, |mut driver| match caret {
+        InitialCaret::SelectAll => driver.select_all(),
+        InitialCaret::SelectStem => driver.select_byte_range(0, stem),
+        InitialCaret::End => driver.move_to_text_end(),
+        InitialCaret::Start => driver.move_to_text_start(),
+    });
 }
 
 /// Whether a node has the keyboard already.
@@ -149,11 +162,7 @@ pub(crate) fn place_caret(element: &MountedData, caret: InitialCaret) -> Focused
     };
     match field {
         Field::Editable => done(node.write(|doc| {
-            doc.with_text_input(node.node, |mut driver| match caret {
-                InitialCaret::SelectAll => driver.select_all(),
-                InitialCaret::End => driver.move_to_text_end(),
-                InitialCaret::Start => driver.move_to_text_start(),
-            });
+            put_caret(doc, node.node, caret);
             doc.shell_provider.request_redraw();
         })),
         // Blitz builds a field's editor with its first layout; a field focused on mount is

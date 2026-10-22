@@ -7,6 +7,7 @@ pub mod button_marks;
 pub mod button_model;
 pub mod checkbox;
 pub mod chip;
+pub mod chip_dot;
 pub mod choice;
 pub mod command_line;
 pub mod copy_state;

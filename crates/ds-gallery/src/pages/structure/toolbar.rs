@@ -13,8 +13,11 @@ use ds::prelude::*;
 /// The items either side of the title.
 fn leading() -> Vec<ToolbarItem<&'static str>> {
     vec![
-        ToolbarItem::new("back", "Back", Icon::ChevronLeft),
-        ToolbarItem::new("forward", "Forward", Icon::ChevronRight).with(Availability::Disabled),
+        ToolbarItem::new("back", "Back", Icon::ChevronLeft)
+            .with_shortcut(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('[')])),
+        ToolbarItem::new("forward", "Forward", Icon::ChevronRight)
+            .with_shortcut(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char(']')]))
+            .with(Availability::Disabled),
     ]
 }
 
@@ -69,7 +72,7 @@ pub fn ToolbarSection() -> Element {
     let mut view = use_signal(|| 0u8);
     let mut hung = use_signal(|| None::<Anchor>);
     rsx! {
-        Section { title: "Toolbar", note: "NSToolbar: a 52 px band. Items give way from the last trailing one when the room is short and the chevron opens them as a menu; a toggle shows its state; a control can stand in the title's place. A pick reports the item and its button (Picked), and Tag in the first toolbar hangs a menu from that button.",
+        Section { title: "Toolbar", note: "NSToolbar: a 52 px band. Items give way from the last trailing one when the room is short and the chevron opens them as a menu; a toggle shows its state; a control can stand in the title's place, or stand with it (the title after the leading items, the control centred in the room left); a tooltip carries the item's key (Back  ⌘[); a right click on the band is the app's (oncontextmenu) and does not reach the window's menu behind it. A pick reports the item and its button (Picked), and Tag in the first toolbar hangs a menu from that button.",
             div { class: "g-list", style: "width:620px",
                 Toolbar::<&'static str> {
                     leading: leading(),
@@ -104,6 +107,24 @@ pub fn ToolbarSection() -> Element {
                         }
                     },
                     room: ToolbarRoom::Fixed(Px(620.0)),
+                    onpick: move |pick: Picked<&'static str>| said.set(pick.value.to_owned()),
+                }
+            }
+            div { class: "g-list", style: "width:620px",
+                Toolbar::<&'static str> {
+                    leading: leading(),
+                    trailing: trailing(),
+                    title: Some(TextLine::from("Downloads")),
+                    center: rsx! {
+                        SegmentedControl::<u8> {
+                            label: "View",
+                            choices: Choice::pairs([(0u8, "Icons"), (1, "List")]),
+                            tracking: Tracking::SelectOne(view()),
+                            onchange: move |next| view.set(next),
+                        }
+                    },
+                    room: ToolbarRoom::Fixed(Px(620.0)),
+                    oncontextmenu: move |_| said.set("context menu on the toolbar".to_owned()),
                     onpick: move |pick: Picked<&'static str>| said.set(pick.value.to_owned()),
                 }
             }

@@ -30,6 +30,17 @@ impl ListStyle {
     }
 }
 
+/// When a list takes the keyboard.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum ListFocus {
+    /// Only when the person or the caller puts it there.
+    #[default]
+    Manual,
+    /// As soon as it is mounted: the list a sheet opens on (Choose Application gives its list the
+    /// keyboard), so the arrow keys work at once.
+    OnMount,
+}
+
 /// What an item is to the keyboard.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum ListRole {

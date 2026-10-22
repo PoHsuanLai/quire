@@ -213,6 +213,7 @@ that registration is not done yet (see FINDINGS "Settings and schema").
 | `bar.item_font_weight` | `Count` | `500` | `100..=900`; the app name is always bold | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `bar.item_radius_px` | `Px` | `5` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `bar.battery_low_percent` | `Percent` | `20` | `5..=50`; at or under this charge, on battery, the fill turns `--battery-low` and the item nudges once per discharge | `26-DETAILS.md` §5.1.3 G10, G11; sill FINDINGS F822 | proposed (D1, 2026-09-27) |
+| `bar.autohide` | `BarAutohide::{Always,DesktopOnly,FullScreenOnly,Never}` | `FullScreenOnly` | TOML words `always`, `desktop_only`, `full_screen_only`, `never`; macOS's "Automatically hide and show the menu bar" (Always, On Desktop Only, In Full Screen Only, Never); Appearance › Bar | `28-CUSTOMIZATION.md` (menu bar auto-hide is a scalar key, not a placement); sill's bar auto-hide | settled (shell, 2026-10-22) |
 
 ### 3.5 `dock` (sill/settings.toml)
 
@@ -1051,7 +1052,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 
 | Settings app page | Keys shown |
 | --- | --- |
-| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `appearance.transparency`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
+| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `appearance.transparency`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome); under **Bar**: `bar.autohide` |
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.indicators`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into the compositor's `system_actions` and `custom` shortcut files, and the chord the desktop already holds wins a clash, shown on the row (28 §7 decision 10) |
@@ -1061,7 +1062,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Power** (added Q445; sill's own idle service, section 3.24) | `idle.screen_off_ac_min`, `idle.screen_off_battery_min`, `idle.suspend_ac_min`, `idle.suspend_battery_min`, `idle.dim_s`, `idle.dim_level_pct`, `idle.lock`, `idle.locked_screen_off_s`, `session.lock_grace_s` (`Sill` under `idle.times` is what makes the `idle.screen_off_*`/`idle.suspend_*` sliders apply; under `Desktop` they still render, disabled, so the row explains itself) |
 | **Intelligence** (the companion, design/32; sill's `companion` domain and the daemons' schemas) | Companion: `companion.summon`, `companion.in_field`, `companion.notify`; Models: `ai.local_only`, `ai.floor.<class>`, `ai.model.<kind>.<tier>` (the live picker, section 9.4); Memory: `memory.files.at_rest`, `memory.consolidation.when`, `memory.consolidation.apply`, and the memory view (a live module); Computer use: `cua.enabled`, `cua.apps`, `cua.default_mode`, `cua.autopause`; Privacy: `agent.strictness`, `agent.mcp.expose`, `agent.undo.keep_h`; Confirmations: `companion.confirm_arm_ms` is Advanced |
 | **Viewer** (anyview, section 3.31) | Window: `viewer.chrome.hide_after`, `viewer.warm_for`; Viewing: `viewer.zoom.step`, `viewer.media.seek_step`; History: `viewer.history.cap`, `viewer.versions.keep`; Export: `viewer.export.jpeg_quality`, `viewer.export.avif_quality`, `viewer.export.paper`, `viewer.export.orientation`; `viewer.peek.*` and `viewer.image.*` are Advanced |
-| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
+| **Advanced** (file only) | everything else in section 3: `bar.*` except `bar.autohide`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
 
 **Row help (2026-10-13).** Settings is for normal people: a row's label is a short noun and its details
 come on request. Settings rows use `FieldRow { help_shown: HelpShown::OnRequest }` (04-COMPONENTS.md

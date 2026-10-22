@@ -6,7 +6,8 @@
 
 use crate::components::lists::list::entry::{ListEntry, SetPlace};
 use crate::components::lists::list::keys::{ListKey, labelled, list_key, moved};
-use crate::components::lists::list::model::{ListItem, ListStyle};
+use crate::components::lists::list::model::{ListFocus, ListItem, ListStyle};
+use crate::focus::soon::focus_soon;
 use crate::root::common::Common;
 use crate::stack::typeahead::Typeahead;
 use dioxus::prelude::*;
@@ -35,6 +36,8 @@ enum Held {
 /// `on_settled` hears each dropped key once its batch has settled. Multi-selection is the
 /// caller's: it puts each selected row's own state, and the list only moves the cursor. Keys are
 /// hashed to name the items' nodes, so a key must hash the same on every render.
+///
+/// `focus: ListFocus::OnMount` gives the list the keyboard as it mounts (default `Manual`).
 #[component]
 pub fn List<K: Clone + PartialEq + Hash + 'static>(
     label: String,
@@ -46,6 +49,7 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
     #[props(default)] onpick: Option<EventHandler<K>>,
     #[props(default = Exit::Row)] exit: Exit,
     #[props(default)] on_settled: Option<EventHandler<K>>,
+    #[props(default)] focus: ListFocus,
     #[props(default)] common: Common,
 ) -> Element {
     let book = use_book(&items);
@@ -116,7 +120,12 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
             "data-style": style.drawn().slug(),
             "data-sidebar-size": (style == ListStyle::SourceList).then(|| sidebar.slug()),
             "data-focus": away,
-            onmounted: move |event| mounted.mounted(event),
+            onmounted: move |event: MountedEvent| {
+                if focus == ListFocus::OnMount {
+                    focus_soon(event.data());
+                }
+                mounted.mounted(event);
+            },
             onfocus: move |_| held.set(Held::Yes),
             onblur: move |_| held.set(Held::No),
             onkeydown: onkey,

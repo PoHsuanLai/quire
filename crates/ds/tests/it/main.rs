@@ -53,6 +53,7 @@ mod support;
 mod surface;
 mod symbol_ssr;
 mod token_derive;
+mod toolbar_parts_ssr;
 mod typeface;
 mod user_style_ssr;
 mod voice_orb_ssr;

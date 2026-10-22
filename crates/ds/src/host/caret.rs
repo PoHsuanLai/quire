@@ -25,6 +25,18 @@ pub enum InitialCaret {
     Start,
     /// The whole text selected, so the first key typed replaces it.
     SelectAll,
+    /// The name without its extension selected ("photo" of "photo.png"), as Finder opens a
+    /// rename; see [`stem_end`].
+    SelectStem,
+}
+
+/// Where the stem of the file name `text` ends, in bytes: at its last dot, unless the dot starts
+/// the name (".bashrc" is all stem) or there is none, when it ends with the text.
+pub fn stem_end(text: &str) -> usize {
+    match text.rfind('.') {
+        Some(dot) if dot > 0 => dot,
+        Some(_) | None => text.len(),
+    }
 }
 
 /// Whether a field focused before its first layout still owes the caret its landing asked for.
@@ -77,7 +89,23 @@ pub enum Collapsed {
 
 #[cfg(test)]
 mod tests {
-    use super::{Caret, Collapsed, caret_at};
+    use super::{Caret, Collapsed, caret_at, stem_end};
+
+    #[test]
+    fn a_stem_ends_at_the_last_dot_that_does_not_start_the_name() {
+        const CASES: &[(&str, usize)] = &[
+            ("photo.png", 5),
+            ("archive.tar.gz", 11),
+            (".bashrc", 7),
+            ("README", 6),
+            ("name.", 4),
+            ("", 0),
+            ("été.png", 5),
+        ];
+        for &(name, want) in CASES {
+            assert_eq!(stem_end(name), want, "{name:?}");
+        }
+    }
 
     #[test]
     fn only_a_bare_caret_after_the_last_character_is_at_the_end() {

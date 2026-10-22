@@ -109,6 +109,7 @@ pub use crate::components::overlays::loadable::Phase;
 pub use crate::components::overlays::pinned_bar::{PinEdge, PinnedBar};
 pub use crate::components::overlays::popover::Popover;
 pub use crate::components::overlays::sheet::Sheet;
+pub use crate::components::overlays::sheet_actions::SheetActions;
 pub use crate::components::overlays::skeleton::Skeleton;
 pub use crate::components::overlays::skeleton::SkeletonShape;
 pub use crate::components::overlays::skeleton_row::SkeletonLines;

@@ -3,6 +3,7 @@
 
 use dioxus::prelude::*;
 use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::chip_dot::ChipDot;
 use ds::prelude::*;
 use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
@@ -31,7 +32,7 @@ fn App() -> Element {
                 Chip {
                     variant: ChipVariant::Neutral,
                     text: "Work",
-                    dot: "#3366cc".to_string(),
+                    dot: ChipDot::Colour("#3366cc".to_owned()),
                     pressed,
                     onpress: move |_| presses += 1,
                     onremove: move |()| removed += 1,

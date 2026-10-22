@@ -37,8 +37,10 @@
 }
 .ds-chip-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }
 
-/* A leading colour dot: the chip's `dot` colour in `--chip-dot`. */
+/* A leading colour dot: the chip's `dot` colour (a `--tag-*` token or any CSS colour) in `--chip-dot`. */
 .ds-chip-dot{ display:inline-block; vertical-align:middle; flex:none; width:12px; height:12px; margin-right:var(--s-4); border-radius:var(--r-pill); background:var(--chip-dot); }
+/* A dot with no text (a tag in a row): nothing to keep apart from. */
+.ds-chip-dot:only-child{ margin-right:0; }
 
 /* Pressable: the face is a button that wears the chip's own type and ink; the chip lays the
    face and its remove button in a row. Focus ring: the global keyboard rule. */

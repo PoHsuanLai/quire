@@ -11,13 +11,15 @@ use ds_core::word::Word;
 
 /// A vertical stack: `gap` between children (a spacing step, 8 px unless given; `ColumnGap::None`
 /// for none), `align` across the width (stretched unless given), `extent` along its height (as
-/// tall as the children unless given).
+/// tall as the children unless given). `oncontextmenu` hears a right click anywhere in the column
+/// and keeps it from reaching the menu of whatever holds the column.
 #[component]
 pub fn Column(
     children: Element,
     #[props(into, default)] gap: ColumnGap,
     #[props(default)] align: ColumnAlign,
     #[props(default)] extent: ColumnExtent,
+    #[props(default)] oncontextmenu: Option<EventHandler<MouseEvent>>,
     #[props(default)] common: Common,
 ) -> Element {
     let data = common.data_attributes();
@@ -36,6 +38,12 @@ pub fn Column(
             "data-extent": extent_kind,
             "data-size": extent_size,
             "data-align": (align != ColumnAlign::Stretch).then(|| align.slug()),
+            oncontextmenu: move |event: MouseEvent| {
+                if let Some(hear) = oncontextmenu {
+                    event.stop_propagation();
+                    hear.call(event);
+                }
+            },
             onmounted: move |event| common.mounted(event),
             ..data,
             {children}

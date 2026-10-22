@@ -78,18 +78,18 @@ fn windows_state(source: impl KeymapSource + Send + Sync + 'static) -> KeyState 
 fn a_reload_applies_the_sources_change_and_registers_again_over_it() {
     let remap = Remap::default();
     let mut state = windows_state(remap.clone());
-    let compose = row("mail.compose", "Primary+Shift+N");
+    let compose = row("mail.compose", "Primary+Shift+J");
     assert_eq!(
         state.register(&mail(), &rows(std::slice::from_ref(&compose))),
         Ok(())
     );
-    let ctrl_shift_n = press(&[Modifier::Ctrl, Modifier::Shift], 'n');
+    let ctrl_shift_n = press(&[Modifier::Ctrl, Modifier::Shift], 'j');
     assert_eq!(
         state.keymap.resolve(&ctrl_shift_n, Context::Normal),
         Some(Action::App(compose.0.clone()))
     );
     // The person gives Copy the chord the app registered: the system's settings win a chord.
-    remap.set_copy("Ctrl+Shift+N");
+    remap.set_copy("Ctrl+Shift+J");
     state.reload();
     assert_eq!(
         state.keymap.resolve(&ctrl_shift_n, Context::Normal),
@@ -139,7 +139,7 @@ fn the_sources_change_flag_is_taken_once() {
     assert!(!state.take_changed());
 }
 
-/// What the probe saw: the platform, what Ctrl+Shift+N resolved to, and Ctrl+C in a terminal.
+/// What the probe saw: the platform, what Ctrl+Shift+J resolved to, and Ctrl+C in a terminal.
 type Seen = (Platform, Option<Action>, Option<Action>);
 
 thread_local! {
@@ -149,10 +149,10 @@ thread_local! {
 fn probe() -> Element {
     let keys = use_keys_provider();
     use_hook(|| {
-        let registered = keys.register_actions(&mail(), &[row("mail.compose", "Primary+Shift+N")]);
+        let registered = keys.register_actions(&mail(), &[row("mail.compose", "Primary+Shift+J")]);
         assert_eq!(registered, Ok(()));
         let held = Modifiers::CONTROL | Modifiers::SHIFT;
-        let compose = keys.resolve(&Key::Character("N".into()), held, Context::Normal);
+        let compose = keys.resolve(&Key::Character("J".into()), held, Context::Normal);
         let copy = keys.resolve(
             &Key::Character("c".into()),
             Modifiers::CONTROL,
@@ -242,9 +242,9 @@ fn an_app_forgoes_what_it_does_not_offer_and_never_what_every_app_honours() {
 #[test]
 fn registering_an_app_again_replaces_its_earlier_registration() {
     let mut state = ours_state();
-    let command_shift_n = press(&[Modifier::Super, Modifier::Shift], 'n');
-    let old = row("mail.compose", "Primary+Shift+N");
-    let new = row("mail.write", "Primary+Shift+N");
+    let command_shift_n = press(&[Modifier::Super, Modifier::Shift], 'j');
+    let old = row("mail.compose", "Primary+Shift+J");
+    let new = row("mail.write", "Primary+Shift+J");
     assert_eq!(state.register(&mail(), &rows(&[old])), Ok(()));
     // The changed defaults give the chord to another action: no clash with the app's own old one.
     assert_eq!(
@@ -273,14 +273,14 @@ fn registering_an_app_again_replaces_its_earlier_registration() {
 #[test]
 fn app_overrides_lie_on_the_source_and_survive_a_reload() {
     let (overrides, parsed) =
-        Overrides::parse("mail.compose = Primary+Alt+N\nmail.other = Primary+Space\n");
+        Overrides::parse("mail.compose = Primary+Alt+J\nmail.other = Primary+Space\n");
     assert!(parsed.is_empty(), "{parsed:?}");
     let source = KeySource::conventions(ours()).with_overrides(overrides);
     let mut state = KeyState::load(source);
-    let compose = row("mail.compose", "Primary+Shift+N");
+    let compose = row("mail.compose", "Primary+Shift+J");
     assert_eq!(state.register(&mail(), &rows(&[compose])), Ok(()));
-    let rebound = press(&[Modifier::Super, Modifier::Alt], 'n');
-    let default = press(&[Modifier::Super, Modifier::Shift], 'n');
+    let rebound = press(&[Modifier::Super, Modifier::Alt], 'j');
+    let default = press(&[Modifier::Super, Modifier::Shift], 'j');
     for _ in 0..2 {
         assert_eq!(
             state.keymap.resolve(&rebound, Context::Normal),
@@ -296,17 +296,17 @@ fn app_overrides_lie_on_the_source_and_survive_a_reload() {
 #[test]
 fn set_overrides_rebinds_and_an_empty_set_restores_the_default() {
     let mut state = ours_state();
-    let compose = row("mail.compose", "Primary+Shift+N");
+    let compose = row("mail.compose", "Primary+Shift+J");
     let tab = row("mail.tab", "Primary+T");
     let tabs = Registration::new(&mail())
         .forgo(StandardAction::ShowFonts)
         .action(compose.0, compose.1)
         .action(tab.0, tab.1);
     assert_eq!(state.register(&mail(), &tabs), Ok(()));
-    let rebound = press(&[Modifier::Super, Modifier::Alt], 'n');
-    let default = press(&[Modifier::Super, Modifier::Shift], 'n');
+    let rebound = press(&[Modifier::Super, Modifier::Alt], 'j');
+    let default = press(&[Modifier::Super, Modifier::Shift], 'j');
     let command_t = press(&[Modifier::Super], 't');
-    let (overrides, parsed) = Overrides::parse("mail.compose = Primary+Alt+N\n");
+    let (overrides, parsed) = Overrides::parse("mail.compose = Primary+Alt+J\n");
     assert!(parsed.is_empty(), "{parsed:?}");
     state.set_overrides(overrides);
     assert_eq!(
@@ -340,17 +340,17 @@ fn the_handle_sets_overrides_in_a_running_app() {
     fn running() -> Element {
         let keys = use_keys_provider();
         use_hook(|| {
-            let (compose, chord) = row("mail.compose", "Primary+Shift+N");
+            let (compose, chord) = row("mail.compose", "Primary+Shift+J");
             let registration = Registration::new(&mail()).action(compose, chord);
             assert_eq!(keys.register(&mail(), &registration), Ok(()));
             let rebound = |keys: &super::Keys| {
                 keys.resolve(
-                    &Key::Character("n".into()),
+                    &Key::Character("j".into()),
                     Modifiers::META | Modifiers::ALT,
                     Context::Normal,
                 )
             };
-            let (overrides, _) = Overrides::parse("mail.compose = Primary+Alt+N\n");
+            let (overrides, _) = Overrides::parse("mail.compose = Primary+Alt+J\n");
             keys.set_overrides(overrides);
             SEEN.with(|seen| seen.borrow_mut().push(rebound(&keys)));
             keys.set_overrides(Overrides::default());

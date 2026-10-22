@@ -44,6 +44,7 @@ mod launcher_pane_cues;
 mod launcher_unmount;
 mod layout_signal;
 mod level_control;
+mod list_focus;
 mod list_roster;
 mod list_strip;
 mod loadable;

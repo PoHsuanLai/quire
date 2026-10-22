@@ -80,9 +80,10 @@ fn custom_refuses_a_taken_combination_in_any_order_or_case() {
             Verdict::Free,
         ),
         (vec![ShortcutKey::Enter], Verdict::Free),
+        // ⌘⌫ is Move to Trash, as in Finder.
         (
             vec![ShortcutKey::Super, ShortcutKey::Backspace],
-            Verdict::Free,
+            Verdict::Standard(StandardAction::MoveToTrash),
         ),
     ];
     for (keys, want) in cases {

@@ -36,6 +36,7 @@ pub mod target;
 mod units;
 mod user_style;
 mod watch;
+mod when;
 mod writer;
 pub mod xdg;
 
@@ -62,4 +63,5 @@ pub use spaces_storage::{Fixup, Origin, SpacesLoad, SpacesStorage};
 pub use store::Store;
 pub use units::{Count, Fraction, Mins, Ms, Percent, Px, Scalar, Secs, Units};
 pub use watch::{DEBOUNCE, Watch, WatchState};
+pub use when::{UnixSecs, UtcOffset, list_date};
 pub use writer::{Edit, SettingsWriter};

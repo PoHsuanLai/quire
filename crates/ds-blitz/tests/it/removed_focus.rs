@@ -90,6 +90,51 @@ fn to_button() -> Element {
     rsx! { MenuPage { anchored: Anchored::ToButton } }
 }
 
+/// As `to_button`, but a pick removes the button (the pick swapped the view it stood in).
+#[component]
+fn SwappedPage() -> Element {
+    let mut log = use_signal(Vec::<String>::new);
+    let mut open = use_signal(|| false);
+    let mut swapped = use_signal(|| false);
+    let mut button = use_signal(|| None::<MountedRef>);
+    let anchor = button().map_or(
+        Anchor::Point(Point {
+            x: Px(40.0),
+            y: Px(80.0),
+        }),
+        Anchor::Mounted,
+    );
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { class: "app", tabindex: "0", style: "padding:20px; width:300px; height:200px",
+                onkeydown: move |event: KeyboardEvent| {
+                    log.with_mut(|log| log.push(format!("key:{}", event.key())));
+                    if event.key() == dioxus::prelude::Key::Character("m".to_owned()) {
+                        open.set(true);
+                    }
+                },
+                div { class: "bar", style: "display:flex; height:32px",
+                    if !swapped() {
+                        Button { common: Common { mounted: Some(EventHandler::new(move |event: MountedEvent| button.set(Some(MountedRef(event.data()))))), ..Common::default() }, label: "More",
+                            onclick: move |_: Press| open.set(true),
+                        }
+                    }
+                }
+                p { class: "log", {log().join(",")} }
+            }
+            if open() {
+                Menu::<u8> {
+                    placement: MenuPlacement::Bar,
+                    anchor,
+                    items: entries(),
+                    onpick: move |_| swapped.set(true),
+                    onclose: move |()| open.set(false),
+                }
+            }
+        }
+    }
+}
+
 /// A shell holding a pane (itself focusable) holding a field that removes itself on Enter, as
 /// a rename field does when it commits.
 #[allow(non_snake_case)]
@@ -175,6 +220,27 @@ fn a_menu_opened_by_a_key_on_the_app_gives_the_keyboard_back_to_the_app() {
     open_and_escape(&mut harness, |harness| {
         harness.send(Input::key(ShortcutKey::Char('m')))
     });
+    settle_until(&mut harness, |harness| {
+        harness.focus_of(".app") == FocusState::Focused
+    });
+    harness.send(Input::key(ShortcutKey::Char('j')));
+    assert_eq!(log(&harness), "key:m,key:j");
+}
+
+#[test]
+fn a_menu_whose_opener_the_pick_removes_hands_the_keyboard_to_an_ancestor() {
+    let mut harness = harness(SwappedPage, FocusFallback::Ancestor);
+    click(&mut harness, ".log");
+    settle_until(&mut harness, |harness| {
+        harness.focus_of(".app") == FocusState::Focused
+    });
+    harness.send(Input::key(ShortcutKey::Char('m')));
+    settle_until(&mut harness, |harness| {
+        harness.focus_of(".ds-menu") == FocusState::Focused
+    });
+    harness.send(Input::key(ShortcutKey::Down));
+    harness.send(Input::key(ShortcutKey::Enter));
+    settle_until(&mut harness, |harness| harness.count(".ds-menu") == 0);
     settle_until(&mut harness, |harness| {
         harness.focus_of(".app") == FocusState::Focused
     });

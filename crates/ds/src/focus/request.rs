@@ -31,6 +31,16 @@ impl FocusRequest {
         }
     }
 
+    /// This request, selecting the file name without its extension each time it lands (and as the
+    /// field mounts): a rename field opened on "photo.png" selects "photo", as Finder does. A host
+    /// that cannot place a selection selects the whole name.
+    pub fn with_select_stem(self) -> Self {
+        FocusRequest {
+            landing: Some(InitialCaret::SelectStem),
+            ..self
+        }
+    }
+
     /// This request, putting the field's caret at `caret` each time it lands (and as the field
     /// mounts): a command palette opened on a query puts it at the end. Needs the
     /// host's [`CaretHost::place_caret`](crate::host::parts::CaretHost::place_caret) for `End` and `Start`; a
@@ -43,10 +53,12 @@ impl FocusRequest {
     }
 
     /// What the field does with its text when the focus lands: [`Select::All`] for a request
-    /// that selects the whole value, [`Select::None`] otherwise (a caret placed at an end too).
+    /// that selects the whole value, [`Select::Stem`] for the name without its extension,
+    /// [`Select::None`] otherwise (a caret placed at an end too).
     pub fn select(&self) -> Select {
         match self.landing {
             Some(InitialCaret::SelectAll) => Select::All,
+            Some(InitialCaret::SelectStem) => Select::Stem,
             None | Some(InitialCaret::End | InitialCaret::Start) => Select::None,
         }
     }

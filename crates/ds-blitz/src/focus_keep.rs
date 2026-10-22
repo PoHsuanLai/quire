@@ -64,11 +64,14 @@ pub struct FocusKeeper {
     returns: Vec<HandBack>,
 }
 
-/// One registered hand-back: when `surface` is removed with the keyboard, `opener` has it next.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// One registered hand-back: when `surface` is removed with the keyboard, `opener` has it next;
+/// if the opener has gone too (the pick swapped the view it stood in), `fallback` does, the
+/// opener's focusable ancestors as they were when the surface mounted.
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct HandBack {
     surface: NodeId,
     opener: NodeId,
+    fallback: Candidates,
 }
 
 impl FocusKeeper {
@@ -101,23 +104,34 @@ impl FocusKeeper {
         }
     }
 
-    /// Record that `surface`, removed with the keyboard, gives it to `opener`.
-    pub(crate) fn hand_back(&mut self, surface: NodeId, opener: NodeId) {
+    /// Record that `surface`, removed with the keyboard, gives it to `opener`, or to `fallback`
+    /// (the opener's focusable ancestors, read now) once the opener is gone.
+    pub(crate) fn hand_back(&mut self, surface: NodeId, opener: NodeId, fallback: Candidates) {
         self.returns.retain(|back| back.surface != surface);
-        self.returns.push(HandBack { surface, opener });
+        self.returns.push(HandBack {
+            surface,
+            opener,
+            fallback,
+        });
     }
 
-    /// The candidates `surface`'s registered opener offers now, and the registrations of
-    /// surfaces no longer in `doc` forgotten.
+    /// The candidates `surface`'s registered opener offers now (its ancestors from when the
+    /// surface mounted, if the opener has gone), and the registrations of surfaces no longer in
+    /// `doc` forgotten.
     fn opener_of(&mut self, doc: &BaseDocument, surface: NodeId) -> Candidates {
-        let opener = self
+        let offered = self
             .returns
             .iter()
             .find(|back| back.surface == surface)
-            .map(|back| back.opener)
-            .filter(|&opener| in_document(doc, opener));
+            .map(|back| {
+                if in_document(doc, back.opener) {
+                    Candidates::from(doc, back.opener)
+                } else {
+                    back.fallback.clone()
+                }
+            });
         self.returns.retain(|back| in_document(doc, back.surface));
-        opener.map_or_else(Candidates::default, |opener| Candidates::from(doc, opener))
+        offered.unwrap_or_default()
     }
 
     /// The focus is nowhere: removed, or cleared on purpose.
@@ -208,7 +222,10 @@ pub(crate) fn hand_back_seam(keeper: Rc<RefCell<FocusKeeper>>) -> ds::host::hand
                 NodeRef::of(opener),
                 keeper.try_borrow_mut(),
             ) {
-                keeper.hand_back(surface.node, opener.node);
+                let fallback = opener
+                    .read(|doc| Candidates::from(doc, opener.node))
+                    .unwrap_or_default();
+                keeper.hand_back(surface.node, opener.node, fallback);
             }
         },
     ))

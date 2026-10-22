@@ -19,6 +19,37 @@ first, with what a consumer has to change.
 - The lenient reader reports a list whose entries were dropped on reading, and accepts a key the
   type no longer writes when it changed what the type means (an older spelling).
 
+### Small pieces
+
+- `ds_settings::list_date(modified, now, offset, hours)` words a file's modified time for a list
+  cell as Finder does: "Today at 14:05" (or "2:05 PM" on a 12-hour clock, `ResolvedHours`),
+  "Yesterday", otherwise a short date with its year ("Oct 5, 2026"). New `UnixSecs` and
+  `UtcOffset`. Month names are English until the desktop has a locale seam.
+- `Toolbar { title, center }` now shows both: the title after the leading items
+  (`data-with-center` on `.ds-toolbar-title`) and the centre item centred in the room left
+  (`.ds-toolbar-center`). A centre item with no title takes the title's place as before.
+- A toolbar button's tooltip carries its item's shortcut (`Back  ⌘[`), and the overflow menu
+  row shows it as its key.
+- `FocusRequest::with_select_stem()` and `Select::Stem` / `InitialCaret::SelectStem`: a rename
+  field opened on "photo.png" selects "photo" (up to the last dot; ".bashrc" is all stem).
+  `ds::host::caret::stem_end` is the rule. A host that cannot select a range selects the whole name.
+- `Chip { dot: Option<ChipDot> }`: `ChipDot::Tag(TagColour)` paints from `--tag-<hue>`,
+  `ChipDot::Colour(css)` is the old string. Breaking: `dot` took a `String`. `Chip { label }` names
+  a chip with a dot and no text (default: the tag colour's word, "Red"); it writes `aria-label`
+  (and `role=img` on a static chip).
+- `--tag-gray`: `TagColour::Gray` and `SystemHue::Gray` (systemGray, Finder's Gray tag).
+- `List { focus: ListFocus::OnMount }` gives the list the keyboard as it mounts (default `Manual`).
+- `SheetActions { leading, children }`: a sheet's buttons side by side at the trailing edge, the
+  default last, with an optional control kept at the start (`.ds-sheet-actions`,
+  `.ds-sheet-actions-leading`).
+- A menu whose opener the pick removed (the pick swapped the view) hands the keyboard to the
+  opener's nearest focusable ancestor, remembered when the menu mounted, else to the window.
+- `ProviderMark { size: ControlSize::Large }` is a 64 px mark (it repeated Regular before).
+- `oncontextmenu: Option<EventHandler<MouseEvent>>` on `Column`, `Toolbar` and `Sidebar`: a right
+  click there reaches the handler and not the menu of whatever holds it.
+- design/22-SETTINGS.md: `bar.autohide` (`always`, `desktop_only`, `full_screen_only` by default,
+  `never`), Appearance › Bar.
+
 ## v0.3.40
 
 The files batch, second part: the icon view's tiles take a context menu, a drop and a badge; a

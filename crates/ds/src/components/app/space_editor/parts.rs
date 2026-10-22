@@ -4,6 +4,7 @@
 use super::{DotIndex, Picker, dot_index, edit};
 use crate::components::controls::button::Button;
 use crate::components::controls::chip::{Chip, ChipVariant};
+use crate::components::controls::chip_dot::ChipDot;
 use crate::components::controls::slider::Slider;
 use crate::components::lists::section_header::SectionHeader;
 use dioxus::prelude::*;
@@ -39,7 +40,7 @@ pub(super) fn Stops(
                     key: "{index}",
                     variant: ChipVariant::Neutral,
                     text: format!("{}°", dot.hue.round()),
-                    dot: palette.picked.get(index).cloned().unwrap_or_default(),
+                    dot: palette.picked.get(index).cloned().map(ChipDot::Colour),
                     pressed: if index == current { Check::On } else { Check::Off },
                     onpress: move |_| picker.pick(dot_index(index)),
                     onremove: removable.then(|| {

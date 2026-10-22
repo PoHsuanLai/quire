@@ -42,3 +42,8 @@
 /* Bottom (`Attach::Bottom`): `--s-8` above the root's bottom edge, never taller than half of it,
    rising from below (`--sheet-dy`, the keyframes' offset, with no scale). */
 .ds-sheet[*|data-attach=bottom]{ --sheet-dy:calc(100% + var(--s-36)); --sheet-scale:1; top:auto; bottom:var(--s-8); max-height:calc(50% - var(--s-8)); border-radius:var(--r-panel); }
+
+/* Actions (`SheetActions`): the sheet's buttons side by side at the trailing edge, `--s-8` apart,
+   the default one last. A leading control stays at the start of the row. */
+.ds-sheet-actions{ display:flex; align-items:center; justify-content:flex-end; gap:var(--s-8); }
+.ds-sheet-actions-leading{ display:flex; align-items:center; margin-right:auto; }

@@ -3,6 +3,7 @@
 use crate::components::content::avatar::{AvatarFace, face};
 use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
+use crate::components::controls::chip_dot::ChipDot;
 use crate::components::controls::press::{ActivationKeys, PressListeners};
 use dioxus::prelude::*;
 use ds_core::colour::contrast::Verdict;
@@ -64,7 +65,9 @@ impl ChipVariant {
 /// A small label (design/04-COMPONENTS.md section 10).
 ///
 /// `onremove` puts a remove button (a cross, named "Remove {text}") after the text, on any
-/// variant. `dot` is a CSS colour drawn as a small disc before the text. `onpress` makes the
+/// variant. `dot` is a small disc before the text, a tag colour (`ChipDot::Tag`, painted from
+/// `--tag-<hue>`) or a CSS colour. A chip with a dot and no text is named by `label` (what
+/// a screen reader says), else by the tag colour's word ("Red"). `onpress` makes the
 /// chip pressable: its face becomes a real `button` that hears a click, Return or Space, and
 /// `pressed` says whether it is the picked one (`aria-pressed`; leave it `None` for a chip
 /// that acts and holds no state). The remove button stays a separate button beside the face,
@@ -76,8 +79,23 @@ pub fn Chip(
     #[props(default)] onremove: Option<EventHandler<()>>,
     #[props(default)] pressed: Option<Check>,
     #[props(default)] onpress: Option<EventHandler<Press>>,
-    #[props(default)] dot: Option<String>,
+    #[props(default)] dot: Option<ChipDot>,
+    #[props(default)] label: Option<String>,
 ) -> Element {
+    let name = if text.is_empty() {
+        label.or_else(|| dot.as_ref().and_then(ChipDot::name).map(str::to_owned))
+    } else {
+        None
+    };
+    let paint = dot.as_ref().map(ChipDot::paint);
+    let role = match (&onpress, &name) {
+        (None, Some(_)) => Some("img"),
+        _ => None,
+    };
+    let aria = match onpress {
+        None => name.clone(),
+        Some(_) => None,
+    };
     let avatar = match &variant {
         ChipVariant::Person(avatar) => Some(*avatar),
         _ => None,
@@ -86,8 +104,8 @@ pub fn Chip(
         if let Some(avatar) = avatar {
             {face(avatar)}
         }
-        if let Some(colour) = dot {
-            i { class: "ds-chip-dot", style: "--chip-dot:{colour};" }
+        if let Some(paint) = paint {
+            i { class: "ds-chip-dot", style: "--chip-dot:{paint};" }
         }
         "{text}"
     };
@@ -99,8 +117,10 @@ pub fn Chip(
             "data-status": variant.status(),
             "data-pressable": onpress.map(|_| ""),
             "data-state": onpress.and(pressed).map(|state| state.slug()),
+            role,
+            "aria-label": aria,
             if let Some(onpress) = onpress {
-                ChipFace { pressed, onpress, {content} }
+                ChipFace { pressed, onpress, name, {content} }
             } else {
                 {content}
             }
@@ -113,12 +133,18 @@ pub fn Chip(
 
 /// The face of a pressable chip: one button holding the chip's avatar, dot and text.
 #[component]
-fn ChipFace(pressed: Option<Check>, onpress: EventHandler<Press>, children: Element) -> Element {
+fn ChipFace(
+    pressed: Option<Check>,
+    onpress: EventHandler<Press>,
+    name: Option<String>,
+    children: Element,
+) -> Element {
     let listen = PressListeners::new(onpress);
     rsx! {
         button {
             r#type: "button",
             class: "ds-chip-press",
+            "aria-label": name,
             "aria-pressed": pressed.map(Check::aria),
             onclick: move |event| listen.click(&event),
             onkeydown: move |event| listen.key_down(&event, ActivationKeys::ReturnAndSpace),

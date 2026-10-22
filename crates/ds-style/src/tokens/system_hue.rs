@@ -1,4 +1,4 @@
-//! Apple's twelve system colours (Human Interface Guidelines, Color, 2025): each hue in the
+//! Apple's thirteen system colours (Human Interface Guidelines, Color, 2025): each hue in the
 //! four forms the platform gives it, light and dark, at ordinary and at increased contrast.
 //!
 //! The accents, the signal colours and the tag colours all read their hues here, so a hue is
@@ -8,7 +8,7 @@ use crate::appearance::{system::Contrast, theme::Scheme};
 use crate::tokens::hex::Hex;
 use ds_core::word::Word;
 
-/// One of the twelve system hues, in the order the HIG lists them.
+/// One of the thirteen system hues, in the order the HIG lists them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 #[non_exhaustive]
 pub enum SystemHue {
@@ -36,6 +36,8 @@ pub enum SystemHue {
     Pink,
     /// systemBrown.
     Brown,
+    /// systemGray (Finder's Gray tag).
+    Gray,
 }
 
 /// A hue's four values: ordinary and increased contrast, in each scheme.
@@ -92,6 +94,7 @@ impl SystemHue {
             SystemHue::Purple => shades(0xCB30E0, 0xB02FC2, 0xDB34F2, 0xEA8DFF),
             SystemHue::Pink => shades(0xFF2D55, 0xE7124D, 0xFF375F, 0xFF8AC4),
             SystemHue::Brown => shades(0xAC7F5E, 0x956D51, 0xB78A66, 0xDBA679),
+            SystemHue::Gray => shades(0x8E8E93, 0x6C6C70, 0x98989D, 0xAEAEB2),
         }
     }
 
@@ -108,13 +111,13 @@ mod tests {
     use ds_core::word::Word;
 
     #[test]
-    fn the_twelve_come_in_the_order_the_guidelines_list_them() {
+    fn the_thirteen_come_in_the_order_the_guidelines_list_them() {
         let slugs: Vec<&str> = SystemHue::ALL.iter().map(|hue| hue.slug()).collect();
         assert_eq!(
             slugs,
             [
                 "red", "orange", "yellow", "green", "mint", "teal", "cyan", "blue", "indigo",
-                "purple", "pink", "brown"
+                "purple", "pink", "brown", "gray"
             ]
         );
     }

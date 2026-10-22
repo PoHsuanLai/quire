@@ -21,7 +21,8 @@ use std::hash::Hash;
 /// an arrow or a typed letter reached. `size` is the rows' height, `appearance.sidebar_size`'s
 /// value. `fill` is what it paints behind its rows: its own ground (the default), nothing
 /// (`SidebarFill::Clear`, so the window's colour shows through) or a flat step above the paper
-/// (`SidebarFill::Flat`).
+/// (`SidebarFill::Flat`). `oncontextmenu` hears a right click on the sidebar and keeps it from
+/// reaching the window's own menu behind it.
 #[component]
 pub fn Sidebar<K: Clone + PartialEq + Hash + 'static>(
     #[props(into)] label: String,
@@ -32,6 +33,7 @@ pub fn Sidebar<K: Clone + PartialEq + Hash + 'static>(
     #[props(default)] header: Option<Element>,
     #[props(default)] foot: Option<Element>,
     #[props(default)] fill: SidebarFill,
+    #[props(default)] oncontextmenu: Option<EventHandler<MouseEvent>>,
     #[props(default)] common: Common,
 ) -> Element {
     let data = common.data_attributes();
@@ -42,6 +44,12 @@ pub fn Sidebar<K: Clone + PartialEq + Hash + 'static>(
             "aria-label": common.aria_label.clone().unwrap_or_else(|| label.clone()),
             "data-size": size.slug(),
             "data-fill": (fill != SidebarFill::Material).then(|| fill.slug()),
+            oncontextmenu: move |event: MouseEvent| {
+                if let Some(hear) = oncontextmenu {
+                    event.stop_propagation();
+                    hear.call(event);
+                }
+            },
             onmounted: move |event| common.mounted(event),
             ..data,
             if let Some(header) = header {

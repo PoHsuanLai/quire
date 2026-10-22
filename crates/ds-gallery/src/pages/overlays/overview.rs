@@ -132,7 +132,10 @@ pub fn OverlaysPage() -> Element {
                     div { class: "g-panel",
                         h2 { "A sheet" }
                         p { class: "g-note", "Hangs from the top edge and dims nothing; Escape closes it." }
-                        Button { answers: Answers::Return, label: "Done", onclick: move |_| opened.set(None) }
+                        SheetActions {
+                            Button { label: "Cancel", onclick: move |_| opened.set(None) }
+                            Button { answers: Answers::Return, label: "Done", onclick: move |_| opened.set(None) }
+                        }
                     }
                 }
             },

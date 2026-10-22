@@ -13,15 +13,19 @@ pub enum Select {
     None,
     /// All of it selected, so the first key typed replaces it.
     All,
+    /// The file name without its extension selected, so typing replaces "photo" of "photo.png".
+    Stem,
 }
 
 impl From<Select> for Option<InitialCaret> {
-    /// The caret a focus write puts: [`Select::All`] is [`InitialCaret::SelectAll`], and
+    /// The caret a focus write puts: [`Select::All`] is [`InitialCaret::SelectAll`],
+    /// [`Select::Stem`] is [`InitialCaret::SelectStem`], and
     /// [`Select::None`] leaves the caret where the renderer puts it.
     fn from(select: Select) -> Self {
         match select {
             Select::None => None,
             Select::All => Some(InitialCaret::SelectAll),
+            Select::Stem => Some(InitialCaret::SelectStem),
         }
     }
 }

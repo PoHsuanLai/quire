@@ -31,11 +31,11 @@ pub trait FocusHost {
     /// Give `el` the keyboard and put its caret at `at` in the same write, so a key typed the
     /// moment the focus lands never meets a caret placed afterwards from a stale view of the
     /// text. A host that cannot place a caret from here selects all for
-    /// [`InitialCaret::SelectAll`] and only focuses for the rest; a field that already has the
-    /// keyboard keeps its caret.
+    /// [`InitialCaret::SelectAll`] and [`InitialCaret::SelectStem`] (the whole name) and only
+    /// focuses for the rest; a field that already has the keyboard keeps its caret.
     fn focus_placing(&self, el: &MountedData, at: InitialCaret) -> Focused {
         match (self.focus(el), at) {
-            (Focused::Done, InitialCaret::SelectAll) => self.select(el),
+            (Focused::Done, InitialCaret::SelectAll | InitialCaret::SelectStem) => self.select(el),
             (focused, _) => focused,
         }
     }

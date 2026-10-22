@@ -5,8 +5,10 @@
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
 use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::chip_dot::ChipDot;
 use ds::prelude::*;
 use ds_style::tokens::label_hue::LabelHue;
+use ds_style::tokens::tag_colour::TagColour;
 
 fn render(app: fn() -> Element) -> String {
     let mut dom = VirtualDom::new(app);
@@ -46,7 +48,31 @@ fn Action() -> Element {
 }
 #[allow(non_snake_case)]
 fn Dotted() -> Element {
-    page(rsx! { Chip { variant: ChipVariant::Neutral, text: "Work", dot: "#336699".to_string() } })
+    page(rsx! {
+        Chip {
+            variant: ChipVariant::Neutral,
+            text: "Work",
+            dot: ChipDot::Colour("#336699".to_owned()),
+        }
+    })
+}
+#[allow(non_snake_case)]
+fn TagDot() -> Element {
+    page(rsx! {
+        Chip { variant: ChipVariant::Neutral, text: "", dot: ChipDot::Tag(TagColour::Red) }
+    })
+}
+#[allow(non_snake_case)]
+fn NamedDot() -> Element {
+    page(rsx! {
+        Chip {
+            variant: ChipVariant::Neutral,
+            text: "",
+            dot: ChipDot::Tag(TagColour::Gray),
+            label: "Home".to_owned(),
+            onpress: |_| {},
+        }
+    })
 }
 #[allow(non_snake_case)]
 fn Removable() -> Element {
@@ -91,6 +117,18 @@ fn a_dot_is_a_disc_before_the_text_coloured_by_its_property() {
         "{html}"
     );
     assert!(html.find("ds-chip-dot") < html.find("Work"), "{html}");
+}
+
+#[test]
+fn a_tag_dot_is_painted_from_its_token_and_a_dot_only_chip_is_named() {
+    let html = render(TagDot);
+    assert!(html.contains("--chip-dot:var(--tag-red);"), "{html}");
+    assert!(html.contains("role=\"img\""), "{html}");
+    assert!(html.contains("aria-label=\"Red\""), "{html}");
+    let named = render(NamedDot);
+    assert!(named.contains("--chip-dot:var(--tag-gray);"), "{named}");
+    assert!(named.contains("aria-label=\"Home\""), "{named}");
+    assert!(!named.contains("role=\"img\""), "{named}");
 }
 
 #[test]

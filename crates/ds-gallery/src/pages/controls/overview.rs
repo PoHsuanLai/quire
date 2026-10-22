@@ -12,6 +12,7 @@ use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, Avata
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::chip_dot::ChipDot;
 use ds::components::controls::command_line::CommandLine;
 use ds::components::controls::copy_state::CopyState;
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
@@ -22,6 +23,7 @@ use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::hex::{Colour, Hex};
 use ds::style::tokens::label_hue::LabelHue;
+use ds::style::tokens::tag_colour::TagColour;
 use ds_core::colour::contrast::Verdict;
 
 /// The chord the specimens start with: Shift and Command and K.
@@ -221,7 +223,7 @@ fn Chips() -> Element {
         shape: AvatarShape::Round,
     };
     rsx! {
-        Section { title: "Chip", note: "Every variant; the person chip with its remove button.",
+        Section { title: "Chip", note: "Every variant; the person chip with its remove button. A dot is a tag colour (ChipDot::Tag, painted from --tag-<hue>) or any CSS colour; a chip with a dot and no text is named by its colour or by label.",
             div { class: "g-row",
                 Chip { variant: ChipVariant::Accent, text: "Accent" }
                 Chip { variant: ChipVariant::Neutral, text: "Neutral" }
@@ -235,6 +237,13 @@ fn Chips() -> Element {
             div { class: "g-row",
                 Chip { variant: ChipVariant::Person(person), text: "Dana Okafor", onremove: Some(EventHandler::new(|()| {})) }
                 Chip { variant: ChipVariant::Person(person), text: "No remove" }
+            }
+            div { class: "g-row",
+                for tag in TagColour::ALL.iter().copied() {
+                    Chip { variant: ChipVariant::Neutral, text: "", dot: ChipDot::Tag(tag) }
+                }
+                Chip { variant: ChipVariant::Neutral, text: "Work", dot: ChipDot::Tag(TagColour::Gray) }
+                Chip { variant: ChipVariant::Neutral, text: "Travel", dot: ChipDot::Colour("#336699".to_owned()), onpress: |_| {} }
             }
         }
     }
@@ -279,8 +288,8 @@ fn Marks() -> Element {
         address: Some(format!("{initial}@example.org").to_lowercase()),
     };
     rsx! {
-        Section { title: "ProviderMark and PinTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed), one showing the favicon the app supplies (mark: MarkStyle::Image), a local-folders account (Provider::Local: the neutral folder), and the Add account tile after them.",
-            for size in [ControlSize::Regular, ControlSize::Mini, ControlSize::Small] {
+        Section { title: "ProviderMark and PinTile", note: "Letters at tile, row and inline size, and Large (64 px) for a header avatar; tiles pressed and not (the tile desaturates its colour when not pressed), one showing the favicon the app supplies (mark: MarkStyle::Image), a local-folders account (Provider::Local: the neutral folder), and the Add account tile after them.",
+            for size in [ControlSize::Regular, ControlSize::Mini, ControlSize::Small, ControlSize::Large] {
                 div { class: "g-row",
                     for provider in PROVIDERS {
                         ProviderMark { provider, size, style: MarkStyle::Letter }

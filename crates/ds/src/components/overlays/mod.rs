@@ -17,6 +17,7 @@ pub mod pinned_bar;
 pub mod popover;
 pub(crate) mod scrim;
 pub mod sheet;
+pub mod sheet_actions;
 pub mod sheet_attach;
 pub mod sheet_width;
 pub(crate) mod side_panel;

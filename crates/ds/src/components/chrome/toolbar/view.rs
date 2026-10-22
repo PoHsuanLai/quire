@@ -5,7 +5,8 @@
 //! reports the item's value and its button (`Picked`), so a menu or popover can hang from it.
 //!
 //! Markup: `div.ds-toolbar[role=toolbar][data-overflow]` of `span.ds-toolbar-leading`,
-//! `span.ds-toolbar-title` (`.ds-toolbar-heading`, `.ds-toolbar-subtitle`) and
+//! `span.ds-toolbar-title` (`.ds-toolbar-heading`, `.ds-toolbar-subtitle`),
+//! `span.ds-toolbar-center` (only with a title and a centre item together) and
 //! `span.ds-toolbar-trailing`.
 
 use crate::components::chrome::toolbar::model::{
@@ -44,6 +45,7 @@ fn button<T: Clone + PartialEq + 'static>(
         Button {
             label: item.label.clone(),
             title: Some(item.label.clone()),
+            title_shortcut: item.shortcut.clone(),
             bezel: Bezel::Toolbar,
             size: ControlSize::Large,
             image: ImagePosition::Only,
@@ -73,7 +75,7 @@ fn hidden_rows<T: Clone>(items: &[&ToolbarItem<T>]) -> Vec<MenuItem<T>> {
             value: item.value.clone(),
             title: item.label.clone(),
             image: Some(MenuImage::Icon(item.icon)),
-            key: None,
+            key: item.shortcut.clone(),
             hint: None,
             check: item.check,
             availability: item.availability,
@@ -83,8 +85,41 @@ fn hidden_rows<T: Clone>(items: &[&ToolbarItem<T>]) -> Vec<MenuItem<T>> {
         .collect()
 }
 
-/// A toolbar. `leading` and `trailing` are the items either side of the title; `center`
-/// replaces the title's words with a control (a segmented control of views). `onpick` hears an
+/// The title's span, and the centre item's beside it when both are given. With only a centre
+/// item that item takes the title's span.
+fn title_span(
+    title: Option<&TextLine>,
+    subtitle: Option<&TextLine>,
+    center: Option<Element>,
+) -> Element {
+    let words = rsx! {
+        if let Some(title) = title {
+            span { class: "ds-toolbar-heading", {text(title)} }
+        }
+        if let Some(subtitle) = subtitle {
+            span { class: "ds-toolbar-subtitle", {text(subtitle)} }
+        }
+    };
+    match (title.is_some() || subtitle.is_some(), center) {
+        (false, Some(center)) => rsx! {
+            span { class: "ds-toolbar-title", {center} }
+        },
+        (true, Some(center)) => rsx! {
+            span { class: "ds-toolbar-title", "data-with-center": "true", {words} }
+            span { class: "ds-toolbar-center", {center} }
+        },
+        (_, None) => rsx! {
+            span { class: "ds-toolbar-title", {words} }
+        },
+    }
+}
+
+/// A toolbar. `leading` and `trailing` are the items either side of the title; `center` is a
+/// control (a segmented control of views). With no title it takes the title's place, centred;
+/// with a title the two sit together as in Finder, the title after the leading items and the
+/// control centred in the room that is left. A button's tooltip carries its item's shortcut
+/// (`Back  ⌘[`). `oncontextmenu` hears a right click anywhere on the band and keeps it from
+/// reaching the window's own menu behind it. `onpick` hears an
 /// item from the band or from the overflow menu, with the button it came from, so a menu can
 /// hang from that button. `room` is the width the items are laid out in. `search` is a search
 /// field at the band's trailing end that collapses to a magnifier button when the band is too
@@ -98,6 +133,7 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
     #[props(default)] center: Option<Element>,
     #[props(default = ToolbarRoom::Measured)] room: ToolbarRoom,
     #[props(default)] search: Option<ToolbarSearch>,
+    #[props(default)] oncontextmenu: Option<EventHandler<MouseEvent>>,
     onpick: EventHandler<Picked<T>>,
     #[props(default)] common: Common,
 ) -> Element {
@@ -135,6 +171,12 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
             role: "toolbar",
             "aria-label": common.aria_label.clone(),
             "data-overflow": if overflowing { Some("true") } else { None },
+            oncontextmenu: move |event: MouseEvent| {
+                if let Some(hear) = oncontextmenu {
+                    event.stop_propagation();
+                    hear.call(event);
+                }
+            },
             onmounted: move |event| {
                 probe.on_mounted(event.clone());
                 mounted.mounted(event);
@@ -145,18 +187,7 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
                     {button(item, place, buttons, onpick)}
                 }
             }
-            span { class: "ds-toolbar-title",
-                if let Some(center) = center {
-                    {center}
-                } else {
-                    if let Some(title) = title.as_ref() {
-                        span { class: "ds-toolbar-heading", {text(title)} }
-                    }
-                    if let Some(subtitle) = subtitle.as_ref() {
-                        span { class: "ds-toolbar-subtitle", {text(subtitle)} }
-                    }
-                }
-            }
+            {title_span(title.as_ref(), subtitle.as_ref(), center)}
             span { class: "ds-toolbar-trailing",
                 for (at , item) in trailing.iter().enumerate().take(kept.trailing) {
                     {button(item, leading.len() + at, buttons, onpick)}
