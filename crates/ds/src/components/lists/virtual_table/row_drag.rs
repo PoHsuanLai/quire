@@ -30,7 +30,10 @@ const LINE: f32 = 3.0;
 enum Phase {
     Idle,
     /// The press is down on `row` at `from` and has not moved past the threshold.
-    Pending { row: usize, from: Point },
+    Pending {
+        row: usize,
+        from: Point,
+    },
     /// Carrying `rows`, over `target` if the pointer is over a place that takes them.
     Live {
         rows: Vec<usize>,
@@ -165,7 +168,11 @@ impl RowDrag {
         if delta.abs() > 0.0 {
             self.scroller.by(Px(delta));
         }
-        let kind = |row: usize| spec.kind.as_ref().map_or(RowDropKind::Item, |kind| kind.call(row));
+        let kind = |row: usize| {
+            spec.kind
+                .as_ref()
+                .map_or(RowDropKind::Item, |kind| kind.call(row))
+        };
         let found = drop_target(content.y.0, spec.pitch.0, spec.rows, spec.gaps, kind)?;
         allowed(found, rows)
     }

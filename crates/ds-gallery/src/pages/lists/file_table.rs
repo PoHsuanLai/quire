@@ -166,7 +166,10 @@ pub fn FileTableGallery() -> Element {
     let cell_width = Callback::new(move |(row, column): (usize, usize)| {
         let entry = &TREE[widths[row]];
         let (chars, indent) = match column {
-            0 => (entry.name.chars().count(), 22.0 + 16.0 * f32::from(entry.depth)),
+            0 => (
+                entry.name.chars().count(),
+                22.0 + 16.0 * f32::from(entry.depth),
+            ),
             _ => (8, 0.0),
         };
         Px(chars as f32 * 7.0 + indent)

@@ -3,7 +3,7 @@
 //! section 2.4; design/13-BEHAVIOUR-menus-windows.md sections 13.3.2-13.3.4).
 
 use crate::components::menus::item::item::AfterPick;
-use crate::components::menus::menu::choices::{Act, Choice, Slot, liveness};
+use crate::components::menus::menu::choices::{Act, Choice, Slot};
 use crate::components::menus::menu::keys::KeyAct;
 use crate::stack::roving::{Step, Wrap, edge_live, moved_live};
 use ds_core::vocab::Availability;

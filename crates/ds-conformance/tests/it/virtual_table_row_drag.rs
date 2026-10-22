@@ -114,22 +114,26 @@ fn option_makes_the_drop_a_copy() {
 #[test]
 fn a_row_outside_the_selection_drags_alone_and_a_plain_row_takes_no_drop() {
     let mut harness = harness();
-    let from = harness.centre(&row(6)).expect("row 6";
+    let from = harness.centre(&row(6)).expect("row 6");
     let folder = harness.centre(&row(5)).expect("the folder row");
     drag_holding(&mut harness, from, folder, Modifiers::empty());
     assert_eq!(log(&harness), "[6] onto 5 move");
     let mut harness = self::harness();
     let plain = harness.centre(&row(4)).expect("a plain row");
-    let from = harness.centre(&row(6)).expect("row 6";
+    let from = harness.centre(&row(6)).expect("row 6");
     drag_holding(&mut harness, from, plain, Modifiers::empty());
-    assert_eq!(log(&harness), "", "no gaps are offered, so a plain row takes nothing");
+    assert_eq!(
+        log(&harness),
+        "",
+        "no gaps are offered, so a plain row takes nothing"
+    );
 }
 
 #[test]
 fn the_indicator_outlines_the_folder_under_the_pointer_while_the_drag_is_live() {
     let mut harness = harness();
     assert_eq!(harness.count(".ds-vtable-drop"), 0);
-    let from = harness.centre(&row(6)).expect("row 6";
+    let from = harness.centre(&row(6)).expect("row 6");
     let folder = harness.centre(&row(5)).expect("the folder row");
     harness.send(Input::pointer_down(from));
     harness.send(Input::pointer_move(folder));
@@ -150,5 +154,9 @@ fn double_clicking_a_column_edge_fits_the_widest_cell() {
     harness.send(Input::click(edge));
     harness.send(Input::click(edge));
     let after = harness.rect(".ds-table-head").expect("the first head");
-    assert_eq!(after.size.width, Px(CELL + 16.0), "the cell and its padding");
+    assert_eq!(
+        after.size.width,
+        Px(CELL + 16.0),
+        "the cell and its padding"
+    );
 }

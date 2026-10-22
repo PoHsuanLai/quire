@@ -342,10 +342,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
         let mounted = start..end;
         Rc::new(move |column: usize| {
             let title = titles.get(column).map_or("", String::as_str);
-            fit_width(
-                title,
-                mounted.clone().map(|row| width.call((row, column))),
-            )
+            fit_width(title, mounted.clone().map(|row| width.call((row, column))))
         }) as Fit
     });
     let frame = match kept {
