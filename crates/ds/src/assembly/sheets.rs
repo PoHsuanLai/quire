@@ -50,6 +50,10 @@ pub(crate) const SHEETS: [(&str, &str); 105] = [
         include_str!("../components/controls/disclosure.css"),
     ),
     (
+        "document_tabs",
+        include_str!("../components/chrome/document_tabs.css"),
+    ),
+    (
         "drag_ghost",
         include_str!("../components/overlays/drag_ghost.css"),
     ),

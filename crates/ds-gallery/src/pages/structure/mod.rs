@@ -3,6 +3,7 @@
 
 mod capsule;
 mod column;
+mod document_tabs;
 mod drag_ghost;
 mod field_row;
 mod menu_bar;
@@ -33,6 +34,7 @@ pub fn StructurePage() -> Element {
         sidebar_sections::SidebarSectionsSection {}
         status_bar::StatusBarSection {}
         tab_view::TabViewSection {}
+        document_tabs::DocumentTabsSection {}
         field_row::FieldRowSection {}
         menu_bar::MenuBarSection {}
         drag_ghost::DragGhostSection {}

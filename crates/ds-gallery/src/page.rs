@@ -21,7 +21,7 @@ pub enum Page {
     Forms,
     /// Menus, menu items and pop-up buttons.
     Menus,
-    /// Stepper, Table, Toolbar, SplitView, Sidebar, TabView, FieldRow and FieldGroup,
+    /// Stepper, Table, Toolbar, SplitView, Sidebar, TabView, DocumentTabs, FieldRow and FieldGroup,
     /// the MenuBar model, the drag image and the window titlebar, in every state (design/30
     /// sections 2.1 to 2.7).
     Structure,

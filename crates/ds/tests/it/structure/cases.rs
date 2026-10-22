@@ -6,6 +6,7 @@ use dioxus::prelude::*;
 use ds::components::chrome::capsule::model::{CapsuleSlot, LevelSlot, ScrubSlot};
 use ds::components::chrome::capsule::priority::essentials;
 use ds::components::chrome::capsule::view::Capsule;
+use ds::components::chrome::document_tabs::{DocumentTab, DocumentTabs};
 use ds::components::chrome::sidebar::Sidebar;
 use ds::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
@@ -135,6 +136,12 @@ fn places() -> Vec<ListItem<u8>> {
 fn tabs(count: u8) -> Vec<Choice<u8>> {
     (0..count)
         .map(|at| Choice::new(at, format!("Tab {}", at + 1)))
+        .collect()
+}
+
+fn titles(count: u8) -> Vec<DocumentTab> {
+    (0..count)
+        .map(|at| DocumentTab::new(format!("Document {}", at + 1)))
         .collect()
 }
 
@@ -307,6 +314,21 @@ pub const CASES: &[Case] = &[
         component: "tab_view",
         state: "six-at-most",
         make: || rsx! { TabView::<u8> { label: "Settings", tabs: tabs(8), value: 0, onchange: |_| {}, p { "Body" } } },
+    },
+    Case {
+        component: "document_tabs",
+        state: "second",
+        make: || rsx! { DocumentTabs { label: "Documents", tabs: titles(3), selected: 1, onselect: |_| {}, onclose: |_| {}, onnew: |_| {} } },
+    },
+    Case {
+        component: "document_tabs",
+        state: "reorderable",
+        make: || rsx! { DocumentTabs { label: "Documents", tabs: titles(2), selected: 0, onselect: |_| {}, onclose: |_| {}, onnew: |_| {}, onreorder: |_| {} } },
+    },
+    Case {
+        component: "document_tabs",
+        state: "seven-no-limit",
+        make: || rsx! { DocumentTabs { label: "Documents", tabs: titles(7), selected: 0, onselect: |_| {}, onclose: |_| {}, onnew: |_| {} } },
     },
     Case {
         component: "field_row",

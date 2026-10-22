@@ -76,7 +76,7 @@ pub fn entry(page: Page) -> Entry {
         Page::Structure => Entry {
             page: Page::Structure,
             title: "Structure",
-            lede: "Stepper with its field and bare, a sortable resizable Table, Toolbar with its overflow chevron, SplitView dragged and folded, Sidebar at each size, TabView, FieldRow and FieldGroup, the MenuBar model's menus, the drag image with its count badge and the window titlebar with its subtitle, proxy icon and edited dot.",
+            lede: "Stepper with its field and bare, a sortable resizable Table, Toolbar with its overflow chevron, SplitView dragged and folded, Sidebar at each size, TabView, DocumentTabs, FieldRow and FieldGroup, the MenuBar model's menus, the drag image with its count badge and the window titlebar with its subtitle, proxy icon and edited dot.",
             height: 5900,
             body: pages::structure::StructurePage,
         },

@@ -27,6 +27,16 @@ first, with what a consumer has to change.
 - Double-clicking a column divider in `VirtualTable` fits the column to its content (B4) when `cell_width` gives each cell's content width; only the mounted rows and the header are measured.
 - `MenuItem::Swatches(SwatchRow)` (H4) is Finder's row of tag dots in one menu row (`MenuItem::swatches(title, vec![MenuSwatch::new(value, name, colour)])`): each dot is its own pick target with a tooltip and an `aria-label`, Up and Down pass the row as one stop and Left and Right walk the dots. **A consumer that matches `MenuItem` exhaustively adds an arm.**
 
+### Lane C
+
+- `DocumentTabs` (chrome): Finder's and Safari's tab strip. A full-width strip under the toolbar, the
+  tabs sharing the width, a close button on the selected tab and under the pointer, a tooltip with
+  the full title, a plus at the end, tabs dragged to reorder, no tab limit and no framed body. It
+  hears `onselect(index)`, `onclose(index)`, `onnew` and `onreorder((from, to))`; the arrows, Home
+  and End select a tab and the standard New and Close actions call `onnew` and `onclose`
+  (chordkit has no next or previous tab action). The app draws it only when
+  `document_tabs_model::strip_shown(count)` (two or more tabs). `TabView` stays `NSTabView`.
+
 ## v0.3.41
 
 The files batch, third part, and hot corners beyond the Mac. A hot corner holds several bindings
