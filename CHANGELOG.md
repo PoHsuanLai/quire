@@ -3,7 +3,29 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.41 (unreleased)
+## v0.3.41
+
+The files batch, third part, and hot corners beyond the Mac. A hot corner holds several bindings
+keyed by held modifiers, each a desktop action, an app's action, something to open or a command
+(older files still load). CollectionView takes landscape thumbnails, can size itself to its content
+and draws Finder's rubber band, as VirtualTable does; VirtualTable's first column can be an outline
+with a Name cell; a file drop says which operation its modifiers chose. Also a `Picture`, a list
+date formatter, a toolbar title beside its centre item, key tooltips on toolbar items, stem
+selection on rename, tag dots on chips and in menus, `--tag-gray`, sheet button rows and a large
+`ProviderMark`. chordkit moves to 99eec9d: Move to Trash (⌘⌫), New Folder (⇧⌘N) and Empty Trash
+(⇧⌘⌫) are standard actions an app can offer. Blitz and blitz-kit stay where v0.3.40 put them.
+
+**What a consumer changes**
+- Move every chordkit pin to 99eec9d together with quire (one chordkit in the lock); relock. An
+  app that binds ⌘⌫ or ⇧⌘N (or ⌥⌘N, which a terminal reads as ⇧⌘N's form) to its own action now
+  gets a standard-action conflict: adopt the standard action or forgo it.
+- `Chip.dot` is `Option<ChipDot>` (`ChipDot::Tag(TagColour)` or `ChipDot::Colour(String)`).
+- `InitialCaret` and `Select` gain `SelectStem` and `Stem`; `SystemHue::ALL` and `TagColour` gain Gray.
+- `FileDragInput::Dropped` carries `modifiers`; `FileDrop` has `modifiers` and `operation()`.
+- `HotCornerSettings`' corners are `CornerBindings`; `CornerAction` loses `None` and `Command`.
+  A program editing the settings file as TOML runs `ds_settings::schema::fold_older_commands`.
+- The stylesheet golden moves (new classes for the toolbar, sheet actions, chip dots, pictures,
+  menu swatches, the marquee, the outline and the Name cell).
 
 ### Hot corners
 - A hot corner is now a list of bindings, each holding exactly a set of modifier keys
