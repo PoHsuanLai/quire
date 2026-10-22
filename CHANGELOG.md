@@ -22,6 +22,11 @@ first, with what a consumer has to change.
   double-click ask `onopen`, a selected leaf shows the `preview` slot, and a divider drag resizes
   the columns. New classes: `ds-colbrowser`, `-strip`, `-column`, `-item`, `-divider`, `-preview`.
 
+### Lane D
+- `VirtualTable` rows drag (E5): give `onrowdrop` and a press on a row, or on a selected row to carry the whole selection, drags it. `drop_kind` says which rows are folders (`RowDropKind::Container`), which are outlined under the pointer; `drop_gaps: RowGaps::Offered` also draws a line in the nearest gap. The drag lives in the table, so rows that are not mounted are places to drop on, and the list scrolls near its edges. `onrowdrop` hears a `RowDrop` (the dragged row indices, a `RowDropTarget` and a `DropOperation`; Option copies).
+- Double-clicking a column divider in `VirtualTable` fits the column to its content (B4) when `cell_width` gives each cell's content width; only the mounted rows and the header are measured.
+- `MenuItem::Swatches(SwatchRow)` (H4) is Finder's row of tag dots in one menu row (`MenuItem::swatches(title, vec![MenuSwatch::new(value, name, colour)])`): each dot is its own pick target with a tooltip and an `aria-label`, Up and Down pass the row as one stop and Left and Right walk the dots. **A consumer that matches `MenuItem` exhaustively adds an arm.**
+
 ## v0.3.41
 
 The files batch, third part, and hot corners beyond the Mac. A hot corner holds several bindings

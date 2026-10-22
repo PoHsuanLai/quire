@@ -83,3 +83,13 @@
 .ds-vtable-twisty{ color:var(--ink-faint); cursor:default; }
 .ds-vtable-twisty:hover{ color:var(--ink-soft); }
 .ds-vtable-outline-cell{ display:block; flex:1 1 auto; min-width:0; overflow:hidden; white-space:nowrap; }
+
+/* Dragging rows (`onrowdrop`; row_drag.rs): the drop indicator is drawn in a layer of no height at
+   the top of the scroller's content, placed in the content's own coordinates so it scrolls with the
+   rows, as the rubber band is. Over a folder's row it is the row outlined in the accent under its
+   wash (`data-drop=onto`, the row's own rounded block); in a gap it is a line (`data-drop=between`,
+   the height Rust gives it). It never takes the pointer. */
+.ds-vtable-drop-layer{ position:relative; height:0; }
+.ds-vtable-drop{ position:absolute; left:var(--s-6); right:var(--s-6); box-sizing:border-box; pointer-events:none; z-index:var(--z-raise); }
+.ds-vtable-drop[*|data-drop=onto]{ border:2px solid var(--accent); border-radius:var(--r-shell-highlight); background:var(--accent-soft); }
+.ds-vtable-drop[*|data-drop=between]{ border-radius:var(--r-micro); background:var(--accent-text); }

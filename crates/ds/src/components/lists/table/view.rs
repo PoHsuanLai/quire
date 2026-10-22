@@ -44,7 +44,7 @@ pub fn Table<K: Clone + PartialEq + Hash + 'static, C: Clone + PartialEq + 'stat
 ) -> Element {
     let resize = use_resize();
     let template = resize.template(&columns);
-    let header = resize.header(&columns, sort.as_ref(), on_sort);
+    let header = resize.header(&columns, sort.as_ref(), on_sort, None);
     let items: Vec<ListItem<K>> = rows
         .iter()
         .map(|row| {

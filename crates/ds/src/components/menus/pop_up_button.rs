@@ -46,6 +46,7 @@ fn chosen_title<T: PartialEq>(items: &[MenuItem<T>], value: Option<&T>) -> Optio
         | MenuItem::Submenu { .. }
         | MenuItem::Header(_)
         | MenuItem::Info { .. }
+        | MenuItem::Swatches(_)
         | MenuItem::Separator => None,
     })
 }

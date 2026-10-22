@@ -69,6 +69,7 @@ mod tests {
                 MenuItem::Submenu { .. } => "S".to_string(),
                 MenuItem::Header(_) => "H".to_string(),
                 MenuItem::Info { .. } => "I".to_string(),
+                MenuItem::Swatches(_) => "D".to_string(),
                 MenuItem::Separator => "-".to_string(),
             })
             .collect::<Vec<_>>()

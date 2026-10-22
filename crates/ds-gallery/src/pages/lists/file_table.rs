@@ -2,7 +2,8 @@
 //! Option-click opens a whole folder, Right and Left on the cursor's row open and close it) of
 //! name cells (a glyph and a name cut from the middle), and a drag from empty space below the rows
 //! draws a rubber band that selects the rows it touches. The page keeps which folders are open, as
-//! an app does.
+//! an app does. Rows drag onto folders (Option copies), and a double click on a column's right
+//! edge resizes the column to fit the names.
 
 use crate::pages::Section;
 use dioxus::prelude::*;
@@ -11,7 +12,10 @@ use ds::components::content::icon_source::IconSource;
 use ds::components::controls::scroller::handle::use_scroller;
 use ds::components::lists::name_cell::NameCell;
 use ds::components::lists::table::model::TableColumn;
-use ds::components::lists::virtual_table::{OutlineRow, OutlineToggle, ToggleReach, VirtualTable};
+use ds::components::lists::virtual_table::{
+    OutlineRow, OutlineToggle, RowDrop, RowDropKind, RowDropTarget, ToggleReach, VirtualTable,
+};
+use ds::file_drop::drag::DropOperation;
 use ds::prelude::*;
 use ds_core::vocab::Shown;
 
@@ -95,12 +99,29 @@ fn toggled(open: Vec<usize>, shown: &[usize], toggle: OutlineToggle) -> Vec<usiz
     }
 }
 
+/// A sentence for what a drop asked: "Moved Notes, README into Archive".
+fn described(drop: &RowDrop, shown: &[usize]) -> String {
+    let name = |row: usize| shown.get(row).map_or("?", |at| TREE[*at].name);
+    let names: Vec<&str> = drop.rows.iter().map(|row| name(*row)).collect();
+    let verb = match drop.operation {
+        DropOperation::Copy => "Copied",
+        DropOperation::Move => "Moved",
+        DropOperation::Link => "Linked",
+    };
+    let place = match drop.target {
+        RowDropTarget::Onto(row) => format!("into {}", name(row)),
+        RowDropTarget::Between(gap) => format!("before row {}", gap + 1),
+    };
+    format!("{verb} {} {place}", names.join(", "))
+}
+
 /// The table, with the folders it has open.
 #[component]
 pub fn FileTableGallery() -> Element {
     let scroller = use_scroller();
     let mut open = use_signal(|| vec![0usize]);
     let mut chosen = use_signal(RowSelection::none);
+    let mut dropped = use_signal(|| "Nothing dragged yet".to_string());
     let shown = showing(&open());
     let columns = vec![
         TableColumn::new(0u8, "Name", Px(260.0)),
@@ -136,11 +157,26 @@ pub fn FileTableGallery() -> Element {
             _ => rsx! { if entry.folder { "Folder" } else { "Document" } },
         }
     });
+    let kinds = shown.clone();
+    let drop_kind = Callback::new(move |row: usize| match TREE[kinds[row]].folder {
+        true => RowDropKind::Container,
+        false => RowDropKind::Item,
+    });
+    let widths = shown.clone();
+    let cell_width = Callback::new(move |(row, column): (usize, usize)| {
+        let entry = &TREE[widths[row]];
+        let (chars, indent) = match column {
+            0 => (entry.name.chars().count(), 22.0 + 16.0 * f32::from(entry.depth)),
+            _ => (8, 0.0),
+        };
+        Px(chars as f32 * 7.0 + indent)
+    });
+    let dropping = shown.clone();
     let toggling = shown.clone();
     rsx! {
         Section {
             title: "VirtualTable, outline",
-            note: "Finder's list view. The first column is an outline: a triangle opens and closes a folder, Option-click (or Option with Right) opens everything under it, Right and Left do it from the keyboard. The names are cut from the middle to the column's width. A drag from the empty space below the rows draws a rubber band over the rows it touches; Shift or Command adds to the selection, and a click there clears it.",
+            note: "Finder's list view. Drag a row (or the selected rows) onto a folder: the folder is outlined, Option copies, and the list scrolls when the pointer nears its top or bottom edge. Double-click the edge between two column titles and the column fits its names (only the rows on screen are measured). The first column is an outline: a triangle opens and closes a folder, Option-click (or Option with Right) opens everything under it, Right and Left do it from the keyboard. The names are cut from the middle to the column's width. A drag from the empty space below the rows draws a rubber band over the rows it touches; Shift or Command adds to the selection, and a click there clears it.",
             div { class: "g-list", style: "width:420px; height:300px; display:flex; flex-direction:column",
                 VirtualTable::<u8> {
                     label: "Files",
@@ -154,12 +190,16 @@ pub fn FileTableGallery() -> Element {
                     selection: Some(chosen()),
                     onreach: move |pick: Pick| chosen.set(chosen().picked(pick)),
                     onmarquee: move |next: RowSelection| chosen.set(next),
+                    onrowdrop: move |drop: RowDrop| dropped.set(described(&drop, &dropping)),
+                    drop_kind,
+                    cell_width,
                     outline,
                     ontoggle: move |toggle: OutlineToggle| {
                         open.set(toggled(open(), &toggling, toggle));
                     },
                 }
             }
+            p { class: "g-note", "{dropped}" }
         }
     }
 }

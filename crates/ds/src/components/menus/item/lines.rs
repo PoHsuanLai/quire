@@ -3,7 +3,8 @@
 
 use crate::components::content::tip_text::TipText;
 use crate::components::menus::alive::Alive;
-use crate::components::menus::item::item::MenuItem;
+use crate::components::menus::item::item::{MenuItem, SwatchRow};
+use crate::components::menus::item::swatches::{DotView, swatches};
 use crate::components::menus::item::view::{
     Branch, Columns, ImageColumn, ItemView, RowEvents, StateColumn, header, info, item,
 };
@@ -72,6 +73,11 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive
                         div { class: "ds-menu-separator", role: "separator" }
                     };
                 }
+                MenuItem::Swatches(row) => {
+                    let first = index;
+                    index += row.swatches.len();
+                    return swatch_row(row, first, drawn, alive);
+                }
                 MenuItem::Item {
                     title,
                     image,
@@ -127,19 +133,7 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive
                 ),
             };
             index += 1;
-            let release = drawn
-                .onrelease
-                .map(|onrelease| EventHandler::new(move |press| onrelease.call((at, press))));
-            item(
-                view,
-                RowEvents {
-                    pick: EventHandler::new(move |()| drawn.onpick.call(at)),
-                    point: EventHandler::new(move |point| drawn.onpoint.call((at, point))),
-                    mounted: EventHandler::new(move |event| drawn.onmounted.call((at, event))),
-                    release,
-                    alive: alive.clone(),
-                },
-            )
+            item(view, events(drawn, at, alive))
         })
         .collect();
     rsx! {
@@ -147,4 +141,34 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive
             Fragment { key: "{key}", {line} }
         }
     }
+}
+
+/// What the choice `at` reports through `drawn`.
+fn events(drawn: Drawn, at: usize, alive: &Alive) -> RowEvents {
+    let release = drawn
+        .onrelease
+        .map(|onrelease| EventHandler::new(move |press| onrelease.call((at, press))));
+    RowEvents {
+        pick: EventHandler::new(move |()| drawn.onpick.call(at)),
+        point: EventHandler::new(move |point| drawn.onpoint.call((at, point))),
+        mounted: EventHandler::new(move |event| drawn.onmounted.call((at, event))),
+        release,
+        alive: alive.clone(),
+    }
+}
+
+/// A row of swatches whose dots are the choices from `first` on.
+fn swatch_row<T>(row: &SwatchRow<T>, first: usize, drawn: Drawn, alive: &Alive) -> Element {
+    let dots = row.swatches.iter().enumerate().map(|(pos, dot)| {
+        let at = first + pos;
+        let view = DotView {
+            name: &dot.name,
+            colour: dot.colour,
+            check: dot.check,
+            highlight: Selection::of(&Some(at), &drawn.selected),
+            availability: row.availability,
+        };
+        (at, view, events(drawn, at, alive))
+    });
+    swatches(&row.title, dots.collect())
 }

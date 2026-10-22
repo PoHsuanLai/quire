@@ -186,7 +186,9 @@ pub use crate::components::controls::radio_group::RadioGroup;
 pub use crate::components::controls::segmented::SegmentedControl;
 pub use crate::components::controls::slider::Slider;
 pub use crate::components::controls::toggle::Toggle;
-pub use crate::components::menus::item::item::{AfterPick, MenuImage, MenuItem};
+pub use crate::components::menus::item::item::{
+    AfterPick, MenuImage, MenuItem, MenuSwatch, SwatchRow,
+};
 pub use crate::components::menus::item::text::{ItemText, Marks};
 pub use crate::components::menus::menu::hung::{Hung, PanelWidth};
 pub use crate::components::menus::menu::menu::Menu;

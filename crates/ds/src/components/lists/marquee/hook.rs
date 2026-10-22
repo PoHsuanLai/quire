@@ -186,6 +186,13 @@ impl Marquee {
         }
     }
 
+    /// The scroller's box and `at` (the window's coordinates) in its content, when the box is
+    /// measured. Another gesture over the same scroller (dragging rows) reads the pointer here.
+    pub(crate) fn place(self, at: Point) -> Option<(Rect, Point)> {
+        let view = self.viewport.rect()?;
+        Some((view, self.content_point(view, at)))
+    }
+
     /// `at` (the window's coordinates) in the scroller's content: from the scroller's corner, and
     /// down by how far it is scrolled.
     fn content_point(self, view: Rect, at: Point) -> Point {

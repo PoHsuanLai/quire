@@ -13,6 +13,11 @@ use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 use std::ops::Range;
+use std::rc::Rc;
+
+/// Says how wide column `at` needs to be to show its content in full: what a double click on
+/// the column's right edge resizes it to.
+pub(crate) type Fit = Rc<dyn Fn(usize) -> Px>;
 
 /// The widths a table's columns have been dragged to, and the drag in progress. `Copy`, so the
 /// table's handlers and the header's edges share it.
@@ -62,6 +67,13 @@ impl Resize {
         }
     }
 
+    /// Column `at` is resized to `content` (its fit), held at the column's least.
+    pub(crate) fn fit<C>(&self, columns: &[TableColumn<C>], at: usize, content: Px) {
+        let next = self.widths.peek().clone().dragged(columns, at, content);
+        let mut widths = self.widths;
+        widths.set(next);
+    }
+
     /// The pointer was released or left: the drag ends.
     pub(crate) fn release(&self) {
         let mut grab = self.grab;
@@ -74,19 +86,22 @@ impl Resize {
         columns: &[TableColumn<C>],
         sort: Option<&Sort<C>>,
         on_sort: EventHandler<Sort<C>>,
+        fit: Option<Fit>,
     ) -> Element {
-        self.header_in(columns, 0..columns.len(), sort, on_sort)
+        self.header_in(columns, 0..columns.len(), sort, on_sort, fit)
     }
 
     /// The header row of the columns `span` of `columns`: a title for each, and a resize edge
     /// after each but the last column of the whole table, so the last column of a pane that
-    /// stops short of it still resizes. A drag names the column by its place in `columns`.
+    /// stops short of it still resizes. A drag names the column by its place in `columns`. A
+    /// double click on an edge resizes the column before it to `fit(column)`, when given.
     pub(crate) fn header_in<C: Clone + PartialEq + 'static>(
         &self,
         columns: &[TableColumn<C>],
         span: Range<usize>,
         sort: Option<&Sort<C>>,
         on_sort: EventHandler<Sort<C>>,
+        fit: Option<Fit>,
     ) -> Element {
         let heads: Vec<(Element, usize, Px, bool)> = columns
             .iter()
@@ -106,6 +121,8 @@ impl Resize {
             })
             .collect();
         let grab = self.grab;
+        let resize = *self;
+        let owned = columns.to_vec();
         rsx! {
             div { class: "ds-table-header", role: "row",
                 for (head , at , width , last) in heads {
@@ -120,6 +137,15 @@ impl Resize {
                                     let from = Px(event.client_coordinates().x as f32);
                                     let mut grab = grab;
                                     grab.set(Some((at, EdgeGrab::new(from, width))));
+                                },
+                                ondoubleclick: {
+                                    let (fit, owned) = (fit.clone(), owned.clone());
+                                    move |event: MouseEvent| {
+                                        event.stop_propagation();
+                                        if let Some(fit) = &fit {
+                                            resize.fit(&owned, at, fit(at));
+                                        }
+                                    }
                                 },
                             }
                         }

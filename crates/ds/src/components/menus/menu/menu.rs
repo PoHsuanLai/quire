@@ -140,6 +140,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         MenuItem::Item { .. }
         | MenuItem::Submenu { .. }
         | MenuItem::Info { .. }
+        | MenuItem::Swatches(_)
         | MenuItem::Separator => None,
     });
     // Escape and an outside click fade the menu out, then close it (design/13 section 13.3.2).

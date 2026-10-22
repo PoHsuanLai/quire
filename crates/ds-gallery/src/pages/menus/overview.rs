@@ -263,6 +263,29 @@ fn Posed(
 /// One specimen: its caption, its items and the posed highlight.
 type PosedItems = (&'static str, Vec<MenuItem<u8>>, Option<usize>);
 
+/// Finder's seven tag colours as the dots of a swatch row; Red is on the files.
+fn tag_dots() -> Vec<MenuSwatch<u8>> {
+    [
+        ("Red", TagColour::Red),
+        ("Orange", TagColour::Orange),
+        ("Yellow", TagColour::Yellow),
+        ("Green", TagColour::Green),
+        ("Blue", TagColour::Blue),
+        ("Purple", TagColour::Purple),
+        ("Gray", TagColour::Gray),
+    ]
+    .into_iter()
+    .zip(1u8..)
+    .map(|((name, colour), value)| {
+        let dot = MenuSwatch::new(value, name, colour);
+        match colour {
+            TagColour::Red => dot.with_check(Check::On),
+            _ => dot,
+        }
+    })
+    .collect()
+}
+
 /// Every state of an item, drawn in an inline menu whose highlight is posed.
 #[component]
 fn Items() -> Element {
@@ -315,6 +338,15 @@ fn Items() -> Element {
             Some(1),
         ),
         (
+            "Swatches: a row of tag dots (the second is highlighted, Red is on)",
+            vec![
+                leaf(0, "Open"),
+                MenuItem::swatches("Tags", tag_dots()),
+                leaf(9, "Tags\u{2026}"),
+            ],
+            Some(2),
+        ),
+        (
             "Header, status line, rule",
             vec![
                 MenuItem::Header("Network".to_string()),
@@ -331,7 +363,7 @@ fn Items() -> Element {
     rsx! {
         Section {
             title: "MenuItem",
-            note: "The highlight is a fill that snaps, with no fade: the accent under its ink while the window is active, grey when it is not. A menu tracks the pointer, so an item has no hover of its own. The state column keeps a column for the check (a dash for mixed) wherever some item has one; the image column likewise.",
+            note: "A row of swatches (Finder's tag colours) is one stop for Up and Down; Left and Right move across its dots, and each dot has a tooltip and an aria-label of its name. The highlight is a fill that snaps, with no fade: the accent under its ink while the window is active, grey when it is not. A menu tracks the pointer, so an item has no hover of its own. The state column keeps a column for the check (a dash for mixed) wherever some item has one; the image column likewise.",
             div { class: "g-row g-row-top",
                 for (name , items , at) in states {
                     Specimen { key: "{name}", name,

@@ -29,6 +29,7 @@ use crate::components::controls::scroller::view::Scroller;
 use crate::components::lists::marquee::band::MarqueeBand;
 use crate::components::lists::marquee::hook::Marquee;
 use crate::components::lists::virtual_table::outline::OutlineRow;
+use crate::components::lists::virtual_table::row_drag::{RowDrag, RowDropMark};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Selection;
@@ -91,6 +92,9 @@ pub(super) struct Panes {
     pub(super) onopen: Option<EventHandler<usize>>,
     /// The table's rubber band.
     pub(super) marquee: Marquee,
+    /// The table's row drag, and the rows' pitch it places its indicator by.
+    pub(super) row_drag: RowDrag,
+    pub(super) pitch: Px,
 }
 
 /// The body of a table that holds columns: the two headers, then the `Scroller` of the two
@@ -110,6 +114,8 @@ pub(super) fn body(panes: Panes) -> Element {
         hovered,
         onopen,
         marquee,
+        row_drag,
+        pitch,
     } = panes;
     let (held_width, held_template) = (held.width.0, held.template);
     let (side_width, side_template) = (scrolling.width.0, scrolling.template);
@@ -134,6 +140,7 @@ pub(super) fn body(panes: Panes) -> Element {
             }
             Scroller { scroller, common: marquee.common(),
                 MarqueeBand { marquee }
+                RowDropMark { drag: row_drag, pitch }
                 div { class: "ds-vtable-split",
                     div {
                         class: "ds-vtable-held",
@@ -147,6 +154,7 @@ pub(super) fn body(panes: Panes) -> Element {
                                 hovered,
                                 onopen,
                                 marquee,
+                                row_drag,
                                 selection: line.selection,
                                 stripe: line.stripe,
                                 outline: line.outline,
@@ -182,6 +190,7 @@ pub(super) fn body(panes: Panes) -> Element {
                                         hovered,
                                         onopen,
                                         marquee,
+                                        row_drag,
                                         selection: line.selection,
                                         stripe: line.stripe,
                                         outline: line.outline,
@@ -208,6 +217,7 @@ fn HeldItem(
     hovered: Signal<Option<usize>>,
     onopen: Option<EventHandler<usize>>,
     marquee: Marquee,
+    row_drag: RowDrag,
     selection: Selection,
     stripe: Option<&'static str>,
     outline: Option<OutlineRow>,
@@ -235,7 +245,10 @@ fn HeldItem(
             "data-stripe": stripe,
             "data-hover": over,
             style: "height:{height}px",
-            onpointerdown: move |_| marquee.item_pressed(),
+            onpointerdown: move |event: PointerEvent| {
+                marquee.item_pressed();
+                row_drag.pressed(row, &event);
+            },
             ondoubleclick: move |_| {
                 if let Some(onopen) = onopen {
                     onopen.call(row);

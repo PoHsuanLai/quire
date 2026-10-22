@@ -88,8 +88,85 @@ pub enum MenuItem<T> {
         /// A second, fainter line.
         detail: Option<String>,
     },
+    /// One row of coloured dots, each its own pick target: Finder's row of tag colours in a
+    /// context menu. Left and Right move across the dots when the row is highlighted; Up and
+    /// Down pass the row as one stop.
+    Swatches(SwatchRow<T>),
     /// A rule between groups.
     Separator,
+}
+
+/// A [`MenuItem::Swatches`] row: the dots, and whether they can be picked.
+#[derive(Debug, Clone, PartialEq)]
+pub struct SwatchRow<T> {
+    /// What the row is called to assistive technology (the group's label); nothing is drawn.
+    pub title: String,
+    /// Whether the dots can be picked. A disabled row is drawn at .35 opacity and skipped by the
+    /// arrow keys, as a disabled item is.
+    pub availability: Availability,
+    /// The dots, in order.
+    pub swatches: Vec<MenuSwatch<T>>,
+}
+
+impl<T> SwatchRow<T> {
+    fn map<U>(self, lift: &impl Fn(T) -> U) -> SwatchRow<U> {
+        SwatchRow {
+            title: self.title,
+            availability: self.availability,
+            swatches: self
+                .swatches
+                .into_iter()
+                .map(|swatch| MenuSwatch {
+                    value: lift(swatch.value),
+                    name: swatch.name,
+                    colour: swatch.colour,
+                    check: swatch.check,
+                    after: swatch.after,
+                })
+                .collect(),
+        }
+    }
+}
+
+/// One dot of a [`SwatchRow`].
+#[derive(Debug, Clone, PartialEq)]
+pub struct MenuSwatch<T> {
+    /// What picking it yields.
+    pub value: T,
+    /// Its name: the tooltip's text and the dot's `aria-label`.
+    pub name: String,
+    /// Its colour (`--tag-*`).
+    pub colour: TagColour,
+    /// Whether the tag is already on the files: `On` draws a check in the dot, `Mixed` a dash.
+    pub check: Option<Check>,
+    /// Whether a pick closes the menu.
+    pub after: AfterPick,
+}
+
+impl<T> MenuSwatch<T> {
+    /// A dot named `name` in `colour` that yields `value`, shows no state and closes the menu.
+    pub fn new(value: T, name: impl Into<String>, colour: TagColour) -> Self {
+        MenuSwatch {
+            value,
+            name: name.into(),
+            colour,
+            check: None,
+            after: AfterPick::Close,
+        }
+    }
+
+    /// The same dot with the state mark `check`.
+    pub fn with_check(self, check: Check) -> Self {
+        MenuSwatch {
+            check: Some(check),
+            ..self
+        }
+    }
+
+    /// The same dot with `after` as what its pick does to the menu.
+    pub fn with_after(self, after: AfterPick) -> Self {
+        MenuSwatch { after, ..self }
+    }
 }
 
 impl<T> MenuItem<T> {
@@ -130,6 +207,7 @@ impl<T> MenuItem<T> {
                 children: children.into_iter().map(|child| child.map(lift)).collect(),
             },
             MenuItem::Header(title) => MenuItem::Header(title),
+            MenuItem::Swatches(row) => MenuItem::Swatches(row.map(lift)),
             MenuItem::Info { title, detail } => MenuItem::Info { title, detail },
             MenuItem::Separator => MenuItem::Separator,
         }
@@ -160,6 +238,15 @@ impl<T> MenuItem<T> {
         self
     }
 
+    /// A row of `swatches`, called `title` to assistive technology, enabled.
+    pub fn swatches(title: impl Into<String>, swatches: Vec<MenuSwatch<T>>) -> Self {
+        MenuItem::Swatches(SwatchRow {
+            title: title.into(),
+            availability: Availability::Enabled,
+            swatches,
+        })
+    }
+
     /// The same item with the key equivalent `key`; only a command has one.
     pub fn with_key(mut self, key: Shortcut) -> Self {
         if let MenuItem::Item { key: slot, .. } = &mut self {
@@ -186,10 +273,12 @@ impl<T> MenuItem<T> {
 
     /// The same item with `availability`; a header, status line or rule has none to change.
     pub fn with_availability(mut self, to: Availability) -> Self {
-        if let MenuItem::Item { availability, .. } | MenuItem::Submenu { availability, .. } =
-            &mut self
-        {
-            *availability = to;
+        match &mut self {
+            MenuItem::Item { availability, .. } | MenuItem::Submenu { availability, .. } => {
+                *availability = to;
+            }
+            MenuItem::Swatches(row) => row.availability = to,
+            MenuItem::Header(_) | MenuItem::Info { .. } | MenuItem::Separator => {}
         }
         self
     }
@@ -234,6 +323,7 @@ impl<T> MenuItem<T> {
             MenuItem::Item { availability, .. } | MenuItem::Submenu { availability, .. } => {
                 Some(*availability)
             }
+            MenuItem::Swatches(row) => Some(row.availability),
             MenuItem::Header(_) | MenuItem::Info { .. } | MenuItem::Separator => None,
         }
     }

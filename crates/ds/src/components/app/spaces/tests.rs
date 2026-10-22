@@ -131,6 +131,7 @@ fn titles(items: &[MenuItem<SpacePick<u8>>]) -> Vec<String> {
             MenuItem::Separator => "-".to_owned(),
             MenuItem::Header(title) => title.clone(),
             MenuItem::Info { title, .. } => title.clone(),
+            MenuItem::Swatches(row) => row.title.clone(),
         })
         .collect()
 }

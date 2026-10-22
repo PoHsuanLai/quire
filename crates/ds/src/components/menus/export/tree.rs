@@ -225,6 +225,11 @@ fn node<T: AppCommand + Clone>(
             label: title.clone(),
             kind: NodeKind::Label,
         },
+        MenuItem::Swatches(row) => MenuNode {
+            id: minter.mint(&format!("{parent}/#{at}")),
+            label: row.title.clone(),
+            kind: NodeKind::Label,
+        },
         MenuItem::Separator => MenuNode {
             id: minter.mint(&format!("{parent}/-{at}")),
             label: String::new(),

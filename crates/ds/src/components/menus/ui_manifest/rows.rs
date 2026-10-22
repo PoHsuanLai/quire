@@ -32,7 +32,10 @@ pub fn menu_rows<T: AppCommand>(items: &[MenuItem<T>]) -> Vec<CommandRow> {
                 face: value.face(),
             }],
             MenuItem::Submenu { children, .. } => menu_rows(children),
-            MenuItem::Header(_) | MenuItem::Info { .. } | MenuItem::Separator => Vec::new(),
+            MenuItem::Header(_)
+            | MenuItem::Info { .. }
+            | MenuItem::Swatches(_)
+            | MenuItem::Separator => Vec::new(),
         })
         .collect()
 }

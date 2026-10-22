@@ -5,6 +5,23 @@ use crate::components::lists::table::model::TableColumn;
 use ds_core::geometry::units::Px;
 use std::ops::Range;
 
+/// A header title's average glyph, in logical pixels: `--fs-help` at weight 600 is about 11 px,
+/// and a glyph is a little over half that (the estimate the capsule's readouts use too).
+const TITLE_GLYPH: f32 = 6.6;
+/// What a header keeps beside its title for the sort indicator and the gap before it.
+const SORT_ROOM: f32 = 14.0;
+/// A cell's (and a header's) padding on both sides together: `--s-8` each.
+const CELL_PADDING: f32 = 16.0;
+
+/// How wide a column needs to be to show its title and every one of `cells` (each cell's content
+/// width, padding left out) in full: the widest of them, and the cells' padding. The title's
+/// width is estimated from its characters; the cells' are the caller's.
+pub(crate) fn fit_width(title: &str, cells: impl IntoIterator<Item = Px>) -> Px {
+    let title = title.chars().count() as f32 * TITLE_GLYPH + SORT_ROOM;
+    let widest = cells.into_iter().map(|cell| cell.0).fold(title, f32::max);
+    Px((widest + CELL_PADDING).ceil())
+}
+
 /// The width of each column: a dragged one wins over the column's own.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub(crate) struct Widths(Vec<Option<Px>>);
@@ -68,7 +85,7 @@ impl Widths {
 
 #[cfg(test)]
 mod tests {
-    use super::Widths;
+    use super::{Widths, fit_width};
     use crate::components::lists::table::model::TableColumn;
     use ds_core::geometry::units::Px;
 
@@ -132,5 +149,27 @@ mod tests {
                 "{span:?}"
             );
         }
+    }
+
+    #[test]
+    fn a_column_fits_its_widest_cell_or_its_title_and_the_padding() {
+        // (title, cell contents, wanted)
+        let cases: [(&str, &[f32], f32); 4] = [
+            ("Name", &[120.0, 300.0, 80.0], 316.0),
+            ("Date Modified", &[40.0, 52.0], 116.0),
+            ("Size", &[], 57.0),
+            ("", &[0.0], 30.0),
+        ];
+        for (title, cells, want) in cases {
+            let got = fit_width(title, cells.iter().map(|cell| Px(*cell)));
+            assert_eq!(got, Px(want), "{title:?} {cells:?}");
+        }
+    }
+
+    #[test]
+    fn a_fit_narrower_than_the_least_is_held_at_the_least() {
+        let columns = columns();
+        let widths = Widths::default().dragged(&columns, 2, fit_width("", [Px(0.0)]));
+        assert_eq!(widths.of(&columns, 2), Px(48.0));
     }
 }

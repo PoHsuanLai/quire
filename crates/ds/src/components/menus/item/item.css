@@ -86,3 +86,15 @@
 .ds-menu-image[*|data-image=avatar]{ color:inherit; width:auto; min-width:22px; }
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-subtitle{ color:var(--accent-ink); }
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-subtitle{ color:var(--ink-faint); }
+
+/* A row of swatches (`MenuItem::Swatches`, Finder's tag colours): the dots side by side and
+   centred, each a 20 px target that rings in the accent when the keys or the pointer rest on it
+   (`data-selected`) and carries the 12 px `.ds-menu-swatch` in its tag's colour. A dot whose tag
+   is on the files draws a check (or a dash for some of them) in the dot, in the ink that sits on
+   the accent. The row is not one of the item rows, so it keeps no state or image column. */
+.ds-menu-swatches{ display:flex; flex-direction:row; align-items:center; justify-content:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:var(--s-2) var(--s-8); }
+.ds-menu-dot{ position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:20px; height:20px; border:2px solid transparent; border-radius:var(--r-pill); cursor:default; }
+.ds-menu-dot[*|data-focus=highlight][*|data-selected=true]{ border-color:var(--accent); }
+.ds[*|data-activity=inactive] .ds-menu-dot[*|data-focus=highlight][*|data-selected=true]{ border-color:var(--ink-faint); }
+.ds-menu-dot[*|aria-disabled=true]{ opacity:.35; }
+.ds-menu-dot .ds-menu-swatch{ display:flex; align-items:center; justify-content:center; color:var(--accent-ink); }

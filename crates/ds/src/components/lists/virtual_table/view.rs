@@ -47,6 +47,10 @@
 //! (the other columns are scrolled sideways or not), and the body is `split::body`'s: see there.
 //! `columns_id(id)` names the box that scrolls sideways then.
 //!
+//! While rows are dragged (`onrowdrop`) a `div.ds-vtable-drop-layer` of a `div.ds-vtable-drop`
+//! (`data-drop=onto` over a folder's row, `between` for a line in a gap) is the scroller's second
+//! child, placed in the content's coordinates.
+//!
 //! With `outline` the first cell is `span.ds-vtable-outline` (its `padding-left` the depth's
 //! indent) of a `span.ds-vtable-twisty[role=button]` (or `span.ds-vtable-twisty-gap` on a leaf) and
 //! `span.ds-vtable-outline-cell`, and the item carries `aria-level` and, on a branch,
@@ -60,18 +64,21 @@ use crate::components::lists::marquee::hook::use_marquee;
 use crate::components::lists::marquee::model::rows_in;
 use crate::components::lists::reach::Reach;
 use crate::components::lists::row::row::Row;
-use crate::components::lists::table::head::{cells, use_resize};
+use crate::components::lists::table::head::{Fit, cells, use_resize};
 use crate::components::lists::table::look::TableLook;
 use crate::components::lists::table::model::{Sort, TableColumn};
 use crate::components::lists::table::rules::{ColumnRules, HeaderRule, Scrolled};
+use crate::components::lists::table::widths::fit_width;
 use crate::components::lists::virtual_list::layout::Layout;
 use crate::components::lists::virtual_list::view::use_cursor_reveal;
+use crate::components::lists::virtual_table::drag_model::{RowDrop, RowDropKind, RowGaps};
 use crate::components::lists::virtual_table::model::{
     TableKey, held_columns, key_how, page_rows, table_key, target,
 };
 use crate::components::lists::virtual_table::outline::{
     OutlineKind, OutlineRow, OutlineToggle, outline_cell,
 };
+use crate::components::lists::virtual_table::row_drag::{RowDragSpec, RowDropMark, use_row_drag};
 use crate::components::lists::virtual_table::split::{self, Line, Pane, Panes};
 use crate::keys::use_platform;
 use crate::root::common::Common;
@@ -82,6 +89,7 @@ use ds_core::selection::{Pick, RowSelection};
 use ds_core::vocab::{RowState, Selection};
 use ds_core::word::Word;
 use ds_style::tokens::row_scale::ROW_SCALE;
+use std::rc::Rc;
 
 /// How many rows around the viewport are mounted besides the visible ones.
 const OVERSCAN_ROWS: usize = 4;
@@ -148,6 +156,26 @@ fn row_content<C>(
 /// reaches the whole subtree. The table keeps no open state: the app lists the rows that show and
 /// remembers which branches are open.
 ///
+/// `onrowdrop` makes the rows draggable (Finder's drag of files onto a folder in the list). A
+/// press on a row that moves past the drag threshold carries it, or the whole `selection` when the
+/// press began on a selected row; the pointer then finds its place by the rows' height, so rows
+/// that are not mounted are places to drop on too, and near the top or bottom edge each pointer
+/// move scrolls the list. `drop_kind` says which rows are folders (`RowDropKind::Container`, the
+/// default is none): a folder takes the drop onto it and is outlined. `drop_gaps` also offers the
+/// gaps between rows (`RowGaps::Offered`) and draws a line in the nearest one; by default only
+/// folders take a drop. Rows are never dropped on themselves or beside their own block.
+/// `onrowdrop` hears a [`RowDrop`]: the dragged row indices, the target and the `DropOperation`
+/// (Option copies, Command moves, both link, none moves). Escape, or the pointer leaving the
+/// table, calls the drag off.
+///
+/// `cell_width`, given, makes a double click on a column's right edge resize that column to fit
+/// its content, as Finder does: it is asked for the width of the content of `(row, column)`
+/// (padding left out, an outline's indent in) for each mounted row, and the column becomes the
+/// widest of those and its title (the title's width is estimated from its characters) plus the
+/// cell padding, never under the column's least. Only the mounted rows are measured, so a row
+/// scrolled out of view that is wider than all of them does not count, and the last column has no
+/// edge to double-click.
+///
 /// `overscan` is how many rows are mounted beyond the visible ones on each side (4 by default).
 /// `look` dresses the table (`TableLook::Plain`, the grid, by default; `Striped` and `Unstriped`
 /// are Finder's list view). `rules` draws a hairline between the columns; `header_rule` draws one under the
@@ -174,6 +202,10 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     #[props(default)] onpick: Option<EventHandler<usize>>,
     #[props(default)] onopen: Option<EventHandler<usize>>,
     #[props(default)] onmarquee: Option<EventHandler<RowSelection>>,
+    #[props(default)] onrowdrop: Option<EventHandler<RowDrop>>,
+    #[props(default)] drop_kind: Option<Callback<usize, RowDropKind>>,
+    #[props(default)] drop_gaps: RowGaps,
+    #[props(default)] cell_width: Option<Callback<(usize, usize), Px>>,
     #[props(default)] outline: Option<Callback<usize, OutlineRow>>,
     #[props(default)] ontoggle: Option<EventHandler<OutlineToggle>>,
     #[props(default)] pinned: usize,
@@ -207,6 +239,16 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
         onselect,
         onopen,
     };
+    let row_drag = use_row_drag(marquee, scroller);
+    row_drag.aim(onrowdrop.map(|ondrop| RowDragSpec {
+        platform: reach.platform,
+        pitch,
+        rows,
+        selection: selection.clone(),
+        kind: drop_kind,
+        gaps: drop_gaps,
+        ondrop,
+    }));
     let kept = held_columns(pinned, columns.len());
     let selected = |row: usize| {
         let on = match &selection {
@@ -238,6 +280,9 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
         .collect();
     let step_of = |row: usize| steps.get(row - start).copied().flatten();
     let onkeydown = move |event: KeyboardEvent| {
+        if event.key() == Key::Escape {
+            row_drag.cancel();
+        }
         let Some(act) = table_key(&event.key(), event.modifiers(), reach.platform) else {
             return;
         };
@@ -292,9 +337,20 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     let scrolled = header_rule.attribute(scroller.scroll().read().offset);
     let (above, below) = (layout.top(start).0, layout.below(end).0);
     let height = pitch.0;
+    let fit: Option<Fit> = cell_width.map(|width| {
+        let titles: Vec<String> = columns.iter().map(|column| column.title.clone()).collect();
+        let mounted = start..end;
+        Rc::new(move |column: usize| {
+            let title = titles.get(column).map_or("", String::as_str);
+            fit_width(
+                title,
+                mounted.clone().map(|row| width.call((row, column))),
+            )
+        }) as Fit
+    });
     let frame = match kept {
         0 => {
-            let header = resize.header(&columns, sort.as_ref(), on_sort);
+            let header = resize.header(&columns, sort.as_ref(), on_sort, fit);
             let template = resize.template(&columns);
             let wide = resize.total(&columns).0;
             let items: Vec<(usize, Element, Option<OutlineRow>)> = drawn_rows
@@ -309,6 +365,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                     {header}
                     Scroller { scroller, common: marquee.common(),
                         MarqueeBand { marquee }
+                        RowDropMark { drag: row_drag, pitch }
                         div { class: "ds-vtable-spacer", style: "height:{above}px" }
                         div {
                             class: "ds-vtable-rows",
@@ -327,7 +384,10 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                                     "data-selected": (selected(row) == Selection::Selected).then_some("yes"),
                                     "data-stripe": look.striped(row).then_some("odd"),
                                     style: "height:{height}px",
-                                    onpointerdown: move |_| marquee.item_pressed(),
+                                    onpointerdown: move |event: PointerEvent| {
+                                        marquee.item_pressed();
+                                        row_drag.pressed(row, &event);
+                                    },
                                     ondoubleclick: move |_| reach.opened(row),
                                     {content}
                                 }
@@ -361,13 +421,13 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             };
             let body = split::body(Panes {
                 held: Pane {
-                    head: resize.header_in(&columns, 0..kept, sort.as_ref(), on_sort),
+                    head: resize.header_in(&columns, 0..kept, sort.as_ref(), on_sort, fit.clone()),
                     lines: lines(0..kept),
                     template: resize.template_in(&columns, 0..kept),
                     width: resize.total_in(&columns, 0..kept),
                 },
                 scrolling: Pane {
-                    head: resize.header_in(&columns, kept..all, sort.as_ref(), on_sort),
+                    head: resize.header_in(&columns, kept..all, sort.as_ref(), on_sort, fit),
                     lines: lines(kept..all),
                     template: resize.template_in(&columns, kept..all),
                     width: resize.total_in(&columns, kept..all),
@@ -383,6 +443,8 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                 hovered,
                 onopen,
                 marquee,
+                row_drag,
+                pitch,
             });
             let ahead = Some(Scrolled::at(across()).slug());
             (body, None, Some("yes"), ahead)
@@ -412,15 +474,18 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             },
             onpointermove: move |event: PointerEvent| {
                 resize.drag(&move_columns, &event);
+                row_drag.moved(&event);
                 marquee.moved(&event, &|band| vec![rows_in(band, pitch, rows)], onmarquee);
             },
-            onpointerup: move |_| {
+            onpointerup: move |event: PointerEvent| {
                 resize.release();
                 marquee.end();
+                row_drag.released(&event);
             },
             onpointerleave: move |_| {
                 resize.release();
                 marquee.end();
+                row_drag.cancel();
             },
             ..data,
             {body}
