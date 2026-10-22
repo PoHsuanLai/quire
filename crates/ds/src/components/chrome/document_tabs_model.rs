@@ -87,7 +87,11 @@ mod tests {
             (Rove::Edge(Edge::Last), 0, 0, 0),
         ];
         for &(rove, selected, count, want) in CASES {
-            assert_eq!(rove_to(rove, selected, count), want, "{rove:?} {selected}/{count}");
+            assert_eq!(
+                rove_to(rove, selected, count),
+                want,
+                "{rove:?} {selected}/{count}"
+            );
         }
     }
 

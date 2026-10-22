@@ -214,7 +214,10 @@ fn a_document_tab_is_a_selected_or_unselected_tab_with_a_named_close_button() {
     assert_eq!(html.matches("aria-selected=\"true\"").count(), 1);
     assert_eq!(html.matches("aria-selected=\"false\"").count(), 2);
     for n in 1..=3 {
-        assert!(html.contains(&format!("aria-label=\"Close Document {n}\"")), "{n}");
+        assert!(
+            html.contains(&format!("aria-label=\"Close Document {n}\"")),
+            "{n}"
+        );
     }
     assert!(html.contains("aria-label=\"New Tab\""));
 }

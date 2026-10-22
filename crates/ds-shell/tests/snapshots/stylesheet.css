@@ -1003,6 +1003,47 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-disclosure-body{ min-width:0; }
 .ds-disclosure-body[*|data-closed=true]{ visibility:hidden; pointer-events:none; }
 .ds-disclosure-content{ display:flow-root; }
+/* -- document_tabs -- */
+/* DocumentTabs (design/27 section 5, pre-Liquid-Glass; Finder and Safari tabs): a full-width strip
+   under the toolbar, 28 tall, a hairline below. The tabs share the width equally (`flex:1 1 0`,
+   `min-width:0`) with a hairline between; the selected one is raised to the window's surface, the
+   others sit in the recessed `--line-soft`, and a tab under the pointer takes the faint
+   `--hover-wash`. The title is centred and truncates with `.ds-truncate` (no ellipsis on Blitz);
+   the close button sits at the leading edge, hidden until the pointer is over the tab and always
+   on the selected one. The plus is a fixed square at the end. `data-drop=target` tints the tab a
+   dragged one would take the place of; `data-drag=source` dims the one dragged. Attribute
+   selectors carry `*|` (spike S2). */
+
+.ds-document-tabs{
+  display:flex; align-items:stretch; box-sizing:border-box; flex:none; width:100%; min-width:0; height:var(--s-28);
+  background:var(--line-soft); box-shadow:inset 0 calc(var(--hair) * -1) 0 var(--line); user-select:none;
+}
+
+.ds-document-tab{
+  position:relative; display:flex; align-items:center; justify-content:center; box-sizing:border-box; flex:1 1 0; min-width:0;
+  padding:0 var(--s-24); color:var(--ink-soft); font-size:var(--fs-help); cursor:default;
+  box-shadow:inset calc(var(--hair) * -1) 0 0 var(--line);
+}
+.ds-document-tab:hover{ background:var(--hover-wash); color:var(--ink); }
+.ds-document-tab[*|data-selected=true]{ background:var(--surface); color:var(--ink); }
+.ds-document-tab[*|data-drop=target]{ background:var(--accent-soft); }
+.ds-document-tab[*|data-drag=source]{ opacity:.35; }
+.ds-document-tab-title{ display:block; min-width:0; max-width:100%; white-space:nowrap; text-align:center; }
+
+.ds-document-tab-close{
+  position:absolute; top:50%; left:var(--s-6); display:grid; place-items:center; box-sizing:border-box; width:var(--s-16); height:var(--s-16);
+  margin:0; padding:0; border:0; border-radius:var(--r-item); background:transparent; color:var(--ink-soft); line-height:0; cursor:default;
+  transform:translateY(-50%); opacity:0;
+}
+.ds-document-tab:hover .ds-document-tab-close,
+.ds-document-tab[*|data-selected=true] .ds-document-tab-close{ opacity:1; }
+.ds-document-tab-close:hover{ background:var(--line); color:var(--ink); }
+
+.ds-document-tabs-new{
+  display:grid; place-items:center; box-sizing:border-box; flex:none; width:var(--s-28); height:100%; margin:0; padding:0; border:0;
+  background:transparent; color:var(--ink-soft); line-height:0; cursor:default;
+}
+.ds-document-tabs-new:hover{ background:var(--hover-wash); color:var(--ink); }
 /* -- drag_ghost -- */
 /* DragGhost and DropLine (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)), 1:1 with the pointer and
