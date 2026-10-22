@@ -45,7 +45,7 @@ impl Wire for TomlWire {
     fn parse(text: &str) -> Result<toml::Table, String> {
         let mut table = text.parse::<toml::Table>().map_err(|e| e.to_string())?;
         // An older spelling the reader would otherwise drop key by key (design/22 §3.23).
-        crate::schema::corners_stored::fold_older_commands(&mut table);
+        crate::schema::fold_older_commands(&mut table);
         Ok(table)
     }
 

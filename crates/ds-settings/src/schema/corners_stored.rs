@@ -96,7 +96,10 @@ impl TryFrom<StoredHotCorners> for HotCornerSettings {
 /// `[{ action = "command", command = "x" }]` (an empty `x`, an empty list), and the `*_command`
 /// key of any word corner goes. The lenient reader then sees only keys the type writes back, so
 /// an older command is kept and its key is not reported as unknown.
-pub(crate) fn fold_older_commands(file: &mut toml::Table) {
+///
+/// A program that edits the settings file as TOML text (Settings) runs the same fold before it
+/// reads the corners.
+pub fn fold_older_commands(file: &mut toml::Table) {
     let Some(toml::Value::Table(corners)) = file.get_mut("hot_corners") else {
         return;
     };
