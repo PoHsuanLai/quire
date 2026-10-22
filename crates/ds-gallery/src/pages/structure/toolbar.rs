@@ -128,6 +128,21 @@ pub fn ToolbarSection() -> Element {
                     onpick: move |pick: Picked<&'static str>| said.set(pick.value.to_owned()),
                 }
             }
+            p { class: "g-note", "Title menu: hold the primary modifier (Command) and click the title to list the folders enclosing it; picking one reports its index (ontitlemenu). A plain click does nothing." }
+            div { class: "g-list", style: "width:620px",
+                Toolbar::<&'static str> {
+                    leading: leading(),
+                    trailing: trailing(),
+                    title: Some(TextLine::from("Downloads")),
+                    title_menu: vec![
+                        PathSegment::new("Pohsuan", Icon::Home),
+                        PathSegment::new("Files", Icon::Folder),
+                    ],
+                    ontitlemenu: move |at: usize| said.set(format!("title menu: folder {at}")),
+                    room: ToolbarRoom::Fixed(Px(620.0)),
+                    onpick: move |pick: Picked<&'static str>| said.set(pick.value.to_owned()),
+                }
+            }
             p { class: "g-note", "NSSearchToolbarItem: the search field keeps its minimum width while the band has room for it and its items; below that it collapses to a magnifier button, and pressing the button opens the field in place with the caret in it. An empty field folds back when the caret leaves it or on Escape." }
             SearchToolbar { room: 620.0 }
             SearchToolbar { room: 380.0 }

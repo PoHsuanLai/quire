@@ -37,6 +37,12 @@ first, with what a consumer has to change.
   (chordkit has no next or previous tab action). The app draws it only when
   `document_tabs_model::strip_shown(count)` (two or more tabs). `TabView` stays `NSTabView`.
 
+### Lane A
+
+- `PathControl`: Finder's path bar. An app gives `PathSegment`s (name, glyph, drop state) and hears a click on a segment, or on one in the collapsed middle of a long path, by index; a segment it marks `Accepts` or `Target` takes a drop (`ondropenter`, `ondropleave`, `ondrop`), driven like a `Row`'s. New classes: `ds-path-control`, `ds-path-segment`, `ds-path-name`, `ds-path-chevron`, `ds-path-more`.
+- `Toolbar` takes `title_menu` (a list of `PathSegment`s) and `ontitlemenu`: a click on the title with the primary modifier held opens a menu of the enclosing folders.
+- `detent --page accounts-setup` has a page: the hidden built-in `accounts-setup`, "Sign in to Your Accounts", resolves by id and by `accounts_setup`.
+
 ## v0.3.41
 
 The files batch, third part, and hot corners beyond the Mac. A hot corner holds several bindings

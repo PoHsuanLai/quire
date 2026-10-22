@@ -70,6 +70,16 @@ title = "Accounts"
 symbol = "key"
 order = 120
 
+# Step sill opens to sign in to the person's accounts (`detent --page accounts-setup`): reachable by id,
+# never a sidebar row.
+[[page]]
+id = "accounts-setup"
+title = "Sign in to Your Accounts"
+symbol = "key"
+order = 121
+listing = "hidden"
+aliases = ["accounts_setup"]
+
 [[page]]
 id = "privacy"
 title = "Privacy & Security"

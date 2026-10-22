@@ -234,6 +234,10 @@ pub(crate) const SHEETS: [(&str, &str); 106] = [
         include_str!("../components/app/spaces/spaces.css"),
     ),
     (
+        "path_control",
+        include_str!("../components/chrome/path_control/path_control.css"),
+    ),
+    (
         "progress",
         include_str!("../components/controls/progress/progress.css"),
     ),

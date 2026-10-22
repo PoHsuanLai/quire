@@ -7,6 +7,7 @@ mod document_tabs;
 mod drag_ghost;
 mod field_row;
 mod menu_bar;
+mod path_control;
 mod sidebar;
 mod sidebar_sections;
 mod split_view;
@@ -32,6 +33,7 @@ pub fn StructurePage() -> Element {
         split_view::SplitViewPeekSection {}
         sidebar::SidebarListSection {}
         sidebar_sections::SidebarSectionsSection {}
+        path_control::PathControlSection {}
         status_bar::StatusBarSection {}
         tab_view::TabViewSection {}
         document_tabs::DocumentTabsSection {}

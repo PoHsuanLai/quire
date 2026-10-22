@@ -9,6 +9,7 @@
 //! `span.ds-toolbar-center` (only with a title and a centre item together) and
 //! `span.ds-toolbar-trailing`.
 
+use crate::components::chrome::path_control::model::{PathSegment, rows};
 use crate::components::chrome::toolbar::model::{
     Expansion, Kept, Picked, ToolbarItem, ToolbarRoom, search_fit, search_room,
 };
@@ -21,8 +22,10 @@ use crate::components::menus::item::item::{AfterPick, MenuImage, MenuItem};
 use crate::components::menus::menu::menu::Menu;
 use crate::components::menus::menu::placement::MenuPlacement;
 use crate::host::measure::{Anchor, MountedRef, use_rect};
+use crate::keys::use_platform;
 use crate::root::common::Common;
 use dioxus::prelude::*;
+use ds_core::command::holds_primary;
 use ds_core::geometry::units::Px;
 use ds_core::press::Press;
 use ds_core::vocab::{Availability, Shown};
@@ -85,13 +88,32 @@ fn hidden_rows<T: Clone>(items: &[&ToolbarItem<T>]) -> Vec<MenuItem<T>> {
         .collect()
 }
 
+/// What the title's span does when the toolbar has a title menu: a click on it, and its
+/// element, which the menu hangs from.
+#[derive(Clone, Copy)]
+struct TitleMenu {
+    onclick: EventHandler<MouseEvent>,
+    onmounted: EventHandler<MountedEvent>,
+}
+
 /// The title's span, and the centre item's beside it when both are given. With only a centre
 /// item that item takes the title's span.
 fn title_span(
     title: Option<&TextLine>,
     subtitle: Option<&TextLine>,
     center: Option<Element>,
+    menu: Option<TitleMenu>,
 ) -> Element {
+    let onclick = move |event: MouseEvent| {
+        if let Some(menu) = menu {
+            menu.onclick.call(event);
+        }
+    };
+    let onmounted = move |event: MountedEvent| {
+        if let Some(menu) = menu {
+            menu.onmounted.call(event);
+        }
+    };
     let words = rsx! {
         if let Some(title) = title {
             span { class: "ds-toolbar-heading", {text(title)} }
@@ -102,14 +124,30 @@ fn title_span(
     };
     match (title.is_some() || subtitle.is_some(), center) {
         (false, Some(center)) => rsx! {
-            span { class: "ds-toolbar-title", {center} }
+            span {
+                class: "ds-toolbar-title",
+                onclick,
+                onmounted,
+                {center}
+            }
         },
         (true, Some(center)) => rsx! {
-            span { class: "ds-toolbar-title", "data-with-center": "true", {words} }
+            span {
+                class: "ds-toolbar-title",
+                "data-with-center": "true",
+                onclick,
+                onmounted,
+                {words}
+            }
             span { class: "ds-toolbar-center", {center} }
         },
         (_, None) => rsx! {
-            span { class: "ds-toolbar-title", {words} }
+            span {
+                class: "ds-toolbar-title",
+                onclick,
+                onmounted,
+                {words}
+            }
         },
     }
 }
@@ -124,6 +162,12 @@ fn title_span(
 /// hang from that button. `room` is the width the items are laid out in. `search` is a search
 /// field at the band's trailing end that collapses to a magnifier button when the band is too
 /// tight for it (`ToolbarSearch`); the field gives way before any item goes behind the chevron.
+///
+/// `title_menu` makes the title a place that opens a menu: a click on it with the primary
+/// modifier held (Command on a Mac or our desktop, Ctrl elsewhere) lists the segments, which are
+/// the folders enclosing the one the title names, in the order the caller gives; `ontitlemenu`
+/// hears the one picked, by its index in `title_menu`. A plain click on the title does nothing.
+/// With an empty `title_menu` the title is plain text.
 #[component]
 pub fn Toolbar<T: Clone + PartialEq + 'static>(
     #[props(default)] leading: Vec<ToolbarItem<T>>,
@@ -133,6 +177,8 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
     #[props(default)] center: Option<Element>,
     #[props(default = ToolbarRoom::Measured)] room: ToolbarRoom,
     #[props(default)] search: Option<ToolbarSearch>,
+    #[props(default)] title_menu: Vec<PathSegment>,
+    #[props(default)] ontitlemenu: Option<EventHandler<usize>>,
     #[props(default)] oncontextmenu: Option<EventHandler<MouseEvent>>,
     onpick: EventHandler<Picked<T>>,
     #[props(default)] common: Common,
@@ -141,6 +187,9 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
     let probe = use_rect();
     let mut open = use_signal(|| Shown::Hidden);
     let mut chevron = use_signal(|| None::<MountedRef>);
+    let platform = use_platform();
+    let mut title_open = use_signal(|| Shown::Hidden);
+    let mut title_seat = use_signal(|| None::<MountedRef>);
     let width = match room {
         ToolbarRoom::Fixed(width) => width,
         ToolbarRoom::Measured => probe.rect().map_or(Px(f32::MAX), |rect| rect.size.width),
@@ -164,6 +213,17 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
     let mounted = common.clone();
     let data = common.data_attributes();
     let anchor = chevron().map(Anchor::Mounted);
+    let title_anchor = title_seat().map(Anchor::Mounted);
+    let menu = (!title_menu.is_empty()).then(|| TitleMenu {
+        onclick: EventHandler::new(move |event: MouseEvent| {
+            if holds_primary(platform, event.modifiers()) {
+                title_open.set(Shown::Visible);
+            }
+        }),
+        onmounted: EventHandler::new(move |event: MountedEvent| {
+            title_seat.set(Some(MountedRef(event.data())));
+        }),
+    });
     rsx! {
         div {
             id: common.id.clone(),
@@ -187,7 +247,7 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
                     {button(item, place, buttons, onpick)}
                 }
             }
-            {title_span(title.as_ref(), subtitle.as_ref(), center)}
+            {title_span(title.as_ref(), subtitle.as_ref(), center, menu)}
             span { class: "ds-toolbar-trailing",
                 for (at , item) in trailing.iter().enumerate().take(kept.trailing) {
                     {button(item, leading.len() + at, buttons, onpick)}
@@ -214,6 +274,20 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
                 if let (Some(search), Some(fit)) = (search.as_ref(), fit) {
                     {search_item(search, fit, expansion)}
                 }
+            }
+        }
+        if title_open() == Shown::Visible && let Some(anchor) = title_anchor {
+            Menu::<usize> {
+                placement: MenuPlacement::Popup,
+                anchor,
+                items: rows(&title_menu, 0),
+                onpick: move |at: usize| {
+                    title_open.set(Shown::Hidden);
+                    if let Some(hear) = ontitlemenu {
+                        hear.call(at);
+                    }
+                },
+                onclose: move |()| title_open.set(Shown::Hidden),
             }
         }
         if open() == Shown::Visible && let Some(anchor) = anchor {

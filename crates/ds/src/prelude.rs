@@ -147,6 +147,8 @@ pub use crate::components::app::space_editor::colour::SpaceColour;
 pub use crate::components::app::space_editor::dot::{DotFace, SpaceDot};
 
 // Chrome
+pub use crate::components::chrome::path_control::model::{PathPart, PathSegment};
+pub use crate::components::chrome::path_control::view::PathControl;
 pub use crate::components::chrome::status_bar::StatusBar;
 pub use crate::components::chrome::status_bar_model::item_count_text;
 pub use crate::components::chrome::window_frame::TrafficLights;

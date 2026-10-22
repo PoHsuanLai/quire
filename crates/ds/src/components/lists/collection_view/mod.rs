@@ -7,7 +7,7 @@ pub(crate) mod view;
 
 mod act;
 mod item;
-mod landing;
+pub(crate) mod landing;
 mod size;
 mod window;
 

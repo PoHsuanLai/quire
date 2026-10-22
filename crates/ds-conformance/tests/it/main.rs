@@ -73,6 +73,7 @@ mod palette_mark_group_action;
 mod palette_selection_view;
 mod palette_surface_layout;
 mod palette_trailing_action;
+mod path_control;
 mod pane_stack;
 mod pick_list;
 mod pinned_bar_layout;
