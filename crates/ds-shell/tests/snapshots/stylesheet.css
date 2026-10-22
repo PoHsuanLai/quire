@@ -2816,7 +2816,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-path-segment,
 .ds-path-more{
   display:inline-flex; align-items:center; flex:0 1 auto; min-width:0; gap:var(--s-4); height:var(--s-24);
-  padding:0 var(--s-6); border:0; border-radius:var(--r-control); background:transparent; color:inherit;
+  padding:0 var(--s-8); border:0; border-radius:var(--r-control); background:transparent; color:inherit;
   font:inherit; cursor:default;
 }
 .ds-path-segment:hover,
