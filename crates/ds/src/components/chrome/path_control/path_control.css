@@ -10,13 +10,13 @@
 .ds-path-segment,
 .ds-path-more{
   display:inline-flex; align-items:center; flex:0 1 auto; min-width:0; gap:var(--s-4); height:var(--s-24);
-  padding:0 var(--s-8); border:0; border-radius:var(--r-control); background:transparent; color:inherit;
+  padding:0 var(--s-8); border:0; border-radius:var(--r-small); background:transparent; color:inherit;
   font:inherit; cursor:default;
 }
 .ds-path-segment:hover,
 .ds-path-more:hover{ background:var(--hover-wash); }
 .ds-path-segment[*|aria-current]{ color:var(--ink); }
-.ds-path-name{ min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.ds-path-name{ min-width:0; }
 .ds-path-chevron{ display:inline-flex; flex:none; color:var(--ink-faint); }
 .ds-path-segment[*|data-drop=accepts]{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
 .ds-path-segment[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); box-shadow:0 0 0 var(--s-2) var(--accent); }

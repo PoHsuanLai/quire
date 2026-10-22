@@ -62,7 +62,7 @@ fn draw(
                 }
             },
             IconView { source: IconSource::from(segment.icon), size: IconSize::Compact }
-            span { class: "ds-path-name", "{segment.label}" }
+            span { class: "ds-path-name ds-truncate", "{segment.label}" }
         }
     }
 }
