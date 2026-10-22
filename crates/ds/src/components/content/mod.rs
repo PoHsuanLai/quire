@@ -10,6 +10,7 @@ pub mod level_glyph;
 pub mod mark_face;
 pub(crate) mod muted;
 pub mod pdf_thumb;
+pub mod picture;
 pub mod picture_fit;
 pub mod provider_mark;
 pub mod rich_text;

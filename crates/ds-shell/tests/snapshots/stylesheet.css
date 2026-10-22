@@ -799,7 +799,7 @@ html,body{margin:0;padding:0;background:transparent}
    wash when it does not (`data-focus=away`, an inactive window). A tile that takes a
    drop is outlined while a drag is on (`data-drop=accepts`), its thumbnail is washed and ringed
    under the pointer (`data-drop=target`), and the one being dragged is dimmed (`data-drag=source`),
-   as a row's are. A badge sits centred under the caption in the room the caption band already
+   as a row's are. `data-aspect=landscape` makes the thumbnail 16:10 (`--cv-thumb-h` tall) with its picture covering it; `data-extent=content` sizes the view to its rows (the inline height) and leaves the scrolling to the page. A badge sits centred under the caption in the room the caption band already
    keeps, so the pitch does not change. A tile arrives with a fade and
    leaves with one (the roster's `data-presence`), under Reduced motion with the same fades. */
 
@@ -816,6 +816,10 @@ html,body{margin:0;padding:0;background:transparent}
   display:flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box;
   width:var(--cv-thumb); height:var(--cv-thumb); border-radius:var(--r-item); color:var(--ink-soft);
 }
+.ds-cv[*|data-aspect=landscape] .ds-cv-thumb{ height:var(--cv-thumb-h, var(--cv-thumb)); }
+.ds-cv[*|data-aspect=landscape] .ds-cv-image{ object-fit:cover; border-radius:var(--r-item); }
+.ds-cv[*|data-extent=content]{ flex:none; height:auto; }
+.ds-cv[*|data-extent=content] > .ds-scroller{ overflow-y:visible; }
 .ds-cv-image{ display:block; width:100%; height:100%; object-fit:contain; border-radius:var(--r-tiny); }
 .ds-cv-caption{
   display:block; max-width:100%; box-sizing:border-box; margin-top:var(--s-4); padding:var(--s-1) var(--s-6);
@@ -1566,6 +1570,23 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--ink); }
 
+/* A swatch (`MenuImage::Swatch`): a 12 px dot in the tag's colour (`data-tag`), ringed by a
+   hairline so a pale tag reads on the highlight; it keeps its colour when the row is highlighted. */
+.ds-menu-image[*|data-image=swatch]{ color:inherit; }
+.ds-menu-swatch{ display:block; width:12px; height:12px; border-radius:var(--r-pill); box-shadow:var(--shadow-mark); }
+.ds-menu-swatch[*|data-tag=red]{ background:var(--tag-red); }
+.ds-menu-swatch[*|data-tag=orange]{ background:var(--tag-orange); }
+.ds-menu-swatch[*|data-tag=yellow]{ background:var(--tag-yellow); }
+.ds-menu-swatch[*|data-tag=green]{ background:var(--tag-green); }
+.ds-menu-swatch[*|data-tag=mint]{ background:var(--tag-mint); }
+.ds-menu-swatch[*|data-tag=teal]{ background:var(--tag-teal); }
+.ds-menu-swatch[*|data-tag=cyan]{ background:var(--tag-cyan); }
+.ds-menu-swatch[*|data-tag=blue]{ background:var(--tag-blue); }
+.ds-menu-swatch[*|data-tag=indigo]{ background:var(--tag-indigo); }
+.ds-menu-swatch[*|data-tag=purple]{ background:var(--tag-purple); }
+.ds-menu-swatch[*|data-tag=pink]{ background:var(--tag-pink); }
+.ds-menu-swatch[*|data-tag=brown]{ background:var(--tag-brown); }
+
 /* Disabled (design/13 section 13.3.3): opacity .35, not selectable. */
 .ds-menu-item[*|aria-disabled=true]{ opacity:.35; }
 
@@ -1795,6 +1816,15 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-pdf-thumb[*|data-state=pending] .ds-pdf-thumb-sheet{ opacity:.5; }
 .ds-pdf-thumb-page{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; pointer-events:none; user-select:none; }
 .ds-pdf-thumb-plate{ position:absolute; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; }
+/* -- picture -- */
+/* Picture: an image cropped to fill a rounded frame of one ratio (`data-shape`: landscape 16:10,
+   square). The frame is as wide as its parent, `overflow:hidden` at the media radius, and the
+   picture covers it. Attribute selectors carry `*|` (spike S2). */
+
+.ds-picture{ position:relative; display:block; box-sizing:border-box; width:100%; overflow:hidden; border-radius:var(--r-media); background:var(--fill-quaternary); }
+.ds-picture[*|data-shape=landscape]{ aspect-ratio:16/10; }
+.ds-picture[*|data-shape=square]{ aspect-ratio:1; }
+.ds-picture-image{ display:block; width:100%; height:100%; object-fit:cover; user-select:none; }
 /* -- pinned_bar -- */
 /* PinnedBar: a bar laid over the top or bottom edge of a scroll container. Blitz has no
    `position: sticky`, so the container is positioned and the bar is absolute within it, outside

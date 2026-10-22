@@ -122,6 +122,7 @@ pub use crate::stack::host::use_overlays;
 pub use crate::components::content::avatar::Avatar;
 pub use crate::components::content::image_source::ImageSource;
 pub use crate::components::content::pdf_thumb::PdfThumb;
+pub use crate::components::content::picture::{Picture, PictureShape};
 pub use crate::components::content::provider_mark::ProviderMark;
 pub use crate::components::content::text_runs::RunTone;
 pub use crate::components::content::text_runs::TextLine;

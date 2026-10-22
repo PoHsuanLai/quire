@@ -8,6 +8,39 @@ use ds_core::word::Word;
 /// `--cv-pitch` the view writes, so the rows the view windows are the rows that are drawn.
 const CAPTION_BAND: Px = Px(44.0);
 
+/// The shape of the thumbnail's box: Finder's square, or the landscape 16:10 of a screen (a
+/// wallpaper, a screenshot), which a square would letterbox to a strip.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum ThumbAspect {
+    /// As tall as wide.
+    #[default]
+    Square,
+    /// 16 wide to 10 tall.
+    Landscape,
+}
+
+impl ThumbAspect {
+    /// The box's height for a `width`.
+    pub fn height(self, width: Px) -> Px {
+        match self {
+            ThumbAspect::Square => width,
+            ThumbAspect::Landscape => Px((width.0 * 10.0 / 16.0).round()),
+        }
+    }
+}
+
+/// Whether the view scrolls itself or takes the room its rows need.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum CollectionExtent {
+    /// The view fills the box its owner gives it and scrolls inside it, mounting only the rows
+    /// near the viewport.
+    #[default]
+    Fill,
+    /// The view is as tall as all its rows and does not scroll itself, for a page that scrolls
+    /// (every tile is mounted, so it suits a few hundred tiles, not a folder of thousands).
+    Content,
+}
+
 /// Finder's icon sizes: how large the thumbnail is drawn.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum CollectionSize {
@@ -38,7 +71,12 @@ impl CollectionSize {
 
     /// The distance between one row's top and the next: the thumbnail and its caption band.
     pub fn pitch(self) -> Px {
-        Px(self.thumb().0 + CAPTION_BAND.0)
+        self.pitch_for(ThumbAspect::Square)
+    }
+
+    /// The row pitch when the thumbnail's box has the shape `aspect`.
+    pub fn pitch_for(self, aspect: ThumbAspect) -> Px {
+        Px(aspect.height(self.thumb()).0 + CAPTION_BAND.0)
     }
 
     /// How many characters of a caption fit on its line. Blitz has no `text-overflow` and quire
@@ -49,14 +87,22 @@ impl CollectionSize {
         (self.tile().0 / 6.5).floor() as usize
     }
 
-    /// The inline style that hands the stylesheet the size's three numbers.
-    pub(crate) fn style(self) -> String {
-        format!(
+    /// The inline style that hands the stylesheet the size's three numbers, for a thumbnail box
+    /// of the shape `aspect`; a landscape one adds its height as `--cv-thumb-h` (the square's is
+    /// `--cv-thumb`).
+    pub(crate) fn style_for(self, aspect: ThumbAspect) -> String {
+        let base = format!(
             "--cv-thumb:{}px;--cv-tile:{}px;--cv-pitch:{}px",
             self.thumb().0,
             self.tile().0,
-            self.pitch().0
-        )
+            self.pitch_for(aspect).0
+        );
+        match aspect {
+            ThumbAspect::Square => base,
+            ThumbAspect::Landscape => {
+                format!("{base};--cv-thumb-h:{}px", aspect.height(self.thumb()).0)
+            }
+        }
     }
 }
 
@@ -86,7 +132,7 @@ impl Flow {
 
 #[cfg(test)]
 mod tests {
-    use super::{CollectionSize, Flow};
+    use super::{CollectionExtent, CollectionSize, Flow, ThumbAspect};
     use ds_core::geometry::units::Px;
 
     #[test]
@@ -103,9 +149,23 @@ mod tests {
             assert_eq!(size.pitch(), Px(pitch), "{size:?} pitch");
         }
         assert_eq!(
-            CollectionSize::Medium.style(),
+            CollectionSize::Medium.style_for(ThumbAspect::Square),
             "--cv-thumb:64px;--cv-tile:100px;--cv-pitch:108px"
         );
+    }
+
+    #[test]
+    fn a_landscape_thumbnail_is_sixteen_to_ten_and_shortens_the_row_to_match() {
+        let large = CollectionSize::Large;
+        assert_eq!(ThumbAspect::Landscape.height(large.thumb()), Px(60.0));
+        assert_eq!(ThumbAspect::Square.height(large.thumb()), Px(96.0));
+        assert_eq!(large.pitch_for(ThumbAspect::Landscape), Px(104.0));
+        assert_eq!(large.pitch_for(ThumbAspect::Square), large.pitch());
+        assert_eq!(
+            large.style_for(ThumbAspect::Landscape),
+            "--cv-thumb:96px;--cv-tile:132px;--cv-pitch:104px;--cv-thumb-h:60px"
+        );
+        assert_eq!(CollectionExtent::default(), CollectionExtent::Fill);
     }
 
     #[test]

@@ -50,6 +50,19 @@ first, with what a consumer has to change.
 - design/22-SETTINGS.md: `bar.autohide` (`always`, `desktop_only`, `full_screen_only` by default,
   `never`), Appearance › Bar.
 
+### Pictures
+- `CollectionView { aspect: ThumbAspect::Landscape }`: a 16:10 thumbnail box (`ThumbAspect`
+  is `Square` by default); an image covers it, an icon is drawn at its shorter side, and the row
+  pitch shortens to match (`CollectionSize::pitch_for`). The view carries `data-aspect=landscape`
+  and `--cv-thumb-h`.
+- `CollectionView { extent: CollectionExtent::Content }`: the view is as tall as all its rows
+  (`ceil(len / columns) * pitch`), mounts every tile and leaves the scrolling to the page
+  (`data-extent=content`). `Fill` is the default and unchanged.
+- New `Picture { source, alt, shape }`: an image cropped to fill a rounded frame (`object-fit:
+  cover`, `--r-media`), landscape 16:10 or square (`PictureShape`); alt text is required.
+- `MenuImage::Swatch(TagColour)`: a coloured dot in a menu row, for a Finder tag. Not yet: the
+  single row of tag dots in a context menu (needs several picks on one menu line).
+
 ## v0.3.40
 
 The files batch, second part: the icon view's tiles take a context menu, a drop and a badge; a

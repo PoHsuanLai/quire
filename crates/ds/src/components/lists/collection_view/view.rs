@@ -33,7 +33,8 @@
 //! `data-index`, `data-presence`, `data-exit` while leaving, `data-editing` while a field holds
 //! the caption, `data-drop` and `data-drag` as a drag puts them) of `span.ds-cv-thumb`,
 //! `span.ds-cv-caption` and, when the item has one, `span.ds-cv-badge`, and a spacer.
-//! `data-focus=away` marks a view that does not hold the keyboard.
+//! `data-focus=away` marks a view that does not hold the keyboard; `data-aspect=landscape` and
+//! `data-extent=content` mark the non-default shapes (`--cv-thumb-h` is then the thumbnail's height).
 
 use crate::components::controls::scroller::handle::use_scroller;
 use crate::components::controls::scroller::view::Scroller;
@@ -43,7 +44,9 @@ use crate::components::lists::collection_view::landing::{Drops, Landing};
 use crate::components::lists::collection_view::model::{
     CollectionKey, collection_key, target, tiles_in,
 };
-use crate::components::lists::collection_view::size::{CollectionSize, Flow};
+use crate::components::lists::collection_view::size::{
+    CollectionExtent, CollectionSize, Flow, ThumbAspect,
+};
 use crate::components::lists::collection_view::window::{Memory, Shown, Stand, reconcile, shown};
 use crate::components::lists::reach::Reach;
 use crate::components::lists::virtual_list::layout::Layout;
@@ -91,6 +94,12 @@ enum Held {
 /// owner marks the tile under the pointer `Target` and the thing being dragged `Source`, as a
 /// `Row`'s `RowState::drop` is driven.
 ///
+/// `aspect` is the shape of each tile's thumbnail box: the square by default, or the landscape
+/// 16:10 of a screen (`ThumbAspect::Landscape`; an image then covers its box, and the row pitch
+/// shortens to match). `extent` is `Fill` by default, a view that scrolls inside the box its
+/// owner gives it; `Content` makes it as tall as all its rows (`ceil(len / columns)` of them)
+/// and mounts every tile, for a page that scrolls instead.
+///
 /// `items` is read on every render and its captions are cloned for type-to-select only when
 /// letters are typed; the keys are collected on every render, so an owner of a million tiles keeps
 /// its `items` in a memo.
@@ -100,6 +109,8 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
     items: Vec<CollectionItem<K>>,
     #[props(default)] size: CollectionSize,
     #[props(default)] flow: Flow,
+    #[props(default)] aspect: ThumbAspect,
+    #[props(default)] extent: CollectionExtent,
     #[props(default)] cursor: Option<usize>,
     #[props(default)] selection: Option<RowSelection>,
     #[props(default)] onselect: Option<EventHandler<usize>>,
@@ -118,14 +129,18 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
     let columns = flow.columns(probe.rect().map(|rect| rect.size.width), size.tile());
     let scroller = use_scroller();
     let layout = Layout::Even {
-        pitch: size.pitch(),
+        pitch: size.pitch_for(aspect),
         len: len.div_ceil(columns),
     };
     let rows = use_memo(use_reactive(
         (&layout, &overscan),
         move |(layout, overscan)| layout.window(*scroller.scroll().read(), overscan),
     ));
-    let window = tiles_in(rows(), columns, len);
+    let in_view = match extent {
+        CollectionExtent::Fill => rows(),
+        CollectionExtent::Content => 0..layout.len(),
+    };
+    let window = tiles_in(in_view.clone(), columns, len);
     let keys: Vec<K> = items.iter().map(|item| item.key.clone()).collect();
     let roster = use_roster_from(
         &keys[window.clone()],
@@ -141,7 +156,7 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
         let mut state = memory.write();
         reconcile(&mut state, &keys, change, &layout, roster);
         roster.list_from_render(keys[window.clone()].to_vec());
-        shown(&mut state, &roster.entries(), &items, window, size)
+        shown(&mut state, &roster.entries(), &items, window, size, aspect)
     };
     use_cursor_reveal(
         scroller,
@@ -215,7 +230,13 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
     let data = common.data_attributes();
     let mounted = common.clone();
     let away = (held() == Held::No).then_some("away");
-    let (above, below) = (layout.top(rows().start).0, layout.below(rows().end).0);
+    let (above, below) = (layout.top(in_view.start).0, layout.below(in_view.end).0);
+    let style = match extent {
+        CollectionExtent::Fill => size.style_for(aspect),
+        CollectionExtent::Content => {
+            format!("{};height:{}px", size.style_for(aspect), layout.total().0)
+        }
+    };
     let grid = format!("grid-template-columns:repeat({columns},1fr)");
     rsx! {
         div {
@@ -225,8 +246,10 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
             tabindex: "0",
             "aria-label": common.aria_label.clone().unwrap_or(label),
             "data-size": size.slug(),
+            "data-aspect": (aspect != ThumbAspect::Square).then(|| aspect.slug()),
+            "data-extent": (extent != CollectionExtent::Fill).then(|| extent.slug()),
             "data-focus": away,
-            style: size.style(),
+            style,
             onmounted: move |event| {
                 probe.on_mounted(event.clone());
                 mounted.mounted(event);

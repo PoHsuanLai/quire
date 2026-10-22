@@ -1,0 +1,8 @@
+/* Picture: an image cropped to fill a rounded frame of one ratio (`data-shape`: landscape 16:10,
+   square). The frame is as wide as its parent, `overflow:hidden` at the media radius, and the
+   picture covers it. Attribute selectors carry `*|` (spike S2). */
+
+.ds-picture{ position:relative; display:block; box-sizing:border-box; width:100%; overflow:hidden; border-radius:var(--r-media); background:var(--fill-quaternary); }
+.ds-picture[*|data-shape=landscape]{ aspect-ratio:16/10; }
+.ds-picture[*|data-shape=square]{ aspect-ratio:1; }
+.ds-picture-image{ display:block; width:100%; height:100%; object-fit:cover; user-select:none; }

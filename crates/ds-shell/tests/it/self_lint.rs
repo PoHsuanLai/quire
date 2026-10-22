@@ -57,6 +57,7 @@ const INLINE_VARS: &[&str] = &[
     // A collection's thumbnail size and row pitch (`CollectionView { size }`).
     "--cv-thumb",
     "--cv-pitch",
+    "--cv-thumb-h",
 ];
 
 const EXCEPTIONS: &[Exception] = &[

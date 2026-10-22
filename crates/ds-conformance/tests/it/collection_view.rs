@@ -10,7 +10,9 @@ use dioxus::prelude::*;
 use ds::base::press::PointerButton;
 use ds::base::selection::{Pick, PickHow};
 use ds::components::content::icon_source::IconSource;
-use ds::components::lists::collection_view::{CollectionItem, CollectionView, Flow, Thumbnail};
+use ds::components::lists::collection_view::{
+    CollectionExtent, CollectionItem, CollectionSize, CollectionView, Flow, ThumbAspect, Thumbnail,
+};
 use ds::prelude::*;
 use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
@@ -394,4 +396,61 @@ fn a_badge_sits_centred_under_the_caption_without_moving_it() {
         harness.count(&format!("{} .ds-cv-badge", tile(FILE as usize))),
         0
     );
+}
+
+/// Forty landscape tiles in four columns, sized to their rows.
+#[allow(non_snake_case)]
+fn WidePage() -> Element {
+    let items: Vec<CollectionItem<u32>> = (0..40)
+        .map(|n| {
+            CollectionItem::new(
+                n,
+                caption(n),
+                Thumbnail::Icon(IconSource::Glyph(Icon::File)),
+            )
+        })
+        .collect();
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "width:400px",
+                CollectionView::<u32> {
+                    label: "Wallpapers",
+                    items,
+                    size: CollectionSize::Large,
+                    aspect: ThumbAspect::Landscape,
+                    extent: CollectionExtent::Content,
+                    flow: Flow::Columns(4),
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn a_landscape_view_sized_to_its_content_mounts_every_row_at_the_shorter_pitch() {
+    let harness = Harness::new(
+        WidePage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    assert_eq!(harness.count(".ds-cv-item"), 40);
+    assert_eq!(
+        harness.attr(".ds-cv", "data-aspect").as_deref(),
+        Some("landscape")
+    );
+    assert_eq!(
+        harness.attr(".ds-cv", "data-extent").as_deref(),
+        Some("content")
+    );
+    // Ten rows of the Large landscape pitch (60 px thumbnail + 44 px caption band).
+    let view = harness.rect(".ds-cv").expect("laid out");
+    assert_eq!(view.size.height, Px(1040.0));
+    let thumb = harness.rect(".ds-cv-thumb").expect("laid out");
+    assert_eq!(thumb.size.height, Px(60.0));
+}
+
+#[test]
+fn a_default_view_has_neither_the_landscape_nor_the_content_mark() {
+    let harness = harness();
+    assert_eq!(harness.attr(".ds-cv", "data-aspect"), None);
+    assert_eq!(harness.attr(".ds-cv", "data-extent"), None);
 }

@@ -46,6 +46,23 @@
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--ink); }
 
+/* A swatch (`MenuImage::Swatch`): a 12 px dot in the tag's colour (`data-tag`), ringed by a
+   hairline so a pale tag reads on the highlight; it keeps its colour when the row is highlighted. */
+.ds-menu-image[*|data-image=swatch]{ color:inherit; }
+.ds-menu-swatch{ display:block; width:12px; height:12px; border-radius:var(--r-pill); box-shadow:var(--shadow-mark); }
+.ds-menu-swatch[*|data-tag=red]{ background:var(--tag-red); }
+.ds-menu-swatch[*|data-tag=orange]{ background:var(--tag-orange); }
+.ds-menu-swatch[*|data-tag=yellow]{ background:var(--tag-yellow); }
+.ds-menu-swatch[*|data-tag=green]{ background:var(--tag-green); }
+.ds-menu-swatch[*|data-tag=mint]{ background:var(--tag-mint); }
+.ds-menu-swatch[*|data-tag=teal]{ background:var(--tag-teal); }
+.ds-menu-swatch[*|data-tag=cyan]{ background:var(--tag-cyan); }
+.ds-menu-swatch[*|data-tag=blue]{ background:var(--tag-blue); }
+.ds-menu-swatch[*|data-tag=indigo]{ background:var(--tag-indigo); }
+.ds-menu-swatch[*|data-tag=purple]{ background:var(--tag-purple); }
+.ds-menu-swatch[*|data-tag=pink]{ background:var(--tag-pink); }
+.ds-menu-swatch[*|data-tag=brown]{ background:var(--tag-brown); }
+
 /* Disabled (design/13 section 13.3.3): opacity .35, not selectable. */
 .ds-menu-item[*|aria-disabled=true]{ opacity:.35; }
 

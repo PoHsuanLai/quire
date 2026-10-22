@@ -12,5 +12,5 @@ mod size;
 mod window;
 
 pub use item::{CollectionItem, Thumbnail};
-pub use size::{CollectionSize, Flow};
+pub use size::{CollectionExtent, CollectionSize, Flow, ThumbAspect};
 pub use view::CollectionView;

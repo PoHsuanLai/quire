@@ -8,6 +8,7 @@ use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, Avata
 use ds::components::overlays::popover::Arrow;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
+use ds::style::tokens::tag_colour::TagColour;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
@@ -121,5 +122,39 @@ fn a_result_row_draws_marks_an_avatar_and_a_second_line() {
         )),
         0,
         "a plain row has no title wrapper"
+    );
+}
+
+/// Two tag rows in a popup menu.
+#[allow(non_snake_case)]
+fn SwatchPage() -> Element {
+    let items = vec![
+        MenuItem::new(1, "Red").with_image(MenuImage::Swatch(TagColour::Red)),
+        MenuItem::new(2, "Blue").with_image(MenuImage::Swatch(TagColour::Blue)),
+    ];
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            Menu::<u8> {
+                placement: MenuPlacement::Popup,
+                anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }),
+                items,
+                onpick: |_| {},
+                onclose: |()| {},
+            }
+        }
+    }
+}
+
+#[test]
+fn a_swatch_row_draws_a_dot_in_the_tags_colour() {
+    let mut harness = Harness::new(
+        SwatchPage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    harness.advance(Duration::from_millis(400));
+    assert_eq!(harness.count(".ds-menu-swatch"), 2);
+    assert_eq!(
+        harness.attr(".ds-menu-swatch", "data-tag").as_deref(),
+        Some("red")
     );
 }

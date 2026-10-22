@@ -2,14 +2,14 @@
 
 use crate::components::content::icon_view::IconView;
 use crate::components::lists::collection_view::item::{CollectionItem, Thumbnail};
-use crate::components::lists::collection_view::size::CollectionSize;
+use crate::components::lists::collection_view::size::{CollectionSize, ThumbAspect};
 use crate::focus::click::kept_click;
 use dioxus::prelude::*;
 use ds_core::text::clip::Truncate;
 use ds_style::icon::render::{IconPx, IconSize};
 
-/// The thumbnail's picture: an image fitted in its square, or an icon at the square's size.
-fn picture(thumbnail: &Thumbnail, size: CollectionSize) -> Element {
+/// The thumbnail's picture: an image fitted in its box, or an icon at the box's shorter side.
+fn picture(thumbnail: &Thumbnail, size: CollectionSize, aspect: ThumbAspect) -> Element {
     match thumbnail {
         Thumbnail::Image(source) => rsx! {
             img { class: "ds-cv-image", alt: "", src: "{source.0}", draggable: "false" }
@@ -17,7 +17,7 @@ fn picture(thumbnail: &Thumbnail, size: CollectionSize) -> Element {
         Thumbnail::Icon(source) => rsx! {
             IconView {
                 source: source.clone(),
-                size: IconSize::Px(IconPx(size.thumb().0 as u8)),
+                size: IconSize::Px(IconPx(aspect.height(size.thumb()).0 as u8)),
             }
         },
     }
@@ -54,14 +54,18 @@ fn edit_slot(slot: Element) -> Element {
     }
 }
 
-/// `item`'s thumbnail and caption (or its field), drawn at `size`.
-pub(crate) fn content<K>(item: &CollectionItem<K>, size: CollectionSize) -> Element {
+/// `item`'s thumbnail and caption (or its field), drawn at `size` in a thumbnail box of `aspect`.
+pub(crate) fn content<K>(
+    item: &CollectionItem<K>,
+    size: CollectionSize,
+    aspect: ThumbAspect,
+) -> Element {
     let words = match &item.edit {
         Some(editing) => edit_slot(editing.clone()),
         None => caption(&item.caption, size),
     };
     rsx! {
-        span { class: "ds-cv-thumb", "aria-hidden": "true", {picture(&item.thumbnail, size)} }
+        span { class: "ds-cv-thumb", "aria-hidden": "true", {picture(&item.thumbnail, size, aspect)} }
         {words}
         if let Some(badge) = &item.badge {
             span { class: "ds-cv-badge", {badge.clone()} }

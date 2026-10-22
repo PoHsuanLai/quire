@@ -3,7 +3,7 @@
 //! more while it plays its exit.
 
 use crate::components::lists::collection_view::item::CollectionItem;
-use crate::components::lists::collection_view::size::CollectionSize;
+use crate::components::lists::collection_view::size::{CollectionSize, ThumbAspect};
 use crate::components::lists::collection_view::tile;
 use crate::components::lists::list::list::node_key;
 use crate::components::lists::virtual_list::layout::Layout;
@@ -105,6 +105,7 @@ pub(crate) fn shown<K: Clone + Eq + Hash + 'static>(
     items: &[CollectionItem<K>],
     window: Range<usize>,
     size: CollectionSize,
+    aspect: ThumbAspect,
 ) -> Vec<Shown> {
     state.exiting.retain(|(key, _)| {
         entries
@@ -133,7 +134,7 @@ pub(crate) fn shown<K: Clone + Eq + Hash + 'static>(
         let Some(at) = at_of.get(&entry.key).copied() else {
             continue;
         };
-        let content = tile::content(&items[at], size);
+        let content = tile::content(&items[at], size, aspect);
         drawn.push(Shown {
             node: node_key(&entry.key),
             stand: Stand::Live(at),

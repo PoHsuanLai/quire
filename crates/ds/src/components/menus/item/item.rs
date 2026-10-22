@@ -7,6 +7,7 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::menus::item::text::{ItemText, Marks};
 use ds_core::vocab::{Availability, Check, Shortcut};
 use ds_style::icon::Icon;
+use ds_style::tokens::tag_colour::TagColour;
 
 /// The image at an item's start.
 #[derive(Debug, Clone, PartialEq)]
@@ -18,6 +19,9 @@ pub enum MenuImage {
     Source(IconSource),
     /// A person or account as a coloured disc with a letter: a result row for someone.
     Avatar(AvatarFace),
+    /// A coloured dot in a tag's colour (`--tag-*`): a row for a Finder tag, in the menu that
+    /// tags files. It keeps its colour under the highlight.
+    Swatch(TagColour),
 }
 
 /// What a pick does to the menu that holds the item.

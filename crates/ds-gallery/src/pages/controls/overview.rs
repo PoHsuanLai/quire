@@ -68,6 +68,7 @@ pub fn ControlsPage() -> Element {
         ExternalIcons {}
         Glyphs {}
         PlateTints {}
+        crate::pages::content::picture::PictureGallery {}
         Choosers {}
         Chips {}
         Faces {}

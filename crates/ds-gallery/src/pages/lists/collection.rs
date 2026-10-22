@@ -2,9 +2,12 @@
 //! captions, and a right click selects the tile and names the one a menu would open for.
 
 use crate::pages::Section;
+use crate::pages::content::picture::wide_image;
 use dioxus::prelude::*;
 use ds::components::content::icon_source::IconSource;
-use ds::components::lists::collection_view::{CollectionItem, CollectionView, Flow, Thumbnail};
+use ds::components::lists::collection_view::{
+    CollectionExtent, CollectionItem, CollectionSize, CollectionView, Flow, ThumbAspect, Thumbnail,
+};
 use ds::prelude::*;
 
 /// How many tiles the grid has.
@@ -26,6 +29,19 @@ fn dots() -> Element {
         span { style: dot("--accent") }
         span { style: dot("--ink-faint") }
     }
+}
+
+/// Six wallpapers as landscape tiles.
+fn wallpapers() -> Vec<CollectionItem<usize>> {
+    (0..6)
+        .map(|at| {
+            CollectionItem::new(
+                at,
+                format!("Wallpaper {}", at + 1),
+                Thumbnail::Image(wide_image()),
+            )
+        })
+        .collect()
 }
 
 /// The collection view and the line that says what its menu was asked for.
@@ -62,6 +78,20 @@ pub fn CollectionGallery() -> Element {
                     }
                 }
                 p { class: "g-note", "{asked}" }
+            }
+        }
+        Section {
+            title: "CollectionView, landscape and sized to its rows",
+            note: "aspect: Landscape draws each thumbnail 16:10 with its picture covering the box (a wallpaper keeps its shape), and the row shortens to match. extent: Content makes the view as tall as all its rows, for a page that scrolls; the box around it here has no height of its own.",
+            div { class: "g-list", style: "width:440px",
+                CollectionView::<usize> {
+                    label: "Wallpapers",
+                    items: wallpapers(),
+                    size: CollectionSize::Large,
+                    aspect: ThumbAspect::Landscape,
+                    extent: CollectionExtent::Content,
+                    flow: Flow::Columns(3),
+                }
             }
         }
     }

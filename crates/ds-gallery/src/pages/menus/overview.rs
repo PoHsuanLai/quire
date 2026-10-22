@@ -9,6 +9,7 @@ use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::host::measure::{Anchor, MountedRef};
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::tag_colour::TagColour;
 
 /// The three placements, one at a time.
 const PLACEMENTS: [(MenuPlacement, &str); 3] = [
@@ -104,6 +105,22 @@ fn nested() -> Vec<MenuItem<u8>> {
             image: Some(MenuImage::Icon(Icon::Refresh)),
             availability: Availability::Disabled,
             children: vec![item(20, "Restart", None, Availability::Enabled)],
+        },
+        MenuItem::Submenu {
+            title: "Tags".to_string(),
+            image: Some(MenuImage::Icon(Icon::Tag)),
+            availability: Availability::Enabled,
+            children: [
+                (30, "Red", TagColour::Red),
+                (31, "Orange", TagColour::Orange),
+                (32, "Green", TagColour::Green),
+                (33, "Blue", TagColour::Blue),
+            ]
+            .into_iter()
+            .map(|(value, title, colour)| {
+                MenuItem::new(value, title).with_image(MenuImage::Swatch(colour))
+            })
+            .collect(),
         },
         item(2, "Quit", Some(Icon::X), Availability::Enabled),
     ]

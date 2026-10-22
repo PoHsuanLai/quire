@@ -292,6 +292,11 @@ fn image_mark(image: Option<&MenuImage>) -> Element {
                 {face(*avatar)}
             }
         },
+        Some(MenuImage::Swatch(colour)) => rsx! {
+            span { class: "ds-menu-image", "data-image": "swatch",
+                span { class: "ds-menu-swatch", "data-tag": colour.slug() }
+            }
+        },
         None => rsx! {
             span { class: "ds-menu-image", "data-image": "none" }
         },
