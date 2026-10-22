@@ -3,7 +3,26 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.42 (unreleased)
+## v0.3.42
+
+The files batch, fourth part. Finder's path bar (`PathControl`, segments that take drops, a long
+path folds its middle into a menu) and a toolbar title that opens a menu of enclosing folders on the
+primary click; Finder's column view (`ColumnBrowser`); document tabs (`DocumentTabs`: close, new,
+drag to reorder, no tab limit); VirtualTable rows that drag onto folders or between rows with the
+operation their modifiers chose, and a divider double click that fits a column to its content; a
+menu row of tag dots (`MenuItem::Swatches`); and a file clipboard in ds-blitz, so ⌘C on files
+reaches other apps. ds-settings declares the hidden `accounts-setup` page. chordkit, Blitz and
+blitz-kit stay where v0.3.41 put them.
+
+**What a consumer changes**
+- `MenuItem` gains `Swatches(SwatchRow<T>)`: an exhaustive match over `MenuItem` needs an arm.
+- `Clipboard` gains `read_files` and `write_files`, with defaults, so an implementer still compiles.
+- `Toolbar` gains `title_menu` and `ontitlemenu`; `VirtualTable` gains `onrowdrop`, `drop_kind`,
+  `drop_gaps` and `cell_width`; all default off.
+- The stylesheet golden moves (new sheets `path_control`, `column_browser`, `document_tabs`, new
+  classes for the row drop mark and the menu's tag dots; SHEETS is 107).
+- A cut of files is the app's own state: the system clipboard carries the files as a copy, and the
+  app turns a paste of its cut set into a move (`ClipboardFiles::same_files`).
 
 ### Lane E
 
