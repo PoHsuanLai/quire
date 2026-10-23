@@ -296,6 +296,8 @@ fn every_table_name_is_declared_on_the_root() {
 const PER_ELEMENT: &[&str] = &[
     "--a",
     "--dy",
+    // A list row's drag offset while it is reordered (`List { onreorder }`).
+    "--drag-y",
     "--d",
     "--i",
     "--j",

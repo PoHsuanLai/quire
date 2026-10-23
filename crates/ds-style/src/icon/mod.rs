@@ -270,6 +270,9 @@ pub enum Icon {
     Ellipsis,
     /// Lucide `ellipsis-vertical`: the same menu where the row is narrow and tall.
     EllipsisVertical,
+    /// Lucide `grip-vertical`: six dots, two across and three down; a row's handle where a list
+    /// can be reordered by dragging it.
+    Grip,
     // Control center parts 2: quire's own glyphs on Lucide's grid.
     /// Two toggles with their knobs at opposite ends: the control center's bar item
     /// (`geometry_own`, which documents the geometry).
@@ -420,6 +423,7 @@ impl Icon {
             | Icon::Phone => geometry_control::shapes(self),
             Icon::Ellipsis => geometry_actions::ELLIPSIS,
             Icon::EllipsisVertical => geometry_actions::ELLIPSIS_VERTICAL,
+            Icon::Grip => geometry_actions::GRIP,
             Icon::Switches => geometry_own::SWITCHES,
             Icon::MoonFilled => geometry_own::MOON_FILLED,
             Icon::ArrowRight => geometry_actions::ARROW_RIGHT,

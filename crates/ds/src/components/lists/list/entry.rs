@@ -1,7 +1,9 @@
 //! One item of a `List`: the caller's content in a `div.ds-list-item` that plays the item's
 //! entrance, exit and heal, and measures its height, which is how far the items below it heal
-//! when it leaves.
+//! when it leaves. In a list that can be reordered it leads with its grip, the handle a drag
+//! starts from, and stands where the drag puts it ([`Dragged`]).
 
+use crate::components::lists::list::reorder::Dragged;
 use crate::host::measure::client_rect;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
@@ -9,6 +11,8 @@ use ds_core::word::Word;
 use ds_motion::presence::Presence;
 use ds_motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
 use ds_motion::use_roster::Pitches;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::task::spawn_in;
 use std::rc::Rc;
 
@@ -34,13 +38,18 @@ impl SetPlace {
     }
 }
 
-/// One item in the list.
+/// One item in the list. `grip` hears a press on its grip, which only a list that can be
+/// reordered draws; `mounted` hears its element once mounted, for the list to measure the rows
+/// when a drag begins; `dragged` is where the drag puts it.
 #[component]
 pub(crate) fn ListEntry<K: Clone + PartialEq + 'static>(
     entry: RosterEntry<K>,
     pitches: Pitches<K>,
     place: SetPlace,
     content: Element,
+    #[props(default)] grip: Option<EventHandler<PointerEvent>>,
+    #[props(default)] mounted: Option<EventHandler<Rc<MountedData>>>,
+    #[props(default)] dragged: Dragged,
 ) -> Element {
     let mut element = use_signal(|| None::<Rc<MountedData>>);
     let mut measured_leaving = use_hook(|| CopyValue::new(Measured::AtMount));
@@ -76,13 +85,34 @@ pub(crate) fn ListEntry<K: Clone + PartialEq + 'static>(
             "aria-setsize": place.setsize(),
             "data-presence": presence_slug(entry.presence, entry.heal),
             "data-exit": exit_slug(entry.presence),
-            style: motion_style(&entry),
+            "data-drag": dragged.slug(),
+            style: styled(motion_style(&entry), dragged.offset()),
             onmounted: move |event| {
                 element.set(Some(event.data()));
                 measure();
+                if let Some(mounted) = mounted {
+                    mounted.call(event.data());
+                }
             },
             {content}
+            // After the content, so it is drawn over the row and the press is its own.
+            if let Some(grip) = grip {
+                span {
+                    class: "ds-list-grip",
+                    "aria-hidden": "true",
+                    onpointerdown: move |event| grip.call(event),
+                    Glyph { icon: Icon::Grip, size: IconSize::Small }
+                }
+            }
         }
+    }
+}
+
+/// The item's `style`: its heal's distance and its drag's, whichever it has.
+fn styled(heal: Option<String>, drag: Option<String>) -> Option<String> {
+    match (heal, drag) {
+        (Some(heal), Some(drag)) => Some(format!("{heal};{drag}")),
+        (heal, drag) => heal.or(drag),
     }
 }
 

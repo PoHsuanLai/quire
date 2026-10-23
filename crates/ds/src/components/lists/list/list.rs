@@ -3,21 +3,33 @@
 //! and the rows below close the gap), the arrow keys, Home and End rove among the rows and stop
 //! at the ends, letters jump to the next label that starts with them, and the list draws its
 //! selection accent while it holds the keyboard and grey when it does not.
+//!
+//! With `onreorder` each row leads with a grip (`Icon::Grip`) and can be dragged by it: past
+//! 3 px the row lifts and follows the pointer up or down, the rows it passes make room, and on
+//! release the new order goes to the caller, who owns it (the list never reorders itself, as
+//! `PinTiles` does not). Only the grip starts a drag, so a press on the row is still the row's.
 
+use crate::components::app::pin_order::moved as reordered;
 use crate::components::lists::list::entry::{ListEntry, SetPlace};
 use crate::components::lists::list::keys::{ListKey, labelled, list_key, moved};
 use crate::components::lists::list::model::{ListFocus, ListItem, ListStyle};
+use crate::components::lists::list::reorder::{held_to, stand};
 use crate::focus::soon::focus_soon;
+use crate::host::measure::client_rect;
 use crate::root::common::Common;
 use crate::stack::typeahead::Typeahead;
+use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px, Rect};
 use ds_core::time::clock::now;
 use ds_core::word::Word;
+use ds_motion::drag::{DRAG_THRESHOLD, DragPhase, use_drag};
 use ds_motion::presence::Exit;
 use ds_motion::roster::RowPitch;
 use ds_motion::use_roster::{LeaveBy, RosterSpec, use_roster};
 use ds_style::tokens::control_size::SidebarSize;
 use std::hash::Hash;
+use std::rc::Rc;
 
 /// Whether the list holds the keyboard.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,6 +50,9 @@ enum Held {
 /// hashed to name the items' nodes, so a key must hash the same on every render.
 ///
 /// `focus: ListFocus::OnMount` gives the list the keyboard as it mounts (default `Manual`).
+///
+/// `onreorder` makes the rows draggable by their grips; it hears the keys in their new order
+/// once a row is dropped somewhere else.
 #[component]
 pub fn List<K: Clone + PartialEq + Hash + 'static>(
     label: String,
@@ -50,9 +65,29 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
     #[props(default = Exit::Row)] exit: Exit,
     #[props(default)] on_settled: Option<EventHandler<K>>,
     #[props(default)] focus: ListFocus,
+    #[props(default)] onreorder: Option<EventHandler<Vec<K>>>,
     #[props(default)] common: Common,
 ) -> Element {
     let book = use_book(&items);
+    let drag = use_drag::<K>(DRAG_THRESHOLD);
+    // Each row's element, and the rows' rects and the pointer as the drag began.
+    let rows = use_hook(|| CopyValue::new(Vec::<(K, Rc<MountedData>)>::new()));
+    let measured = use_hook(|| CopyValue::new(Vec::<Rect>::new()));
+    let began = use_hook(|| CopyValue::new(Point::default()));
+    let order: Vec<K> = items.iter().map(|item| item.key.clone()).collect();
+    let phase = drag.phase();
+    let finish = {
+        let order = order.clone();
+        move || {
+            if let (Some((key, to)), Some(onreorder)) = (drag.up(), onreorder) {
+                let next = reordered(&order, &key, to);
+                if next != order {
+                    onreorder.call(next);
+                }
+            }
+        }
+    };
+    let leave = finish.clone();
     let keys: Vec<K> = items.iter().map(|item| item.key.clone()).collect();
     let roster = use_roster(
         keys,
@@ -120,12 +155,20 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
             "data-style": style.drawn().slug(),
             "data-sidebar-size": (style == ListStyle::SourceList).then(|| sidebar.slug()),
             "data-focus": away,
+            "data-reorder": onreorder.map(|_| "grip"),
             onmounted: move |event: MountedEvent| {
                 if focus == ListFocus::OnMount {
                     focus_soon(event.data());
                 }
                 mounted.mounted(event);
             },
+            onpointermove: move |event| {
+                if !matches!(drag.phase(), DragPhase::Idle) {
+                    drag.moved(held_to(point(&event), &measured.peek()));
+                }
+            },
+            onpointerup: move |_| finish(),
+            onpointerleave: move |_| leave(),
             onfocus: move |_| held.set(Held::Yes),
             onblur: move |_| held.set(Held::No),
             onkeydown: onkey,
@@ -134,6 +177,21 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
                 ListEntry::<K> {
                     key: "{node_key(&entry.key)}",
                     content: book.of(&entry.key),
+                    grip: onreorder.map(|_| grip(drag, entry.key.clone(), order.clone(), rows, measured, began)),
+                    mounted: onreorder.map(|_| {
+                        let key = entry.key.clone();
+                        EventHandler::new(move |element: Rc<MountedData>| {
+                            let mut rows = rows;
+                            let mut rows = rows.write();
+                            rows.retain(|(held, _)| *held != key);
+                            rows.push((key.clone(), element));
+                        })
+                    }),
+                    dragged: order
+                        .iter()
+                        .position(|held| *held == entry.key)
+                        .map(|at| stand(&phase, &order, &measured.peek(), *began.peek(), at))
+                        .unwrap_or_default(),
                     entry,
                     pitches,
                     place: SetPlace { index, len },
@@ -141,6 +199,54 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
             }
         }
     }
+}
+
+/// A press's point in the surface's own coordinates.
+fn point(event: &PointerEvent) -> Point {
+    let at = event.client_coordinates();
+    Point {
+        x: Px(at.x as f32),
+        y: Px(at.y as f32),
+    }
+}
+
+/// What a primary press on `key`'s grip does: hold the row, and measure every row in `order`, which
+/// is where a drop can land.
+fn grip<K: Clone + PartialEq + 'static>(
+    drag: ds_motion::drag::DragTracker<K>,
+    key: K,
+    order: Vec<K>,
+    rows: CopyValue<Vec<(K, Rc<MountedData>)>>,
+    measured: CopyValue<Vec<Rect>>,
+    began: CopyValue<Point>,
+) -> EventHandler<PointerEvent> {
+    EventHandler::new(move |event: PointerEvent| {
+        if !matches!(event.trigger_button(), None | Some(MouseButton::Primary)) {
+            return;
+        }
+        let at = point(&event);
+        let mut began = began;
+        began.set(at);
+        drag.down(key.clone(), at);
+        let elements: Vec<Rc<MountedData>> = order
+            .iter()
+            .filter_map(|wanted| {
+                rows.peek()
+                    .iter()
+                    .find(|(held, _)| held == wanted)
+                    .map(|(_, element)| element.clone())
+            })
+            .collect();
+        spawn(async move {
+            let mut rects = Vec::new();
+            for element in elements {
+                rects.extend(client_rect(&element).await);
+            }
+            let mut measured = measured;
+            measured.set(rects.clone());
+            drag.set_targets(rects);
+        });
+    })
 }
 
 /// An item's node key: its key's hash, in hex.

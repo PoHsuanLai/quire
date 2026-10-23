@@ -5,3 +5,4 @@ pub(crate) mod keys;
 #[allow(clippy::module_inception)] // The layout names the file for its one concept.
 pub(crate) mod list;
 pub mod model;
+pub(crate) mod reorder;

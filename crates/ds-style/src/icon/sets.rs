@@ -105,6 +105,7 @@ impl Icon {
         Icon::FolderInput,
         Icon::Ellipsis,
         Icon::EllipsisVertical,
+        Icon::Grip,
         // Lock and switcher parts (M11).
         Icon::ArrowRight,
         Icon::CapsLock,
@@ -264,6 +265,7 @@ impl Icon {
         Icon::FolderInput,
         Icon::Ellipsis,
         Icon::EllipsisVertical,
+        Icon::Grip,
         Icon::ArrowRight,
         Icon::CapsLock,
         Icon::Clipboard,
