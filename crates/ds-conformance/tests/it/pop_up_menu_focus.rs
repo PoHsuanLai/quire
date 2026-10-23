@@ -108,3 +108,29 @@ fn a_press_in_the_first_frames_after_the_menu_opens_chooses_the_item_under_it() 
         assert_eq!(pressed_after(frames).as_deref(), Some("2"), "{frames} in");
     }
 }
+
+#[test]
+fn escape_right_after_the_click_closes_the_menu_and_leaves_the_keyboard_on_the_button() {
+    let mut harness = Harness::new(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(Duration::from_millis(400));
+    open(&mut harness);
+    assert_eq!(
+        harness
+            .attr(".ds-popup .ds-button", "aria-expanded")
+            .as_deref(),
+        Some("true")
+    );
+    harness.send(Input::key(ShortcutKey::Escape));
+    harness.advance(Duration::from_millis(300));
+    assert_eq!(harness.count(".ds-menu"), 0, "the menu closed");
+    assert_ne!(
+        harness
+            .attr(".ds-popup .ds-button", "aria-expanded")
+            .as_deref(),
+        Some("true")
+    );
+    assert_eq!(
+        harness.focus_of(".ds-popup .ds-button"),
+        FocusState::Focused
+    );
+}

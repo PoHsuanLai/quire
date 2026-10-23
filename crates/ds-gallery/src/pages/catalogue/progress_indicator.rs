@@ -15,6 +15,7 @@ use ds::style::tokens::control_size::ControlSize;
 pub fn ProgressSection() -> Element {
     let mut share = use_signal(|| Fraction(350));
     let mut operation = use_signal(|| Operation::Running(PendingToken::start()));
+    let mut badge = use_signal(|| Shown::Visible);
     rsx! {
         Section { title: "ProgressIndicator", note: "NSProgressIndicator: a determinate value tweens linearly over --t-move to its new value; an unknown amount is a barber pole, a spinner or a turning arc that exists only while an Operation runs and keeps turning under Reduced motion.",
             div { class: "g-row",
@@ -46,6 +47,11 @@ pub fn ProgressSection() -> Element {
                     Specimen { name: "ring, running".to_owned(),
                         ProgressIndicator { style: ProgressStyle::Ring, progress: Progress::Unknown(operation()), size }
                     }
+                    if size != ControlSize::Regular {
+                        Specimen { name: "pie".to_owned(),
+                            ProgressIndicator { style: ProgressStyle::Pie, progress: Progress::Known(share()), size }
+                        }
+                    }
                 }
             }
             div { class: "g-row g-row-top",
@@ -56,6 +62,18 @@ pub fn ProgressSection() -> Element {
                     div { style: "width:160px; display:flex; flex-direction:column; gap:8px",
                         ProgressIndicator { progress: Progress::Known(Fraction(0)) }
                         ProgressIndicator { progress: Progress::Known(Fraction(1000)) }
+                    }
+                }
+            }
+        }
+        Section { title: "Fade",
+            note: "Fade {{ shown }} wraps content that goes away: Hidden fades it out over --t-quick and then unmounts it (at once under Reduced motion), where an `if` would drop it in a frame. Finder fades a row's download badge this way when the download completes.",
+            div { class: "g-row",
+                Button { size: ControlSize::Mini, label: "Complete", onclick: move |_| badge.set(Shown::Hidden) }
+                Button { size: ControlSize::Mini, label: "Restart", onclick: move |_| badge.set(Shown::Visible) }
+                Specimen { name: "a pie badge".to_owned(),
+                    Fade { shown: badge(),
+                        ProgressIndicator { style: ProgressStyle::Pie, progress: Progress::Known(Fraction(650)), size: ControlSize::Small }
                     }
                 }
             }

@@ -52,12 +52,45 @@ impl RingSpan {
     }
 }
 
+/// A point on the circle of `radius` at `degrees` clockwise from twelve, written `x y`.
+fn point_on(radius: f32, degrees: f32) -> String {
+    let radians = degrees.to_radians();
+    let x = 50.0 + radius * radians.sin();
+    let y = 50.0 - radius * radians.cos();
+    format!("{x:.2} {y:.2}")
+}
+
 /// A point on the ring's circle at `degrees` clockwise from twelve, written `x y`.
 fn point(degrees: f32) -> String {
-    let radians = degrees.to_radians();
-    let x = 50.0 + RADIUS * radians.sin();
-    let y = 50.0 - RADIUS * radians.cos();
-    format!("{x:.2} {y:.2}")
+    point_on(RADIUS, degrees)
+}
+
+/// The radius of the pie's filled wedge: inside the outline circle, with a gap between.
+pub const PIE_RADIUS: f32 = 34.0;
+
+/// The outline circle round a pie: its radius and stroke, in the 100-unit box.
+pub const PIE_RIM: f32 = 46.0;
+
+/// The SVG path of the wedge a `level` fills of the pie, from twelve clockwise, as a closed
+/// shape through the centre; none for an empty level. A whole pie is two half arcs.
+pub fn pie_path(level: Fraction) -> Option<String> {
+    let sweep = RingSpan::FULL.filled(level).sweep;
+    if sweep <= 0.0 {
+        return None;
+    }
+    let r = PIE_RADIUS;
+    let top = point_on(r, 0.0);
+    if sweep >= 360.0 {
+        return Some(format!(
+            "M{top}A{r} {r} 0 0 1 {bottom}A{r} {r} 0 0 1 {top}Z",
+            bottom = point_on(r, 180.0),
+        ));
+    }
+    let large = i32::from(sweep > 180.0);
+    Some(format!(
+        "M50 50L{top}A{r} {r} 0 {large} 1 {end}Z",
+        end = point_on(r, sweep),
+    ))
 }
 
 /// The SVG path of `span` on the ring's circle. A whole circle is two half arcs (one arc cannot
@@ -84,7 +117,7 @@ pub fn arc_path(span: RingSpan) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{RingSpan, arc_path};
+    use super::{RingSpan, arc_path, pie_path};
     use ds_core::vocab::Fraction;
 
     #[test]
@@ -135,6 +168,22 @@ mod tests {
         ];
         for (span, want) in cases {
             assert_eq!(arc_path(span).as_deref(), want, "{span:?}");
+        }
+    }
+
+    #[test]
+    fn a_pie_wedge_grows_clockwise_from_twelve() {
+        let cases = [
+            (0, None),
+            (250, Some("M50 50L50.00 16.00A34 34 0 0 1 84.00 50.00Z")),
+            (750, Some("M50 50L50.00 16.00A34 34 0 1 1 16.00 50.00Z")),
+            (
+                1000,
+                Some("M50.00 16.00A34 34 0 0 1 50.00 84.00A34 34 0 0 1 50.00 16.00Z"),
+            ),
+        ];
+        for (permille, want) in cases {
+            assert_eq!(pie_path(Fraction(permille)).as_deref(), want, "{permille}");
         }
     }
 }

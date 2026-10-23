@@ -1,5 +1,6 @@
 //! What a caller hands a `CollectionView` for each tile.
 
+use crate::components::content::file_icon::FileIconChoice;
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::image_source::ImageSource;
 use dioxus::prelude::Element;
@@ -14,6 +15,10 @@ pub enum Thumbnail {
     /// A glyph or an icon standing for the kind of item (a folder), drawn at the thumbnail's
     /// size.
     Icon(IconSource),
+    /// A file's icon (`ds::FileIcon`): a standard page, a folder, a picture on a page frame or
+    /// finished artwork, drawn whole at the thumbnail's size like an icon and never cropped to a
+    /// frame of the tile's.
+    FileIcon(FileIconChoice),
 }
 
 /// One tile: what identifies it, its picture and its name.

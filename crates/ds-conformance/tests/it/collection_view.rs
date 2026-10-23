@@ -9,6 +9,7 @@
 use dioxus::prelude::*;
 use ds::base::press::PointerButton;
 use ds::base::selection::{Pick, PickHow};
+use ds::components::content::file_icon::FileIconChoice;
 use ds::components::content::icon_source::IconSource;
 use ds::components::lists::collection_view::{
     CollectionExtent, CollectionItem, CollectionSize, CollectionView, Flow, ThumbAspect, Thumbnail,
@@ -453,4 +454,42 @@ fn a_default_view_has_neither_the_landscape_nor_the_content_mark() {
     let harness = harness();
     assert_eq!(harness.attr(".ds-cv", "data-aspect"), None);
     assert_eq!(harness.attr(".ds-cv", "data-extent"), None);
+}
+
+#[allow(non_snake_case)]
+fn FileIconsPage() -> Element {
+    let items = vec![
+        CollectionItem::new(
+            0,
+            "Documents",
+            Thumbnail::FileIcon(FileIconChoice::Folder(FolderKind::Documents)),
+        ),
+        CollectionItem::new(
+            1,
+            "Report.pdf",
+            Thumbnail::FileIcon(FileIconChoice::Standard {
+                kind: FileKind::Pdf,
+                label: ExtLabel::from_extension("pdf"),
+            }),
+        ),
+    ];
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "height:300px; width:400px; display:flex; flex-direction:column",
+                CollectionView::<usize> { label: "Files", items, flow: Flow::Columns(2) }
+            }
+        }
+    }
+}
+
+#[test]
+fn a_file_icon_thumbnail_draws_the_file_icon_whole_at_the_thumbnail_size() {
+    let harness = Harness::new(
+        FileIconsPage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    assert_eq!(harness.count(".ds-cv-thumb .ds-file-icon"), 2);
+    assert_eq!(harness.count(".ds-cv-image"), 0);
+    let icon = harness.rect(".ds-file-icon").expect("laid out");
+    assert_eq!(icon.size.width, Px(64.0));
 }

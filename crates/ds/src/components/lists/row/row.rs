@@ -206,6 +206,10 @@ pub fn Row(
     };
     let line_style = flush.map(|px| format!("--row-line:{}px", px.0));
     let name = title.plain_text();
+    let spoken = common
+        .aria_label
+        .clone()
+        .or_else(|| Some(name.clone()).filter(|name| !name.is_empty()));
     let data = common.data_attributes();
     let mounted = common.clone();
     let row = rsx! {
@@ -213,7 +217,7 @@ pub fn Row(
             class: busy_class(common.class("ds-row"), busy_seen),
             id: common.id.clone(),
             role: "option",
-            "aria-label": common.aria_label.clone(),
+            "aria-label": spoken,
             "aria-selected": selection.aria(),
             "aria-checked": accessory.checked(),
             "aria-expanded": expanded,

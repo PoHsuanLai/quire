@@ -1,0 +1,5 @@
+/* Fade: a box round content that fades out before it is unmounted. The content appears at once;
+   it leaves over `--t-quick` with the popover's exit and takes no press while it goes. */
+
+.ds-fade{ display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.ds-fade[*|data-presence=leaving]{ pointer-events:none; animation:menu-out var(--t-quick) var(--e-exit) forwards; }

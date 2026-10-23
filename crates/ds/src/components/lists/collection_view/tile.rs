@@ -1,5 +1,6 @@
 //! What a tile shows: its thumbnail over its caption, or the field the person is renaming it in.
 
+use crate::components::content::file_icon::FileIcon;
 use crate::components::content::icon_view::IconView;
 use crate::components::lists::collection_view::item::{CollectionItem, Thumbnail};
 use crate::components::lists::collection_view::size::{CollectionSize, ThumbAspect};
@@ -8,7 +9,7 @@ use dioxus::prelude::*;
 use ds_core::text::clip::Truncate;
 use ds_style::icon::render::{IconPx, IconSize};
 
-/// The thumbnail's picture: an image fitted in its box, or an icon at the box's shorter side.
+/// The thumbnail's picture: an image fitted in its box, or an icon or a file icon at the box's shorter side.
 fn picture(thumbnail: &Thumbnail, size: CollectionSize, aspect: ThumbAspect) -> Element {
     match thumbnail {
         Thumbnail::Image(source) => rsx! {
@@ -17,6 +18,12 @@ fn picture(thumbnail: &Thumbnail, size: CollectionSize, aspect: ThumbAspect) -> 
         Thumbnail::Icon(source) => rsx! {
             IconView {
                 source: source.clone(),
+                size: IconSize::Px(IconPx(aspect.height(size.thumb()).0 as u8)),
+            }
+        },
+        Thumbnail::FileIcon(choice) => rsx! {
+            FileIcon {
+                choice: choice.clone(),
                 size: IconSize::Px(IconPx(aspect.height(size.thumb()).0 as u8)),
             }
         },

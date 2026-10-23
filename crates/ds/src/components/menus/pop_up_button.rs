@@ -176,6 +176,15 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
             event.prevent_default();
             set_open(Shown::Visible);
         }
+        // Escape heard by the button itself, before the open menu has taken the keyboard (it
+        // does so a frame or two after it mounts): the menu's own Escape is on its panel, which
+        // is not under this span, so the button closes the menu it opened. The button already
+        // has the keyboard, which is where a closed menu leaves it.
+        Key::Escape if shown == Shown::Visible => {
+            event.stop_propagation();
+            event.prevent_default();
+            set_open(Shown::Hidden);
+        }
         Key::Character(text)
             if live
                 && kind == PopUpKind::PopUp

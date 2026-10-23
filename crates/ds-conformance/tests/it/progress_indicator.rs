@@ -38,6 +38,9 @@ fn Page() -> Element {
             div { id: "bar", style: "width:200px",
                 ProgressIndicator { progress: Progress::Known(SHARE()) }
             }
+            div { id: "pie",
+                ProgressIndicator { style: ProgressStyle::Pie, progress: Progress::Known(SHARE()), size: ControlSize::Small }
+            }
             div { id: "spin",
                 ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(OPERATION()), size: ControlSize::Small }
             }
@@ -185,4 +188,27 @@ fn busy_cross_fades_both_ways_over_t_quick_and_never_on_first_show() {
     assert!(harness.is_animating(), "and fades in, it does not pop");
     harness.advance(settle(Anim::Fade, MotionLevel::Standard) + ms(50));
     assert!(!harness.is_animating());
+}
+
+fn wedge(harness: &Harness) -> String {
+    harness
+        .attr("#pie .ds-progress-fill path", "d")
+        .unwrap_or_default()
+}
+
+#[test]
+fn a_pie_stands_at_its_value_and_grows_clockwise_over_t_move() {
+    let mut harness = harness();
+    assert!(
+        wedge(&harness).contains("0 0 1"),
+        "20 % is a short wedge: {}",
+        wedge(&harness)
+    );
+    harness.within(|| *SHARE.write() = Fraction(800));
+    harness.advance(ms(125));
+    let halfway = wedge(&harness);
+    harness.advance(ms(300));
+    let done = wedge(&harness);
+    assert_ne!(halfway, done, "it was still moving halfway");
+    assert!(done.contains("0 1 1"), "80 % is the long way round: {done}");
 }

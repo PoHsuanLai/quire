@@ -1,10 +1,10 @@
-//! ProgressIndicator (design/30 section 2.9, `NSProgressIndicator`): a bar, a spoke spinner or
-//! a ring. Markup: `div.ds-progress[data-style][data-size]` with `role="progressbar"`; a known
+//! ProgressIndicator (design/30 section 2.9, `NSProgressIndicator`): a bar, a spoke spinner,
+//! a ring or a pie. Markup: `div.ds-progress[data-style][data-size]` with `role="progressbar"`; a known
 //! share is `--f` on the fill and `aria-valuenow`; an operation without a known share is
 //! `data-pending` (`step` while it runs) and the loop's step as `--step` on the root, so nothing turns without an
 //! [`Operation`](ds_motion::detail::operation::Operation).
 
-use super::arc::{RingSpan, arc_path};
+use super::arc::{PIE_RIM, RingSpan, arc_path, pie_path};
 use super::model::{Progress, ProgressStyle, RingGap};
 use super::spokes::{SPIN, age, step_of};
 use crate::components::content::icon_source::IconSource;
@@ -75,6 +75,7 @@ pub fn ProgressIndicator(
                 ProgressStyle::Bar => bar(shown, frame),
                 ProgressStyle::Spinner => spinner(frame),
                 ProgressStyle::Ring => ring(shown, frame, glyph, centre, gap),
+                ProgressStyle::Pie => pie(shown, frame),
             }
         }
     }
@@ -159,6 +160,37 @@ fn ring(
         } else if let Some(source) = glyph {
             span { class: "ds-progress-glyph",
                 IconView { source, size: IconSize::Compact }
+            }
+        }
+    }
+}
+
+/// The pie: a thin outline circle and the wedge inside it, from twelve clockwise. Unknown, the
+/// wedge is a quarter turned by the loop's step.
+fn pie(shown: Fraction, frame: PendingFrame) -> Element {
+    let level = match frame {
+        PendingFrame::Step(_) => Fraction(250),
+        PendingFrame::Idle => shown,
+    };
+    let wedge = pie_path(level);
+    rsx! {
+        svg { class: "ds-progress-track", "data-ds-svg": "progress", view_box: "0 0 100 100", "aria-hidden": "true",
+            circle {
+                cx: "50",
+                cy: "50",
+                r: "{PIE_RIM}",
+                fill: "none",
+                stroke: "currentColor",
+                "stroke-width": "7",
+            }
+        }
+        if let Some(d) = wedge {
+            svg {
+                class: "ds-progress-fill",
+                "data-ds-svg": "progress",
+                view_box: "0 0 100 100",
+                "aria-hidden": "true",
+                path { d, fill: "currentColor" }
             }
         }
     }

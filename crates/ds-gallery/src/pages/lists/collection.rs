@@ -6,6 +6,7 @@ use crate::pages::Section;
 use crate::pages::content::picture::wide_image;
 use dioxus::prelude::*;
 use ds::base::selection::RowSelection;
+use ds::components::content::file_icon::FileIconChoice;
 use ds::components::content::icon_source::IconSource;
 use ds::components::lists::collection_view::{
     CollectionExtent, CollectionItem, CollectionSize, CollectionView, Flow, ThumbAspect, Thumbnail,
@@ -43,6 +44,25 @@ fn wallpapers() -> Vec<CollectionItem<usize>> {
                 Thumbnail::Image(wide_image()),
             )
         })
+        .collect()
+}
+
+/// Folders and files drawn with the standard file icon.
+fn files() -> Vec<CollectionItem<usize>> {
+    let page = |kind: FileKind, ext: &str| FileIconChoice::Standard {
+        kind,
+        label: ExtLabel::from_extension(ext),
+    };
+    let choices = [
+        ("Documents", FileIconChoice::Folder(FolderKind::Documents)),
+        ("Notes.txt", page(FileKind::Document, "txt")),
+        ("Report.pdf", page(FileKind::Pdf, "pdf")),
+        ("Budget.xlsx", page(FileKind::Spreadsheet, "xlsx")),
+    ];
+    choices
+        .into_iter()
+        .enumerate()
+        .map(|(at, (name, choice))| CollectionItem::new(at, name, Thumbnail::FileIcon(choice)))
         .collect()
 }
 
@@ -102,6 +122,19 @@ pub fn CollectionGallery() -> Element {
                     aspect: ThumbAspect::Landscape,
                     extent: CollectionExtent::Content,
                     flow: Flow::Columns(3),
+                }
+            }
+        }
+        Section {
+            title: "CollectionView, file icons",
+            note: "Thumbnail::FileIcon draws a file's icon (a folder, a standard page with its extension) whole at the thumbnail's size, with no frame of the tile's.",
+            div { class: "g-list g-stage-pad", style: "width:440px",
+                CollectionView::<usize> {
+                    label: "Files",
+                    items: files(),
+                    size: CollectionSize::Large,
+                    extent: CollectionExtent::Content,
+                    flow: Flow::Columns(4),
                 }
             }
         }

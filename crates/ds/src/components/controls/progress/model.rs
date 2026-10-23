@@ -14,6 +14,10 @@ pub enum ProgressStyle {
     Spinner,
     /// A circular arc from twelve o'clock, clockwise.
     Ring,
+    /// A small filled pie that grows clockwise from twelve inside a thin outline circle (the
+    /// Finder row's and the sidebar's download badge): for `Mini` and `Small`, where a ring's
+    /// stroke is too thin to read. Known work only; an unknown amount turns a quarter wedge.
+    Pie,
 }
 
 /// Whether a ring is closed or leaves a notch at twelve (`data-gap`): a charging battery's ring

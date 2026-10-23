@@ -5,6 +5,14 @@ first, with what a consumer has to change.
 
 ## v0.3.47 (unreleased)
 
+### wh-q47a
+
+- `Thumbnail::FileIcon(FileIconChoice)`: a `CollectionView` tile can draw a file's icon (`ds::FileIcon`) whole at the thumbnail's size, uncropped like an icon. `Thumbnail` gains a variant, so an exhaustive `match` on it needs an arm; `FileIconChoice` now derives `Eq` and `Hash`.
+- A `Row` with no `common.aria_label` is spoken by its title's plain text, not by its run-together text (avatar letter, title, detail). A menu item is spoken by its title, not by its key glyph and hint.
+- `PopUpButton`: Escape heard by the button while its menu is open closes the menu and leaves the keyboard on the button, as on a Mac. The cause: the open menu's own Escape lives on its panel, in the overlay outside the button's element, and the panel takes the keyboard a frame or two after it mounts (and its close plays a 150 ms fade), so an Escape that reached the button first had no handler and the menu stayed open.
+- `ProgressStyle::Pie`: a small filled pie that grows clockwise from twelve inside a thin outline circle, for `Mini` and `Small` (the Finder row and sidebar download badge). It tweens like the ring (linear over `--t-move`). `ProgressStyle` gains a variant, so an exhaustive `match` on it needs an arm. New `arc::pie_path`, `PIE_RADIUS`, `PIE_RIM`.
+- `ds::Fade { shown, on_hidden }`: wraps any inline content; when `shown` turns `Hidden` it fades the content out over `--t-quick` and then unmounts it (on the short reduced settle under Reduced motion). Built on `use_presence` with `Exit::Fade`. New class `ds-fade`.
+
 ### wh-q47b
 
 - New glyphs `Icon::Cloud`, `Icon::CloudDownload` (in the cloud only, click to download) and `Icon::CloudUpload` (waiting to upload), Lucide `cloud`, `cloud-download` and `cloud-upload` (outline by default, each with a solid form) for the files app's cloud-drive states. `Icon` is not `non_exhaustive`: an exhaustive `match` on it gains three arms.
@@ -13,7 +21,7 @@ first, with what a consumer has to change.
 
 - blitz-kit moves 07f0272b -> ec1fd3e2 (pinned block): `blitz_kit::adapter::opening()`, one process-wide lock every wgpu opener holds while it makes an instance and requests a device. ds-harness takes it inside its own once-per-process open, so an app's own opener in the same test binary never runs the Vulkan loader's scan beside it (anyview's intermittent SIGSEGV). Consumers move blitz-kit with quire, and their own openers should take the lock too.
 
-## v0.3.46 (unreleased)
+## v0.3.46
 
 ### wh-e4a
 

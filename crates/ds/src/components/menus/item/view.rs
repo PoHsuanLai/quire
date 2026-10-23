@@ -157,6 +157,7 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
             "data-focus": FocusStyle::Highlight.slug(),
             "data-state-column": leading,
             "data-lines": lines,
+            "aria-label": Some(view.title.to_owned()).filter(|title| !title.is_empty()),
             "aria-checked": view.check.map(Check::aria),
             "aria-disabled": view.availability.aria_disabled(),
             "aria-busy": view.availability.aria_busy(),
