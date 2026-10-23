@@ -96,7 +96,7 @@ add items. "Before/during" = before the app pass or during it (section 6).
 | 4.2 | Launcher result categories and providers | which categories show; (ours: their order); folders excluded | Settings › Spotlight › Search results checklist; Search Privacy list | yes (Core Spotlight, importers) | 9 providers, closed `ProviderKind` enum, fixed Tab order; per-provider on/off only for web, clipboard, files backend | must | before |
 | 4.3 | Control center modules | which optional modules join; per module: show in the bar Always / When Active / Never | Settings › Control Center: three groups, a pop-up per row | no (controls not on macOS before 26) | 8 modules, reorderable today through `control_center.modules` (membership-only removes that); `InMenuBar::{Show,Hide}` per module, no Focus key, fixed bar order | must | before |
 | 4.4 | Menu bar status items | order, remove, add back | Command-drag in the bar; each app's own setting to show its extra | yes (status items) | tray (SNI) in arrival order keyed by bus address, SNI `Id` not read; module items in `MENU_BAR_ORDER`; no reorder, no hide | must | before |
-| 4.5 | Dock items and stacks | pinned apps and their order, folders/files as stacks, recent apps on/off | drag in, drag out ("Remove"), Options › Keep in Dock; Settings › Desktop & Dock | apps are items; no plug-ins | pins with order (`dock.json`, `PinEvent`), Keep in Dock, drag reorder; no stacks, no recents section | must (exists), stacks nice | before (migrate), stacks later |
+| 4.5 | Dock items and stacks | pinned apps and their order, folders/files as stacks, recent apps on/off | drag in, drag out ("Remove"), Options › Keep in Dock; Settings › Desktop & Dock | apps are items; no plug-ins | pins with order (`[[dock]]` in `sill/layout.toml` since sill 848a20a7, `PinEvent`), Keep in Dock, drag reorder; no stacks, no recents section | must (exists), stacks nice | before (migrate), stacks later |
 | 4.6 | App toolbars | which items, order, spaces, icon/text | View › Customize Toolbar sheet; Command-drag | per app; extensions add Quick Action items | no toolbars yet | must for apps with toolbars | during |
 | 4.7 | Share destinations | which extensions show in the Share menu | Settings › Login Items & Extensions › Sharing checklist | yes (share and action extensions) | none | nice | during |
 | 4.8 | Quick Look and preview-pane previewers, Quick Actions | which extensions are on; per type, which preview fields | Extensions settings (Quick Look, Finder); View › Show Preview Options; Customize Quick Actions | yes (Quick Look and Finder extensions) | launcher preview pane with a closed `Preview` enum | nice | during |
@@ -377,7 +377,7 @@ stacks, Trash. A folder in the Dock is a stack (Display as Folder/Stack, View co
 Fan/Grid/List/Automatic, Sort by: L, from its context menu). Third party: apps are items; no
 plug-ins; an app adds items to its own Dock menu (HIG dock-menus).
 
-**Today.** sill: `DockPins { version, pinned: Vec<AppId> }` in `dock.json`, `PinEvent::Pin {
+**Before sill 848a20a7.** sill: `DockPins { version, pinned: Vec<AppId> }` in `dock.json`, `PinEvent::Pin {
 app, at: PinAt::{End,Index} }` and unpin, applied by one writer task (`pins::run`: load once,
 reduce, save atomically, watch for outside edits); `sill dock pin` and Keep in Dock send it
 events. Drag reorder and drag-out remove live in the dock machine (`dock/machine/press.rs`),
@@ -392,7 +392,7 @@ file, as the mailo appearance migration in 22 §2); `pins::run` stays its one wr
 
 | Layout entry (design/22 §10 when it lands) | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `layout.dock` | `Vec<Placement>`, ordered | today's `dock.json` pins | kinds `quire.dock.app` (config `app`), `quire.dock.stack` (config `path`, `display: StackDisplay::{Stack,Folder}`, `view: StackView::{Automatic,Fan,Grid,List}`, `sort: StackSort::{Name,Added,Modified,Created,Kind}`) | mh35859; 10 §10.6 | proposed (design/28) |
+| `[[dock]]` (`layout.dock`) | `Vec<Placement>`, ordered | the old `dock.json` pins (built: sill 848a20a7, rows `{ kind = "quire.dock.app", app = "<id>" }`) | kinds `quire.dock.app` (config `app`), `quire.dock.stack` (config `path`, `display: StackDisplay::{Stack,Folder}`, `view: StackView::{Automatic,Fan,Grid,List}`, `sort: StackSort::{Name,Added,Modified,Created,Kind}`) | mh35859; 10 §10.6 | proposed (design/28) |
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
@@ -847,7 +847,7 @@ appear motion once when it scrolls into view (the wake stamp), never on a loop.
   or "spotlight categories" to it, 22 §9.3).
 - **Migration** (once, at first read, old value left in place, as 22 §2's mailo rule):
   `widgets.center`, `widgets.desktop_widgets` and `widgets.world_clocks` into the layout,
-  `dock.json` into `layout.dock`, `control_center.modules` into `layout.control_center`
+  `dock.json` into `[[dock]]` (done, sill 848a20a7), `control_center.modules` into `layout.control_center`
   (its Other modules only; the order is dropped). `desktop-widgets.json` is **not** migrated:
   it stays the state file and gains the `instance` field (an entry without one means the kind's
   first instance).
@@ -967,7 +967,7 @@ Shell; each a quire lane plus a sill lane where named.
    system shortcuts list read ids; `shortcuts.bindings` written to the compositor's `custom` and
    `system_actions` with the compositor winning a clash (4.11); design/22 §5's Keyboard / Shortcuts line
    now points here.
-8. **P7 Dock on the shared shape** (sill): `layout.dock`, migration of `dock.json`, `pins::run`
+8. **P7 Dock on the shared shape** (sill): `[[dock]]` and the migration of `dock.json` (done, sill 848a20a7), `pins::run`
    as its writer task; stacks stay deferred.
 
 ### 6.2 During the app pass (with each app)

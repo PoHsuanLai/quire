@@ -175,7 +175,7 @@ are omitted in v1. While the menu is open the dock is Frozen (10.3.3).
 | Remove threshold | pointer outside the pill rect inflated by 64 px | proposed (R20 H behaviour, distance UNKNOWN) |
 | Remove label | a `DockLabel` reading "Remove" 7 px above the ghost, shown while beyond the threshold; no poof animation | settled (brief) |
 | Release beyond threshold | pinned: unpin; the ghost fades with a Fade `--t-quick`; the gap closes with a `Spring` (response Move); UI sound `item-deleted` (§13.3.10). Running app: unpinned, its tile animates back into the running section | R20 (H) |
-| Release inside | commit the new order to `~/.config/sill/dock.json` | proposed |
+| Release inside | commit the new order to `[[dock]]` in `~/.config/sill/layout.toml` | proposed |
 | Esc during drag | cancel, ghost returns to the origin slot by `use_drag_return` (a `Spring`) | proposed |
 | File drop onto a tile | accepted iff the drag offers `text/uri-list` and at least one URI's MIME type is in the app's `MimeType=` (directories: `inode/directory`); the tile shows an `--accent` 2 px ring; drop launches via `expand_exec` (`%f %F %u %U`) or D-Bus `Open` | R19 (H) |
 | Spring-loading | a DnD pointer resting on a running app's tile for 500 ms activates that app's most recent toplevel; the drag continues | R24 (M) |
@@ -184,7 +184,7 @@ are omitted in v1. While the menu is open the dock is Frozen (10.3.3).
 
 ### 10.3.9 Items and order
 
-`[pinned (dock.json order)] [running, unpinned, in launch order] | [Trash]`. Grouping by
+`[pinned (layout.toml `[[dock]]` order)] [running, unpinned, in launch order] | [Trash]`. Grouping by
 `match_app` (plan). Trash tile: opens `trash:///` in the file manager, accepts file drops
 (move to trash), context menu `Empty Trash` (UI sound `trash-empty`). The separator and the
 Trash tile are **proposed** (R26); stacks are **deferred** (R25 UNKNOWN).
@@ -378,7 +378,7 @@ hiding:  y_off(t) = D * e_exit(t / 500 ms)
 ## 10.6 Configuration
 
 Settings app keys, stored in `~/.config/sill/settings.toml` under `dock` (`22-SETTINGS.md` is the full list) (pinned items stay in
-`~/.config/sill/dock.json`, plan). Two-state values are enums, not bools (CONVENTIONS §4).
+`~/.config/sill/layout.toml` `[[dock]]`, built in sill 848a20a7; the old `dock.json` is read once and carried over). Two-state values are enums, not bools (CONVENTIONS §4).
 
 | Key | Type | Default | Range | Status |
 | --- | --- | --- | --- | --- |
@@ -456,7 +456,7 @@ headless renderer and pure table tests. Frame times refer to the output refresh 
     them; all-minimized click restores the most recent one; release outside the tile does
     nothing.
 11. **Drag out**: drag a pinned tile 100 px above the pill: "Remove" label visible; release:
-    `dock.json` no longer contains it; running app variant keeps its tile in the running
+    the `[[dock]]` rows no longer contain it; running app variant keeps its tile in the running
     section; drag 40 px and release: order changed or unchanged per insertion index, nothing
     removed.
 12. **Spring-loading**: a DnD (test source offering `text/uri-list`) resting 500 ms +- 1 frame

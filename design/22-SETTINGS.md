@@ -35,7 +35,7 @@ preferences:
 3. **Per-workspace instance data is not a global default.** `21-SPACES.md#10-storage-settled-path-target-clean-up-phase-schema`'s
    `$XDG_CONFIG_HOME/quire/spaces.json` stores each workspace's chosen `SpaceLook` (its hue, chroma
    factor, grain, theme; target (clean-up phase), 21 section 1) — that is saved *state*, like
-   `dock.json`'s pinned items, not a settings default. The *defaults* applied when a workspace has
+   the dock's pinned items (`[[dock]]` in `sill/layout.toml`), not a settings default. The *defaults* applied when a workspace has
    none (preset table, fallback grain) are keys in the `spaces` domain below.
 
 ## 2. Storage
@@ -219,7 +219,7 @@ that registration is not done yet (see FINDINGS "Settings and schema").
 
 ### 3.5 `dock` (sill/settings.toml)
 
-Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
+Pinned items live in `[[dock]]` rows of `~/.config/sill/layout.toml` (design/28 §5.6, built in sill 848a20a7; the old `dock.json` is read once and carried over), not in this file (
 `10-BEHAVIOUR-dock.md#10-6-configuration`).
 
 | Key | Type | Default | Range / Alt | Source | Status |
