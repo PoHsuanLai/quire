@@ -9,6 +9,10 @@ first, with what a consumer has to change.
 
 - New glyphs `Icon::Cloud`, `Icon::CloudDownload` (in the cloud only, click to download) and `Icon::CloudUpload` (waiting to upload), Lucide `cloud`, `cloud-download` and `cloud-upload` (outline by default, each with a solid form) for the files app's cloud-drive states. `Icon` is not `non_exhaustive`: an exhaustive `match` on it gains three arms.
 
+### pins
+
+- blitz-kit moves 07f0272b -> ec1fd3e2 (pinned block): `blitz_kit::adapter::opening()`, one process-wide lock every wgpu opener holds while it makes an instance and requests a device. ds-harness takes it inside its own once-per-process open, so an app's own opener in the same test binary never runs the Vulkan loader's scan beside it (anyview's intermittent SIGSEGV). Consumers move blitz-kit with quire, and their own openers should take the lock too.
+
 ## v0.3.46 (unreleased)
 
 ### wh-e4a

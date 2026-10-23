@@ -5,7 +5,7 @@
 
 use crate::error::HarnessError;
 use crate::gpu_diagnostics::GpuDiagnostics;
-use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref, block_on, ranked, request_device};
+use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref, block_on, opening, ranked, request_device};
 use std::sync::{Mutex, PoisonError};
 use wgpu_context::DeviceHandle;
 
@@ -56,11 +56,14 @@ pub(crate) fn open_device(
     Ok((handle, adapter))
 }
 
-/// A new instance and device on the preferred adapter. Called with [`OPENED`] held.
+/// A new instance and device on the preferred adapter. Called with [`OPENED`] held; it also
+/// holds blitz-kit's process-wide [`opening`] lock, so an app's own opener in the same test binary
+/// never runs the Vulkan loader's scan beside it.
 fn open_new(
     pref: &AdapterPref,
     diagnostics: GpuDiagnostics,
 ) -> Result<(DeviceHandle, String), HarnessError> {
+    let _opening = opening();
     let mut desc = wgpu::InstanceDescriptor::new_without_display_handle().with_env();
     // Not the environment's or the build's flags: a harness is headless and many run at once.
     desc.flags = diagnostics.flags();
