@@ -3,7 +3,6 @@
 use super::chord::SwitchChord;
 use super::controller::SpacesHandle;
 use super::new_space::NewSpace;
-use super::open_menu::Showing;
 use crate::components::app::space_editor::dot::{DotFace, SpaceDot};
 use crate::components::controls::button::Button;
 use crate::components::controls::button_model::{Bezel, ImagePosition};
@@ -22,12 +21,11 @@ use ds_style::space::look::SpaceLook;
 /// so no dot and no dots group is drawn, and an empty gap keeps that width. Each Space is a small dot, as Dia draws
 /// them (`DotFace::Foot`): the current one larger and in ink, the others faint ink; a Space's own
 /// colours are its frame's, not the picker's. A right click on a dot is that Space's menu; a click switches, unless a part of a
-/// Space's menu is open. `+` adds a Space over `new_payload` and opens its name.
+/// Space's menu is open. `+` names a new Space over `new_payload`, added once it is named.
 ///
 /// `new_space: NewSpace::Hidden` leaves the `+` out, for a foot whose one menu holds New Space
-/// (Dia's chevron, a `PullDownButton` in `trailing`). That menu's item makes the Space itself:
-/// `let made = handle.add(payload); handle.show(made, at, Showing::Rename);`, both reached
-/// through `SpacesHandle` and `Showing` (in the prelude).
+/// (Dia's chevron, a `PullDownButton` in `trailing`). That menu's item asks for the Space itself:
+/// `handle.begin_new(payload, at)`.
 #[component]
 pub fn SpacesFoot<P, R>(
     handle: SpacesHandle<P, R>,
@@ -95,10 +93,7 @@ where
                     title: "New Space".to_owned(),
                     title_shortcut: new_shortcut,
                     onclick: move |press: ds_core::press::Press| {
-                        if handle.editing().is_none() {
-                            let made = handle.add(new_payload.call(()));
-                            handle.show(made, press.at, Showing::Rename);
-                        }
+                        handle.begin_new(new_payload.call(()), press.at);
                     },
                 }
             }

@@ -10,7 +10,7 @@ use ds_style::space::list::SpaceId;
 pub enum Showing {
     /// The menu.
     Menu,
-    /// The name field at the pointer (a new Space's, opened as it is made).
+    /// The name field at the pointer (a new Space's, before it is added: `begin_new`).
     Rename,
     /// The Edit Space sheet: the name, and the colour field, stops, grain and presets.
     Edit,
@@ -51,10 +51,14 @@ impl<P: Clone + PartialEq + 'static, R: Clone + Default + PartialEq + 'static> S
         menu.set(Some(OpenMenu { space, at, showing }));
     }
 
-    /// Close the menu or the part, keeping what a part changed.
+    /// Close the menu or the part, keeping what a part changed. A new Space still being named
+    /// ([`Self::begin_new`]) is dropped: it was never added.
     pub fn close_menu(&self) {
-        let (mut menu, mut editing) = (self.menu, self.editing);
-        if editing.peek().is_some() {
+        let (mut menu, mut editing, mut pending) = (self.menu, self.editing, self.pending);
+        if pending.peek().is_some() {
+            pending.set(None);
+            editing.set(None);
+        } else if editing.peek().is_some() {
             editing.set(None);
             self.commit();
         }

@@ -4,7 +4,7 @@ use super::chord::SwitchChord;
 use super::open_menu::OpenMenu;
 use crate::keys::{Keys, use_keys};
 use dioxus::prelude::*;
-use ds_style::space::list::{Refused, Removed, SlideIn, SpaceId, Spaces, Switched};
+use ds_style::space::list::{Refused, Removed, SlideIn, Space, SpaceId, Spaces, Switched};
 use ds_style::space::look::SpaceLook;
 
 /// The Spaces of one window, and what drives them. `Copy`: hand it to any handler or view.
@@ -16,6 +16,8 @@ pub struct SpacesHandle<P: 'static, R: 'static> {
     pub(super) editing: Signal<Option<SpaceId>>,
     pub(super) slide: Signal<Option<SlideIn>>,
     pub(super) menu: Signal<Option<OpenMenu>>,
+    /// A new Space being named, not in the list until its name is kept ([`Self::begin_new`]).
+    pub(super) pending: Signal<Option<Space<P>>>,
     pub(super) keep: Callback<Spaces<P, R>>,
     pub(super) here: Callback<(), R>,
     pub(super) arrived: Callback<Switched<R>>,
@@ -66,6 +68,7 @@ where
         editing: use_signal(|| None),
         slide: use_signal(|| None),
         menu: use_signal(|| None),
+        pending: use_signal(|| None),
         keep: use_callback(move |spaces: Spaces<P, R>| keep(&spaces)),
         here: use_callback(move |()| here()),
         arrived: use_callback(arrived),
@@ -124,7 +127,67 @@ impl<P: Clone + PartialEq + 'static, R: Clone + Default + PartialEq + 'static> S
         self.switch_index(usize::from(number.get()) - 1)
     }
 
-    /// "+": add a Space over `payload`, switch to it and write. The app opens its Rename.
+    /// "+" and New Space: name a Space over `payload` at `at` before there is one. The name field
+    /// opens on a pending Space, "Space N" and tinted as [`Self::add`] would make it, which is in
+    /// no list: Return with a name adds it, switches to it and writes; Escape or a click outside
+    /// drops it, and nothing was added. Nothing happens while a part is open.
+    pub fn begin_new(&self, payload: P, at: ds_core::geometry::units::Point) {
+        if self.editing.peek().is_some() {
+            return;
+        }
+        let mut probe = self.spaces.peek().clone();
+        let id = probe.add(payload);
+        let Some(draft) = probe.get(id).cloned() else {
+            return;
+        };
+        let mut pending = self.pending;
+        pending.set(Some(draft));
+        self.show(id, at, super::open_menu::Showing::Rename);
+    }
+
+    /// The new Space being named, if `id` is it.
+    pub(super) fn pending_as(&self, id: SpaceId) -> Option<Space<P>> {
+        self.pending.read().clone().filter(|space| space.id == id)
+    }
+
+    /// Name the pending Space `name`.
+    pub(super) fn rename_pending(&self, name: String) {
+        let mut pending = self.pending;
+        if let Some(space) = pending.write().as_mut() {
+            space.name = name;
+        }
+    }
+
+    /// Add the pending Space as it was named, switch to it and write; `None` when there is none,
+    /// or its name is blank.
+    pub(super) fn keep_pending(&self) -> Option<SpaceId> {
+        let mut pending = self.pending;
+        let draft = pending.peek().clone()?;
+        if draft.name.trim().is_empty() {
+            return None;
+        }
+        pending.set(None);
+        let id = {
+            let mut spaces = self.spaces.write_unchecked();
+            let id = spaces.add(draft.payload);
+            spaces.edit(id, |space| {
+                space.name = draft.name;
+                space.look = draft.look;
+            });
+            id
+        };
+        // Named, the field closes; then the switch, which a part held open refuses.
+        let (mut menu, mut editing) = (self.menu, self.editing);
+        editing.set(None);
+        menu.set(None);
+        if self.switch(id).is_none() {
+            self.commit();
+        }
+        Some(id)
+    }
+
+    /// Add a Space over `payload` at once, switch to it and write. [`Self::begin_new`] is "+":
+    /// it adds the Space only once it is named.
     pub fn add(&self, payload: P) -> SpaceId {
         let id = self.spaces.write_unchecked().add(payload);
         if self.switch(id).is_none() {

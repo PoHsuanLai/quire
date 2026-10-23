@@ -3,8 +3,8 @@
 /// Whether [`super::SpacesFoot`] draws the `+` that adds a Space.
 ///
 /// An app whose sidebar foot gathers its commands in one menu (Dia's chevron) hides it and puts
-/// New Space in that menu: it adds the Space with `SpacesHandle::add(payload)` and opens its name
-/// with `SpacesHandle::show(space, at, Showing::Rename)`, as the button would.
+/// New Space in that menu: it names the Space with `SpacesHandle::begin_new(payload, at)`, as the
+/// button would, and the Space is added once it is named.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum NewSpace {
     /// The foot draws the `+` after the dots.

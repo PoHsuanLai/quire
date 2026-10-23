@@ -1,6 +1,7 @@
 //! The Space's menu through the kit on a real Blitz document: the rows in order, Edit Space's
-//! sheet keeping what Save keeps and putting back what Cancel drops, New Space opening its name
-//! at once, Delete asking first, and Delete missing for the last Space.
+//! sheet keeping what Save keeps and putting back what Cancel drops, New Space opening the name
+//! of a Space added only once it is named, Delete asking first, and Delete missing for the last
+//! Space.
 
 use crate::support::spaces_page::{EditedOnAPage, One, Three, WithAccounts};
 use dioxus::prelude::Element;
@@ -149,17 +150,43 @@ fn edit_goes_to_the_app_s_own_page_when_it_has_one() {
 }
 
 #[test]
-fn new_space_makes_one_and_opens_its_name() {
+fn new_space_opens_a_name_and_adds_nothing_yet() {
     let mut harness = harness(Three);
+    let before = harness.text_of(".current");
     open_menu(&mut harness);
     pick(&mut harness, 4);
-    assert_eq!(dots(&harness), 4);
-    assert_eq!(
-        harness.text_of(".current").as_deref(),
-        Some("3"),
-        "the new Space is on screen"
-    );
     assert_eq!(harness.count(".ds-space-rename"), 1, "its name is open");
+    assert_eq!(dots(&harness), 3, "a Space was added before it was named");
+    assert_eq!(harness.text_of(".current"), before, "the window switched");
+}
+
+/// A new Space being named and dropped with a click outside was never added.
+#[test]
+fn a_click_outside_drops_a_new_space() {
+    let mut harness = harness(Three);
+    open_part(&mut harness, 4);
+    for letter in "Work".chars() {
+        harness.send(Input::key(ShortcutKey::Char(letter)));
+    }
+    harness.send(Input::click(Point {
+        x: Px(410.0),
+        y: Px(410.0),
+    }));
+    harness.advance(ms(400));
+    assert_eq!(harness.count(".ds-space-rename"), 0, "the name stayed open");
+    assert_eq!(dots(&harness), 3, "the dropped Space was added");
+}
+
+/// Return with a blank name adds nothing, and the name stays open.
+#[test]
+fn a_new_space_is_not_added_without_a_name() {
+    let mut harness = harness(Three);
+    open_part(&mut harness, 4);
+    // A space typed over the selected name: a name of nothing but blank.
+    key(&mut harness, ShortcutKey::Char(' '));
+    key(&mut harness, ShortcutKey::Enter);
+    assert_eq!(harness.count(".ds-space-rename"), 1, "the name closed");
+    assert_eq!(dots(&harness), 3, "a Space with no name was added");
 }
 
 #[test]
@@ -229,7 +256,7 @@ fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
     harness.send(Input::click(new));
     harness.advance(ms(500));
     assert_eq!(harness.count(".ds-menu"), 0, "a kit row closes the menu");
-    assert_eq!(harness.count(".ds-spaces-dot-hold"), 3, "and did its work");
+    assert_eq!(harness.count(".ds-space-rename"), 1, "and did its work");
 }
 
 /// The first frame the submenu is painted, its rect; then its rect once everything has settled.
@@ -307,6 +334,7 @@ fn rename_takes_the_keyboard_and_escape_restores_the_name() {
     harness.advance(ms(100));
     key(&mut harness, ShortcutKey::Escape);
     assert_eq!(harness.count(".ds-space-rename"), 0, "Escape closes it");
+    assert_eq!(dots(&harness), 3, "Escape added the new Space");
     assert_ne!(opened_on.as_deref(), Some("The Work Space"));
     assert_eq!(
         head_label(&harness),
@@ -329,11 +357,13 @@ fn rename_return_commits_and_gives_the_keyboard_back() {
     }
     key(&mut harness, ShortcutKey::Enter);
     assert_eq!(harness.count(".ds-space-rename"), 0);
+    assert_eq!(dots(&harness), 4, "Return added the named Space");
     assert_eq!(
         harness
             .attr(".ds-space-head .ds-label", "aria-label")
             .as_deref(),
-        Some("The Work Space")
+        Some("The Work Space"),
+        "the new Space is on screen, with its name"
     );
     assert!(
         focused(&harness, OPENER),
