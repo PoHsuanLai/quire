@@ -303,3 +303,34 @@ fn the_file_manager_glyphs_are_in_the_actions_set() {
         [Shape::Path(_), Shape::Rect { .. }]
     ));
 }
+
+/// The markup and document-view glyphs are in the actions set, drawn outline by default, and
+/// carry both forms.
+#[test]
+fn the_markup_glyphs_are_outline_actions_with_both_forms() {
+    const GLYPHS: &[Icon] = &[
+        Icon::Hand,
+        Icon::Crop,
+        Icon::MousePointer,
+        Icon::Highlighter,
+        Icon::Type,
+        Icon::Circle,
+        Icon::Line,
+        Icon::ArrowUpRight,
+        Icon::PenLine,
+        Icon::ListTree,
+        Icon::Table,
+    ];
+    for icon in GLYPHS {
+        assert!(Icon::ACTIONS.contains(icon), "{icon:?}");
+        assert!(Icon::ALL.contains(icon), "{icon:?}");
+        assert_eq!(icon.native(), Native::Outline, "{icon:?}");
+        assert!(!icon.shapes().is_empty(), "{icon:?}");
+        assert!(!icon.solid_shapes().is_empty(), "{icon:?}");
+    }
+    assert_eq!(Icon::Line.shapes(), &[Shape::Path("M22 2 2 22")]);
+    assert!(matches!(
+        Icon::Table.shapes(),
+        [Shape::Path(_), Shape::Rect { .. }, Shape::Path(_), Shape::Path(_)]
+    ));
+}

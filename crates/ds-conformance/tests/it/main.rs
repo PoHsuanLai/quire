@@ -158,6 +158,7 @@ mod tip_style;
 mod tip_wall_clock;
 mod tips_not_titles;
 mod title_tooltip;
+mod titlebar_leading;
 mod titlebar_title_fit;
 mod titlebar_trailing;
 mod toast_action;

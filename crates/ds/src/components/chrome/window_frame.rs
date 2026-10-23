@@ -32,14 +32,15 @@ pub enum TrafficLights {
     Hidden,
 }
 
-/// Where a titlebar's title sits when the bar also carries a trailing control.
+/// Where a titlebar's title sits when the bar also carries a leading or trailing control.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum TitleRoom {
     /// Centred in the bar between the title insets, as `NSWindow` centres a title: the trailing
     /// control may lie under it in a bar too narrow for both.
     #[default]
     Centred,
-    /// In the room between the lights and the trailing control, centred there: a title too long
+    /// In the room between the leading and trailing controls (or the lights and the bar's end),
+    /// centred there: a title too long
     /// for it is cut (in the middle) before the control, as Preview's is before its toolbar.
     Beside,
 }
@@ -61,6 +62,9 @@ pub enum WindowFrame {
         lights: TrafficLights,
         /// The move threshold and the tiling menu's delays, from the settings.
         timing: FrameTiming,
+        /// What sits after the lights and before the title (a sidebar button). A press on it
+        /// never starts a window move or zooms the window.
+        leading: Option<Element>,
         /// What sits at the bar's trailing end (a mode switch, a share button). A press on it
         /// never starts a window move or zooms the window.
         trailing: Option<Element>,
@@ -75,7 +79,30 @@ impl WindowFrame {
             parts: TitleParts::default(),
             lights,
             timing: FrameTiming::default(),
+            leading: None,
             trailing: None,
+        }
+    }
+
+    /// The same frame with `leading` after its lights; no frame has no bar.
+    pub fn with_leading(self, leading: Element) -> Self {
+        match self {
+            WindowFrame::None => WindowFrame::None,
+            WindowFrame::Titlebar {
+                title,
+                parts,
+                lights,
+                timing,
+                trailing,
+                ..
+            } => WindowFrame::Titlebar {
+                title,
+                parts,
+                lights,
+                timing,
+                leading: Some(leading),
+                trailing,
+            },
         }
     }
 
@@ -88,12 +115,14 @@ impl WindowFrame {
                 parts,
                 lights,
                 timing,
+                leading,
                 ..
             } => WindowFrame::Titlebar {
                 title,
                 parts,
                 lights,
                 timing,
+                leading,
                 trailing: Some(trailing),
             },
         }
@@ -107,6 +136,7 @@ impl WindowFrame {
                 title,
                 lights,
                 timing,
+                leading,
                 trailing,
                 ..
             } => WindowFrame::Titlebar {
@@ -114,6 +144,7 @@ impl WindowFrame {
                 parts,
                 lights,
                 timing,
+                leading,
                 trailing,
             },
         }
@@ -138,9 +169,10 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
             parts,
             lights,
             timing,
+            leading,
             trailing,
         } => rsx! {
-            WindowTitlebar { title, parts, lights, timing, trailing }
+            WindowTitlebar { title, parts, lights, timing, leading, trailing }
             div { class: "ds-window-body", {children} }
             ResizeEdges {}
         },
@@ -153,7 +185,8 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
 /// double-click zooms. Neither happens on a light, nor while the window is maximized or
 /// fullscreen. `data-first-mouse` lets the first click of an inactive window through
 /// (design/13 section 13.3.8). `parts` are what goes with the title; `data-activity` says
-/// whether the window is the one the person works in. `trailing` is drawn after the title area at
+/// whether the window is the one the person works in. `leading` is drawn after the lights and
+/// before the title area, `trailing` is drawn after the title area at
 /// the bar's end; a press or double-click on it is its own and neither moves nor zooms the window.
 /// `title_room` says whether the title keeps to the middle of the bar or to the room beside the
 /// lights and `trailing`.
@@ -164,6 +197,7 @@ pub fn WindowTitlebar(
     #[props(default)] lights: TrafficLights,
     #[props(default)] timing: FrameTiming,
     #[props(default)] pose: TilePose,
+    #[props(default)] leading: Option<Element>,
     #[props(default)] trailing: Option<Element>,
     #[props(default)] title_room: TitleRoom,
     #[props(default)] common: Common,
@@ -212,6 +246,14 @@ pub fn WindowTitlebar(
             ..data,
             if lights == TrafficLights::Shown {
                 TrafficLightGroup { timing, pose }
+            }
+            if let Some(leading) = leading {
+                div {
+                    class: "ds-titlebar-leading",
+                    onpointerdown: move |event: PointerEvent| event.stop_propagation(),
+                    ondoubleclick: move |event: MouseEvent| event.stop_propagation(),
+                    {leading}
+                }
             }
             TitleArea { title, parts }
             if let Some(trailing) = trailing {

@@ -109,6 +109,15 @@ its 256 grid to 24, rounded to three decimals), 7 are drawn here (`Minus`, `Sear
 Phosphor was taken only where Tabler has no filled form and the Phosphor glyph is a heavy
 shape on the same footprint, so it sits in the same row as the Tabler ones.
 
+The markup and document-view glyphs (`Hand`, `Crop`, `MousePointer`, `Highlighter`, `Type`,
+`Circle`, `Line`, `ArrowUpRight`, `PenLine`, `ListTree`, `Table`; added 2026-10-23 for the
+viewer's tools, `geometry_markup.rs` and `solid_markup.rs`) follow the same rule. Their outline is
+Lucide 1.47.0 verbatim (`Line` is Lucide `slash`, which has no glyph named `line`); their solid
+form is Tabler filled for `MousePointer`, `Circle`, `ListTree` (Tabler `list`) and `Table`,
+Phosphor Fill for `Hand`, `Crop`, `Highlighter`, `Type` (`text-t`), `ArrowUpRight` and `PenLine`
+(`pencil-simple-line`), and a drawn diagonal capsule for `Line`. The native pick of all eleven is
+outline.
+
 Open strokes (a chevron, a plus, a check, an arrow) are solid in the sense that the stroke is
 already a filled outline shape in both sets (Tabler's `check` is a 2 px bar, drawn as a path);
 no solid glyph carries a stroke attribute.

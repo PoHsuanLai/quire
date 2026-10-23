@@ -27,6 +27,7 @@ pub(crate) mod geometry_actions;
 pub(crate) mod geometry_control;
 pub(crate) mod geometry_files;
 pub(crate) mod geometry_format;
+pub(crate) mod geometry_markup;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
 pub mod mime;
@@ -45,6 +46,7 @@ pub mod slash;
 pub mod solid_fan;
 pub(crate) mod solid_files;
 pub(crate) mod solid_mailo;
+pub(crate) mod solid_markup;
 pub(crate) mod solid_more;
 pub mod solid_parts;
 pub(crate) mod solid_shell;
@@ -310,6 +312,28 @@ pub enum Icon {
     GitBranch,
     /// Lucide `diff`: lines added and removed (a plus over a minus).
     Diff,
+    /// Lucide `hand`: the pan tool.
+    Hand,
+    /// Lucide `crop`.
+    Crop,
+    /// Lucide `mouse-pointer`: the select tool.
+    MousePointer,
+    /// Lucide `highlighter`.
+    Highlighter,
+    /// Lucide `type`: a text box.
+    Type,
+    /// Lucide `circle`: an oval shape.
+    Circle,
+    /// Lucide `slash`: a diagonal stroke.
+    Line,
+    /// Lucide `arrow-up-right`: an arrow shape.
+    ArrowUpRight,
+    /// Lucide `pen-line`: freehand.
+    PenLine,
+    /// Lucide `list-tree`: an outline or table of contents.
+    ListTree,
+    /// Lucide `table`: a spreadsheet.
+    Table,
     // A file manager: places, drives and the kinds of file.
     /// Lucide `house`: the home folder.
     Home,
@@ -414,6 +438,17 @@ impl Icon {
             Icon::Heart => geometry_actions::HEART,
             Icon::GitBranch => geometry_actions::GIT_BRANCH,
             Icon::Diff => geometry_actions::DIFF,
+            Icon::Hand
+            | Icon::Crop
+            | Icon::MousePointer
+            | Icon::Highlighter
+            | Icon::Type
+            | Icon::Circle
+            | Icon::Line
+            | Icon::ArrowUpRight
+            | Icon::PenLine
+            | Icon::ListTree
+            | Icon::Table => geometry_markup::shapes(self),
             Icon::Home
             | Icon::Eject
             | Icon::DriveInternal

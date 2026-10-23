@@ -3,6 +3,22 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.43 (unreleased)
+
+### Lane A
+
+- `WindowTitlebar` takes `leading: Option<Element>`, drawn after the traffic lights and before the
+  title (where Preview and Finder put the sidebar button), and `WindowFrame::with_leading` sets it
+  on a framed root. It mirrors `trailing`: a press or double-click on it is its own and neither
+  moves nor zooms the window. With `TitleRoom::Centred` the title stays centred in the bar; with
+  `TitleRoom::Beside` it is centred in the room between the leading and trailing controls.
+  `WindowFrame::Titlebar` gains a `leading` field (a struct-pattern match needs `..` or the field).
+  New class: `.ds-titlebar-leading`.
+- `ds_style::Icon` gains `Hand`, `Crop`, `MousePointer`, `Highlighter`, `Type`, `Circle`, `Line`,
+  `ArrowUpRight`, `PenLine`, `ListTree` and `Table` (Lucide outlines, solid forms from Tabler and
+  Phosphor, all native outline). They join `Icon::ACTIONS` and `Icon::ALL`; an exhaustive match
+  over `Icon` needs arms.
+
 ## v0.3.42
 
 The files batch, fourth part. Finder's path bar (`PathControl`, segments that take drops, a long

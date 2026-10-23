@@ -75,6 +75,7 @@ impl Icon {
         [
             super::solid_fan::shapes,
             super::solid_files::shapes,
+            super::solid_markup::shapes,
             super::solid_mailo::shapes,
             super::solid_shell::shapes,
             super::solid_more::shapes,
