@@ -7,6 +7,7 @@ mod damaged_files;
 mod derive;
 mod doc_tables;
 mod hot_corners;
+mod published_parts;
 mod rows;
 mod schema;
 mod spaces_file;

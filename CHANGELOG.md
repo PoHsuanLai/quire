@@ -77,6 +77,19 @@ first, with what a consumer has to change.
 - `AppearanceSettings` gains `look` (a `Provided`).
 - `ds_settings::xdg::search_dirs` is public.
 
+### Whopper (merge)
+
+- Published style parts as data: an app writes its `AppSelectors::classes()` with
+  `ds_settings::PublishedParts::new(app, classes).write_to(<prefix>/share/quire/selectors)`, and
+  Settings reads every app's with `discover_parts(&parts_dirs())`, then passes each `classes` to
+  `ds_lint::user_stylesheet_with`, so a person's rule on `sill-*` is not reported as internal
+  without linking sill. A class outside the app's prefix is dropped on write and read.
+- A program may ship a second settings schema for a second file it owns,
+  `<app>.<part>.settings.toml` (`Schema::write_part_to`); `discover` admits one per app and file.
+  quire's `extensions.toml` schema is written by `cargo run -p ds-extensions --example
+  write_schema -- --write-schema <dir>`; installers run it beside ds-settings' own.
+- Design docs describe the dock's pins as built (`[[dock]]` in `sill/layout.toml`, sill 848a20a7).
+
 ## v0.3.44
 
 Reorderable lists, a New Space that is named before it exists, and the CSS ellipsis allowed.

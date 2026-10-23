@@ -387,8 +387,11 @@ A person restyles the desktop with CSS, so the names a stylesheet may rely on ar
    any release.
 3. Add a test in the app that `misnamed_roots()` is empty and every listed class is in the app's
    stylesheet.
-4. Whoever checks a stylesheet (Settings, the command line) passes every installed app's
-   `AppSelectors::classes()` to `ds_lint::user_stylesheet_with`, so a listed part is not reported
+4. Install the table as data so Settings needs no link to the app: the app's installer (or its
+   `--write-selectors <dir>`) writes `ds_settings::PublishedParts::new(app, classes()).write_to(
+   <prefix>/share/quire/selectors)`. Whoever checks a stylesheet (Settings, the command line)
+   reads every app's with `ds_settings::discover_parts` and passes each `classes` to
+   `ds_lint::user_stylesheet_with`, so a listed part is not reported
    as an internal selector. `classes()` drops anything outside the app's prefix, so a table
    cannot claim a `ds-` name.
 5. Rename and removal follow the recipe above, with the app's own `SURFACE`-style number if it

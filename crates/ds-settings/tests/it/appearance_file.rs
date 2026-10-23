@@ -254,7 +254,7 @@ fn a_bad_value_costs_only_its_own_field() {
 #[test]
 fn a_key_nobody_reads_and_a_comment_survive_the_next_save() {
     const TEXT: &str = "# mine, not the program's\nversion = 1\nfuture = \"kept\"\n\
-        [appearance]\ntheme = \"dark\"   # night owl\npuppy = true\nlook = \"arc\"\n\
+        [appearance]\ntheme = \"dark\"   # night owl\npuppy = true\nglow = \"arc\"\n\
         [icons]\nsparkle = 3\n[later]\nanswer = 42\n";
     let scratch = Scratch::new();
     let store = scratch.store();
@@ -262,7 +262,7 @@ fn a_key_nobody_reads_and_a_comment_survive_the_next_save() {
     let read = store.load::<AppearanceFile>();
     assert_eq!(read.value.appearance.theme, Theme::Dark);
     let reported = [
-        "appearance.look",
+        "appearance.glow",
         "appearance.puppy",
         "future",
         "icons.sparkle",
@@ -285,7 +285,7 @@ fn a_key_nobody_reads_and_a_comment_survive_the_next_save() {
         "future = \"kept\"",
         "# night owl",
         "puppy = true",
-        "look = \"arc\"",
+        "glow = \"arc\"",
         "sparkle = 3",
         "[later]",
         "answer = 42",

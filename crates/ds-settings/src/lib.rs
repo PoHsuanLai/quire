@@ -26,6 +26,7 @@ mod lenient;
 pub mod live;
 mod portal;
 mod preserve;
+pub mod published_parts;
 mod region;
 mod root;
 pub mod schema;
@@ -57,6 +58,7 @@ pub use portal::{
     SystemPrefsSource, SystemPrefsWatch, contrast_from_portal, reduced_motion_from_portal,
     scheme_from_portal,
 };
+pub use published_parts::{PublishedParts, discover_parts, parts_dirs, parts_dirs_from};
 pub use region::{HourCycle, RegionSettings, ResolvedHours, time_locale};
 pub use root::{AppName, ConfigRoot};
 pub use spaces_storage::{Fixup, Origin, SpacesLoad, SpacesStorage};
