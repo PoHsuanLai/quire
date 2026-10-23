@@ -685,6 +685,7 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Vocabulary | `Availability`, `Check`, `DropState`, `Emphasis`, `Fraction`, `Percent`, `Selection`, `Shortcut`, `ShortcutKey`, `Shown`, `Word` |
 | Geometry | `Placement`, `Scale`, `Point`, `Px`, `Rect`, `Size`, `Alpha` |
 | Icons | `ExternalIcon`, `IconSource`, `IconView`, `BatteryGlyph`, `BluetoothGlyph`, `StatusState`, `VolumeGlyph`, `WifiGlyph`, `Icon`, `IconSize` |
+| File icons | `FileIcon`, `FileIconChoice`, `FileIconStyle`, `FileKind`, `FolderKind`, `ExtLabel` (data in `ds_style::icon::file_kind`, `mime::kind_for_mime`, `file_tint`) |
 | Menus | `MenuCursor`, `Hung`, `PanelWidth`, `ItemText`, `Marks` |
 | Fields | `EditSurface`, `TextField`, `SearchField`, `SuggestionSection`, `FieldFocus`, `FieldBezel`, `FieldKind`, `Validity` |
 | Overlays | `Alert`, `DragGhost`, `HoverCard`, `InlineBanner`, `Loadable`, `Phase`, `Popover`, `Sheet`, `Skeleton`, `SkeletonShape`, `SkeletonLines`, `SkeletonRow`, `use_toasts`, `Tooltip`, `use_overlays` |

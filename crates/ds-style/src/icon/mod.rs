@@ -22,6 +22,8 @@ use shape::Shape;
 pub mod classify;
 pub(crate) mod drawn;
 pub mod family;
+pub mod file_kind;
+pub mod file_tint;
 pub(crate) mod geometry;
 pub(crate) mod geometry_actions;
 pub(crate) mod geometry_control;
@@ -364,6 +366,10 @@ pub enum Icon {
     FilePdf,
     /// Lucide `file-cog`: a program.
     FileApp,
+    /// Lucide `align-left`: three lines of text, the mark of a document (`geometry_files`).
+    Lines,
+    /// quire's own drawing: the letter P, the mark of a PDF (`geometry_files`).
+    Pdf,
 }
 
 impl Icon {
@@ -465,7 +471,9 @@ impl Icon {
             | Icon::FileArchive
             | Icon::FileCode
             | Icon::FilePdf
-            | Icon::FileApp => geometry_files::shapes(self),
+            | Icon::FileApp
+            | Icon::Lines
+            | Icon::Pdf => geometry_files::shapes(self),
             shell => geometry_shell::shapes(shell),
         }
     }

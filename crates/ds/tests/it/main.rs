@@ -24,6 +24,7 @@ mod control_goldens_lint;
 #[path = "controls/css_scan.rs"]
 mod css_scan;
 mod edit_surface_ssr;
+mod file_icon_ssr;
 mod forms_ssr;
 mod golden_hygiene;
 mod hig_lint;

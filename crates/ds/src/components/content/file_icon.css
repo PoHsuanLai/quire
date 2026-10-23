@@ -1,0 +1,58 @@
+/* FileIcon (customization design section 6.1): the standard file icon, drawn. `.ds-file-icon` is
+   a square of `--ic-size`; its parts are placed in percent of it, and each shape is an `svg`
+   filled with `currentColor`, so a part's `color` is its paint (spike S6). The page is paper in
+   both schemes (`--foreign-ground`): a document is white whatever the desktop's scheme, as the
+   reference's is, so the marks use the light hues (`--file-kind-*`). The folder takes its dark
+   tones in the dark (`--file-folder-*`). Attribute selectors carry `*|` (spike S2).
+
+   Monochrome (`data-icon-style`): the folder and the marks read the tinted values the component
+   writes inline (`--file-tab-l` ... `--file-mark`), under the root's `data-theme` as a tinted
+   plate does. The page is 0.75 wide to tall and 69 x 92 % of the square; the folder is 64 to 52
+   and 94 % across; the label is shown from 48 px (`data-label`). */
+
+.ds-file-icon{ position:relative; display:inline-block; flex:none; box-sizing:border-box; width:var(--ic-size); height:var(--ic-size); vertical-align:middle; user-select:none; }
+.ds-file-page,.ds-file-folder{ position:absolute; display:block; }
+.ds-file-page{ left:15.5%; top:4%; width:69%; height:92%; }
+.ds-file-folder{ left:3%; top:11.8%; width:94%; height:76.4%; }
+.ds-file-layer{ position:absolute; left:0; top:0; display:block; }
+.ds-file-shadow{ position:absolute; left:0; top:0; right:0; bottom:0; border-radius:var(--r-micro); box-shadow:var(--shadow-1); }
+.ds-file-folder .ds-file-shadow{ top:19%; }
+
+.ds-file-paper{ color:var(--foreign-ground); }
+.ds-file-flap{ color:var(--file-fold); }
+.ds-file-edge{ color:var(--file-edge); }
+.ds-file-tab{ color:var(--fi-tab, var(--file-folder-tab)); }
+.ds-file-body{ color:var(--fi-body, var(--file-folder-body)); }
+
+/* The mark: centred below the fold, higher when a label sits under it. */
+.ds-file-mark{ position:absolute; left:0; right:0; top:22%; height:46%; display:flex; align-items:center; justify-content:center; color:var(--fi-mark, var(--file-mark-colour)); }
+.ds-file-page[*|data-slot=bare] .ds-file-mark{ top:20%; height:60%; }
+.ds-file-label{ position:absolute; left:0; right:0; bottom:7%; text-align:center; font-family:var(--font-display); font-weight:800; font-size:var(--file-label-size); line-height:1.1; color:var(--file-label); }
+.ds-file-icon[*|data-kind=other] .ds-file-label{ top:0; bottom:0; display:flex; align-items:center; justify-content:center; }
+
+/* The photo: the picture fills the page-shaped frame under the page's shadow. */
+.ds-file-photo{ border-radius:var(--r-micro); overflow:hidden; }
+.ds-file-picture{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; object-fit:cover; pointer-events:none; }
+
+/* The folder's glyph: a light copy a pixel lower, then the dark one, pressed into the front. */
+.ds-file-emboss{ position:absolute; left:0; right:0; top:19%; bottom:0; display:flex; align-items:center; justify-content:center; color:var(--fi-ink, var(--file-folder-ink)); }
+.ds-file-emboss-light{ top:calc(19% + 1px); color:var(--fi-light, var(--file-folder-light)); }
+
+/* Each kind's mark colour. */
+.ds-file-icon[*|data-kind=document]{ --file-mark-colour:var(--file-kind-document); }
+.ds-file-icon[*|data-kind=pdf]{ --file-mark-colour:var(--file-kind-pdf); }
+.ds-file-icon[*|data-kind=spreadsheet]{ --file-mark-colour:var(--file-kind-spreadsheet); }
+.ds-file-icon[*|data-kind=presentation]{ --file-mark-colour:var(--file-kind-presentation); }
+.ds-file-icon[*|data-kind=image]{ --file-mark-colour:var(--file-kind-image); }
+.ds-file-icon[*|data-kind=audio]{ --file-mark-colour:var(--file-kind-audio); }
+.ds-file-icon[*|data-kind=video]{ --file-mark-colour:var(--file-kind-video); }
+.ds-file-icon[*|data-kind=archive]{ --file-mark-colour:var(--file-kind-archive); }
+.ds-file-icon[*|data-kind=code]{ --file-mark-colour:var(--file-kind-code); }
+.ds-file-icon[*|data-kind=font]{ --file-mark-colour:var(--file-kind-font); }
+.ds-file-icon[*|data-kind=disk-image]{ --file-mark-colour:var(--file-kind-disk-image); }
+.ds-file-icon[*|data-kind=program]{ --file-mark-colour:var(--file-kind-program); }
+.ds-file-icon[*|data-kind=other]{ --file-mark-colour:var(--file-kind-other); }
+
+/* Monochrome: one hue. The marks sit on the light page in both schemes. */
+.ds-file-icon[*|data-icon-style=monochrome]{ --fi-tab:var(--file-tab-l); --fi-body:var(--file-body-l); --fi-ink:var(--file-ink-l); --fi-light:var(--file-light-l); --fi-mark:var(--file-mark); }
+.ds[*|data-theme=dark] .ds-file-icon[*|data-icon-style=monochrome]{ --fi-tab:var(--file-tab-d); --fi-body:var(--file-body-d); --fi-ink:var(--file-ink-d); --fi-light:var(--file-light-d); }

@@ -16,6 +16,7 @@ pub mod easing;
 pub mod elevation;
 pub mod elevation_layers;
 pub mod emoji_face;
+pub mod file_icon;
 pub mod glow;
 pub mod hex;
 pub mod label_hue;

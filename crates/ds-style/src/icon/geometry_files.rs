@@ -1,6 +1,6 @@
 //! Geometry for a file manager's glyphs: Home, the drives, Eject and the per-type file glyphs.
 //! Lucide, transcribed from `lucide-static` 1.47.0
-//! (<https://unpkg.com/lucide-static@1.47.0/icons/>), ISC licence; see `super`, except the two
+//! (<https://unpkg.com/lucide-static@1.47.0/icons/>), ISC licence; see `super`, except the
 //! marks Lucide has no icon for, which are quire's own on Lucide's grid (24, a 2 px round
 //! stroke, no fills):
 //!
@@ -10,6 +10,9 @@
 //!   "drive"; `hard-drive-download` carries a download arrow.
 //! - `FilePdf`: Lucide's `file` with a letter P inside (a stem and a bowl); Lucide has no PDF
 //!   file icon.
+//! - `Pdf`: the letter P of `FilePdf` without its page (a stem and a bowl), the mark of a PDF
+//!   on the standard file icon.
+//! - `Lines`: Lucide `align-left`, the mark of a document on the standard file icon.
 //!
 //! A Lucide `<line>` is written as the equivalent path, as in `geometry_shell`.
 
@@ -33,6 +36,8 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::FileCode => FILE_CODE,
         Icon::FilePdf => FILE_PDF,
         Icon::FileApp => FILE_APP,
+        Icon::Lines => LINES,
+        Icon::Pdf => PDF,
         _ => &[],
     }
 }
@@ -197,3 +202,13 @@ const FILE_APP: &[Shape] = &[
         r: "3",
     },
 ];
+
+/// Lucide `align-left`: three lines of text.
+const LINES: &[Shape] = &[
+    Shape::Path("M21 6H3"),
+    Shape::Path("M15 12H3"),
+    Shape::Path("M17 18H3"),
+];
+
+/// quire's own: the letter P of `FILE_PDF`, alone.
+const PDF: &[Shape] = &[Shape::Path("M9 20V4h4.5a4 4 0 0 1 0 8H9")];

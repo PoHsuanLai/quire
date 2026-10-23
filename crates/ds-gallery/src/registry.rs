@@ -185,6 +185,13 @@ pub fn entry(page: Page) -> Entry {
             height: 3000,
             body: crate::pages::content::symbols::SymbolsPage,
         },
+        Page::FileIcons => Entry {
+            page: Page::FileIcons,
+            title: "File icons",
+            lede: "The standard file-icon set, drawn by quire with no image files: a page with a folded corner for each kind (document, PDF, spreadsheet, presentation, image, audio, video, archive, code, font, disk image, program, other) with the kind's mark and the extension label, the Mac folder with the special folders' glyphs embossed, a file's own picture, and the monochrome style, at 16, 32, 64 and 128 px in light and dark.",
+            height: 9000,
+            body: crate::pages::content::file_icons::FileIconsPage,
+        },
         Page::Accounts => Entry {
             page: Page::Accounts,
             title: "Accounts",

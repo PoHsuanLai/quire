@@ -684,6 +684,30 @@ of every style: silhouette against the squircle, bevel shade on all five, bevel 
 plate that is not near white (the Paper plate, L 0.98, has no room for a white arc: its bevel
 shows as the shade and rim only), and the drop shadow's reach within 2 px.
 
+### 2.12 File icons (the standard set, 2026-10-24)
+
+The customization design's section 6.1, drawn by `ds::FileIcon` with no image files. Pre-Liquid-Glass
+Mac wins (design/27).
+
+- **Page.** White (`--foreign-ground`, light in both schemes), 0.75 aspect, 69 x 92 % of the square, the
+  top right corner folded 22 % of the width (`--file-fold`), a hairline edge (`--file-edge`) and the
+  resting contact shadow (`--shadow-1`).
+- **Mark and colour.** One glyph per kind, solid, in the kind's system hue from the light scheme
+  (`--file-kind-<kind>`): document `Lines`, pdf `Pdf` (a P), spreadsheet `Table`, presentation `Monitor`,
+  image `Image`, audio `Music`, video `Play`, archive `Archive`, code `Code`, font `Type`, disk image
+  `Disc`, program `Settings`. `Other` has no mark: its extension is the only mark.
+- **Label.** The extension, upper case, at most four letters or digits (`ExtLabel`), bold
+  (`--font-display`, weight 800) near the bottom, 15 % of the side (20 %, centred, for `Other`). Under 48 px
+  it is dropped and the mark grows from 30 % to 50 % of the side.
+- **Folder.** The Mac folder in two blues (`--file-folder-tab` behind, `--file-folder-body` in front;
+  dark tones in the dark scheme). A special folder embosses its glyph on the front: a light copy one pixel
+  lower (`--file-folder-light`) under the dark one (`--file-folder-ink`). Home `Home`, Desktop `Monitor`,
+  Documents `FileText`, Downloads `Download`, Pictures `Image`, Music `Music`, Movies `Play`, Trash `Trash`.
+  The reference's empty and full Trash are a bin, not a folder; they are not drawn here.
+- **Picture.** The file's own thumbnail cropped to a page-shaped frame with the shadow.
+- **Monochrome.** `icons.style = monochrome` tints the folder (both tones and the emboss, per scheme, by
+  the plate's rule) and the marks (once, as the light scheme draws them, since the page stays light).
+
 ## 3. Generation pipeline
 
 Settled route: LOCAL FIRST (PLAN "Icons", "Route").

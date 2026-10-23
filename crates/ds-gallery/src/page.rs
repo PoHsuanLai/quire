@@ -61,6 +61,9 @@ pub enum Page {
     /// Symbol effects: every effect on a few icons, with a button for each `Once` effect and a
     /// toggle for each `While` one (design/35-SYMBOL-EFFECTS.md).
     Symbols,
+    /// The standard file icons: every kind with and without its label, every folder, a picture and
+    /// the monochrome style, at 16 to 128 px in both schemes.
+    FileIcons,
     /// The account sheets: the consent alert, the add-account steps and the parts an app shows.
     Accounts,
     /// The missing-helper sheet in every phase.

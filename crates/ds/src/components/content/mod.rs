@@ -2,6 +2,8 @@
 //! the voice orb and the thumbnails a component shows.
 
 pub mod avatar;
+pub mod file_icon;
+pub(crate) mod file_icon_parts;
 pub mod icon_source;
 pub mod icon_view;
 pub mod image_source;

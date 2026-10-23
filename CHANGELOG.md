@@ -10,6 +10,45 @@ first, with what a consumer has to change.
 - New `ds_helpers::mime`, moved from the files app: `MimeDb`, `MimeLayer`, `NameGuess`, `Associations`, `MimeApps`, `MimeCache`, `IconName`, `XdgDirs` and the `loader`, plus the small types `MimeType` and `FileName` with `MimeError` and `NameError`. A program learns a file's type, the apps that open it and its icon name without depending on files. `DesktopId` gains the strict `DesktopId::new` and `ds_helpers::DesktopIdError`. See CONSUMING "File types".
 - The user-style notes no longer say both "not drawn" and "heavy" of one property: a property Blitz does not draw gets only the `NoEffect` note.
 
+### wh-e4b
+
+- The standard file icon, drawn by quire with no image files: `ds::FileIcon { choice:
+  FileIconChoice, size: IconSize, style: FileIconStyle }`. `FileIconChoice` is `Standard { kind:
+  FileKind, label: Option<ExtLabel> } | Folder(FolderKind) | Picture(ImageSource)`. A standard icon
+  is a white page with a folded corner (0.75 aspect, the fold 22 % of the width), a hairline edge
+  and the soft contact shadow; the kind's mark sits on it in the kind's colour and the extension
+  is a small bold label near the bottom (for `FileKind::Other` it is the only mark). The label is
+  dropped under 48 px (`LabelFit::at`), and the mark grows. A folder is the blue Mac folder in two
+  tones, a special folder with its glyph embossed on the front. The page stays light in the dark
+  scheme; the folder takes its dark tones. Under `icons.style = monochrome`
+  (`FileIconStyle::of(style, tint)`) the folder and the marks take the tint. The resolver that
+  picks a choice is the next lane's.
+- The data, in `ds_style::icon::file_kind`: `FileKind` (document, pdf, spreadsheet, presentation,
+  image, audio, video, archive, code, font, disk_image, program, other; a `Word`, with `mark()`,
+  `colour()` and `file_glyph()`), `FolderKind` (plain, home, desktop, documents, downloads,
+  pictures, music, movies, trash; `emboss()`) and `ExtLabel::from_extension` (upper case, at most
+  four letters or digits, else `None`). New glyphs `Icon::Lines` (Lucide `align-left`) and
+  `Icon::Pdf` (the letter P); the other marks are existing glyphs (`Table`, `Monitor`, `Image`,
+  `Music`, `Play`, `Archive`, `Code`, `Type`, `Disc`, `Settings`).
+- `ds_style::icon::mime` grows from type to glyph into type to kind: `kind_for_mime(&MimeFacts {
+  mime, parents, generic_icon }) -> MimeKind { kind, description }`. The lookup is the exact
+  type, then the shared-mime-info generic-icon name (`x-office-document`, `package-x-generic`,
+  `text-x-script`, ...), then the parents (nearest first), then the major type, then `Other`. The
+  generic icon is before the parents on purpose: a `.docx` is a ZIP by parent and a document by
+  generic icon, a shell script is plain text by parent and code by generic icon. The caller reads
+  the parents and the generic icon from the MIME database; this crate takes plain strings.
+  `glyph_for_mime(mime) -> MimeGlyph` keeps working for files and gives the same answers.
+- Tokens: `--file-fold`, `--file-edge`, `--file-label`, `--file-folder-tab`, `--file-folder-body`,
+  `--file-folder-ink`, `--file-folder-light` (`FileIconColour`, light and dark) and
+  `--file-kind-<kind>` (`FileKindColour`, the kind's system hue in the light scheme in both). The
+  gallery has a "File icons" page.
+
+**What a consumer changes**
+
+- Nothing breaks. `Icon` has two new variants (`Lines`, `Pdf`): a consumer that matches `Icon`
+  exhaustively adds them. `ds::prelude` exports `FileIcon`, `FileIconChoice`, `FileIconStyle`,
+  `FileKind`, `FolderKind` and `ExtLabel`. The stylesheet golden moves.
+
 ## v0.3.45
 
 ### wh-e1a

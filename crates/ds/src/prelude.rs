@@ -54,6 +54,8 @@ pub use crate::components::content::status::family::StatusState;
 pub use crate::components::content::status::volume::VolumeGlyph;
 pub use crate::components::content::status::wifi::WifiGlyph;
 pub use ds_style::icon::Icon;
+pub use ds_style::icon::file_kind::{ExtLabel, FileKind, FolderKind};
+pub use ds_style::icon::file_tint::FileIconStyle;
 pub use ds_style::icon::render::IconSize;
 pub use ds_style::icon::style::GlyphStyle;
 
@@ -121,6 +123,7 @@ pub use crate::stack::host::use_overlays;
 
 // Lists and content
 pub use crate::components::content::avatar::Avatar;
+pub use crate::components::content::file_icon::{FileIcon, FileIconChoice};
 pub use crate::components::content::image_source::ImageSource;
 pub use crate::components::content::pdf_thumb::PdfThumb;
 pub use crate::components::content::picture::{Picture, PictureShape};

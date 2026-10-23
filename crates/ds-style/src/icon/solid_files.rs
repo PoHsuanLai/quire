@@ -24,6 +24,8 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::FileCode => FILE_CODE,
         Icon::FilePdf => FILE_PDF,
         Icon::FileApp => FILE_APP,
+        Icon::Lines => LINES,
+        Icon::Pdf => PDF,
         _ => &[],
     }
 }
@@ -104,4 +106,16 @@ const FILE_ARCHIVE: &[Shape] = &[Shape::Solid(
 /// Phosphor Icons 2.1.1 Fill `file-pdf-fill` (MIT), scaled from its 256 grid to 24.
 const FILE_PDF: &[Shape] = &[Shape::Solid(
     "M4.125 11.25H19.875a0.375 0.375 0 0 0 0.375 -0.375V8.25a0.75 0.75 0 0 0 -0.219 -0.531l-5.25 -5.25A0.75 0.75 0 0 0 14.25 2.25H5.25A1.5 1.5 0 0 0 3.75 3.75v7.125A0.375 0.375 0 0 0 4.125 11.25ZM14.25 4.125l4.125 4.125H14.25Zm6.75 10.175a0.767 0.767 0 0 1 -0.773 0.7H18v1.5h1.475a0.766 0.766 0 0 1 0.773 0.7 0.75 0.75 0 0 1 -0.75 0.8H18v1.475a0.766 0.766 0 0 1 -0.7 0.773 0.75 0.75 0 0 1 -0.8 -0.75V14.25a0.75 0.75 0 0 1 0.75 -0.75h3A0.75 0.75 0 0 1 21 14.3ZM6 13.5H4.5a0.75 0.75 0 0 0 -0.75 0.75v5.225A0.766 0.766 0 0 0 4.45 20.25 0.75 0.75 0 0 0 5.25 19.5v-0.75h0.694c1.429 0 2.638 -1.117 2.68 -2.545A2.625 2.625 0 0 0 6 13.5Zm-0.033 3.75H5.25V15h0.75a1.125 1.125 0 0 1 1.125 1.234A1.148 1.148 0 0 1 5.967 17.25ZM12 13.5H10.5a0.75 0.75 0 0 0 -0.75 0.75v5.25a0.75 0.75 0 0 0 0.75 0.75h1.436c1.843 0 3.395 -1.451 3.438 -3.293A3.375 3.375 0 0 0 12 13.5Zm-0.046 5.25H11.25V15h0.75a1.875 1.875 0 0 1 1.875 1.947C13.836 17.962 12.969 18.75 11.954 18.75Z",
+)];
+
+/// `Lines` as fills: three capsules 2 tall on the 24 grid, 18, 12 and 14 long.
+const LINES: &[Shape] = &[
+    Shape::Solid("M4 5h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"),
+    Shape::Solid("M4 11h10a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"),
+    Shape::Solid("M4 17h12a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"),
+];
+
+/// `Pdf` as one filled letter P: the outer contour, then the counter wound the other way.
+const PDF: &[Shape] = &[Shape::Solid(
+    "M8 4h5.5a4.25 4.25 0 0 1 0 8.5H10.5V20H8zM10.5 6.5V10h3a1.75 1.75 0 0 0 0-3.5z",
 )];
