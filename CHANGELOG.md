@@ -13,7 +13,20 @@ first, with what a consumer has to change.
   `ds-conformance` `text_overflow_ellipsis` reads the cut from the laid-out document, and the
   gallery's S13 section shows the CSS ellipsis beside the fade and the Rust clip.
 
-## v0.3.43 (unreleased)
+## v0.3.43
+
+anyview's Preview-style controls, as general pieces. A window titlebar takes a leading control
+after the traffic lights (the sidebar button); eleven markup and view glyphs (Hand, Crop,
+MousePointer, Highlighter, Type, Circle, Line, ArrowUpRight, PenLine, ListTree, Table); a Sidebar
+section that fills the height the sections above it leave, so a virtualised list sits under view
+rows; and F1 to F12 as shortcut keys, so F9 is the CUA Toggle Sidebar in tests and menus.
+chordkit, Blitz and blitz-kit stay where v0.3.41 put them.
+
+**What a consumer changes**
+- `WindowFrame::Titlebar` gains `leading`: a struct-pattern match needs `..` or the field.
+- `Icon`, `SidebarSection` and `ShortcutKey` gain variants: an exhaustive match needs arms.
+- The stylesheet golden moves (`.ds-titlebar-leading`, `.ds-sidebar-body-split`,
+  `.ds-sidebar-section-fill`).
 
 ### Lane A
 
