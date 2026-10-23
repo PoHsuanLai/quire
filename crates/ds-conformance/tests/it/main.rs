@@ -153,6 +153,7 @@ mod table_columns;
 mod text_field;
 mod text_field_multiline;
 mod text_field_secure;
+mod text_overflow_ellipsis;
 mod thread_more;
 mod thread_row_common;
 mod tip_style;

@@ -80,8 +80,8 @@ const LIMITS: [(&str, &str, &str); 16] = [
     ),
     (
         "S13",
-        "text-overflow: ellipsis draws no ellipsis.",
-        ".ds-truncate fades the end; clip_chars cuts known text in Rust (below).",
+        "text-overflow: ellipsis ends one nowrap line, left to right only.",
+        ".ds-truncate fades the end; clip_chars and clip_middle cut known text in Rust (below).",
     ),
     (
         "S14",
@@ -146,13 +146,16 @@ pub fn BlitzLimitsPage() -> Element {
     }
 }
 
-/// S13: the mask fade, and the Rust clip for known text.
+/// S13: the CSS ellipsis, the mask fade, and the Rust clip for known text.
 #[component]
 fn Truncation() -> Element {
     const TEXT: &str = "The quick brown fox jumps over the lazy dog and keeps running";
     rsx! {
         Section { title: "S13: truncation",
             div { class: "g-grid3",
+                Specimen { name: "text-overflow: ellipsis", code: "Blitz fork e7f9f877".to_string(),
+                    div { style: "width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis", "{TEXT}" }
+                }
                 Specimen { name: ".ds-truncate: the end fades", code: "mask-image, spike S7 and S13".to_string(),
                     div { class: "ds-truncate", style: "width:220px", "{TEXT}" }
                 }

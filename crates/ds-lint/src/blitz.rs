@@ -21,10 +21,6 @@ pub fn unsupported(property: &str, value: &str) -> Option<&'static str> {
              engine (design/11-BEHAVIOUR-scroll.md#11-3-1-ownership); drive a programmatic scroll \
              through the host's ScrollCmd instead",
         ),
-        "text-overflow" => Some(
-            "text-overflow: ellipsis does not truncate on Blitz (FINDINGS S13); use \
-             `.ds-truncate`'s mask-image fade, or `text::clip_chars` for a real ellipsis",
-        ),
         "-webkit-line-clamp" | "line-clamp" => {
             Some("line-clamp has no Blitz spike coverage; use `text::clip_chars` instead")
         }
@@ -101,10 +97,10 @@ mod tests {
             expect: false,
         },
         Case {
-            name: "text-overflow fires",
+            name: "text-overflow: ellipsis passes (Blitz fork e7f9f877 draws the marker)",
             property: "text-overflow",
             value: "ellipsis",
-            expect: true,
+            expect: false,
         },
         Case {
             name: "line-clamp fires",

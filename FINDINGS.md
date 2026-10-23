@@ -370,7 +370,7 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 | S10 | a `futures-timer` sleep wakes the document | YES, from the component body and from a handler |
 | S11 | a TTF registered in `DocumentConfig.font_ctx` is picked by `font-family` | YES |
 | S12 | `:focus-visible` after a keyboard focus | NO |
-| S13 | `text-overflow: ellipsis`; a `mask-image` end fade | NO for ellipsis, YES for the fade |
+| S13 | `text-overflow: ellipsis`; a `mask-image` end fade | YES since Blitz fork e7f9f877 (NO before), YES for the fade |
 | S14 | `color-mix()` in a background | YES |
 | S15 | `backdrop-filter: blur()` | NO on cpu and on hybrid |
 | S16 | `filter: saturate()` / `blur()` | NO on stock anyrender/vello; YES on cpu and hybrid with the local forks (see "CSS `filter`") |
@@ -418,7 +418,9 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
   hover strip, a tree row's trailing button) is revealed by the caller through a prop.
 - **S13.** `text-overflow: ellipsis` hard-clips with no "…". `.ds-truncate` uses a
   `mask-image: linear-gradient(to right, black 70%, transparent)` fade; a real ellipsis is
-  computed in Rust (`text/clip.rs`).
+  computed in Rust (`text/clip.rs`). Since Blitz fork e7f9f877 (review fixes 851fa7dd) a nowrap
+  line that overflows a clipping block ends in its ellipsis, left to right only; the layout keeps
+  the whole text for selection and hit testing (`ds-conformance` `text_overflow_ellipsis`).
 - **S14.** `color-mix(in srgb | in oklab, …)` works, `var()` inside it too. The precomputed
   washes stay for determinism, not because Blitz forces them.
 - **S15.** Both anyrender backends take `backdrop-filter` as `_backdrop_filter` and ignore it.

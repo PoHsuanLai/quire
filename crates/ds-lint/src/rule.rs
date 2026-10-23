@@ -46,8 +46,8 @@ pub enum Rule {
     /// `!important`.
     Important,
     /// A property or value Blitz does not paint, or that fights the host:
-    /// `backdrop-filter`, `mix-blend-mode`, `position: sticky`, `text-overflow`, `line-clamp`,
-    /// `text-shadow`, `scroll-behavior: smooth` (design/11-BEHAVIOUR-scroll.md#11-3-1-ownership).
+    /// `backdrop-filter`, `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow`,
+    /// `scroll-behavior: smooth` (design/11-BEHAVIOUR-scroll.md#11-3-1-ownership).
     BlitzUnsupported,
     /// A `@layer` naming `ds` (`@layer ds { ... }`, `@layer ds, x;`, `@layer ds.x`): that layer
     /// is the design system's own, opened by its stylesheet. A consumer's sheets go in `app`

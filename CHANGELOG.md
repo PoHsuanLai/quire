@@ -3,6 +3,16 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.44 (unreleased)
+
+### Lint
+
+- `Rule::BlitzUnsupported` no longer flags `text-overflow`: the Blitz fork quire pins draws the
+  ellipsis since e7f9f877 (review fixes 851fa7dd), on a nowrap line that overflows a clipping
+  block, left to right only. An app's lint exception for it can go. `.ds-truncate` keeps its fade;
+  `ds-conformance` `text_overflow_ellipsis` reads the cut from the laid-out document, and the
+  gallery's S13 section shows the CSS ellipsis beside the fade and the Rust clip.
+
 ## v0.3.43 (unreleased)
 
 ### Lane A
