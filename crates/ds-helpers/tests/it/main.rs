@@ -5,6 +5,7 @@
 mod desktop_entries;
 mod desktop_file;
 mod files;
+mod mime;
 mod provide;
 
 #[path = "../../../ds/tests/it/support/module_guard.rs"]

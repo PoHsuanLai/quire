@@ -3,7 +3,14 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.45 (unreleased)
+## v0.3.46 (unreleased)
+
+### wh-e4a
+
+- New `ds_helpers::mime`, moved from the files app: `MimeDb`, `MimeLayer`, `NameGuess`, `Associations`, `MimeApps`, `MimeCache`, `IconName`, `XdgDirs` and the `loader`, plus the small types `MimeType` and `FileName` with `MimeError` and `NameError`. A program learns a file's type, the apps that open it and its icon name without depending on files. `DesktopId` gains the strict `DesktopId::new` and `ds_helpers::DesktopIdError`. See CONSUMING "File types".
+- The user-style notes no longer say both "not drawn" and "heavy" of one property: a property Blitz does not draw gets only the `NoEffect` note.
+
+## v0.3.45
 
 ### wh-e1a
 

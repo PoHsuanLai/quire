@@ -3,8 +3,25 @@
 use std::fmt;
 use std::path::Path;
 
+use thiserror::Error;
+
 /// The extension a desktop entry has.
 const EXTENSION: &str = "desktop";
+
+/// Why a text is not a desktop id.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Error)]
+#[non_exhaustive]
+pub enum DesktopIdError {
+    /// It does not end in `.desktop`.
+    #[error("An app id ends in \u{201c}.desktop\u{201d}.")]
+    Suffix,
+    /// Nothing comes before `.desktop`.
+    #[error("An app id needs a name before \u{201c}.desktop\u{201d}.")]
+    Empty,
+    /// It holds a `/`, or white space.
+    #[error("An app id has no slash or spaces.")]
+    Shape,
+}
 
 /// A desktop file ID (Desktop Entry Specification, "Desktop File ID"): the file's path under its
 /// `applications` folder with each `/` made a `-`, so `kde/foo.desktop` is `kde-foo.desktop`. The
@@ -33,6 +50,22 @@ impl DesktopId {
     pub fn parse(text: &str) -> Option<DesktopId> {
         let stem = text.strip_suffix(".desktop").unwrap_or(text);
         (!stem.is_empty()).then(|| DesktopId(format!("{stem}.{EXTENSION}")))
+    }
+
+    /// `text`, when it ends in `.desktop` after a name, with no slash or white space: the strict
+    /// reading, for ids that `mimeapps.list` and `mimeinfo.cache` name. [`DesktopId::parse`] is the
+    /// lenient one.
+    pub fn new(text: &str) -> Result<DesktopId, DesktopIdError> {
+        let Some(stem) = text.strip_suffix(".desktop") else {
+            return Err(DesktopIdError::Suffix);
+        };
+        if stem.is_empty() {
+            return Err(DesktopIdError::Empty);
+        }
+        if text.contains('/') || text.contains(char::is_whitespace) {
+            return Err(DesktopIdError::Shape);
+        }
+        Ok(DesktopId(text.to_owned()))
     }
 
     /// The id with its `.desktop` suffix.

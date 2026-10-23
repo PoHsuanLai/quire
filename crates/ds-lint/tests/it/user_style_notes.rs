@@ -43,9 +43,9 @@ const CASES: &[Case] = &[
         notes: &[],
     },
     Case {
-        name: "backdrop-filter is heavy and has no effect",
-        css: ".ds-row { backdrop-filter: blur(40px) }",
-        notes: &[(1, HEAVY), (1, NO_EFFECT)],
+        name: "backdrop-filter is not drawn, so it has no effect and is never also heavy",
+        css: ".ds-row { backdrop-filter: blur(40px) }\n.ds-row { backdrop-filter: blur(60px) }\n[data-surface=bar] { backdrop-filter: blur(2px) }",
+        notes: &[(1, NO_EFFECT), (2, NO_EFFECT), (3, NO_EFFECT)],
     },
     Case {
         name: "a filter without blur is quiet",

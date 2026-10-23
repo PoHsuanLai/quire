@@ -1552,6 +1552,26 @@ button says "Copied". The line itself is `ds`'s `CommandLine` (next section). `o
 Escape does nothing while `Installing`. `HelperBody` is the same column without the sheet; both are
 `ds`'s `Alert` column (`AlertColumn`) with the install command or spinner in its content slot.
 
+### File types: `ds_helpers::mime`
+
+What type a file is, which apps open it, the default one and its icon name, per shared-mime-info,
+`mimeapps.list` and `mimeinfo.cache`. It moved here from the files app so sill, mailo, anyview and
+the file dialogs do not depend on files. No renderer, no runtime, no feature flag; every parser
+takes text, and only `mime::loader` reads files, from the `XdgDirs` it is given (it never reads the
+environment).
+
+| To | Use |
+|---|---|
+| Load the database | `MimeDb::load(&XdgDirs { data_home, data_dirs, config_home, config_dirs, current_desktops })? -> Loaded<MimeDb> { value, skipped }`; or build one from text with `MimeDb::from_layers(&[MimeLayer { globs2, .. }])` |
+| Type of a name | `db.by_name(&FileName::new("Report.PDF")?) -> NameGuess` (`Type(MimeType)`, and the ambiguous / unknown cases) |
+| Parents, aliases, relation | `db.canonical(&mime)`, `db.ancestors(&mime)`, `db.is_a(&child, &parent) -> Relation` |
+| Icon names | `db.icon_name(&mime) -> IconName`: `.specific()` (`application-pdf`), `.generic()` (`x-office-document`), `.in_order()` |
+| Which apps open it | `Associations::load(&dirs, &db, installed)`, `.default_for(&mime, &db)`, `.apps_for(&mime, &db)`, `.file_manager_default()`; `installed` is `Fn(&DesktopId) -> Installed` |
+| The two small types | `MimeType::new("image/png")?` (lower-cased, `.major()`, `MimeType::FOLDER`), `FileName::new(name)?` (`.stem()`, `.extension()`, `.display()`); their errors are `MimeError` and `NameError` (in `ds_helpers::mime` only, since the crate root already has a `NameError`) |
+
+The id of an app is the desktop-entry layer's `ds_helpers::DesktopId`; `DesktopId::new(text)` is the
+strict reading (`DesktopIdError`), `DesktopId::parse` the lenient one.
+
 ### Showing a command to copy
 
 `ds::components::controls::command_line::CommandLine { text, copy, on_copy }` draws a command as one

@@ -23,7 +23,7 @@ mod match_app;
 mod walk;
 
 pub use data_dirs::XdgEnv;
-pub use desktop_id::DesktopId;
+pub use desktop_id::{DesktopId, DesktopIdError};
 pub use entry::{ApplicationEntry, entry_for_window, load_entries};
 pub use identity::AppIdentity;
 pub use match_app::{AppKeys, match_app};

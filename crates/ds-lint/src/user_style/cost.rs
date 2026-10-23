@@ -23,6 +23,13 @@ pub(super) fn notes(
             kind,
         });
     };
+    // A property Blitz does not draw costs nothing, so it earns only the `NoEffect` note: a blur
+    // that is never painted is not also a heavy one.
+    let text: String = value.iter().map(|token| token.text.as_str()).collect();
+    if crate::blitz::unsupported(&name, &text).is_some() {
+        push(UserStyleNoteKind::NoEffect { property: name });
+        return;
+    }
     match name.as_str() {
         "backdrop-filter" | "filter" if heavy_blur(value, scope) => {
             push(UserStyleNoteKind::HeavyBlur {
@@ -41,10 +48,6 @@ pub(super) fn notes(
             push(UserStyleNoteKind::AnimatesEverything)
         }
         _ => {}
-    }
-    let text: String = value.iter().map(|token| token.text.as_str()).collect();
-    if crate::blitz::unsupported(&name, &text).is_some() {
-        push(UserStyleNoteKind::NoEffect { property: name });
     }
 }
 

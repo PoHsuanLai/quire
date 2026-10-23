@@ -10,6 +10,9 @@
 //! ([`walk_applications`]), the id of one ([`DesktopId`]), the entry a window belongs to
 //! ([`entry_for_window`], [`match_app`]) and the names an app declares ([`AppIdentity`]).
 //!
+//! The file-type layer is the [`mime`] module: a file's type from its name, the apps that open it
+//! and its icon name, per shared-mime-info, `mimeapps.list` and `mimeinfo.cache`.
+//!
 //! Missing helpers (design/27 permission-prompt rules; `quire/CONSUMING.md`, "Missing helpers").
 //!
 //! An app runs distro tools (mpv, ffmpeg, heif-dec) that may not be installed. This crate lets
@@ -77,6 +80,7 @@ mod files;
 mod helpers;
 mod install_line;
 mod installer;
+pub mod mime;
 mod os_release;
 mod outcome;
 mod probe;
@@ -85,8 +89,8 @@ mod watch;
 pub use capability::{CapabilityName, Executable, NameError, PackageName};
 pub use catalog::{Catalog, CatalogError, Entry, data_dirs};
 pub use desktop_entries::{
-    AppIdentity, AppKeys, ApplicationEntry, DesktopId, EntryFile, XdgEnv, entry_for_window,
-    first_of_each_id, load_entries, match_app, walk_applications,
+    AppIdentity, AppKeys, ApplicationEntry, DesktopId, DesktopIdError, EntryFile, XdgEnv,
+    entry_for_window, first_of_each_id, load_entries, match_app, walk_applications,
 };
 pub use desktop_file::{
     DESKTOP_ENTRY_CAP, DesktopFile, DesktopFileError, DesktopGroup, EntryLocale,
