@@ -5,7 +5,9 @@
 //! or leaves the window's own colour showing (a Space's tint), by `fill`.
 //!
 //! Markup: `nav.ds-sidebar[data-size][data-fill]` of `div.ds-sidebar-header`,
-//! `div.ds-sidebar-body` (one `div.ds-sidebar-section` per section) and `div.ds-sidebar-foot`.
+//! `div.ds-sidebar-body` (one `div.ds-sidebar-section` per section; the body also carries
+//! `ds-sidebar-body-split` and the `SidebarSection::Fill` section `ds-sidebar-section-fill`)
+//! and `div.ds-sidebar-foot`.
 
 use crate::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
 use crate::components::lists::list::list::List;
@@ -37,6 +39,45 @@ pub fn Sidebar<K: Clone + PartialEq + Hash + 'static>(
     #[props(default)] common: Common,
 ) -> Element {
     let data = common.data_attributes();
+    let fills = sections
+        .iter()
+        .filter(|section| matches!(section, SidebarSection::Fill(_)))
+        .count();
+    debug_assert!(fills <= 1, "a Sidebar holds one SidebarSection::Fill");
+    let first_fill = sections
+        .iter()
+        .position(|section| matches!(section, SidebarSection::Fill(_)));
+    let body_class = match first_fill {
+        Some(_) => "ds-sidebar-body ds-sidebar-body-split",
+        None => "ds-sidebar-body",
+    };
+    let drawn: Vec<(usize, &'static str, Element)> = sections
+        .into_iter()
+        .enumerate()
+        .filter_map(|(at, section)| match section {
+            SidebarSection::List(items) => Some((
+                at,
+                "ds-sidebar-section",
+                rsx! {
+                    List::<K> {
+                        label: label.clone(),
+                        items,
+                        style: ListStyle::SourceList,
+                        sidebar: size,
+                        cursor: cursor.clone(),
+                        onselect: move |key| onselect.call(key),
+                    }
+                },
+            )),
+            SidebarSection::Custom(content) => Some((at, "ds-sidebar-section", content)),
+            SidebarSection::Fill(content) if Some(at) == first_fill => Some((
+                at,
+                "ds-sidebar-section ds-sidebar-section-fill",
+                content,
+            )),
+            SidebarSection::Fill(_) => None,
+        })
+        .collect();
     rsx! {
         nav {
             id: common.id.clone(),
@@ -55,23 +96,9 @@ pub fn Sidebar<K: Clone + PartialEq + Hash + 'static>(
             if let Some(header) = header {
                 div { class: "ds-sidebar-header", {header} }
             }
-            div { class: "ds-sidebar-body",
-                for (at , section) in sections.into_iter().enumerate() {
-                    div { key: "{at}", class: "ds-sidebar-section",
-                        match section {
-                            SidebarSection::List(items) => rsx! {
-                                List::<K> {
-                                    label: label.clone(),
-                                    items,
-                                    style: ListStyle::SourceList,
-                                    sidebar: size,
-                                    cursor: cursor.clone(),
-                                    onselect: move |key| onselect.call(key),
-                                }
-                            },
-                            SidebarSection::Custom(content) => content,
-                        }
-                    }
+            div { class: body_class,
+                for (at , class , content) in drawn {
+                    div { key: "{at}", class: "{class}", {content} }
                 }
             }
             if let Some(foot) = foot {

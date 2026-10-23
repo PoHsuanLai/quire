@@ -41,6 +41,7 @@ const NAMED: &[(ShortcutKey, &str)] = &[
 fn name_of(key: ShortcutKey) -> String {
     match key {
         ShortcutKey::Char(c) => c.to_uppercase().collect(),
+        ShortcutKey::F(n) => format!("F{n}"),
         other => NAMED
             .iter()
             .find(|(named, _)| *named == other)
@@ -52,6 +53,10 @@ fn name_of(key: ShortcutKey) -> String {
 fn key_of(name: &str) -> Result<ShortcutKey, ChordError> {
     if let Some((key, _)) = NAMED.iter().find(|(_, own)| *own == name) {
         return Ok(*key);
+    }
+    let function = name.strip_prefix('F').and_then(|digits| digits.parse().ok());
+    if let Some(key) = function.and_then(ShortcutKey::function) {
+        return Ok(key);
     }
     let mut chars = name.chars();
     match (chars.next(), chars.next()) {

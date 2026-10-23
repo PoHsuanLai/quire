@@ -25,6 +25,7 @@ const VIEW: Viewport = Viewport {
 thread_local! {
     static CLEAR: Cell<bool> = const { Cell::new(false) };
     static ROWS: Cell<u8> = const { Cell::new(4) };
+    static FILL: Cell<bool> = const { Cell::new(false) };
     static PICKED: Cell<u8> = const { Cell::new(0) };
 }
 
@@ -47,6 +48,27 @@ fn rows(from: u8, count: u8, here: u8, pick: EventHandler<u8>) -> Vec<ListItem<u
             )
         })
         .collect()
+}
+
+fn sections(count: u8, here: u8, pick: EventHandler<u8>) -> Vec<SidebarSection<u8>> {
+    let pinned = SidebarSection::Custom(
+        rsx! { div { class: "custom-section", style: "height:40px", "Pinned" } },
+    );
+    if FILL.with(Cell::get) {
+        let long = SidebarSection::Fill(rsx! {
+            div { class: "the-fill-list", style: "overflow-y:auto",
+                for page in 0..60u8 {
+                    div { key: "{page}", class: "fill-item", style: "height:24px", "Page {page}" }
+                }
+            }
+        });
+        return vec![pinned, long];
+    }
+    vec![
+        pinned,
+        SidebarSection::List(rows(1, count, here, pick)),
+        SidebarSection::List(rows(100, count, here, pick)),
+    ]
 }
 
 #[allow(non_snake_case)]
@@ -75,11 +97,7 @@ fn Page() -> Element {
                     fill,
                     cursor: Some(here()),
                     onselect: move |key| pick.call(key),
-                    sections: vec![
-                        SidebarSection::Custom(rsx! { div { class: "custom-section", style: "height:40px", "Pinned" } }),
-                        SidebarSection::List(rows(1, count, here(), pick)),
-                        SidebarSection::List(rows(100, count, here(), pick)),
-                    ],
+                    sections: sections(count, here(), pick),
                     foot: rsx! { span { class: "the-foot", "Home" } },
                 }
             }
@@ -88,6 +106,7 @@ fn Page() -> Element {
 }
 
 fn start(clear: bool, count: u8) -> Harness {
+    FILL.with(|cell| cell.set(false));
     CLEAR.with(|cell| cell.set(clear));
     ROWS.with(|cell| cell.set(count));
     PICKED.with(|cell| cell.set(0));
@@ -216,4 +235,86 @@ fn a_clear_sidebar_paints_nothing_and_keeps_the_ordinary_inks() {
         let ink = harness.ink_of(".ds-sidebar").expect("ink");
         assert!(matches(ink, paper_ink), "{name}: {ink:?} vs {paper_ink:?}");
     }
+}
+
+fn started_with_fill() -> Harness {
+    FILL.with(|cell| cell.set(true));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(Duration::from_millis(300));
+    harness
+}
+
+fn bottom(rect: &Rect) -> f32 {
+    rect.origin.y.0 + rect.size.height.0
+}
+
+#[test]
+fn a_fill_section_takes_the_height_the_rows_above_it_leave() {
+    let harness = started_with_fill();
+    let body = harness.rect(".ds-sidebar-body").expect("the body");
+    let pinned = harness.rect(".custom-section").expect("the rows above");
+    let fill = harness.rect(".ds-sidebar-section-fill").expect("the fill");
+    let list = harness.rect(".the-fill-list").expect("the list");
+    assert_eq!(harness.count(".ds-sidebar-section-fill"), 1);
+    assert!(
+        fill.origin.y.0 >= bottom(&pinned) - 0.5,
+        "the fill sits under the rows above: {pinned:?} {fill:?}"
+    );
+    assert!(
+        bottom(&body) - bottom(&fill) < 16.0,
+        "the fill runs to the body's end, less its padding: {body:?} {fill:?}"
+    );
+    assert!(
+        near(list.size.height.0, fill.size.height.0),
+        "the content is given the fill's whole height: {list:?} {fill:?}"
+    );
+    assert!(
+        fill.size.height.0 < 60.0 * 24.0,
+        "the fill is the room left, not the content's height: {fill:?}"
+    );
+    let foot = harness.rect(".ds-sidebar-foot").expect("the foot");
+    assert!(
+        foot.origin.y.0 >= bottom(&body) - 0.5,
+        "the foot stays below the body: {foot:?} {body:?}"
+    );
+}
+
+#[test]
+fn with_a_fill_the_body_does_not_scroll_and_the_list_does() {
+    let mut harness = started_with_fill();
+    let pinned = harness.rect(".custom-section").expect("the rows above");
+    let first = harness.rect(".fill-item").expect("the first item");
+    let over_pinned = harness.centre(".custom-section").expect("centre");
+    harness.send(Input::wheel(over_pinned, Px(0.0), Px(-200.0)));
+    harness.advance(Duration::from_millis(50));
+    assert_eq!(
+        harness.rect(".custom-section"),
+        Some(pinned),
+        "the body does not scroll as a whole"
+    );
+    assert_eq!(
+        harness.rect(".fill-item"),
+        Some(first),
+        "nor does the list move"
+    );
+    let over_list = harness.centre(".the-fill-list").expect("centre");
+    harness.send(Input::wheel(over_list, Px(0.0), Px(-200.0)));
+    harness.advance(Duration::from_millis(50));
+    let moved = harness.rect(".fill-item").expect("the first item");
+    assert!(
+        moved.origin.y.0 < first.origin.y.0 - 20.0,
+        "the list scrolls inside the fill: {first:?} then {moved:?}"
+    );
+    assert_eq!(
+        harness.rect(".custom-section"),
+        Some(pinned),
+        "and the rows above stay"
+    );
+}
+
+#[test]
+fn without_a_fill_the_body_stays_the_scrolling_one() {
+    let harness = start(false, 3);
+    assert_eq!(harness.count(".ds-sidebar-section-fill"), 0);
+    assert_eq!(harness.count(".ds-sidebar-body-split"), 0);
 }

@@ -104,7 +104,30 @@ pub(crate) fn keyboard(key: ShortcutKey) -> (DomKey, Code) {
         ShortcutKey::PageDown => (DomKey::PageDown, Code::PageDown),
         ShortcutKey::Insert => (DomKey::Insert, Code::Insert),
         ShortcutKey::ContextMenu => (DomKey::ContextMenu, Code::ContextMenu),
+        ShortcutKey::F(n) => function_keyboard(n),
     }
+}
+
+/// `F1` to `F12`; any other number is an unidentified key.
+fn function_keyboard(n: u8) -> (DomKey, Code) {
+    let keys = [
+        (DomKey::F1, Code::F1),
+        (DomKey::F2, Code::F2),
+        (DomKey::F3, Code::F3),
+        (DomKey::F4, Code::F4),
+        (DomKey::F5, Code::F5),
+        (DomKey::F6, Code::F6),
+        (DomKey::F7, Code::F7),
+        (DomKey::F8, Code::F8),
+        (DomKey::F9, Code::F9),
+        (DomKey::F10, Code::F10),
+        (DomKey::F11, Code::F11),
+        (DomKey::F12, Code::F12),
+    ];
+    usize::from(n)
+        .checked_sub(1)
+        .and_then(|at| keys.get(at).cloned())
+        .unwrap_or((DomKey::Unidentified, Code::Unidentified))
 }
 
 /// The modifier flag a held quire key sets; any other key sets none.

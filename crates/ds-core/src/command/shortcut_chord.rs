@@ -25,7 +25,7 @@ impl Shortcut {
     }
 
     /// The shortcut a portable chord is, written in Mac terms; `None` for a key the shortcut
-    /// vocabulary has no cap for (function keys).
+    /// vocabulary has no cap for (`F13` and up, print screen, a tap).
     pub fn from_default_chord(chord: DefaultChord) -> Option<Shortcut> {
         let base = chord.base();
         let held = match chord.primary() {
@@ -78,6 +78,7 @@ const NAMED: [(ShortcutKey, NamedKey); 15] = [
 fn chord_key(key: ShortcutKey) -> Option<Key> {
     match key {
         ShortcutKey::Char(c) => Some(Key::character(c)),
+        ShortcutKey::F(n) if ShortcutKey::function(n).is_some() => Key::function(n),
         other => NAMED
             .iter()
             .find(|(shortcut, _)| *shortcut == other)
@@ -88,6 +89,7 @@ fn chord_key(key: ShortcutKey) -> Option<Key> {
 fn shortcut_key(key: Key) -> Option<ShortcutKey> {
     match key {
         Key::Char(c) => Some(ShortcutKey::Char(c)),
+        Key::Named(NamedKey::F(n)) => ShortcutKey::function(n),
         Key::Named(named) => NAMED
             .iter()
             .find(|(_, candidate)| *candidate == named)
@@ -155,6 +157,21 @@ mod tests {
                 "{text}"
             );
         }
-        assert_eq!(Shortcut::from_default_chord(parsed("F3")), None);
+        assert_eq!(Shortcut::from_default_chord(parsed("F13")), None);
+    }
+
+    #[test]
+    fn a_function_key_is_a_chord_key_and_back() {
+        for n in 1..=12 {
+            let shortcut = Shortcut(vec![ShortcutKey::F(n)]);
+            let chord = parsed(&format!("F{n}"));
+            assert_eq!(shortcut.default_chord(), Some(chord), "F{n}");
+            assert_eq!(Shortcut::from_default_chord(chord), Some(shortcut), "F{n}");
+        }
+        let with_alt = Shortcut(vec![ShortcutKey::Alt, ShortcutKey::F(9)]);
+        assert_eq!(with_alt.default_chord(), Some(parsed("Alt+F9")));
+        assert_eq!(Shortcut(vec![ShortcutKey::F(13)]).default_chord(), None);
+        assert_eq!(ShortcutKey::F(9).glyph(), "F9");
+        assert_eq!(Shortcut(vec![ShortcutKey::F(9)]).chord(), "f9");
     }
 }

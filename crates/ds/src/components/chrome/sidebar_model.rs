@@ -13,6 +13,12 @@ pub enum SidebarSection<K> {
     /// Anything else a sidebar holds: pinned tiles, Today tabs. The caller draws its heading
     /// (a `SectionHeader`) and its selection, and a section that is empty is simply left out.
     Custom(Element),
+    /// Anything that takes the height the other sections leave, and is given that height as a
+    /// definite one: a virtualised list (PDF thumbnails, an outline) under a few view rows, as
+    /// Preview's sidebar is. The sections above keep their natural height and the body no longer
+    /// scrolls as a whole; the content scrolls itself. A sidebar holds one: a second `Fill` is a
+    /// mistake (a debug assertion fails) and is left out.
+    Fill(Element),
 }
 
 /// What a sidebar paints behind its rows.

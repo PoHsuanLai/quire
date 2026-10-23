@@ -13,4 +13,9 @@
 .ds-sidebar-header + .ds-sidebar-body{ padding-top:0; }
 .ds-sidebar > .ds-sidebar-body:first-child{ padding-top:var(--s-12); }
 .ds-sidebar-section{ flex:none; min-width:0; }
+/* A `SidebarSection::Fill` takes the height the sections above leave, and hands its content that
+   height as a definite one. With a Fill present the body (`-split`) no longer scrolls as a whole. */
+.ds-sidebar-body-split{ overflow-y:hidden; }
+.ds-sidebar-section-fill{ flex:1 1 0; min-height:0; display:flex; flex-direction:column; }
+.ds-sidebar-section-fill > *{ flex:1 1 0; min-height:0; }
 .ds-sidebar-foot{ flex:none; display:flex; align-items:center; gap:var(--s-6); min-width:0; padding:var(--s-6) var(--s-10) var(--s-10); }

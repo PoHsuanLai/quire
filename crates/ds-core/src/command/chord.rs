@@ -28,6 +28,7 @@ impl ShortcutKey {
             ShortcutKey::PageDown => "pagedown".to_owned(),
             ShortcutKey::Insert => "insert".to_owned(),
             ShortcutKey::ContextMenu => "menu".to_owned(),
+            ShortcutKey::F(n) => format!("f{n}"),
         }
     }
 }

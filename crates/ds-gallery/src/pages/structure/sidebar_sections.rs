@@ -53,6 +53,12 @@ const PLACES: &[(&str, &str, Icon)] = &[
     ("trash", "Trash", Icon::Trash),
 ];
 
+const VIEWS: &[(&str, &str, Icon)] = &[
+    ("thumbnails", "Thumbnails", Icon::Inbox),
+    ("contents", "Contents", Icon::Tag),
+    ("info", "Info", Icon::Send),
+];
+
 const LABELS: &[(&str, &str, Icon)] =
     &[("work", "Work", Icon::Tag), ("travel", "Travel", Icon::Tag)];
 
@@ -104,7 +110,7 @@ pub fn SidebarSectionsSection() -> Element {
         .unread(3),
     ];
     rsx! {
-        Section { title: "Sidebar: sections and a foot", note: "Sections of source-list Lists (their headings are ListItem::heading) and Custom content (pinned tiles) scroll between the header and the foot, which stays at the bottom; one cursor runs across every list. The default fill is the sidebar's own ground; SidebarFill::Clear paints nothing, so the window's colour (a Space's flat tint) shows through, with the ordinary inks; SidebarFill::Flat paints --surface-2, one lightness step above the paper a content-first app (terminal, editor) draws its content on: one tone, no gradient, no Space hue. A selected sidebar row is the neutral --sel-neutral wash with the accent on its symbol.",
+        Section { title: "Sidebar: sections and a foot", note: "Sections of source-list Lists (their headings are ListItem::heading) and Custom content (pinned tiles) scroll between the header and the foot, which stays at the bottom; one cursor runs across every list. The default fill is the sidebar's own ground; SidebarFill::Clear paints nothing, so the window's colour (a Space's flat tint) shows through, with the ordinary inks; SidebarSection::Fill takes the height the rows above leave and gives its content that height (a list that scrolls itself, as Preview's thumbnails do), and the body no longer scrolls as a whole; SidebarFill::Flat paints --surface-2, one lightness step above the paper a content-first app (terminal, editor) draws its content on: one tone, no gradient, no Space hue. A selected sidebar row is the neutral --sel-neutral wash with the accent on its symbol.",
             div { class: "g-row g-row-top",
                 for (name , fill) in [("SidebarFill::Material", SidebarFill::Material), ("SidebarFill::Clear", SidebarFill::Clear), ("SidebarFill::Flat", SidebarFill::Flat)] {
                     Specimen { key: "{name}", name,
@@ -123,6 +129,25 @@ pub fn SidebarSectionsSection() -> Element {
                                 ],
                                 foot: foot(scheme),
                             }
+                        }
+                    }
+                }
+                Specimen { name: "SidebarSection::Fill",
+                    div { class: "g-side-frame",
+                        Sidebar::<&'static str> {
+                            label: "Viewer",
+                            cursor: Some("thumbnails"),
+                            onselect,
+                            sections: vec![
+                                places("View", VIEWS, "thumbnails", onselect),
+                                SidebarSection::Fill(rsx! {
+                                    div { style: "overflow-y:auto",
+                                        for page in 1..=40 {
+                                            Row { key: "{page}", title: TextLine::from(format!("Page {page}")) }
+                                        }
+                                    }
+                                }),
+                            ],
                         }
                     }
                 }

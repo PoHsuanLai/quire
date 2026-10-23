@@ -19,6 +19,20 @@ first, with what a consumer has to change.
   Phosphor, all native outline). They join `Icon::ACTIONS` and `Icon::ALL`; an exhaustive match
   over `Icon` needs arms.
 
+### Lane B
+
+- `SidebarSection` gains `Fill(Element)`: a section that takes the height the sections above it
+  leave and gives its content a definite height (a virtualised list under view rows, as in
+  Preview). The body stops scrolling as a whole while a Fill is present; without one nothing
+  changes. A sidebar holds one Fill: a second fails a debug assertion and is left out. An
+  exhaustive match over `SidebarSection` needs an arm. New classes: `.ds-sidebar-body-split`,
+  `.ds-sidebar-section-fill`.
+- `ShortcutKey` gains `F(u8)`, `F1` to `F12` (`ShortcutKey::function(n)` checks the range; other
+  numbers draw as `F<n>` but resolve to nothing). It has a glyph (`F9`), a chord name (`f9`), a
+  dbusmenu name and parse, chordkit's `F9` in `default_chord`/`from_default_chord`, and the
+  harness sends it as the DOM F-key, so `Input::key(ShortcutKey::F(9))` is chordkit's CUA
+  `ToggleSidebar`. An exhaustive match over `ShortcutKey` needs an arm.
+
 ## v0.3.42
 
 The files batch, fourth part. Finder's path bar (`PathControl`, segments that take drops, a long

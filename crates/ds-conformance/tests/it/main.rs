@@ -31,6 +31,7 @@ mod fact_list;
 mod field_focus;
 mod field_help;
 mod field_row_controls;
+mod function_keys;
 mod gestures;
 mod grouped_list;
 mod hover_card_hooks;

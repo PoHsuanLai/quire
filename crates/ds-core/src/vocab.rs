@@ -306,6 +306,9 @@ pub enum ShortcutKey {
     Insert,
     /// The context-menu key (the Menu key): opens a text surface's spelling menu at the caret.
     ContextMenu,
+    /// A function key, `F(1)` to `F(12)` (see [`ShortcutKey::function`]), drawn `F9`. A number
+    /// outside that range is no key: it draws its name but resolves to nothing.
+    F(u8),
 }
 
 /// A shape a key's glyph draws as, for `KeyEquivalent`'s `data-glyph`: a hook for a face rule that only
@@ -384,7 +387,13 @@ impl ShortcutKey {
             ShortcutKey::PageDown => "⇟".to_string(),
             ShortcutKey::Insert => "Ins".to_string(),
             ShortcutKey::ContextMenu => "Menu".to_string(),
+            ShortcutKey::F(n) => format!("F{n}"),
         }
+    }
+
+    /// The function key `F<n>`, or `None` outside `F1` to `F12`.
+    pub fn function(n: u8) -> Option<ShortcutKey> {
+        (1..=12).contains(&n).then_some(ShortcutKey::F(n))
     }
 
     /// The `data-glyph` shape `KeyEquivalent` writes for this key, or `None` for every key whose glyph
