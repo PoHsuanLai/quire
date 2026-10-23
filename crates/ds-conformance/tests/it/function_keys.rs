@@ -17,22 +17,31 @@ const VIEW: Viewport = Viewport {
 
 #[allow(non_snake_case)]
 fn Page() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
+            Pad {}
+        }
+    }
+}
+
+/// Under `Ds`, so `use_keys` reads the root's keymap (the harness's platform), not the default.
+#[allow(non_snake_case)]
+#[component]
+fn Pad() -> Element {
     let keys = ds::keys::use_keys();
     let mut log = use_signal(String::new);
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
-            div {
-                id: "pad",
-                tabindex: "0",
-                style: "width:200px;height:60px",
-                onkeydown: on_action(keys, Context::Normal, move |action| {
-                    log.with_mut(|log| log.push_str(&format!("{action:?};")));
-                    ActionTaken::Yes
-                }),
-                "pad"
-            }
-            span { id: "log", "{log}" }
+        div {
+            id: "pad",
+            tabindex: "0",
+            style: "width:200px;height:60px",
+            onkeydown: on_action(keys, Context::Normal, move |action| {
+                log.with_mut(|log| log.push_str(&format!("{action:?};")));
+                ActionTaken::Yes
+            }),
+            "pad"
         }
+        span { id: "log", "{log}" }
     }
 }
 
@@ -43,8 +52,8 @@ fn started(platform: Platform) -> Harness {
         .with_platform(platform);
     let mut harness = Harness::new(Page, config);
     harness.advance(Duration::from_millis(100));
-    let at = harness.centre("#pad").expect("laid out");
-    harness.send(Input::click(at));
+    // Tab gives the pad the keys (a click does not focus a plain element here).
+    harness.send(Input::key(ShortcutKey::Tab));
     harness.advance(Duration::from_millis(16));
     harness
 }
@@ -59,6 +68,8 @@ fn f9_is_toggle_sidebar_under_the_cua_table() {
         desktop: Desktop::Other,
     });
     harness.send(Input::key(ShortcutKey::F(9)));
+    harness.advance(Duration::from_millis(16));
+    harness.advance(Duration::from_millis(16));
     let want = format!("{:?};", Action::Standard(StandardAction::ToggleSidebar));
     assert_eq!(heard(&harness), want);
 }
@@ -67,5 +78,7 @@ fn f9_is_toggle_sidebar_under_the_cua_table() {
 fn f9_means_nothing_to_the_mac_table() {
     let mut harness = started(Platform::MacOs);
     harness.send(Input::key(ShortcutKey::F(9)));
+    harness.advance(Duration::from_millis(16));
+    harness.advance(Duration::from_millis(16));
     assert_eq!(heard(&harness), "");
 }
