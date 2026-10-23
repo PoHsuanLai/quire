@@ -2086,6 +2086,10 @@ user stylesheet may use: `[data-surface=<name>]` (give a surface root `Ds { surf
 `data-size`, `data-state`, `aria-*` and every token variable. Renaming anything on it is a
 breaking change for the person's file; everything off it may change freely. Token overrides are
 the recommended form (`.ds { --accent: ...; }` restyles every surface consistently).
+`ds::selectors::SURFACE` is the table's version: it goes up when a name is renamed or removed. An
+app that wants its own parts styleable lists them, prefixed `<app>-`, in a
+`ds::selectors::AppSelectors` and says so in its release notes when one is renamed (CONVENTIONS
+section 16 has both recipes).
 
 **Put your own sheets in the `app` layer.** Your own stylesheets are unlayered unless you say
 otherwise, and an unlayered rule beats every `@layer ds` rule, so a `.card { ... }` of yours would
@@ -2097,7 +2101,9 @@ specificity they always had, and the look and the person's still beat both (`ds_
 
 **Report, never block.** `ds_lint::user_stylesheet(css, &ds::kits())` returns notes (unknown
 variables, selectors outside the public surface, `!important`, `url()` that is not a local `file:` or `data:`
-URL, parse errors with line numbers). A settings page or a `--check-style` command can print
+URL, parse errors with line numbers, and cost notes: heavy blur, large shadows, an animation that
+never stops, `transition: all`, a property with no effect here; `note.kind.plain_words()` is the
+text to show). Pass the apps' tables with `ds_lint::user_stylesheet_with`. A settings page or a `--check-style` command can print
 them; loading never waits on them. User CSS is exempt from the design-system lint rules.
 
 ## 13. Portable core, desktop extras

@@ -359,6 +359,57 @@ spec section and our own fixture in the prompt instead.
 copyleft code that reads as an admission. Write what the behaviour is and point at the test or
 trace that proves it; a quirk without a trace is a rumour.
 
+## 16. The public styling surface
+
+A person restyles the desktop with CSS, so the names a stylesheet may rely on are an API
+(ARCHITECTURE.md section 10, DESIGN.md section 7). `ds::selectors::SURFACE` is its version.
+
+- **The version.** `SURFACE` is bumped in the change that renames or removes a public name, and
+  not when one is added. A look made for an earlier number is shown "Made for an earlier version
+  of the desktop"; it still applies.
+
+**Recipe, rename a public part.**
+1. Give the element both classes (`ds-chip-remove ds-chip-close`) and style the old one with the
+   same rules as the new one (a selector list, never a copy).
+2. In `ds::selectors`, change the part's name in its `ComponentSelectors` row and add a
+   `PartRename { root, part, renamed_from }` row to `RENAMES`. The old class is then public and
+   in the table for one release; the test `a_renamed_part_keeps_its_old_name_for_one_release`
+   checks the new part is listed and the old class is still styled.
+3. Bump `SURFACE` when the old name is removed, which is the release after: delete the `RENAMES`
+   row, the old class on the element and its rules, in that one change.
+4. Update `docs/selectors.md` (`DS_BLESS=1`), the gallery "Styling" page follows the table, and
+   list the rename in CHANGELOG under "Styles".
+
+**Recipe, publish your app's styleable parts.**
+1. Name each part `<app>-<component>[-<part>]`. The prefix is the app's; `ds-` is quire's.
+2. List them in a `pub const` `ds::selectors::AppSelectors { app, components, renames }`, the
+   same `ComponentSelectors` rows quire uses. A part nobody listed is internal and may change in
+   any release.
+3. Add a test in the app that `misnamed_roots()` is empty and every listed class is in the app's
+   stylesheet.
+4. Whoever checks a stylesheet (Settings, the command line) passes every installed app's
+   `AppSelectors::classes()` to `ds_lint::user_stylesheet_with`, so a listed part is not reported
+   as an internal selector. `classes()` drops anything outside the app's prefix, so a table
+   cannot claim a `ds-` name.
+5. Rename and removal follow the recipe above, with the app's own `SURFACE`-style number if it
+   keeps one.
+
+**Cost notes on a user stylesheet.** `ds_lint::user_stylesheet` reports CSS that is legal but
+costly (DESIGN.md section 7.5). It never blocks. The limits are constants in
+`ds_lint::limits` (`crates/ds-lint/src/user_style/limits.rs`), the one place to change them:
+
+| Constant | Value | The note it sets |
+|---|---|---|
+| `MAX_BLUR_RADIUS_PX` | 24 | "Heavy blur may slow the desktop": a `backdrop-filter` or `filter: blur()` radius past it |
+| `SURFACE_ATTRIBUTE` | `data-surface` | the same note for any blur on a surface root |
+| `MAX_SHADOW_BLUR_TOTAL_PX` | 80 | "Large shadows may slow the desktop": the blur of every layer of one `box-shadow`, added up |
+| `SPINNER_CLASSES` | the progress, loadable-spin and skeleton parts | "This animation never stops" is not noted on these |
+| `EM_PX` | 16 | converts `em` and `rem` lengths for the two limits |
+
+"Animates everything" is `transition: all`; "Has no effect on this desktop" is a property
+`Rule::BlitzUnsupported` lists. `UserStyleNoteKind::plain_words()` is the text Settings shows for
+each note; it names no property and no developer word.
+
 ---
 
 ## What each repo's ARCHITECTURE.md must contain

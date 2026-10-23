@@ -3,6 +3,7 @@
 
 mod lint_exceptions;
 mod lint_rules;
+mod user_style_notes;
 
 #[path = "../../../ds/tests/it/support/module_guard.rs"]
 mod module_guard;

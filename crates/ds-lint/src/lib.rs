@@ -43,4 +43,6 @@ pub use markup::{markup, markup_warnings};
 pub use rule::{Exception, LintConfig, Offence, Profile, Rule};
 pub use severity::{Severity, WARNINGS};
 pub use stylesheet::{stylesheet, warnings};
-pub use user_style::{ParseFault, UserStyleNote, UserStyleNoteKind, user_stylesheet};
+pub use user_style::{
+    ParseFault, UserStyleNote, UserStyleNoteKind, limits, user_stylesheet, user_stylesheet_with,
+};

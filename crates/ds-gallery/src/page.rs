@@ -65,4 +65,7 @@ pub enum Page {
     Accounts,
     /// The missing-helper sheet in every phase.
     Helpers,
+    /// The public styling surface: every part a stylesheet may name, on a live example, with the
+    /// surface version (`ds::selectors`).
+    Styling,
 }

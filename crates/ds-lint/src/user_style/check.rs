@@ -26,7 +26,12 @@ pub(super) fn notes(parts: &[Part<'_>], known: &KnownNames) -> Vec<UserStyleNote
     for part in parts {
         match part {
             Part::Selector(selector) => selector_notes(selector, known, &mut out),
-            Part::Declaration { value, .. } => {
+            Part::Declaration {
+                property,
+                value,
+                scope,
+            } => {
+                super::cost::notes(property, value, scope, &mut out);
                 important(value, &mut out);
                 variables(value, known, &declared, &mut out);
                 urls(value, &mut out);

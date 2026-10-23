@@ -93,3 +93,28 @@ fn the_report_accepts_every_listed_selector_and_notes_one_that_is_not() {
     let notes = ds_lint::user_stylesheet(".ds-not-listed { color: red }", &kits);
     assert_eq!(notes.len(), 1, "{notes:?}");
 }
+
+#[test]
+fn a_renamed_part_keeps_its_old_name_for_one_release() {
+    let classes = ds::selectors::classes();
+    for rename in ds::selectors::RENAMES {
+        let component = COMPONENTS.iter().find(|c| c.root == rename.root);
+        let component = component.unwrap_or_else(|| panic!("{}: no such component", rename.root));
+        assert!(
+            component.parts.contains(&rename.part),
+            "{}: the new part is not in the table",
+            rename.new_class()
+        );
+        assert!(
+            classes.contains(&rename.old_class()),
+            "{}: the old class is not public",
+            rename.old_class()
+        );
+        assert!(
+            styled(ds::stylesheet(), &rename.old_class()),
+            "{}: the old class is not styled",
+            rename.old_class()
+        );
+    }
+    const { assert!(ds::selectors::SURFACE >= 1) };
+}

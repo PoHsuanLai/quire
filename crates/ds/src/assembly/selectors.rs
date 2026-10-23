@@ -10,9 +10,20 @@
 //! so it updates this table and `docs/selectors.md` (a test keeps the page equal to
 //! [`markdown`]).
 //!
+//! The table is versioned: [`SURFACE`] is bumped when a listed name is renamed or removed. A
+//! renamed part keeps its old name for one release ([`RENAMES`]); an app lists its own parts in
+//! an [`AppSelectors`] table in the same format (CONVENTIONS, "Rename a public part" and
+//! "Publish your app's styleable parts").
+//!
 //! A component's public parts are added here in the change that gives it the part
 //! (a gallery example that restyles it and a `lint::user_stylesheet` case that accepts it come
 //! with the row).
+
+/// The version of the public styling surface this table describes. It is bumped when a public
+/// name is renamed or removed, and not when one is added: a look made for an earlier number may
+/// have lost a part, a look made for a later one cannot have. A look Extension records the number
+/// it was made against (`styles_for`).
+pub const SURFACE: u32 = 1;
 
 /// One component's public class names.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -52,6 +63,85 @@ pub struct Axis {
 /// The attribute every surface root carries, naming the surface: `[data-surface=bar]`. Written
 /// by the consumer's surface root, not by a component.
 pub const SURFACE_ATTRIBUTE: &str = "data-surface";
+
+/// A public part that was renamed. For one quire release the part carries both names: the old
+/// class stays on the element and in this table, so a person's stylesheet keeps working, and the
+/// release notes list it under "Styles". The release after it deletes the row.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PartRename {
+    /// The component's root class: `ds-chip`.
+    pub root: &'static str,
+    /// The new part name, without the root's prefix: `remove`.
+    pub part: &'static str,
+    /// The old part name, still public for this release: `close`.
+    pub renamed_from: &'static str,
+}
+
+impl PartRename {
+    /// The old class, without its dot: `ds-chip-close`.
+    pub fn old_class(&self) -> String {
+        format!("{}-{}", self.root, self.renamed_from)
+    }
+
+    /// The new class, without its dot: `ds-chip-remove`.
+    pub fn new_class(&self) -> String {
+        format!("{}-{}", self.root, self.part)
+    }
+}
+
+/// The parts renamed in the current release, each still public under its old name. Empty when
+/// nothing was renamed.
+pub const RENAMES: &[PartRename] = &[];
+
+/// An app's own public parts, in the table's format. Every root and part carries the app's
+/// prefix (`<app>-`), so an app can never claim a `ds-` name. A part nobody listed is internal.
+/// The app publishes the table (a `const`) and `ds_lint::user_stylesheet_with` reads
+/// [`AppSelectors::classes`] so a listed part is not reported as an internal selector.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AppSelectors {
+    /// The app's short name, lower case: `mailo`. Every class below starts with `<app>-`.
+    pub app: &'static str,
+    /// The components whose root and parts are public; each `root` starts with `<app>-`.
+    pub components: &'static [ComponentSelectors],
+    /// The parts renamed this release, still public under their old names.
+    pub renames: &'static [PartRename],
+}
+
+impl AppSelectors {
+    /// Whether `class` is in this app's namespace.
+    fn owns(&self, class: &str) -> bool {
+        class
+            .strip_prefix(self.app)
+            .is_some_and(|rest| rest.starts_with('-') && rest.len() > 1)
+    }
+
+    /// The roots that do not start with `<app>-`: they are not published, and a test in the app
+    /// asserts this is empty.
+    pub fn misnamed_roots(&self) -> Vec<&'static str> {
+        self.components
+            .iter()
+            .map(|component| component.root)
+            .filter(|root| !self.owns(root))
+            .collect()
+    }
+
+    /// Every class the app publishes, without the dot: each root, each part and each old name.
+    pub fn classes(&self) -> Vec<String> {
+        let current = self.components.iter().flat_map(|component| {
+            std::iter::once(component.root.to_string()).chain(
+                component
+                    .part_selectors()
+                    .into_iter()
+                    .map(|part| part[1..].to_string()),
+            )
+        });
+        let old = self.renames.iter().map(PartRename::old_class);
+        current
+            .chain(old)
+            .filter(|class| self.owns(class))
+            .collect()
+    }
+}
 
 /// The components whose root and parts are public.
 pub const COMPONENTS: &[ComponentSelectors] = &[
@@ -301,6 +391,7 @@ pub fn classes() -> Vec<String> {
                     .map(|part| part[1..].to_string()),
             )
         }))
+        .chain(RENAMES.iter().map(PartRename::old_class))
         .collect()
 }
 
@@ -323,6 +414,9 @@ pub fn markdown() -> String {
          (`--<prefix><slug>`) is public.\n\n",
     );
     page.push_str(&format!(
+        "The surface is version {SURFACE}: it is bumped when a listed name is renamed or removed.\n\n"
+    ));
+    page.push_str(&format!(
         "## Surfaces\n\n`[{SURFACE_ATTRIBUTE}=<name>]` is on every surface root.\n\n"
     ));
     page.push_str("## Components\n\n| Component | Root | Parts |\n| --- | --- | --- |\n");
@@ -341,6 +435,17 @@ pub fn markdown() -> String {
             component.component,
             component.root_selector()
         ));
+    }
+    let renames: Vec<&PartRename> = RENAMES.iter().collect();
+    if !renames.is_empty() {
+        page.push_str("\n## Renamed this release\n\n| Old | New |\n| --- | --- |\n");
+        for rename in renames {
+            page.push_str(&format!(
+                "| `.{}` | `.{}` |\n",
+                rename.old_class(),
+                rename.new_class()
+            ));
+        }
     }
     page.push_str("\n## Attributes\n\n| Attribute | Meaning |\n| --- | --- |\n");
     for axis in AXES {

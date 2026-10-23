@@ -33,6 +33,19 @@ first, with what a consumer has to change.
 - ARCHITECTURE section 10 and CONSUMING section 12 describe the three sheets, the guard and the
   reach rule.
 
+### wh-e1b
+
+- `ds::selectors::SURFACE` (1) versions the public styling surface: it goes up when a public name
+  is renamed or removed, not when one is added. A renamed part carries both names for one release
+  (`ds::selectors::RENAMES`, `PartRename`); an app lists its own `<app>-` parts in an
+  `AppSelectors` table, and `ds_lint::user_stylesheet_with(css, kits, tables)` accepts them
+  (`user_stylesheet` is unchanged). CONVENTIONS section 16 has the recipes.
+- Cost notes in `ds_lint::user_stylesheet`: `HeavyBlur`, `LargeShadow`, `EndlessAnimation`,
+  `AnimatesEverything` and `NoEffect`, with `UserStyleNoteKind::plain_words()` for the text
+  Settings shows (every kind has one). Limits are in `ds_lint::limits`. Report only.
+- The gallery has a "Styling" page: every public part on a live example, generated from
+  `ds::selectors`, with the surface number.
+
 ## v0.3.44
 
 Reorderable lists, a New Space that is named before it exists, and the CSS ellipsis allowed.

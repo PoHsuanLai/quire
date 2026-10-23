@@ -983,7 +983,7 @@ The cascade, lowest to highest:
 | What a sheet may fetch | `ds-style::kit::reach::within` | `url()`, `@import` and `@font-face` in sheets 3-5 may name `data:` or a file inside the sheet's own folder (`StyleHomes`); the rest is rewritten away before the text goes into `<style>` (a `url()` becomes an empty `data:` URL, an `@import` is removed) and recorded as `Dropped`. Blitz's net provider cannot tell which sheet asked, so the rule is a rewrite, not a provider check; an app's `FileRoots` still decide which files the document may read at all |
 | Crash guard | `ds-blitz::styles_guard::StylesGuard`, `use_styles_guard`, `ds::prelude::StylesOffNotice` | before the first window loads the sheets, `begin` writes `<state>/quire/styles-guard/<program>` (the fingerprint of the three sheets and `starting`); `use_styles_guard` marks it `good` after the first frame plus five seconds alive; the last two starts with the same sheets never `good` give `Load::Without` (the pure `decide`), and the app draws with `CustomStyles::Off` and shows `StylesOffNotice` ("Turn On Again" calls `turn_on_again`); a change to any sheet clears it (`changed`). The state directory is a parameter (`ConfigRoot::state_dir(AppName::QUIRE)`; a test passes a scratch one) |
 | Public selector surface | `ds::selectors` (a table, and its doc page) | what a user stylesheet may rely on: `[data-surface=<name>]` on every surface root; `.ds-<component>` on every component root; the parts each component lists as public (`.ds-<component>-<part>`); `data-variant`, `data-size`, `data-state`, `aria-*`; every token variable (`--<prefix><slug>`). Anything else is internal and may change without notice. |
-| Report | `ds-lint::user_stylesheet(css, &Kits) -> Vec<UserStyleNote>` | report-only, never blocks loading: unknown variables, selectors outside the public surface, `url()` that is not a local `file:`/`data:` URL, parse errors with line numbers |
+| Report | `ds-lint::user_stylesheet(css, &Kits) -> Vec<UserStyleNote>` | report-only, never blocks loading: unknown variables, selectors outside the public surface, `url()` that is not a local `file:`/`data:` URL, parse errors with line numbers, and cost notes (heavy blur, large shadows, an endless animation, `transition: all`, a property with no effect here; limits in `ds_lint::limits`). `user_stylesheet_with` also takes the parts apps publish (`ds::selectors::AppSelectors`) |
 
 Rules:
 
@@ -992,7 +992,8 @@ Rules:
 - **Token overrides are the recommended form**: `.ds { --accent: ...; --t-tap: 120ms }`
   re-themes every surface consistently; full selectors are for what tokens cannot express.
 - **Renaming anything on the public selector surface is a breaking change** for the person's
-  file: it updates `ds::selectors`, and the consumer's release notes name it. Everything off the
+  file: it updates `ds::selectors`, bumps `ds::selectors::SURFACE`, carries both names for one
+  release (`RENAMES`; CONVENTIONS section 16), and the consumer's release notes name it. Everything off the
   table stays freely renamable.
 - **The reload path is the `<style>` element**: Blitz re-parses a `<style>` whose text changes
   and restyles the document (`ds-blitz/tests/user_style_reload.rs` proves colours, custom

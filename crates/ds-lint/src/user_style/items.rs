@@ -11,10 +11,12 @@ use crate::tokenize::Located;
 pub(super) enum Part<'a> {
     /// A rule's selector: the tokens before its `{`.
     Selector(&'a [Located]),
-    /// `property: value`, with the property's own token.
+    /// `property: value`, with the property's own token and the selector of the rule it is in
+    /// (empty inside an at-rule such as `@font-face`).
     Declaration {
         property: &'a Located,
         value: &'a [Located],
+        scope: &'a [Located],
     },
     /// An at-rule that has no block: `@import "x";`.
     Statement(&'a [Located]),
@@ -39,7 +41,7 @@ struct Item<'a> {
 pub(super) fn parts(tokens: &[Located]) -> (Vec<Part<'_>>, Vec<UserStyleNote>) {
     let mut parts = Vec::new();
     let mut faults = Vec::new();
-    walk(tokens, Level::Sheet, &mut parts, &mut faults);
+    walk(tokens, Level::Sheet, &[], &mut parts, &mut faults);
     (parts, faults)
 }
 
@@ -112,6 +114,7 @@ const NESTING: &[&str] = &[
 fn walk<'a>(
     tokens: &'a [Located],
     level: Level,
+    scope: &'a [Located],
     parts: &mut Vec<Part<'a>>,
     faults: &mut Vec<UserStyleNote>,
 ) {
@@ -125,24 +128,25 @@ fn walk<'a>(
         let at_rule = first.text.strip_prefix('@').map(str::to_ascii_lowercase);
         match (item.block, at_rule) {
             (Some(block), Some(name)) if NESTING.contains(&name.as_str()) => {
-                walk(block, Level::Sheet, parts, faults);
+                walk(block, Level::Sheet, scope, parts, faults);
             }
-            (Some(block), Some(_)) => walk(block, Level::Body, parts, faults),
+            (Some(block), Some(_)) => walk(block, Level::Body, &[], parts, faults),
             (Some(block), None) => {
                 parts.push(Part::Selector(head));
-                walk(block, Level::Body, parts, faults);
+                walk(block, Level::Body, head, parts, faults);
             }
             (None, Some(_)) => parts.push(Part::Statement(head)),
             (None, None) if level == Level::Sheet => {
                 faults.push(fault(first, ParseFault::RuleWithoutBlock));
             }
-            (None, None) => declaration(head, parts, faults),
+            (None, None) => declaration(head, scope, parts, faults),
         }
     }
 }
 
 fn declaration<'a>(
     head: &'a [Located],
+    scope: &'a [Located],
     parts: &mut Vec<Part<'a>>,
     faults: &mut Vec<UserStyleNote>,
 ) {
@@ -152,6 +156,7 @@ fn declaration<'a>(
         (Some(colon), Some(property)) => parts.push(Part::Declaration {
             property,
             value: kind::trim_trivia(&head[colon + 1..]),
+            scope,
         }),
         _ => faults.push(fault(&head[0], ParseFault::DeclarationWithoutColon)),
     }

@@ -199,6 +199,13 @@ pub fn entry(page: Page) -> Entry {
             height: 2400,
             body: crate::pages::shell::helpers::HelpersPage,
         },
+        Page::Styling => Entry {
+            page: Page::Styling,
+            title: "Styling",
+            lede: "Every part of the public styling surface on a live example, with its class name and the surface version: what a person's stylesheet or a look may rely on. Generated from ds::selectors.",
+            height: 3600,
+            body: crate::pages::foundations::styling::StylingPage,
+        },
     }
 }
 

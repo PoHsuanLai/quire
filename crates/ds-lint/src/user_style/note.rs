@@ -1,5 +1,6 @@
 //! What the report says about a person's stylesheet.
 
+use super::limits;
 use std::fmt;
 
 /// Why a stylesheet is not well-formed CSS. The browser and Blitz skip what they cannot read, so
@@ -61,6 +62,42 @@ pub enum UserStyleNoteKind {
         /// The URL as written.
         url: String,
     },
+    /// `backdrop-filter` or `filter: blur()` over [`limits::MAX_BLUR_RADIUS_PX`], or any blur on
+    /// a surface root: it makes every frame slower.
+    HeavyBlur {
+        /// `backdrop-filter` or `filter`.
+        property: String,
+    },
+    /// A `box-shadow` whose layers add up to more than [`limits::MAX_SHADOW_BLUR_TOTAL_PX`] of
+    /// blur.
+    LargeShadow,
+    /// `animation-iteration-count: infinite` (or the shorthand) outside a spinner part.
+    EndlessAnimation,
+    /// `transition: all`: every property that changes animates.
+    AnimatesEverything,
+    /// A property this desktop's renderer does not draw (the `BlitzUnsupported` list).
+    NoEffect {
+        /// The property, as written lower-cased.
+        property: String,
+    },
+}
+
+impl UserStyleNoteKind {
+    /// What Settings says about this note (DESIGN.md section 7.5): short, no developer words.
+    pub fn plain_words(&self) -> &'static str {
+        match self {
+            UserStyleNoteKind::Parse(_) => "Could not be read",
+            UserStyleNoteKind::UnknownVariable { .. } => "Uses a setting that does not exist",
+            UserStyleNoteKind::InternalSelector { .. } => "This part may change in an update",
+            UserStyleNoteKind::Important => "Does not need to force a rule",
+            UserStyleNoteKind::NonLocalUrl { .. } => "Cannot load from outside this folder",
+            UserStyleNoteKind::HeavyBlur { .. } => "Heavy blur may slow the desktop",
+            UserStyleNoteKind::LargeShadow => "Large shadows may slow the desktop",
+            UserStyleNoteKind::EndlessAnimation => "This animation never stops",
+            UserStyleNoteKind::AnimatesEverything => "Animates everything",
+            UserStyleNoteKind::NoEffect { .. } => "Has no effect on this desktop",
+        }
+    }
 }
 
 /// One thing worth telling the person about their stylesheet, with where.
@@ -108,6 +145,32 @@ impl fmt::Display for UserStyleNote {
                     "{place}: note: `{url}` is not a local file: or data: URL"
                 )
             }
+            UserStyleNoteKind::HeavyBlur { property } => write!(
+                f,
+                "{place}: note: `{property}` blurs a lot ({}px is the limit, and any blur on a surface root); {}",
+                limits::MAX_BLUR_RADIUS_PX,
+                self.kind.plain_words()
+            ),
+            UserStyleNoteKind::LargeShadow => write!(
+                f,
+                "{place}: note: the shadows add up to more than {}px of blur; {}",
+                limits::MAX_SHADOW_BLUR_TOTAL_PX,
+                self.kind.plain_words()
+            ),
+            UserStyleNoteKind::EndlessAnimation => write!(
+                f,
+                "{place}: note: {} (`infinite` outside a spinner)",
+                self.kind.plain_words()
+            ),
+            UserStyleNoteKind::AnimatesEverything => write!(
+                f,
+                "{place}: note: {} (`transition: all`; name the properties)",
+                self.kind.plain_words()
+            ),
+            UserStyleNoteKind::NoEffect { property } => write!(
+                f,
+                "{place}: note: `{property}` has no effect on this desktop"
+            ),
         }
     }
 }

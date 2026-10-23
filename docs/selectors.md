@@ -8,6 +8,8 @@ Prefer token overrides (`.ds { --accent: ...; --t-quick: 120ms }`) to selectors:
 re-theme every surface consistently, and every token variable
 (`--<prefix><slug>`) is public.
 
+The surface is version 1: it is bumped when a listed name is renamed or removed.
+
 ## Surfaces
 
 `[data-surface=<name>]` is on every surface root.
