@@ -9,11 +9,11 @@
 //! release the new order goes to the caller, who owns it (the list never reorders itself, as
 //! `PinTiles` does not). Only the grip starts a drag, so a press on the row is still the row's.
 
-use crate::components::app::pin_order::moved as reordered;
 use crate::components::lists::list::entry::{ListEntry, SetPlace};
 use crate::components::lists::list::keys::{ListKey, labelled, list_key, moved};
 use crate::components::lists::list::model::{ListFocus, ListItem, ListStyle};
 use crate::components::lists::list::reorder::{held_to, stand};
+use crate::components::lists::order::moved as reordered;
 use crate::focus::soon::focus_soon;
 use crate::host::measure::client_rect;
 use crate::root::common::Common;

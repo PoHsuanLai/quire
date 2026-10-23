@@ -1,5 +1,5 @@
-//! The order of a pinned-tile grid after one tile is dragged to another's place (design/30
-//! section 2.11): pure, so the drop's arithmetic is tested without a pointer.
+//! The order of a set after one item is dragged to another's place: a pinned-tile grid (design/30
+//! section 2.11) or a reordered List. Pure, so the drop's arithmetic is tested without a pointer.
 
 /// `order` with `key` taken out and put where the tile at index `to` was: the tiles between shift
 /// one place toward the gap it left. A key not in `order`, or a `to` past the end, leaves it as

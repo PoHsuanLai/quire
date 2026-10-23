@@ -8,7 +8,6 @@ pub(crate) mod hover_open;
 pub mod hover_strip;
 pub mod link_pill;
 pub mod peek;
-pub(crate) mod pin_order;
 pub mod pin_tile;
 pub mod pin_tiles;
 pub mod row_more;

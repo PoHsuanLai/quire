@@ -2,9 +2,9 @@
 //! Add tile last, and a tile dragged onto another's place takes it (the drop line shows where it
 //! lands). The grid never reorders itself: it hands the new order to the caller, who owns it.
 
-use crate::components::app::pin_order::moved;
 use crate::components::app::pin_tile::{PinFace, PinStatus, PinTile};
 use crate::components::content::provider_mark::MarkStyle;
+use crate::components::lists::order::moved;
 use crate::host::measure::client_rect;
 use crate::root::common::Common;
 use dioxus::html::input_data::MouseButton;
