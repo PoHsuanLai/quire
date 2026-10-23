@@ -705,6 +705,9 @@ Mac wins (design/27).
   Documents `FileText`, Downloads `Download`, Pictures `Image`, Music `Music`, Movies `Play`, Trash `Trash`.
   The reference's empty and full Trash are a bin, not a folder; they are not drawn here.
 - **Picture.** The file's own thumbnail cropped to a page-shaped frame with the shadow.
+- **Artwork.** A finished icon from a chosen set of file icons or from the person's own change
+  (the resolver's `IconPick::Artwork`), drawn whole in the square: contained, not cropped, no page frame,
+  no tint.
 - **Monochrome.** `icons.style = monochrome` tints the folder (both tones and the emboss, per scheme, by
   the plate's rule) and the marks (once, as the light scheme draws them, since the page stays light).
 

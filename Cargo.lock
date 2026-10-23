@@ -1805,6 +1805,7 @@ dependencies = [
  "ds-core",
  "ds-helpers",
  "ds-settings",
+ "ds-style",
  "serde",
  "thiserror 2.0.21",
 ]

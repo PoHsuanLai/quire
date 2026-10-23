@@ -39,6 +39,11 @@ impl Search {
         }
     }
 
+    /// The person's data root, if there is one.
+    pub fn person_root(&self) -> Option<&Path> {
+        self.person.as_deref()
+    }
+
     /// A search over the XDG variables as a program has them: `$XDG_DATA_HOME` (else
     /// `$HOME/.local/share`) and `$XDG_DATA_DIRS`.
     pub fn from_env() -> Search {

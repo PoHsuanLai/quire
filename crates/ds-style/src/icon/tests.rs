@@ -292,6 +292,7 @@ fn the_file_manager_glyphs_are_in_the_actions_set() {
         Icon::FileApp,
         Icon::FileArchive,
         Icon::FileAudio,
+        Icon::Puzzle,
     ];
     for icon in GLYPHS {
         assert!(Icon::ACTIONS.contains(icon), "{icon:?}");

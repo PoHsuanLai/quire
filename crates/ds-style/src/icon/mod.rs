@@ -370,6 +370,8 @@ pub enum Icon {
     Lines,
     /// quire's own drawing: the letter P, the mark of a PDF (`geometry_files`).
     Pdf,
+    /// Lucide `puzzle`: a puzzle piece, the Extensions page (`geometry_files`).
+    Puzzle,
 }
 
 impl Icon {
@@ -473,7 +475,8 @@ impl Icon {
             | Icon::FilePdf
             | Icon::FileApp
             | Icon::Lines
-            | Icon::Pdf => geometry_files::shapes(self),
+            | Icon::Pdf
+            | Icon::Puzzle => geometry_files::shapes(self),
             shell => geometry_shell::shapes(shell),
         }
     }

@@ -26,6 +26,7 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::FileApp => FILE_APP,
         Icon::Lines => LINES,
         Icon::Pdf => PDF,
+        Icon::Puzzle => PUZZLE,
         _ => &[],
     }
 }
@@ -118,4 +119,9 @@ const LINES: &[Shape] = &[
 /// `Pdf` as one filled letter P: the outer contour, then the counter wound the other way.
 const PDF: &[Shape] = &[Shape::Solid(
     "M8 4h5.5a4.25 4.25 0 0 1 0 8.5H10.5V20H8zM10.5 6.5V10h3a1.75 1.75 0 0 0 0-3.5z",
+)];
+
+/// `Puzzle` as one filled piece: Lucide's outline, filled.
+const PUZZLE: &[Shape] = &[Shape::Solid(
+    "M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z",
 )];

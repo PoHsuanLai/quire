@@ -128,3 +128,10 @@ pub(crate) fn picture(source: &ImageSource) -> Element {
         }
     }
 }
+
+/// A finished icon, whole: contained in the square, no frame and no crop.
+pub(crate) fn artwork(source: &ImageSource) -> Element {
+    rsx! {
+        img { class: "ds-file-artwork", alt: "", src: "{source.0}", draggable: "false" }
+    }
+}

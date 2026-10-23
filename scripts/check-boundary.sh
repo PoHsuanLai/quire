@@ -100,7 +100,7 @@ EDGES=(
   "ds-shell: ds ds-core ds-motion ds-style"
   "ds-settings: ds-behaviour ds-core ds-helpers ds-peer ds-style ds-settings-derive"
   "ds-settings-page: ds ds-settings"
-  "ds-extensions: ds-core ds-helpers ds-settings"
+  "ds-extensions: ds-core ds-helpers ds-settings ds-style"
   "ds-peer:"
   "ds-helpers: ds-peer"
   "ds-desktop: ds-peer"

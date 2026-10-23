@@ -1826,6 +1826,66 @@ with that owner's own `Provides` type; `ds_extensions::bayonet` is the same bayo
 so the two agree. `ExtensionsFile` is `quire/extensions.toml`; its schema is
 `ds_extensions::extensions_schema()`.
 
+### File icons
+
+An app that shows files asks one resolver which icon a file gets, and draws the answer with
+`ds::FileIcon`. The icon is the person's own change if they set one for the type (Your changes),
+else the pack they chose in Settings (`appearance.file_icons`, "File icons"), else the standard set
+quire draws.
+
+```rust,ignore
+use std::sync::Arc;
+use ds::prelude::*;                                   // FileIcon, FileIconChoice, ImageSource ...
+use ds_extensions::{FileFacts, FileIcons, FolderFacts, IconPick, Search};
+use ds_helpers::mime::{FileName, MimeDb, MimeType, NameGuess, XdgDirs};
+
+// Once: the MIME database (an Arc, so a rebuild below does not reload it).
+let db = Arc::new(MimeDb::from_layers(&layers));      // see "File types" above
+
+// Now, and again whenever the watch you already have on the extensions folders and on
+// `extensions.toml` fires. Do not add a second watcher: rebuild from the same one.
+let off = store.load::<ExtensionsFile>().value.off_ids();
+let found = Search::from_env().scan(&off);
+let built = FileIcons::build(db.clone(), &found, &settings.appearance.file_icons);
+// `built.stale`: report once, like a stale look. `built.off`: offer "Turn On…" for it.
+let icons: FileIcons = built.icons;                   // cheap to clone; hand it to the views
+
+// Per file (no file is read): the type is yours (`db.by_name`, or your own sniffing).
+let name = FileName::new("Report.pdf")?;
+let mime = MimeType::new("application/pdf")?;
+let pick = icons.of(&FileFacts { mime: &mime, name: &name, folder: FolderFacts::NotAFolder });
+let choice = match pick {
+    IconPick::Standard { kind, label } => FileIconChoice::Standard { kind, label },
+    IconPick::Folder(kind) => FileIconChoice::Folder(kind),
+    IconPick::Artwork(path) => ImageSource::file(&path)
+        .map_or_else(|_| /* the standard icon */ todo!(), FileIconChoice::Artwork),
+};
+rsx! { FileIcon { choice, size: IconSize::Px(IconPx(32)) } }
+```
+
+The mapping is three arms because `ds-extensions` may not name `ds` (the components) and `ds` may
+not name `ds-extensions`; `IconPick` is made of `ds-style` types both know. Pass a folder as
+`FolderFacts::Folder(FolderKind::Downloads)` (`FolderKind::Plain` for any other).
+
+A pack is an Extension with a `file_icons` entry; its `file-icons/` folder is keyed by the names
+shared-mime-info uses: `application-pdf.svg` (a type's icon name), `x-office-document.svg` (a
+generic icon), `image.svg` (a major type), `other.svg`, `folder.svg`, `folder-downloads.svg`. Only
+`.svg` and `.png` are read, each up to 1 MiB (`PICTURE_CAP_BYTES`); a link that leads out of the
+folder is ignored. A pack may cover ten types or a thousand: what it lacks keeps the standard
+icon. Inside a layer a file's names are tried in this order: the type's own icon name, its
+generic icon, its parents (nearest first), its major type, then `other`. The generic icon comes
+before the parents on purpose, as it does for the standard kinds (`kind_for_mime`): a `.docx`
+has the parent `application/zip` but the generic icon `x-office-document`. A folder tries
+`folder-<kind>` and then `folder`.
+
+Your changes is `ds_extensions::YourChanges::in_root(&data_root)` (or `YourChanges::of(&search)`):
+`set(&icon_name, &picture)` copies a picked `.svg` or `.png` into the Extension (`user.YourChanges`,
+shown as "Your changes") under the type's icon name (`db.icon_name(&mime)`) and writes its
+`extension.toml`; `clear(&icon_name)` takes it away; `changed()` lists the types; `removal()` is
+`Removal::Blocked` while it holds a change, so Settings offers no Remove for it. Every write is
+atomic. It is never in the choice menu (`choices_for` leaves it out): it applies on top of
+whatever is chosen. The Get Info and Settings screens that ask for the picture are the shell's.
+
 ## 8. What Blitz cannot do, and what to use instead
 
 Everything below is from `FINDINGS.md` spikes S1-S16 (blitz @ `e99fbdbd`, dioxus 0.7.10) — the

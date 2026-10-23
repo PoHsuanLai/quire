@@ -11,6 +11,8 @@ publish.workspace = true
 [dependencies]
 ds-core = { workspace = true }
 ds-settings = { workspace = true }
+# The kinds, folder kinds, extension label and the type-to-kind table the standard set is.
+ds-style = { workspace = true }
 # The capped file reader (a look's stylesheet is read through it).
 ds-helpers = { workspace = true }
 # Manifests, the folder scan and the registry; see the workspace entry.

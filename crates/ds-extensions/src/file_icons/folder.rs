@@ -7,8 +7,8 @@
 //! dir = "file-icons"            # relative to the Extension's folder
 //! ```
 //!
-//! This crate parses and checks the entry only. Reading the pictures and resolving a type to one
-//! is the file-icon resolver's (a later phase).
+//! This file parses and checks the entry only. Reading the pictures and resolving a type to one
+//! is the resolver's ([`super::FileIcons`]).
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -26,19 +26,19 @@ struct Wire {
 
 /// A `file_icons` entry: the folder of pictures, inside the Extension's folder.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FileIcons {
+pub struct IconFolder {
     dir: PathBuf,
     folder: PathBuf,
 }
 
-impl FileIcons {
+impl IconFolder {
     /// Reads the entry. The folder path is made absolute inside the Extension's folder
     /// (`Entry::resolve`): an absolute path or a `..` is refused.
-    pub(crate) fn from_entry(entry: Entry) -> Result<FileIcons, Refusal<Fault>> {
+    pub(crate) fn from_entry(entry: Entry) -> Result<IconFolder, Refusal<Fault>> {
         let wire: Wire = entry.clone().read::<Wire, Fault>()?;
         let dir = entry.resolve::<Fault>(wire.dir)?;
         let folder = entry.resolve::<Fault>(PathBuf::from("."))?;
-        Ok(FileIcons { dir, folder })
+        Ok(IconFolder { dir, folder })
     }
 
     /// The folder of pictures.

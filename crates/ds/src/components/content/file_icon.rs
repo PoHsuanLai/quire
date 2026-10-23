@@ -1,8 +1,9 @@
 //! FileIcon: the standard file icon, drawn (customization design section 6.1). A page with a
 //! folded corner carries the kind's mark in the kind's colour and, when there is room, the
 //! extension as a small bold label; a folder is the blue Mac folder, a special one with its glyph
-//! embossed; a picture is the file's own thumbnail on a page frame. There are no image files: the
-//! shapes are inline SVG and the marks are quire's glyphs, so it scales from 16 to 512 px.
+//! embossed; a picture is the file's own thumbnail on a page frame; artwork (a chosen set's icon,
+//! or the person's own) is drawn whole. The standard shapes are inline SVG and the marks are
+//! quire's glyphs, so it scales from 16 to 512 px.
 //!
 //! The page stays light in the dark scheme, as the reference's does; the folder takes its dark
 //! tones. Under `icons.style = monochrome` (`style: FileIconStyle::Monochrome(tint)`) the folder
@@ -12,7 +13,7 @@
 //! `file_icon_parts`. Which choice an app draws for a file is the resolver's job
 //! (`FileIcons::of`), not this component's.
 
-use crate::components::content::file_icon_parts::{folder, page, picture};
+use crate::components::content::file_icon_parts::{artwork, folder, page, picture};
 use crate::components::content::image_source::ImageSource;
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -36,6 +37,9 @@ pub enum FileIconChoice {
     Folder(FolderKind),
     /// The file's own picture on a page frame.
     Picture(ImageSource),
+    /// A finished icon from a set of file icons or from the person's own change: drawn whole in
+    /// the square, uncropped and with no page frame. (`IconPick::Artwork` of the resolver.)
+    Artwork(ImageSource),
 }
 
 /// Whether the extension label is drawn at a size.
@@ -68,6 +72,7 @@ impl FileIconChoice {
             FileIconChoice::Standard { .. } => "standard",
             FileIconChoice::Folder(_) => "folder",
             FileIconChoice::Picture(_) => "picture",
+            FileIconChoice::Artwork(_) => "artwork",
         }
     }
 
@@ -76,7 +81,7 @@ impl FileIconChoice {
         match self {
             FileIconChoice::Standard { kind, .. } => Some(kind.slug()),
             FileIconChoice::Folder(kind) => Some(kind.slug()),
-            FileIconChoice::Picture(_) => None,
+            FileIconChoice::Picture(_) | FileIconChoice::Artwork(_) => None,
         }
     }
 
@@ -88,6 +93,7 @@ impl FileIconChoice {
             FileIconChoice::Folder(FolderKind::Trash) => "Trash".to_owned(),
             FileIconChoice::Folder(kind) => format!("{} folder", kind.label()),
             FileIconChoice::Picture(_) => "Picture".to_owned(),
+            FileIconChoice::Artwork(_) => "File".to_owned(),
         }
     }
 }
@@ -126,6 +132,7 @@ pub fn FileIcon(
                 FileIconChoice::Standard { kind, label } => page(*kind, label.as_ref(), px, fit),
                 FileIconChoice::Folder(kind) => folder(*kind, px),
                 FileIconChoice::Picture(source) => picture(source),
+                FileIconChoice::Artwork(source) => artwork(source),
             }
         }
     }

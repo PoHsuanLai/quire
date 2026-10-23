@@ -4,8 +4,10 @@
 mod checks;
 mod choices;
 mod extensions_file;
+mod file_icons;
 mod scan;
 mod support;
+mod your_changes;
 
 #[path = "../../../ds/tests/it/support/module_guard.rs"]
 mod module_guard;

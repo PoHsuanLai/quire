@@ -8,14 +8,14 @@ use serde::Deserialize;
 
 use crate::capability::Capability;
 use crate::fault::Fault;
-use crate::file_icons::FileIcons;
+use crate::file_icons::IconFolder;
 use crate::look::Look;
 
 /// One `[[provides]]` entry of a word this crate owns.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Provision {
     /// `file_icons`.
-    FileIcons(FileIcons),
+    FileIcons(IconFolder),
     /// `look`.
     Look(Look),
 }
@@ -36,7 +36,7 @@ impl Provision {
     }
 
     /// The file icons, if this entry is that.
-    pub fn file_icons(&self) -> Option<&FileIcons> {
+    pub fn file_icons(&self) -> Option<&IconFolder> {
         match self {
             Provision::FileIcons(icons) => Some(icons),
             Provision::Look(_) => None,
@@ -60,7 +60,7 @@ impl Provides for Provision {
     fn parse(entry: Entry) -> Result<Provision, Refusal<Fault>> {
         let head = entry.clone().read::<Head, Fault>()?;
         match Capability::parse(&head.capability) {
-            Some(Capability::FileIcons) => FileIcons::from_entry(entry).map(Provision::FileIcons),
+            Some(Capability::FileIcons) => IconFolder::from_entry(entry).map(Provision::FileIcons),
             Some(Capability::Look) => Look::from_entry(entry).map(Provision::Look),
             None => Err(Refusal::Fault(Fault::NotOwned {
                 word: head.capability,

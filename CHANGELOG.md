@@ -49,6 +49,47 @@ first, with what a consumer has to change.
   exhaustively adds them. `ds::prelude` exports `FileIcon`, `FileIconChoice`, `FileIconStyle`,
   `FileKind`, `FolderKind` and `ExtLabel`. The stylesheet golden moves.
 
+### wh-e4c
+
+- File icons resolve: `ds_extensions::FileIcons::build(db, &found, &settings.appearance.file_icons)`
+  makes a cheap-to-clone resolver (rebuild it when the existing watch fires) and
+  `FileIcons::of(&FileFacts { mime, name, folder: FolderFacts })` answers `IconPick::Standard { kind,
+  label } | Folder(FolderKind) | Artwork(path)`. Top wins: Your changes, then the chosen pack,
+  then the standard set (`kind_for_mime` and the extension label). A pack is an Extension with a
+  `file_icons` entry whose `file-icons/` folder is keyed by shared-mime-info names
+  (`application-pdf.svg`, `x-office-document.svg`, `image.svg`, `other.svg`, `folder.svg`,
+  `folder-downloads.svg`); `.svg` and `.png`, each up to 1 MiB; what a pack lacks falls through.
+  The names are tried as the standard kinds are: the type's icon name, its generic icon, its
+  parents, its major type, then `other`. The generic icon is before the parents on purpose (a
+  `.docx` has the parent `application/zip`); this differs from the design's wording, which put
+  the parents first. `FileIcons::standard(db)` is a resolver with only the standard set.
+  `Built` also carries `stale` (a stored pack that is gone or off reads as standard; report it once)
+  and `off` (the turned-off Extension, so a host can offer Turn On…).
+- `ds-extensions` now depends on `ds-style` (its `FileKind`, `FolderKind` and `ExtLabel`), so the
+  resolver answers in its own `IconPick`; an app maps it to `ds::FileIconChoice` in three arms
+  (CONSUMING "File icons"), since neither crate may name the other. The entry type of the
+  `file_icons` word, which was `ds_extensions::FileIcons`, is now `IconFolder`
+  (`Provision::file_icons()` returns it); `FileIcons` is the resolver.
+- New `FileIconChoice::Artwork(ImageSource)`: a finished icon from a pack, drawn whole in the square
+  (`data-choice=artwork`, `img.ds-file-artwork`), where `Picture` crops a thumbnail to a page frame.
+- New setting `appearance.file_icons` ("File icons", Appearance page, section "Files", a `Provided`
+  key of the `file_icons` capability, default `standard`, agent-settable). Settings fills its choices
+  with `choices_for(Capability::FileIcons, ..)`, "Standard" first. The agent-settable keys are now
+  `appearance.theme`, `accent`, `look`, `file_icons` and `custom_styles`.
+- Your changes: `ds_extensions::YourChanges::in_root(&data_root)` is the person Extension
+  `user.YourChanges` ("Your changes"). `set(&icon_name, &picture)` copies a picked `.svg` or `.png`
+  into its `file-icons/` under the type's icon name and writes its `extension.toml`; `clear`,
+  `changed` and `removal() -> Removal::{Allowed, Blocked}` (blocked while it holds a change). Writes
+  are atomic; a picture must be a PNG or an SVG with no script, foreign content or link. It is
+  never offered as a choice.
+- New glyph `Icon::Puzzle` (Lucide `puzzle`, outline and solid) for the Extensions page.
+
+**What a consumer changes**
+
+- A consumer that named `ds_extensions::FileIcons` as the entry type uses `IconFolder`. `Icon` and
+  `FileIconChoice` have a new variant each (`Puzzle`, `Artwork`): a consumer that matches them
+  exhaustively adds the arm. The stylesheet golden moves (`.ds-file-artwork`).
+
 ## v0.3.45
 
 ### wh-e1a

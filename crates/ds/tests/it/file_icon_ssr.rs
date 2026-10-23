@@ -152,6 +152,27 @@ fn a_picture_is_an_image_on_a_page_frame() {
 }
 
 #[test]
+fn artwork_is_an_image_drawn_whole_with_no_page_frame() {
+    let html = icon(
+        FileIconChoice::Artwork(ImageSource("file:///packs/pdf.svg".to_owned())),
+        64,
+        FileIconStyle::Colour,
+    );
+    for part in [
+        "data-choice=\"artwork\"",
+        "<img",
+        "src=\"file:///packs/pdf.svg\"",
+        "ds-file-artwork",
+    ] {
+        assert!(html.contains(part), "{part}: {html}");
+    }
+    assert!(
+        !html.contains("ds-file-photo") && !html.contains("ds-file-page"),
+        "{html}"
+    );
+}
+
+#[test]
 fn monochrome_writes_the_tinted_folder_and_marks_and_colour_writes_nothing() {
     let tint = Tint {
         hue: 150.0,

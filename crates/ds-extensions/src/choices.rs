@@ -14,6 +14,7 @@ use ds_settings::schema::{KeyPath, KeySpec, Provided, STANDARD, WordLabels};
 
 use crate::capability::Capability;
 use crate::provision::Provision;
+use crate::your_changes::YOUR_CHANGES_ID;
 
 /// What a person calls the built-in choice.
 const STANDARD_LABEL: &str = "Standard";
@@ -27,11 +28,15 @@ pub struct Choices {
 }
 
 /// The choices for `capability` among `installed`, the usable Extensions in serving order
-/// ([`Resolved::registry`](crate::Resolved)`.installed()`). Pure: nothing is read.
+/// ([`Resolved::registry`](crate::Resolved)`.installed()`). Pure: nothing is read. "Your changes"
+/// ([`YOUR_CHANGES_ID`]) is never on offer: it is always applied, on top of the choice.
 pub fn choices_for(capability: Capability, installed: &[Installed<Provision>]) -> Choices {
     let mut words = vec![STANDARD.to_owned()];
     let mut labels = vec![(STANDARD.to_owned(), STANDARD_LABEL.to_owned())];
-    for extension in installed {
+    for extension in installed
+        .iter()
+        .filter(|extension| extension.manifest.id.as_str() != YOUR_CHANGES_ID)
+    {
         let provides = extension
             .manifest
             .provides

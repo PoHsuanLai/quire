@@ -155,6 +155,7 @@ impl Icon {
         Icon::FileApp,
         Icon::Lines,
         Icon::Pdf,
+        Icon::Puzzle,
     ];
 
     /// The control center's, the power menu's and Now Playing's glyphs (Lucide,
@@ -310,6 +311,7 @@ impl Icon {
         Icon::FileApp,
         Icon::Lines,
         Icon::Pdf,
+        Icon::Puzzle,
         Icon::Play,
         Icon::Pause,
         Icon::SkipBack,

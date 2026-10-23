@@ -22,7 +22,7 @@
 //! # Whose word is whose
 //!
 //! Each capability word has one owner, the crate that parses its entries. This crate owns the
-//! data words in [`Capability`] ([`Look`], [`FileIcons`]; the rest of the list is later). Other
+//! data words in [`Capability`] ([`Look`], [`IconFolder`]; the rest of the list is later). Other
 //! owners (anyview-plugin owns `probe`, `peek`, `thumbnail`, `decode`, `export` and `play`)
 //! read their own words from the same scan: the entries a scan keeps are raw, and the owner turns
 //! the candidates into its own type with `bayonet::reparse`, which sets aside the words it does
@@ -80,6 +80,13 @@
 //! that is not installed or is off reads as `standard` and is returned as [`Stale`] to report
 //! once. [`look::stylesheet_for`] reads the chosen look's stylesheet.
 //!
+//! # File icons
+//!
+//! [`FileIcons`] turns a file (its type, name and whether it is a folder) into the icon to draw:
+//! Your changes first ([`YourChanges`]), then the chosen pack (`appearance.file_icons`), then
+//! the standard set. [`FileIcons::build`] makes it from a scan and the stored choice; build a new
+//! one when the watch fires. The module `file_icons` has the lookup order.
+//!
 //! # On and off
 //!
 //! [`ExtensionsFile`] is `quire/extensions.toml`, a schema'd settings file whose `extensions.off`
@@ -89,11 +96,12 @@ mod capability;
 mod choices;
 mod extensions_file;
 mod fault;
-mod file_icons;
+pub mod file_icons;
 pub mod look;
 mod provision;
 mod resolve;
 mod search;
+mod your_changes;
 
 pub use bayonet;
 pub use capability::Capability;
@@ -101,8 +109,11 @@ pub use choices::{Choices, Chosen, Stale, choices_for, chosen};
 pub use ds_core::settings::ExtensionId;
 pub use extensions_file::{ExtensionsFile, ExtensionsSettings, OffRow, Power, extensions_schema};
 pub use fault::Fault;
-pub use file_icons::FileIcons;
+pub use file_icons::{
+    Built, FileFacts, FileIcons, FolderFacts, IconFolder, IconPick, PICTURE_CAP_BYTES, Pictures,
+};
 pub use look::{Look, LookSheet, STYLESHEET_CAP_BYTES};
 pub use provision::Provision;
 pub use resolve::{Problem, Resolved, Trouble};
 pub use search::{Found, Off, PROTOCOL, Search};
+pub use your_changes::{ChangeError, Removal, YOUR_CHANGES_ID, YOUR_CHANGES_NAME, YourChanges};

@@ -7,13 +7,14 @@
 
 use super::key::{AgentSetting, KeySpec};
 
-/// The keys proposed as agent-settable: appearance (theme, accent, look), dock size and magnification, the
+/// The keys proposed as agent-settable: appearance (theme, accent, look, file icons), dock size and magnification, the
 /// launcher's web search, and Do Not Disturb. Each is cosmetic or a convenience the person undoes
 /// in one click; none reaches data, accounts, the network beyond a search link, or a lock.
 pub const AGENT_SETTABLE_PROPOSED: &[&str] = &[
     "appearance.theme",
     "appearance.accent",
     "appearance.look",
+    "appearance.file_icons",
     "appearance.custom_styles",
     "dock.magnification",
     "dock.tile_size_px",

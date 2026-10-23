@@ -34,6 +34,9 @@
 .ds-file-photo{ border-radius:var(--r-micro); overflow:hidden; }
 .ds-file-picture{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; object-fit:cover; pointer-events:none; }
 
+/* Artwork: a finished icon from a set or from the person's own change, whole in the square. */
+.ds-file-artwork{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; object-fit:contain; pointer-events:none; }
+
 /* The folder's glyph: a light copy a pixel lower, then the dark one, pressed into the front. */
 .ds-file-emboss{ position:absolute; left:0; right:0; top:19%; bottom:0; display:flex; align-items:center; justify-content:center; color:var(--fi-ink, var(--file-folder-ink)); }
 .ds-file-emboss-light{ top:calc(19% + 1px); color:var(--fi-light, var(--file-folder-light)); }

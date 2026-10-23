@@ -77,6 +77,18 @@ pub struct AppearanceSettings {
         agent_settable
     )]
     pub look: Provided,
+    /// `appearance.file_icons`: `standard`, or the id of an installed file-icons Extension (a
+    /// folder of pictures keyed by file type). A stored id that is not installed, or is turned
+    /// off, reads as `standard` where the installed Extensions are known and is reported once.
+    #[settings(
+        label = "File icons",
+        help = "Standard, or a set of file icons you added in Extensions. A type a set has no \
+                picture for keeps the standard icon; choosing Standard puts them all back.",
+        section = "Files",
+        provided = "file_icons",
+        agent_settable
+    )]
+    pub file_icons: Provided,
     /// `appearance.custom_styles`: whether the look and the person's own stylesheets are drawn.
     /// `off` is the way back from a style that broke a surface; it is a switch, "Use my styles".
     #[settings(
@@ -168,6 +180,7 @@ impl Default for AppearanceSettings {
             transparency: Transparency::System,
             typeface: Typeface::System,
             look: Provided::standard(),
+            file_icons: Provided::standard(),
             custom_styles: CustomStyles::Use,
             material_tint_alpha: Percent(80),
             material_highlight_light: Percent(30),

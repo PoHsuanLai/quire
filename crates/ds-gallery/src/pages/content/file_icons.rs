@@ -1,7 +1,7 @@
 //! The File icons page: the standard file-icon set (`ds::FileIcon`), every kind with and without
 //! its extension label, every folder, a picture, and the monochrome style, at 16, 32, 64 and
-//! 128 px, in the light scheme and the dark. The page stays light in the dark and the folder
-//! takes its dark tones.
+//! 128 px, in the light scheme and the dark. Artwork (a set's finished icon) is drawn whole. The
+//! page stays light in the dark and the folder takes its dark tones.
 
 use crate::pages::content::picture::wide_image;
 use crate::pages::{Section, Specimen};
@@ -86,6 +86,13 @@ pub fn FileIconsPage() -> Element {
             Surface { material: Material::Popover, theme: Some(Scheme::Light),
                 div { class: "g-row g-row-top g-stage-pad",
                     {ladder(FileIconChoice::Picture(wide_image()), FileIconStyle::Colour)}
+                }
+            }
+        }
+        Section { title: "Artwork", note: "FileIcon {{ choice: Artwork(source) }}: a finished icon from a chosen set of file icons, or one the person set for a type (Your changes), drawn whole in the square: contained, never cropped, no page frame. Which choice a file gets is the resolver's (ds-extensions' FileIcons::of, which reads the Extensions folders), so this page shows the drawing only.",
+            Surface { material: Material::Popover, theme: Some(Scheme::Light),
+                div { class: "g-row g-row-top g-stage-pad",
+                    {ladder(FileIconChoice::Artwork(wide_image()), FileIconStyle::Colour)}
                 }
             }
         }
