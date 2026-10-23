@@ -73,6 +73,7 @@ impl ReadError {
 /// `O_NONBLOCK` on the systems where the value is known, so opening a FIFO that nobody writes to
 /// returns at once. Elsewhere 0: the check for a regular file before opening still catches a
 /// FIFO that is there when the read starts.
+#[cfg(unix)]
 const NONBLOCK: i32 = if cfg!(any(target_os = "linux", target_os = "android")) {
     if cfg!(any(
         target_arch = "mips",

@@ -2,7 +2,6 @@
 
 use std::ffi::{OsStr, OsString};
 use std::fmt;
-use std::os::unix::ffi::OsStrExt;
 
 use super::error::NameError;
 
@@ -20,7 +19,7 @@ impl FileName {
     /// `name`, when it is a valid file name.
     pub fn new(name: impl Into<OsString>) -> Result<FileName, NameError> {
         let name = name.into();
-        let bytes = name.as_bytes();
+        let bytes = name.as_encoded_bytes();
         match bytes {
             [] => Err(NameError::Empty),
             b"." | b".." => Err(NameError::Reserved),
@@ -53,16 +52,36 @@ impl FileName {
     }
 
     fn split(&self) -> (&OsStr, Option<&OsStr>) {
-        let bytes = self.0.as_bytes();
+        let bytes = self.0.as_encoded_bytes();
         match bytes.iter().rposition(|b| *b == b'.') {
             Some(0) | None => (&self.0, None),
             Some(at) if at + 1 == bytes.len() => (&self.0, None),
-            Some(at) => (
-                OsStr::from_bytes(&bytes[..at]),
-                Some(OsStr::from_bytes(&bytes[at + 1..])),
-            ),
+            Some(at) => match halves(&self.0, at) {
+                Some((stem, extension)) => (stem, Some(extension)),
+                None => (&self.0, None),
+            },
         }
     }
+}
+
+/// `name` before and after the dot at byte `at`.
+#[cfg(unix)]
+fn halves(name: &OsStr, at: usize) -> Option<(&OsStr, &OsStr)> {
+    use std::os::unix::ffi::OsStrExt;
+    let bytes = name.as_bytes();
+    Some((
+        OsStr::from_bytes(&bytes[..at]),
+        OsStr::from_bytes(&bytes[at + 1..]),
+    ))
+}
+
+/// `name` before and after the dot at byte `at`. Off Unix a name is split only when it is text
+/// (a dot is one byte there too, so `at` is a character boundary); a Windows name that is not
+/// valid Unicode keeps no extension.
+#[cfg(not(unix))]
+fn halves(name: &OsStr, at: usize) -> Option<(&OsStr, &OsStr)> {
+    let text = name.to_str()?;
+    Some((OsStr::new(&text[..at]), OsStr::new(&text[at + 1..])))
 }
 
 impl fmt::Debug for FileName {

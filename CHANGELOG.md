@@ -3,7 +3,14 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.47 (unreleased)
+## v0.3.48 (unreleased)
+
+### wh-q48
+
+- `ds_helpers::mime::FileName` builds off Unix: names are checked through `OsStr::as_encoded_bytes`, and off Unix a name splits into stem and extension when it is text (a Windows name that is not valid Unicode keeps no extension). `files::read`'s `NONBLOCK` is Unix-only, so a Windows build has no dead-code warning. anyview's peek-windows build (anyview-fs takes ds-helpers) compiles again.
+- blitz-kit moves ec1fd3e2 -> 1b8edae4 (pinned block): the Blitz modules are blitz-kit's default feature `blitz`, so a layer below Blitz takes `default-features = false, features = ["adapter"]` for the adapter ranking and `adapter::opening` with std, wgpu and serde only. Consumers that take blitz-kit with its defaults see no change.
+
+## v0.3.47
 
 ### wh-q47a
 
