@@ -13,6 +13,7 @@ use ds_style::appearance::motion::Motion;
 use ds_style::appearance::theme::Theme;
 use ds_style::appearance::transparency::Transparency;
 use ds_style::appearance::typeface::Typeface;
+use ds_style::kit::CustomStyles;
 use serde::{Deserialize, Serialize};
 
 /// `appearance.*`: what every surface resolves its look from.
@@ -64,6 +65,16 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub typeface: Typeface,
+    /// `appearance.custom_styles`: whether the look and the person's own stylesheets are drawn.
+    /// `off` is the way back from a style that broke a surface; it is a switch, "Use my styles".
+    #[settings(
+        label = "Use my styles",
+        help = "Draw the look you chose and your own style sheets. Turn this off if a style \
+                made something hard to use.",
+        section = "Appearance",
+        agent_settable
+    )]
+    pub custom_styles: CustomStyles,
     /// `appearance.material_tint_alpha`: the tint's alpha over compositor blur (proposed 80).
     #[settings(
         label = "Material tint",
@@ -144,6 +155,7 @@ impl Default for AppearanceSettings {
             motion_level: Motion::Standard,
             transparency: Transparency::System,
             typeface: Typeface::System,
+            custom_styles: CustomStyles::Use,
             material_tint_alpha: Percent(80),
             material_highlight_light: Percent(30),
             material_highlight_dark: Percent(12),

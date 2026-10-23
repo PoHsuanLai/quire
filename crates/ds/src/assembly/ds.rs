@@ -16,11 +16,13 @@
 //! the bar and the dock stamp `data-ground="frame"` so the components on them take the `--f-*`
 //! inks.
 //!
-//! `user_style` is the person's own stylesheet (`ds_settings::UserStyle`, ARCHITECTURE.md section
-//! 10): its text goes in `<style data-ds-user>` right after the design-system sheet, unlayered, so
-//! a change to the signal restyles the document and a rule of theirs beats the design system's
-//! `@layer ds` (and a consumer's `@layer app`, `AppStyle`) whatever the specificity. An empty style draws no
-//! element at all.
+//! `styles` is the chosen look and the person's two stylesheets (`ds_style::kit::Styles`,
+//! ARCHITECTURE.md section 10): each non-blank one goes in its own `<style data-ds-style=look |
+//! desktop | app>` right after the design-system sheet, lowest first. The look is `@layer look`
+//! (after `ds` and `app`); the person's two are unlayered, so their rules beat every layered one
+//! whatever the specificity, and the app's own beat the desktop-wide ones. A change to the signal
+//! restyles the document; a blank sheet draws no element. `custom_styles: CustomStyles::Off`
+//! ("Use my styles" is off, `appearance.custom_styles`) draws none of the three.
 //!
 //! `surface` is the consumer's name for the surface this root is (`[data-surface=bar]`, the public
 //! selector surface a user stylesheet targets, `selectors::SURFACE_ATTRIBUTE`).
@@ -83,7 +85,7 @@ use ds_style::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };
 use ds_style::appearance::{blur::BlurState, material::Material};
-use ds_style::kit::UserStyle;
+use ds_style::kit::{CustomStyles, Styles};
 use ds_style::material::recipe::DEFAULT_TINT_ALPHA;
 use ds_style::material::stack::MaterialStack;
 use ds_style::scale::use_root_scale;
@@ -124,7 +126,8 @@ pub fn Ds(
     #[props(default)] window: WindowFrame,
     #[props(default)] extent: RootExtent,
     #[props(default)] typeface: Option<Typeface>,
-    #[props(default)] user_style: ReadSignal<UserStyle>,
+    #[props(default)] styles: ReadSignal<Styles>,
+    #[props(default)] custom_styles: CustomStyles,
     #[props(default)] surface: Option<&'static str>,
     #[props(default)] tip_delay: TipDelay,
     children: Element,
@@ -222,10 +225,11 @@ pub fn Ds(
             if stylesheet == Inject::Inline {
                 style { {sheet.unwrap_or_else(crate::assembly::stylesheet::stylesheet)} }
             }
-            // Unlayered, so a rule of the person's beats every layered rule (the design system's `ds`
-            // and a consumer's `app`) whatever its specificity.
-            if !user_style.read().is_blank() {
-                style { "data-ds-user": "", {user_style.read().0.clone()} }
+            // The look is in `@layer look`; the person's two are unlayered, so a rule of theirs beats
+            // every layered rule (the design system's `ds`, a consumer's `app`, the look) whatever
+            // its specificity.
+            for (slot , text) in styles.read().drawn(custom_styles).into_iter().map(|sheet| (sheet.slot.attribute(), sheet.text)) {
+                style { key: "{slot}", "data-ds-style": slot, {text} }
             }
             match frame_tint {
                 FrameTint::Opaque => frame_layers(layers),

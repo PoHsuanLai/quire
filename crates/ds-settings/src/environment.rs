@@ -45,6 +45,7 @@ impl Environment {
     ///             system: now.system,
     ///             tint_alpha: Some(now.tint_alpha()),
     ///             typeface: Some(now.settings.appearance.typeface()),
+    ///             custom_styles: now.settings.appearance.custom_styles,
     ///             material: Material::Window,
     ///             {children}
     ///         }

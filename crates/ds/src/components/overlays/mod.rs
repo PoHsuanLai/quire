@@ -24,6 +24,7 @@ pub(crate) mod side_panel;
 pub mod skeleton;
 pub mod skeleton_row;
 pub mod spaces_bar;
+pub mod styles_off_notice;
 pub mod swipe_glue;
 pub mod title_tips;
 pub mod toast;

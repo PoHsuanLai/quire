@@ -2,6 +2,7 @@
 //! A separate test target needs a stated reason (CONVENTIONS.md, Tests).
 
 mod glow;
+mod reach;
 
 #[path = "../../../ds/tests/it/support/module_guard.rs"]
 mod module_guard;

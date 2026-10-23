@@ -3,7 +3,60 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.44 (unreleased)
+## v0.3.45 (unreleased)
+
+### wh-e1a
+
+- The cascade gains the look layer: `@layer ds, app, look;` (`ds_style::css::layers::ORDER`, with
+  `LOOK` and `layers::look(css)`). `Ds { user_style }` becomes `Ds { styles: ReadSignal<Styles>,
+  custom_styles: CustomStyles }`: `ds_style::kit::Styles { look, desktop, app, homes }` carries the
+  chosen look (`@layer look`), the person's desktop-wide `~/.config/quire/style.css` and their
+  `~/.config/<app>/style.css` (unlayered, desktop-wide first). Each non-blank sheet is its own
+  `<style data-ds-style=look|desktop|app>` (was `data-ds-user`). The look is filled by the app as
+  a string; `Ds` does not find look Extensions. The desktop-wide file is `UserStyle` under
+  `AppName::QUIRE`; a program watches both files with `Store::watch`. A consumer that passed
+  `user_style` passes `styles: Styles { app: ..., ..Default::default() }`. The stylesheet golden
+  moves (the layer statement).
+- New key `appearance.custom_styles` ("Use my styles", `use` | `off`, a switch on the Appearance
+  page, default `use`, agent-settable): `CustomStyles::Off` makes `Ds` draw none of the three
+  sheets. It is in `AGENT_SETTABLE_PROPOSED` and in design/22 sections 3.1 and 9.7.
+- Crash guard: `ds_blitz::StylesGuard::begin(state_dir, program, &styles)` records the start in
+  `<state>/quire/styles-guard/<program>`, `use_styles_guard(guard)` marks it good after the first
+  frame plus five seconds, and two unfinished starts with the same sheets give `Load::Without`
+  (the pure `styles_guard::decide`). `ds::prelude::StylesOffNotice { program, onturnon }` is the
+  one-line notice with **Turn On Again** (`StylesGuard::turn_on_again`); `changed` clears the guard
+  when a sheet changes. The state directory is a parameter.
+- What a sheet may fetch: `url()`, `@import` and `@font-face` in the three sheets may name `data:`
+  or a file inside the sheet's own folder (`StyleHomes`). Blitz's net provider cannot tell which
+  sheet asked, so `ds_style::kit::reach::within` rewrites the text before it goes into `<style>`
+  and `Styles::dropped()` lists the cuts for the notes.
+- ARCHITECTURE section 10 and CONSUMING section 12 describe the three sheets, the guard and the
+  reach rule.
+
+## v0.3.44
+
+Reorderable lists, a New Space that is named before it exists, and the CSS ellipsis allowed.
+chordkit, Blitz and blitz-kit stay where v0.3.41 put them.
+
+**What a consumer changes**
+- `Icon` gains `Grip`: an exhaustive match needs an arm.
+- The stylesheet golden moves (list reorder rules: `.ds-list[data-reorder=grip]`, `.ds-list-grip`,
+  `.ds-list-item[data-drag]`).
+- `--drag-y` is set inline on a dragged row: a test that checks every var() is declared lists it
+  with the other per-element vars (sill b5ac2cc8).
+- An app's lint exception for `text-overflow` can go.
+
+### List (quire#59, mailo)
+
+- `List { onreorder }`: each row leads with a grip (`Icon::Grip`, Lucide grip-vertical). Dragged by
+  it, the row lifts past 3 px and follows the pointer while the rows it passes slide out of its
+  way; the new order goes to the caller. The order arithmetic is shared with the pinned tiles
+  (`lists::order`, crate-private).
+
+### Spaces (quire#60, mailo)
+
+- `SpacesHandle::begin_new` opens the name field on a pending Space: Return with a name adds it
+  and switches to it; Escape or a click outside drops it, so nothing is added until it is named.
 
 ### Lint
 

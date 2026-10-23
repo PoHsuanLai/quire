@@ -958,16 +958,30 @@ the components the design holds under `--s-8`, each with its reason; an app adds
 
 ## 10. User styles
 
-A person tunes their desktop in real time by editing one CSS file. quire owns the mechanism so
-every consumer (sill, mailo, any app on quire) gets it the same way.
+A person tunes their desktop in real time by editing CSS files, and can change the whole look
+with one (customization design section 7). quire owns the mechanism so every consumer (sill,
+mailo, any app on quire) gets it the same way.
+
+The cascade, lowest to highest:
+
+| # | Sheet | From | Rank |
+|---|---|---|---|
+| 1 | the design system | quire | `@layer ds` |
+| 2 | the app's own sheet | the app (`AppStyle`) | `@layer app` |
+| 3 | the chosen look | the app fills `Styles::look` (finding look Extensions is not `Ds`'s job) | `@layer look` |
+| 4 | the person's desktop-wide style | `~/.config/quire/style.css` | unlayered |
+| 5 | the person's style for this app | `~/.config/<app>/style.css` | unlayered, after 4 |
 
 | Piece | Home | What it is |
 |---|---|---|
-| The file | `ds-style::kit::UserStyle`, `ds-settings::user_style` | `UserStyle(String)` (a value in `ds-style`, so `ds` can take it as a prop; re-exported by `ds-settings`), a `SettingsDoc` with `FILE = "style.css"` under the app's config dir (`~/.config/<app>/style.css`), `Format::Css` (raw text, never parsed at load). A missing file is an empty style. |
-| Live reload | `ds-settings::Store::watch::<UserStyle>()` | the same watch every settings file uses (rename-safe, debounced); each change publishes the whole text |
-| Cascade layers | `ds-style::css::layers` (`DS`, `APP`, `ORDER`), `ds::prelude::AppStyle` | the whole design-system stylesheet (every kit) is `@layer ds { ... }`, opened by the statement `@layer ds, app;`; a consumer's own sheets are `@layer app` (`AppStyle { css }` writes the same statement, so the order holds whichever sheet parses first); the person's `<style data-ds-user>` is unlayered. An unlayered rule beats every layered rule and a later layer beats an earlier one, whatever the specificity, so the order of who wins is user, then app, then ds. Inside `ds` the kits keep the order and specificity they always had (the marker order below); there are no per-kit sub-layers, because a sub-layer would let a Shell rule beat a Components rule by rank alone. |
+| The files | `ds-style::kit::UserStyle`, `ds-settings::user_style` | `UserStyle(String)` (a value in `ds-style`, so `ds` can take it as a prop; re-exported by `ds-settings`), a `SettingsDoc` with `FILE = "style.css"`, `Format::Css` (raw text, never parsed at load). The same document type is the app's file (`AppName("<app>")`) and the desktop-wide one (`AppName::QUIRE`). A missing file is an empty style. |
+| The three sheets | `ds-style::kit::Styles { look: LookStyle, desktop: UserStyle, app: UserStyle, homes: StyleHomes }` | one value for sheets 3-5, empty by default; `Styles::drawn(CustomStyles)` is what `Ds` draws, `Styles::dropped()` what the reach rule cut, `Styles::fingerprint()` the hash the crash guard keeps |
+| Live reload | `ds-settings::Store::watch::<UserStyle>()` | the same watch every settings file uses (rename-safe, debounced); a program watches both its own file and `AppName::QUIRE`'s; each change publishes the whole text |
+| Cascade layers | `ds-style::css::layers` (`DS`, `APP`, `LOOK`, `ORDER`, `app()`, `look()`), `ds::prelude::AppStyle` | the whole design-system stylesheet (every kit) is `@layer ds { ... }`, opened by the statement `@layer ds, app, look;`; a consumer's own sheets are `@layer app` (`AppStyle { css }` writes the same statement, so the order holds whichever sheet parses first); the look is `@layer look` (`layers::look`); the person's two sheets are unlayered. An unlayered rule beats every layered rule and a later layer beats an earlier one, whatever the specificity, so the order of who wins is the person's app sheet, their desktop-wide sheet, the look, app, then ds. A look beats the app on purpose: it restyles every app the same way. Inside `ds` the kits keep the order and specificity they always had (the marker order below); there are no per-kit sub-layers, because a sub-layer would let a Shell rule beat a Components rule by rank alone. |
 | Cascade slot | `ds-style::kit::KitRank::User` | always after every kit: a user kit's sections are written after `@layer ds { }`, unlayered. A user rule wins over the design system by the cascade layer, never by `!important` or specificity |
-| Rendering | `ds::prelude::Ds { user_style: ReadSignal<UserStyle> }` | the root renders the text in its own `<style data-ds-user>` after the design-system stylesheet, unlayered (no element while the style is blank); every surface root re-renders when it changes |
+| Rendering | `ds::prelude::Ds { styles: ReadSignal<Styles>, custom_styles: CustomStyles }` | the root renders each non-blank sheet in its own `<style data-ds-style=look \| desktop \| app>` after the design-system stylesheet, in cascade order (no element for a blank sheet); every surface root re-renders when it changes. `custom_styles` is `appearance.custom_styles` ("Use my styles", `use` \| `off`, a switch, agent-settable): `Off` draws none of the three |
+| What a sheet may fetch | `ds-style::kit::reach::within` | `url()`, `@import` and `@font-face` in sheets 3-5 may name `data:` or a file inside the sheet's own folder (`StyleHomes`); the rest is rewritten away before the text goes into `<style>` (a `url()` becomes an empty `data:` URL, an `@import` is removed) and recorded as `Dropped`. Blitz's net provider cannot tell which sheet asked, so the rule is a rewrite, not a provider check; an app's `FileRoots` still decide which files the document may read at all |
+| Crash guard | `ds-blitz::styles_guard::StylesGuard`, `use_styles_guard`, `ds::prelude::StylesOffNotice` | before the first window loads the sheets, `begin` writes `<state>/quire/styles-guard/<program>` (the fingerprint of the three sheets and `starting`); `use_styles_guard` marks it `good` after the first frame plus five seconds alive; the last two starts with the same sheets never `good` give `Load::Without` (the pure `decide`), and the app draws with `CustomStyles::Off` and shows `StylesOffNotice` ("Turn On Again" calls `turn_on_again`); a change to any sheet clears it (`changed`). The state directory is a parameter (`ConfigRoot::state_dir(AppName::QUIRE)`; a test passes a scratch one) |
 | Public selector surface | `ds::selectors` (a table, and its doc page) | what a user stylesheet may rely on: `[data-surface=<name>]` on every surface root; `.ds-<component>` on every component root; the parts each component lists as public (`.ds-<component>-<part>`); `data-variant`, `data-size`, `data-state`, `aria-*`; every token variable (`--<prefix><slug>`). Anything else is internal and may change without notice. |
 | Report | `ds-lint::user_stylesheet(css, &Kits) -> Vec<UserStyleNote>` | report-only, never blocks loading: unknown variables, selectors outside the public surface, `url()` that is not a local `file:`/`data:` URL, parse errors with line numbers |
 
@@ -990,6 +1004,16 @@ Rules:
 - **A consumer's sheets go in `app`**: draw each with `ds::prelude::AppStyle`, never a bare
   `style { {CSS} }`. A bare sheet is unlayered and would outrank every `ds` rule whatever its
   specificity. `ds_lint::Rule::LayerDs` rejects a consumer sheet that opens `@layer ds`.
+- **One path for sheets 3-5**: the shell and every app hand `Ds` the same `Styles` value; nothing
+  else writes a `<style>` for the look or the person's CSS. A look's text arrives as a string the
+  app fills (`Styles::look`); `Ds` does not find look Extensions. A look is written without a
+  layer (`Ds` wraps it in `@layer look`), so an `@import` inside it is not hoisted: a look that
+  needs more files lists them as `url()`s or inlines them.
+- **"Use my styles" is read where `Ds` is built**: pass `appearance.custom_styles` as
+  `custom_styles`; `Off` is live, no restart. The crash guard is the other way to the same state
+  (`StylesGuard`, above) and the one that works when the program cannot start.
+- **A fetch outside a sheet's folder is cut, not refused**: the reach rule rewrites the text
+  (section above), so the rest of the sheet still applies; the cuts are listed for the notes.
 - **Selector spelling**: an unprefixed attribute selector (`[data-surface=bar]`) matches on
   Blitz since the fork's `1b23fbd9` (dioxus-native-dom writes attributes with no namespace, as
   the DOM does); the `*|` form still matches, and quire's own generated sheet keeps writing it.

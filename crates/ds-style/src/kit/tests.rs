@@ -119,7 +119,7 @@ fn the_design_system_is_one_layer_and_a_user_kit_stays_outside_it() {
     let at = positions(
         &sheet,
         &[
-            "@layer ds, app;",
+            "@layer ds, app, look;",
             "@layer ds {",
             "== one ==",
             "== two ==",

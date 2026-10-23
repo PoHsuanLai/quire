@@ -114,6 +114,7 @@ pub use crate::components::overlays::skeleton::Skeleton;
 pub use crate::components::overlays::skeleton::SkeletonShape;
 pub use crate::components::overlays::skeleton_row::SkeletonLines;
 pub use crate::components::overlays::skeleton_row::SkeletonRow;
+pub use crate::components::overlays::styles_off_notice::StylesOffNotice;
 pub use crate::components::overlays::toast::use_toasts;
 pub use crate::components::overlays::tooltip::Tooltip;
 pub use crate::stack::host::use_overlays;

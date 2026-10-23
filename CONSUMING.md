@@ -321,7 +321,8 @@ fn App() -> Element {
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
 | `sheet` | `Option<&'static str>` | `None`: `ds::stylesheet()` | the text `Inject::Inline` writes; an app that takes `ds-shell` passes `Some(ds_shell::stylesheet())` |
 | `typeface` | `Option<Typeface>` | `None`: the appearance's own | overrides the appearance's typeface for this root |
-| `user_style` | `ReadSignal<UserStyle>` | empty | the person's own stylesheet, drawn after the design system's, unlayered (section 12) |
+| `styles` | `ReadSignal<Styles>` | empty | the look and the person's desktop-wide and per-app stylesheets, drawn after the design system's (section 12) |
+| `custom_styles` | `CustomStyles` | `Use` | `Off` draws none of the three sheets (`appearance.custom_styles`, "Use my styles", section 12) |
 | `surface` | `Option<&'static str>` | `None` | stamped as `data-surface`, the name a user stylesheet selects this root by |
 | `chrome` | `Option<RootChrome>` | `None`: `RootChrome::of(material)` | `Painted` or `Transparent`: whether the root box paints its material. A Popover, Sheet or Toast root is transparent by default (it hosts floating cards, which paint the material themselves); pass `Painted` for a root that *is* the panel (the launcher) — section 6, "bar gaps" |
 | `ground` | `Option<Ground>` | `None`: `Ground::of(material)` | `Paper` or `Frame`: which inks the content takes; Bar and Dock default to `Frame` |
@@ -2001,38 +2002,83 @@ CSS references it directly, since no ds component paints the thumb itself.
 
 ## 12. User styles
 
-A person restyles your app by editing one CSS file, `~/.config/<app>/style.css`, and the change
-shows as they save it (ARCHITECTURE.md section 10). quire owns the mechanism; you wire two things.
+A person restyles your app with CSS, and the change shows as they save it (ARCHITECTURE.md
+section 10). Three sheets sit above your own in the cascade, lowest first: the **look** the person
+chose (`@layer look`, found by the look Extension machinery, not by `Ds`), the person's
+**desktop-wide** style, `~/.config/quire/style.css`, and their style **for your app**,
+`~/.config/<app>/style.css`. The last two are unlayered, desktop-wide first. quire owns the
+mechanism; you wire two things.
 
-**Load and watch it into `Ds`.** `ds_settings::UserStyle` is a `SettingsDoc` for `style.css`: a
-missing file is an empty style and no text is refused at load. `Ds` takes it as
-`user_style: ReadSignal<UserStyle>` and renders it in a `<style data-ds-user>` after the design
-system's own sheet. The design system is `@layer ds` and the person's text is unlayered, so a
-person's rule wins by the cascade whatever its specificity (`.ds-button { ... }` beats quire's
-`.ds-button[data-variant=push]`) and never needs `!important`:
+**Load and watch them into `Ds`.** `ds_settings::UserStyle` is a `SettingsDoc` for `style.css`: a
+missing file is an empty style and no text is refused at load. The desktop-wide file is the same
+document under `AppName::QUIRE`, so you load and `Store::watch` two stores. `Ds` takes the three
+sheets as one value, `styles: ReadSignal<Styles>` (`ds::style::kit::Styles { look, desktop, app,
+homes }`, empty by default), and renders each non-blank one in its own `<style data-ds-style>`
+after the design system's own sheet. The design system is `@layer ds`, your sheets `@layer app`,
+the look `@layer look`, and the person's text is unlayered, so a person's rule wins by the cascade
+whatever its specificity (`.ds-button { ... }` beats quire's `.ds-button[data-variant=push]`) and
+never needs `!important`. `homes` names the folder each sheet may read files from (the look
+Extension's folder, the config folders); a sheet with no home may name `data:` and nothing else.
+`custom_styles: CustomStyles` is `appearance.custom_styles` ("Use my styles"): `Off` draws none of
+the three.
 
 ```rust,ignore
-use ds_settings::{AppName, ConfigRoot, Store, UserStyle};
+use ds::style::kit::{CustomStyles, Styles, UserStyle};
+use ds_settings::{AppName, ConfigRoot, Store};
 
-let store = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
-let mut user_style = use_signal({
-    let store = store.clone();
-    move || store.load::<UserStyle>().value
+let desktop = Store::new(ConfigRoot::Xdg, AppName::QUIRE);
+let own = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
+let mut styles = use_signal({
+    let (desktop, own) = (desktop.clone(), own.clone());
+    move || Styles {
+        desktop: desktop.load::<UserStyle>().value,
+        app: own.load::<UserStyle>().value,
+        ..Styles::default() // the look: your app fills it from the chosen look Extension
+    }
+});
+use_future({
+    let desktop = desktop.clone();
+    move || {
+        let desktop = desktop.clone();
+        async move {
+            let spawner = ds_blitz::TokioSpawner::current();
+            let mut watch = desktop.watch::<UserStyle>(&spawner);
+            while let Some(loaded) = watch.changed().await {
+                styles.write().desktop = loaded.value;
+            }
+        }
+    }
 });
 use_future(move || {
-    let store = store.clone();
+    let own = own.clone();
     async move {
         let spawner = ds_blitz::TokioSpawner::current();
-        let mut watch = store.watch::<UserStyle>(&spawner);
+        let mut watch = own.watch::<UserStyle>(&spawner);
         while let Some(loaded) = watch.changed().await {
-            user_style.set(loaded.value);
+            styles.write().app = loaded.value;
         }
     }
 });
 rsx! {
-    Ds { appearance: Appearance::default(), material: Material::Window, user_style, YourPage {} }
+    // `custom_styles`: `appearance.custom_styles` from the environment ("Use my styles")
+    Ds { appearance: Appearance::default(), material: Material::Window, styles, custom_styles: CustomStyles::Use, YourPage {} }
 }
 ```
+
+**What a sheet may fetch.** `url()`, `@import` and `@font-face` in the three sheets may name
+`data:` or a file inside the sheet's own `home`; anything else is cut before the text reaches the
+`<style>` (a `url()` becomes an empty `data:` URL, an `@import` is removed), and
+`Styles::dropped()` lists each cut with its line for the notes. Your net policy still decides
+which files the document may read at all (`FileRoots`): name the folders of the sheets.
+
+**Do not let a bad style lock the person out.** Before the first window loads styles, call
+`ds_blitz::StylesGuard::begin(&state_dir, "your-app", &styles)` (`state_dir` is
+`ConfigRoot::state_dir(AppName::QUIRE)`). If your last two starts with the same sheets never
+reached a first frame plus five seconds alive, it answers `Load::Without`: draw with
+`custom_styles: CustomStyles::Off`, show `StylesOffNotice { program: "your-app", onturnon }`, and in
+`onturnon` call `guard.turn_on_again(&styles)`. Call `ds_blitz::use_styles_guard(guard)` once in the
+root so the start is marked good. The next change to any of the three sheets clears the guard
+(`guard.changed(&styles)`).
 
 **Publish what a person may rely on.** `ds::selectors` is the table of the selector surface a
 user stylesheet may use: `[data-surface=<name>]` (give a surface root `Ds { surface: Some("bar") }`),
@@ -2045,8 +2091,8 @@ the recommended form (`.ds { --accent: ...; }` restyles every surface consistent
 otherwise, and an unlayered rule beats every `@layer ds` rule, so a `.card { ... }` of yours would
 beat quire's more specific rule where before it lost. Draw each one with `ds::prelude::AppStyle {
 css: MY_CSS }` instead of `style { {MY_CSS} }`: it wraps the text in `@layer app`, after `ds` and
-before the person's unlayered rules, so your rules and quire's keep the order and specificity they
-always had, and the person's still beat both (`ds_style::css::layers` holds the names). Never write
+before the look and the person's unlayered rules, so your rules and quire's keep the order and
+specificity they always had, and the look and the person's still beat both (`ds_style::css::layers` holds the names). Never write
 `@layer ds` in a sheet of your own (`Rule::LayerDs`).
 
 **Report, never block.** `ds_lint::user_stylesheet(css, &ds::kits())` returns notes (unknown

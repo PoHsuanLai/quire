@@ -154,6 +154,15 @@ pub fn OverlaysCataloguePage() -> Element {
                 }
             }
         }
+        Section { title: "StylesOffNotice", note: "StylesOffNotice {{ program, onturnon }}: the one line shown when the crash guard started a program without the person's styles. An InlineBanner with a warning and one action; nothing opens Settings by itself.",
+            div { class: "g-row g-row-top",
+                Specimen { name: "Styles turned off".to_string(),
+                    div { style: "width:520px",
+                        StylesOffNotice { program: "Mail", onturnon: |_| {} }
+                    }
+                }
+            }
+        }
         SkeletonCase {}
         BannerShownCase {}
         crate::pages::overlays::banner_pinned::BannerAndPinned {}

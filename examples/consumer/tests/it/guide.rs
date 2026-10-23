@@ -445,25 +445,45 @@ mod schema {
 /// Section 12, user styles.
 #[component]
 fn UserStyled() -> Element {
-    use ds_settings::{AppName, ConfigRoot, Store, UserStyle};
+    use ds::style::kit::{CustomStyles, Styles, UserStyle};
+    use ds_settings::{AppName, ConfigRoot, Store};
 
-    let store = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
-    let mut user_style = use_signal({
-        let store = store.clone();
-        move || store.load::<UserStyle>().value
+    let desktop = Store::new(ConfigRoot::Xdg, AppName::QUIRE);
+    let own = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
+    let mut styles = use_signal({
+        let (desktop, own) = (desktop.clone(), own.clone());
+        move || Styles {
+            desktop: desktop.load::<UserStyle>().value,
+            app: own.load::<UserStyle>().value,
+            ..Styles::default() // the look: your app fills it from the chosen look Extension
+        }
+    });
+    use_future({
+        let desktop = desktop.clone();
+        move || {
+            let desktop = desktop.clone();
+            async move {
+                let spawner = ds_blitz::TokioSpawner::current();
+                let mut watch = desktop.watch::<UserStyle>(&spawner);
+                while let Some(loaded) = watch.changed().await {
+                    styles.write().desktop = loaded.value;
+                }
+            }
+        }
     });
     use_future(move || {
-        let store = store.clone();
+        let own = own.clone();
         async move {
             let spawner = ds_blitz::TokioSpawner::current();
-            let mut watch = store.watch::<UserStyle>(&spawner);
+            let mut watch = own.watch::<UserStyle>(&spawner);
             while let Some(loaded) = watch.changed().await {
-                user_style.set(loaded.value);
+                styles.write().app = loaded.value;
             }
         }
     });
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window, user_style, YourPage {} }
+        // `custom_styles`: `appearance.custom_styles` from the environment ("Use my styles")
+        Ds { appearance: Appearance::default(), material: Material::Window, styles, custom_styles: CustomStyles::Use, YourPage {} }
     }
 }
 

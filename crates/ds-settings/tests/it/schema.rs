@@ -135,10 +135,40 @@ fn settable(schema: &Schema) -> Vec<&str> {
 }
 
 #[test]
-fn the_derive_marks_theme_and_accent_and_nothing_else_in_the_quire_schema() {
+fn the_derive_marks_theme_accent_and_custom_styles_and_nothing_else_in_the_quire_schema() {
     assert_eq!(
         settable(&quire_schema()),
-        ["appearance.theme", "appearance.accent"]
+        [
+            "appearance.theme",
+            "appearance.accent",
+            "appearance.custom_styles"
+        ]
+    );
+}
+
+#[test]
+fn use_my_styles_is_a_use_off_switch_on_the_appearance_page_that_defaults_to_use() {
+    use ds_settings::schema::{KeyKind, Page, TogglePair};
+    let schema = quire_schema();
+    let key = schema
+        .key
+        .iter()
+        .find(|key| key.path.0 == "appearance.custom_styles")
+        .expect("the key is in the schema");
+    assert_eq!(key.label.0, "Use my styles");
+    assert_eq!(key.page, Page::Appearance);
+    assert_eq!(key.default, toml::Value::String("use".to_owned()));
+    assert_eq!(key.agent, AgentSetting::Settable);
+    let KeyKind::Toggle { variants } = &key.kind else {
+        panic!("a two-word enum is a toggle: {:?}", key.kind);
+    };
+    assert_eq!(variants, &["use".to_owned(), "off".to_owned()]);
+    assert_eq!(
+        TogglePair::of(variants),
+        Some(TogglePair {
+            on: "use".to_owned(),
+            off: "off".to_owned()
+        })
     );
 }
 
@@ -146,7 +176,7 @@ fn the_derive_marks_theme_and_accent_and_nothing_else_in_the_quire_schema() {
 fn a_mark_round_trips_derive_to_toml_to_loader_in_the_wire_form_detent_reads() {
     let schema = quire_schema();
     let text = schema.to_toml();
-    assert_eq!(text.matches("agent = \"settable\"").count(), 2, "{text}");
+    assert_eq!(text.matches("agent = \"settable\"").count(), 3, "{text}");
     // Detent reads the mark from the raw table; the same text must show it there.
     let table: toml::Table = text.parse().expect("the written schema is TOML");
     let marked: Vec<&str> = table["key"]
@@ -156,7 +186,14 @@ fn a_mark_round_trips_derive_to_toml_to_loader_in_the_wire_form_detent_reads() {
         .filter(|key| key.get("agent").and_then(toml::Value::as_str) == Some("settable"))
         .filter_map(|key| key.get("path")?.as_str())
         .collect();
-    assert_eq!(marked, ["appearance.theme", "appearance.accent"]);
+    assert_eq!(
+        marked,
+        [
+            "appearance.theme",
+            "appearance.accent",
+            "appearance.custom_styles"
+        ]
+    );
     let back = Schema::from_toml(&text).unwrap_or_else(|e| panic!("{text}: {e}"));
     assert_eq!(back, schema);
 }

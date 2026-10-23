@@ -13,6 +13,7 @@ use super::key::{AgentSetting, KeySpec};
 pub const AGENT_SETTABLE_PROPOSED: &[&str] = &[
     "appearance.theme",
     "appearance.accent",
+    "appearance.custom_styles",
     "dock.magnification",
     "dock.tile_size_px",
     "dock.magnified_size_px",

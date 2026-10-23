@@ -110,6 +110,7 @@ hand-written. Where a note's default disagrees with the table, the table (the co
 | `appearance.motion_level` | choice {standard, reduced} | `standard` |  | Appearance | Settings |  |
 | `appearance.transparency` | choice {system, reduced} | `system` |  | Appearance | Settings |  |
 | `appearance.typeface` | choice {system, editorial} | `system` |  | Appearance | Settings |  |
+| `appearance.custom_styles` | choice {use, off} | `use` |  | Appearance | Settings | may set |
 | `appearance.material_tint_alpha` | number | `80` | `0..=100` % | Appearance | file only |  |
 | `appearance.material_highlight_light` | number | `30` | `0..=100` % | Appearance | file only |  |
 | `appearance.material_highlight_dark` | number | `12` | `0..=100` % | Appearance | file only |  |
@@ -127,6 +128,7 @@ hand-written. Where a note's default disagrees with the table, the table (the co
 | `appearance.motion_level` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
 | `appearance.transparency` | the portal has no key for it, so ours is a setting; `Reduced` paints every material solid and drops the vibrancy boost; the compositor reads it from this file, as it reads `theme` | `27-HIG-PARITY.md` section 3.1 | settled (adopted in 27) |
 | `appearance.typeface` | RETIRING: The second typeface (Editorial) is dropped (30 section 3.4): one voice, Inter, with Space Mono for code and `Kbd`. Target (clean-up phase): remove the key and `data-typeface`; a stored value is an unknown key | `02-TYPE.md#2-the-faces` | settled; to retire in the clean-up phase (2026-10-02) |
+| `appearance.custom_styles` | "Use my styles": `off` makes `Ds` draw none of the look, the desktop-wide `style.css` or the app's `style.css`, live; the way back from a broken style (customization design section 7.4) | `customization/DESIGN.md` section 7.4 | proposed (2026-10-23) |
 | `appearance.material_tint_alpha` | RETIRING with the tinted chrome: the Space no longer tints the bar, dock, launcher, control centre or OSD (21 section 3), so this key has no reader once the frame model goes | `21-SPACES.md#3-where-the-tint-applies` | settled; to retire in the clean-up phase |
 | `appearance.material_highlight_light` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `appearance.material_highlight_dark` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
@@ -1052,7 +1054,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 
 | Settings app page | Keys shown |
 | --- | --- |
-| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `appearance.transparency`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome); under **Bar**: `bar.autohide` |
+| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `appearance.transparency`, `appearance.custom_styles`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome); under **Bar**: `bar.autohide` |
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.indicators`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into the compositor's `system_actions` and `custom` shortcut files, and the chord the desktop already holds wins a clash, shown on the row (28 §7 decision 10) |
@@ -1418,6 +1420,7 @@ quire's, sill's and detent's tests check their schemas against one source.
 | --- | --- | --- | --- |
 | `appearance.theme` | quire (`AppearanceSettings`) | "make it dark": a visible, instantly reversible preference | proposed (2026-10-03) |
 | `appearance.accent` | quire (`AppearanceSettings`) | the same, one of eight colours | proposed (2026-10-03) |
+| `appearance.custom_styles` | quire (`AppearanceSettings`) | "turn my styles off": the way back from a style that broke a surface, one switch, undone in one click | proposed (2026-10-23) |
 | `dock.magnification` | sill (`DockSettings`) | on/off, cosmetic | proposed (2026-10-03) |
 | `dock.tile_size_px` | sill (`DockSettings`) | bounded slider, cosmetic | proposed (2026-10-03) |
 | `dock.magnified_size_px` | sill (`DockSettings`) | bounded slider, cosmetic | proposed (2026-10-03) |
@@ -1434,7 +1437,8 @@ a program's own schema still decides which other keys it marks settable.
 agent that could raise its own budget or switch computer use on would be its own gatekeeper.
 
 The marks of sill's and detent's own keys live in their schemas; quire marks only what
-`quire/appearance.toml` owns (`appearance.theme`, `appearance.accent`).
+`quire/appearance.toml` owns (`appearance.theme`, `appearance.accent`,
+`appearance.custom_styles`).
 
 ### 9.8 Pages, controls, targets, patches and ranges (v0.3.36)
 

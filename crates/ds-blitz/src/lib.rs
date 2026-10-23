@@ -1,6 +1,7 @@
 //! Blitz glue for quire: launching an app and opening its windows, registering the faces, the
 //! clipboard and the host seams (`provide_host`), PDF output (feature `pdf`), printing (feature
-//! `print`), spellchecking (feature `spell`), the menu bar exported over D-Bus (feature `menus`),
+//! `print`), spellchecking (feature `spell`), the crash guard for the person's styles
+//! (`styles_guard`), the menu bar exported over D-Bus (feature `menus`),
 //! and the device-pixel layout snap (`snap`). The only
 //! quire crate that names the blitz crates; the test driver lives in `ds-harness`, which builds
 //! its document from the parts in `seam` (feature `testing`).
@@ -87,6 +88,7 @@ pub mod snap;
 #[cfg(feature = "spell")]
 pub mod spell;
 mod startup_token;
+pub mod styles_guard;
 mod texture_layer;
 mod wake;
 #[cfg(all(target_os = "linux", feature = "quire-desktop"))]
@@ -147,6 +149,7 @@ pub use print::{PrintError, PrintOutcome, print_dialog};
 pub use quire_emoji::{EMOJI_FAMILY_ENV, EmojiChoice, colrv1_emoji_file};
 pub use shell_keys::ShellKeys;
 pub use snap::snap_to_device;
+pub use styles_guard::{StylesGuard, use_styles_guard};
 pub use texture_layer::{
     Gpu, GpuError, Pace, PixelFormat, Pixels, PixelsError, Sampling, TexelRect, Texels, TextureFit,
     TextureHandle, TextureLayer, use_gpu,

@@ -10,6 +10,7 @@ use ds_style::appearance::motion::Motion;
 use ds_settings::{AppearanceFile, IconDarkVariant, Loaded, Percent, PlateGlyphPolicy};
 use ds_style::appearance::theme::Theme;
 use ds_style::appearance::transparency::Transparency;
+use ds_style::kit::CustomStyles;
 use std::path::Path;
 use support::Scratch;
 
@@ -185,6 +186,20 @@ fn a_bad_value_costs_only_its_own_field() {
             text: "[appearance]\ntransparency = \"clear\"\ntheme = \"dark\"\n",
             want: with(|f| f.appearance.theme = Theme::Dark),
             invalid: &["appearance.transparency"],
+            clamped: &[],
+        },
+        Case {
+            name: "use my styles off is read",
+            text: "[appearance]\ncustom_styles = \"off\"\n",
+            want: with(|f| f.appearance.custom_styles = CustomStyles::Off),
+            invalid: &[],
+            clamped: &[],
+        },
+        Case {
+            name: "an unknown custom_styles costs only itself",
+            text: "[appearance]\ncustom_styles = \"maybe\"\ntheme = \"dark\"\n",
+            want: with(|f| f.appearance.theme = Theme::Dark),
+            invalid: &["appearance.custom_styles"],
             clamped: &[],
         },
         Case {

@@ -46,6 +46,7 @@ mod removed_focus;
 mod root_contexts;
 mod selection_same_frame;
 mod strip_hit_area;
+mod styles_guard;
 mod support;
 mod text_stack_fonts;
 mod user_style_reload;

@@ -1,13 +1,14 @@
 //! The cascade layers (ARCHITECTURE.md section 10): the design system is `@layer ds`, a consumer's
-//! `AppStyle` sheet is `@layer app`, and the person's own style is unlayered. A one-class user
-//! rule beats quire's own attribute-qualified rule, and a one-class app rule beats it too, and a
-//! user rule beats an app rule that is more specific: specificity only ever sorts rules inside
-//! one layer.
+//! `AppStyle` sheet is `@layer app`, the chosen look is `@layer look`, and the person's own styles
+//! are unlayered. A one-class user rule beats quire's own attribute-qualified rule, and a
+//! one-class app rule beats it too, a look beats a more specific app rule, and a user rule beats
+//! a look or an app rule that is more specific: specificity only ever sorts rules inside one
+//! layer.
 
 use dioxus::prelude::*;
 use ds::prelude::*;
+use ds::style::kit::{LookStyle, Styles, UserStyle};
 use ds_harness::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
-use ds_settings::UserStyle;
 use std::cell::Cell;
 
 const VIEW: Viewport = Viewport {
@@ -17,19 +18,24 @@ const VIEW: Viewport = Viewport {
 };
 
 thread_local! {
-    static SHEETS: Cell<(&'static str, &'static str)> = const { Cell::new(("", "")) };
+    static SHEETS: Cell<(&'static str, &'static str, &'static str)> =
+        const { Cell::new(("", "", "")) };
 }
 
 #[allow(non_snake_case)]
 fn Desk() -> Element {
-    let (app, user) = SHEETS.get();
-    let user_style = use_signal(|| UserStyle(user.to_owned()));
+    let (app, look, user) = SHEETS.get();
+    let styles = use_signal(|| Styles {
+        look: LookStyle(look.to_owned()),
+        desktop: UserStyle(user.to_owned()),
+        ..Styles::default()
+    });
     rsx! {
         Ds {
             appearance: Appearance::default(),
             material: Material::Window,
             sheet: Some(ds_shell::stylesheet()),
-            user_style,
+            styles,
             if !app.is_empty() {
                 AppStyle { css: app }
             }
@@ -40,7 +46,12 @@ fn Desk() -> Element {
 
 /// The button's painted fill with `app` and `user` as the two sheets.
 fn fill(app: &'static str, user: &'static str) -> [u8; 4] {
-    SHEETS.set((app, user));
+    fill_with_look(app, "", user)
+}
+
+/// The same with a look between them.
+fn fill_with_look(app: &'static str, look: &'static str, user: &'static str) -> [u8; 4] {
+    SHEETS.set((app, look, user));
     let harness = Harness::new(Desk, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let Srgba(c) = harness
         .fill_of(".ds-button", Part::Element)
@@ -75,5 +86,16 @@ fn a_user_rule_beats_a_more_specific_app_rule() {
             ".ds-button { background: rgb(0,255,0) }"
         ),
         GREEN
+    );
+}
+
+#[test]
+fn a_look_beats_a_more_specific_app_rule_and_a_user_rule_beats_the_look() {
+    let app = ".ds .ds-button.ds-button[data-variant] { background: rgb(0,0,255) }";
+    let look = ".ds-button { background: rgb(0,255,0) }";
+    assert_eq!(fill_with_look(app, look, ""), GREEN);
+    assert_eq!(
+        fill_with_look("", look, ".ds-button { background: rgb(0,0,255) }"),
+        BLUE
     );
 }
