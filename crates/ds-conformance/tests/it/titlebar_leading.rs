@@ -68,7 +68,9 @@ fn the_leading_slot_is_drawn_after_the_lights_and_before_the_title() {
     let harness = start(Led);
     let html = harness.html();
     let lights = html.find("class=\"ds-lights").expect("lights");
-    let slot = html.find("class=\"ds-titlebar-leading").expect("leading slot");
+    let slot = html
+        .find("class=\"ds-titlebar-leading")
+        .expect("leading slot");
     let title = html.find("class=\"ds-titlebar-title").expect("title area");
     assert!(lights < slot && slot < title, "{html}");
     assert!(centre(&harness, ".ds-titlebar-leading .side").x.0 < VIEW.width as f32 / 4.0);
