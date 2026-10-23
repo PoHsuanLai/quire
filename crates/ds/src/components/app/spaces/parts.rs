@@ -20,6 +20,9 @@ pub(super) fn placed() -> Placement {
 /// The Space's name in a field that takes the keyboard, selected so typing replaces it. Each
 /// keystroke renames the Space; Return and a click outside close it, keeping the name, and
 /// Escape closes it with the name it opened on put back.
+///
+/// A new Space ([`SpacesHandle::begin_new`]) is named here before it is in the list: Return
+/// with a name adds it, and Escape or a click outside drops it.
 #[component]
 pub(super) fn RenamePart<P, R>(at: Point, space: SpaceId, handle: SpacesHandle<P, R>) -> Element
 where
@@ -35,12 +38,15 @@ where
             .map(|space| space.name.clone())
             .unwrap_or_default()
     });
-    let Some(name) = handle
-        .spaces()
-        .read()
-        .get(space)
-        .map(|space| space.name.clone())
-    else {
+    let pending = handle.pending_as(space);
+    let new = pending.is_some();
+    let Some(name) = pending.map(|space| space.name).or_else(|| {
+        handle
+            .spaces()
+            .read()
+            .get(space)
+            .map(|space| space.name.clone())
+    }) else {
         return rsx! {};
     };
     rsx! {
@@ -56,9 +62,20 @@ where
                     label: "Space name",
                     value: name,
                     focus,
-                    oninput: move |typed: String| handle.change(space, |one| one.name = typed),
+                    oninput: move |typed: String| {
+                        if new {
+                            handle.rename_pending(typed);
+                        } else {
+                            handle.change(space, |one| one.name = typed);
+                        }
+                    },
                     onkey: move |event: KeyboardEvent| {
                         match event.key() {
+                            // A new Space is added with its name, never with none.
+                            Key::Enter if new => {
+                                event.prevent_default();
+                                handle.keep_pending();
+                            }
                             Key::Enter => {
                                 event.prevent_default();
                                 handle.close_menu();
@@ -66,8 +83,10 @@ where
                             Key::Escape => {
                                 event.prevent_default();
                                 event.stop_propagation();
-                                let old = opened_on.clone();
-                                handle.change(space, move |one| one.name = old);
+                                if !new {
+                                    let old = opened_on.clone();
+                                    handle.change(space, move |one| one.name = old);
+                                }
                                 handle.close_menu();
                             }
                             _ => {}

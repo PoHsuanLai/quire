@@ -53,6 +53,10 @@ where
     let Some(open) = handle.open() else {
         return rsx! {};
     };
+    // A new Space is named before it is in the list.
+    if open.showing == Showing::Rename {
+        return rsx! { RenamePart { at: open.at, space: open.space, handle } };
+    }
     let Some(space) = handle.spaces().read().get(open.space).cloned() else {
         return rsx! {};
     };
@@ -85,10 +89,7 @@ where
                                 }
                                 _ => handle.show(id, at, part),
                             },
-                            Then::NewSpace => {
-                                let made = handle.add(new_payload.call(()));
-                                handle.show(made, at, Showing::Rename);
-                            }
+                            Then::NewSpace => handle.begin_new(new_payload.call(()), at),
                             Then::Link(change) => {
                                 match &change {
                                     LinkChange::Linked(desktop) => {
@@ -118,7 +119,7 @@ where
                 }
             }
         }
-        Showing::Rename => rsx! { RenamePart { at, space: id, handle } },
+        Showing::Rename => rsx! {},
         Showing::Edit => rsx! { EditSpaceSheet { space: id, handle } },
         Showing::Delete => rsx! {
             DeletePart {
