@@ -94,6 +94,10 @@ first, with what a consumer has to change.
 
 - Accounts forms gain `FieldRole::ServerUrl` ("Server address", hint `https://server.example.org/v1`) for porter's `FieldKind::ServerUrl` (porter e91eb7a4). An exhaustive `match` on `FieldRole` needs one more arm.
 
+### anyview ask
+
+- ds-style's PNG decoding for status icons (`icon::classify::classify_with`) is behind a new feature `icon-classify`, on by default and enabled by `ds`. ds-settings, ds-extensions, ds-lint and ds-motion take ds-style without it, so a program that only reads settings or Extensions no longer links the `image` decoder. A crate that names `ds-style` directly and calls `classify_with` keeps the default or names the feature.
+
 ### pins
 
 - bayonet moves 0f5897c3 -> d66e243: an Extension entry may name a program or library outside its folder (`Provides::reach`), and an Extension's `version` may carry a semver pre-release (`0.1.0-beta.1`, ranked below its release). Pin bayonet d66e243 beside quire v0.3.46.

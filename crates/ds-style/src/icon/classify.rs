@@ -59,12 +59,15 @@ impl TryFrom<f32> for ChromaLimit {
     }
 }
 
+#[cfg(feature = "icon-classify")]
 /// The alpha at which a pixel counts as opaque: half coverage. Fainter edge pixels carry
 /// too little of their colour to say anything about it.
 const OPAQUE_FROM: u8 = 128;
 
 /// Whether the PNG `png` is a symbolic or an image icon: symbolic when every pixel with at
 /// least half coverage has OKLCH chroma below `limit` (a fully transparent icon is symbolic).
+/// Needs the `icon-classify` feature (on by default), which links the PNG decoder.
+#[cfg(feature = "icon-classify")]
 pub fn classify_with(png: &[u8], limit: ChromaLimit) -> Result<IconKind, DsError> {
     let decoded = image::load_from_memory_with_format(png, image::ImageFormat::Png)
         .map_err(|error| DsError::IconDecode {
@@ -84,11 +87,12 @@ pub fn classify_with(png: &[u8], limit: ChromaLimit) -> Result<IconKind, DsError
 }
 
 /// The OKLCH chroma of an sRGB colour.
+#[cfg(feature = "icon-classify")]
 pub(crate) fn chroma(rgb: [u8; 3]) -> f64 {
     Oklch::from(Oklab::from(Srgb(rgb))).c
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "icon-classify"))]
 mod tests {
     use super::{ChromaLimit, IconKind, chroma, classify_with};
     use image::{ImageFormat, Rgba, RgbaImage};

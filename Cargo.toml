@@ -37,7 +37,7 @@ publish = false
 
 [workspace.dependencies]
 ds-core            = { path = "crates/ds-core" }
-ds-style           = { path = "crates/ds-style" }
+ds-style           = { path = "crates/ds-style", default-features = false }
 ds-motion          = { path = "crates/ds-motion" }
 ds-lint            = { path = "crates/ds-lint" }
 ds                 = { path = "crates/ds" }

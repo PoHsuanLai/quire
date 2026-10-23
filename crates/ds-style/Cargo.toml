@@ -14,8 +14,9 @@ ds-core-derive = { workspace = true }
 dioxus = { workspace = true, optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-# Decoding a status icon's PNG to decide symbolic or image (design/08-ICONS.md section 1.5).
-image = { workspace = true }
+# Decoding a status icon's PNG to decide symbolic or image (design/08-ICONS.md section 1.5), behind
+# `icon-classify`.
+image = { workspace = true, optional = true }
 
 [lints]
 workspace = true
@@ -28,9 +29,14 @@ skrifa = { workspace = true }
 
 [dev-dependencies.ds-style]
 workspace = true
-features = ["dioxus"]
+features = ["dioxus", "icon-classify"]
 
 [features]
+default = ["icon-classify"]
+# `icon::classify::classify_with`: decoding a status icon's PNG to decide symbolic or image. It links
+# the `image` decoder, so a crate that only reads settings or Extensions (ds-settings,
+# ds-extensions) takes ds-style without it; an app that classifies status icons keeps the default.
+icon-classify = ["dep:image"]
 # The scope, scale, task and busy hooks and the `Glyph` component. Without it the crate is plain
 # data (appearance, tokens, palettes, icons, CSS text), so a crate that only reads settings can
 # name the appearance enums without linking Dioxus.
