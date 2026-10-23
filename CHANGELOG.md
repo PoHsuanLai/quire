@@ -94,6 +94,11 @@ first, with what a consumer has to change.
 
 - Accounts forms gain `FieldRole::ServerUrl` ("Server address", hint `https://server.example.org/v1`) for porter's `FieldKind::ServerUrl` (porter e91eb7a4). An exhaustive `match` on `FieldRole` needs one more arm.
 
+### pins
+
+- bayonet moves 0f5897c3 -> d66e243: an Extension entry may name a program or library outside its folder (`Provides::reach`), and an Extension's `version` may carry a semver pre-release (`0.1.0-beta.1`, ranked below its release). Pin bayonet d66e243 beside quire v0.3.46.
+- tokio 1.53.3 (RUSTSEC-2026-0386).
+
 ## v0.3.45
 
 ### wh-e1a

@@ -64,7 +64,7 @@ ds-harness         = { path = "crates/ds-harness", default-features = false }
 # manifests, scans folders and ranks (the wire-only build has none of that); `testing`, the fake
 # plugin, is not asked for. ds-extensions never starts a plugin program: the owners of
 # program-carrying words do, with bayonet's runner.
-bayonet = { git = "https://github.com/PoHsuanLai/bayonet.git", rev = "0f5897c30033287b7df4e76dd653698b8ec5f3df", default-features = false, features = ["host"] }
+bayonet = { git = "https://github.com/PoHsuanLai/bayonet.git", rev = "d66e243188033c1b7c74e636cb5f548f75caecb8", default-features = false, features = ["host"] }
 
 # ---- BEGIN PINNED BLOCK (source of truth: quire/docs/workspace-deps.toml) ----
 # Copied verbatim into [workspace.dependencies] of quire, shell-host and sill. Bumped only by a
