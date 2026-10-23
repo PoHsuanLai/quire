@@ -331,6 +331,11 @@ fn the_markup_glyphs_are_outline_actions_with_both_forms() {
     assert_eq!(Icon::Line.shapes(), &[Shape::Path("M22 2 2 22")]);
     assert!(matches!(
         Icon::Table.shapes(),
-        [Shape::Path(_), Shape::Rect { .. }, Shape::Path(_), Shape::Path(_)]
+        [
+            Shape::Path(_),
+            Shape::Rect { .. },
+            Shape::Path(_),
+            Shape::Path(_)
+        ]
     ));
 }

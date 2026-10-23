@@ -75,15 +75,9 @@ const PEN_LINE: &[Shape] = &[Shape::Solid(
 
 /// Tabler Icons 3.48.0 `filled/list` (MIT), verbatim except for the invisible bounding path.
 const LIST_TREE: &[Shape] = &[
-    Shape::Solid(
-        "M21 6a1 1 0 0 1 -1 1h-10a1 1 0 1 1 0 -2h10a1 1 0 0 1 1 1",
-    ),
-    Shape::Solid(
-        "M21 12a1 1 0 0 1 -1 1h-10a1 1 0 0 1 0 -2h10a1 1 0 0 1 1 1",
-    ),
-    Shape::Solid(
-        "M21 18a1 1 0 0 1 -1 1h-10a1 1 0 0 1 0 -2h10a1 1 0 0 1 1 1",
-    ),
+    Shape::Solid("M21 6a1 1 0 0 1 -1 1h-10a1 1 0 1 1 0 -2h10a1 1 0 0 1 1 1"),
+    Shape::Solid("M21 12a1 1 0 0 1 -1 1h-10a1 1 0 0 1 0 -2h10a1 1 0 0 1 1 1"),
+    Shape::Solid("M21 18a1 1 0 0 1 -1 1h-10a1 1 0 0 1 0 -2h10a1 1 0 0 1 1 1"),
     Shape::Solid(
         "M7 5.995v.02c0 1.099 -.895 1.99 -2 1.99s-2 -.891 -2 -1.99v-.02c0 -1.099 .895 -1.99 2 -1.99s2 .891 2 1.99",
     ),
