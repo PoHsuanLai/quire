@@ -19,7 +19,7 @@ pub(crate) struct ContainerAttrs {
 }
 
 /// What a field's attributes say about its kind, ahead of its type.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum KindHint {
     /// `range = "a..=b"`: a bounded number from `min` to `max`.
     Bounded {
@@ -30,6 +30,12 @@ pub(crate) enum KindHint {
     },
     /// `text`: free text whatever the type (a `SoundTheme(String)` newtype).
     Text,
+    /// `provided = "look"`: a choice among installed things that provide the capability, stored as
+    /// `"standard"` or an id (a `Provided` field).
+    Provided {
+        /// The capability the choices provide.
+        capability: String,
+    },
     /// Neither: the type decides (`crate::shape`).
     Infer,
 }
@@ -44,7 +50,7 @@ pub(crate) enum AgentMark {
 }
 
 /// `#[settings(label = "...", help = "...", section = "...", range = "a..=b", unit = "...",
-/// control = "...", advanced, text, agent_settable)]` on one field, or `#[settings(skip)]` on one that is not a key at all (a
+/// control = "...", provided = "...", advanced, text, agent_settable)]` on one field, or `#[settings(skip)]` on one that is not a key at all (a
 /// `#[serde(flatten)] extra: toml::Table` catch-all is the only field this workspace's structs
 /// use it for today).
 #[derive(Debug)]
@@ -60,7 +66,7 @@ pub(crate) enum FieldAttrs {
         advanced: bool,
         /// `agent_settable` or nothing.
         agent: AgentMark,
-        /// `text`, `range` (with its ends) or neither.
+        /// `text`, `range` (with its ends), `provided` (with its capability) or none.
         hint: KindHint,
         /// `control = "picture"`: the control that draws the key when its kind's default is not
         /// the one wanted.
@@ -124,6 +130,7 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
     let mut skip = false;
     let mut agent = AgentMark::HandsOff;
     let mut text = false;
+    let mut provided = None;
     let mut found = false;
     for attr in settings_attrs(attrs) {
         found = true;
@@ -149,11 +156,13 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
                 skip = true;
             } else if meta.path.is_ident("text") {
                 text = true;
+            } else if meta.path.is_ident("provided") {
+                provided = Some(lit_str(&meta)?);
             } else {
                 return Err(meta.error(
                     "unknown #[settings(...)] attribute on a field; expected `label`, `help`, \
-                     `section`, `range`, `unit`, `control`, `advanced`, `text`, `agent_settable` \
-                     or `skip`",
+                     `section`, `range`, `unit`, `control`, `provided`, `advanced`, `text`, \
+                     `agent_settable` or `skip`",
                 ));
             }
             Ok(())
@@ -171,17 +180,27 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
              9.5: a key exists only if a KeySpec describes it)",
         ));
     }
-    let hint = match (range, text) {
-        (Some(_), true) => {
+    let hint = match (range, text, provided) {
+        (None, false, Some(capability)) if !capability.is_empty() => {
+            KindHint::Provided { capability }
+        }
+        (_, _, Some(_)) => {
+            return Err(syn::Error::new(
+                span,
+                "#[settings(...)]: `provided` names a capability and goes alone, without \
+                 `text` or `range`",
+            ));
+        }
+        (Some(_), true, None) => {
             return Err(syn::Error::new(
                 span,
                 "#[settings(...)]: `text` and `range` cannot both be given; a key is either \
                  free text or a bounded number",
             ));
         }
-        (Some((min, max)), false) => KindHint::Bounded { min, max },
-        (None, true) => KindHint::Text,
-        (None, false) => KindHint::Infer,
+        (Some((min, max)), false, None) => KindHint::Bounded { min, max },
+        (None, true, None) => KindHint::Text,
+        (None, false, None) => KindHint::Infer,
     };
     Ok(FieldAttrs::Key {
         label: label.ok_or_else(|| missing(span, "label"))?,
@@ -381,6 +400,33 @@ mod tests {
                 panic!("{attr}: expected FieldAttrs::Key");
             };
             assert_eq!(hint, *want, "{attr}");
+        }
+    }
+
+    #[test]
+    fn provided_names_a_capability_and_goes_alone() {
+        let attrs = first_field_attrs(
+            "struct S { #[settings(label = \"L\", provided = \"look\")] f: Provided }",
+        );
+        let FieldAttrs::Key { hint, .. } = field_attrs(attrs[0].span(), &attrs).unwrap() else {
+            panic!("expected FieldAttrs::Key");
+        };
+        assert_eq!(
+            hint,
+            KindHint::Provided {
+                capability: "look".to_owned()
+            }
+        );
+        const BAD: &[&str] = &[
+            "#[settings(label = \"L\", provided = \"look\", text)]",
+            "#[settings(label = \"L\", provided = \"look\", range = \"0..=9\")]",
+            "#[settings(label = \"L\", provided = \"\")]",
+        ];
+        for attr in BAD {
+            let source = format!("struct S {{ {attr} f: Provided }}");
+            let attrs = first_field_attrs(&source);
+            let err = field_attrs(attrs[0].span(), &attrs).unwrap_err();
+            assert!(err.to_string().contains("`provided`"), "{attr}: {err}");
         }
     }
 

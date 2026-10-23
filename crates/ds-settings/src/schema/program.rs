@@ -95,6 +95,17 @@ impl Schema {
             .map_err(|error| error.source)?;
         Ok(target)
     }
+
+    /// Writes `<app-id>.<part>.settings.toml` into `dir`: the schema of a second file the same
+    /// program owns, which [`discover`] admits beside its `<app-id>.settings.toml`
+    /// (`quire.extensions.settings.toml` for `quire/extensions.toml`).
+    pub fn write_part_to(&self, dir: &Path, part: &str) -> io::Result<PathBuf> {
+        std::fs::create_dir_all(dir)?;
+        let target = dir.join(format!("{}.{part}.settings.toml", self.app.0));
+        write_atomic(&target, self.to_toml().as_bytes(), NewFileMode::Umask)
+            .map_err(|error| error.source)?;
+        Ok(target)
+    }
 }
 
 /// The most a schema file may hold: a few KiB for a program with a hundred keys.
@@ -163,7 +174,16 @@ fn admit(path: &Path, found: &[Schema]) -> Result<Schema, String> {
         .file_name()
         .and_then(|name| name.to_str())
         .and_then(|name| name.strip_suffix(SCHEMA_SUFFIX));
-    if named_for != Some(app) {
+    // `<app>.settings.toml`, or `<app>.<part>.settings.toml` for a second file the same program
+    // owns (quire's `extensions.toml` beside `appearance.toml`).
+    let named = named_for.is_some_and(|name| {
+        name == app
+            || name
+                .strip_prefix(app)
+                .and_then(|rest| rest.strip_prefix('.'))
+                .is_some_and(|part| !part.is_empty() && !part.contains('.'))
+    });
+    if !named {
         return Err(format!("the file is not named for its program, {app}"));
     }
     if schema.file.0.split('/').next() != Some(app) {
@@ -172,9 +192,13 @@ fn admit(path: &Path, found: &[Schema]) -> Result<Schema, String> {
             schema.file.0
         ));
     }
-    if found.iter().any(|earlier| earlier.app == schema.app) {
+    if found
+        .iter()
+        .any(|earlier| earlier.app == schema.app && earlier.file == schema.file)
+    {
         return Err(format!(
-            "{app} already has a schema in an earlier directory"
+            "{app} already has a schema for {} in an earlier directory",
+            schema.file.0
         ));
     }
     Ok(schema)

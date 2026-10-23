@@ -4,7 +4,7 @@
 //! only its own key; a key a struct does not read is reported on load and dropped on save.
 
 use crate::region::RegionSettings;
-use crate::schema::Page;
+use crate::schema::{Page, Provided};
 use crate::units::{Fraction, Percent};
 use ds_core::word::Word;
 use ds_style::appearance::accent::Accent;
@@ -65,6 +65,18 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub typeface: Typeface,
+    /// `appearance.look`: `standard`, or the id of an installed look Extension (a stylesheet
+    /// that restyles every quire surface). A stored id that is not installed, or is turned off,
+    /// reads as `standard` where the installed Extensions are known and is reported once.
+    #[settings(
+        label = "Look",
+        help = "Standard, or a look you added in Extensions. A look restyles every window; \
+                choosing Standard puts the desktop back as it shipped.",
+        section = "Appearance",
+        provided = "look",
+        agent_settable
+    )]
+    pub look: Provided,
     /// `appearance.custom_styles`: whether the look and the person's own stylesheets are drawn.
     /// `off` is the way back from a style that broke a surface; it is a switch, "Use my styles".
     #[settings(
@@ -155,6 +167,7 @@ impl Default for AppearanceSettings {
             motion_level: Motion::Standard,
             transparency: Transparency::System,
             typeface: Typeface::System,
+            look: Provided::standard(),
             custom_styles: CustomStyles::Use,
             material_tint_alpha: Percent(80),
             material_highlight_light: Percent(30),

@@ -132,6 +132,7 @@ fn shape(kind: &KeyKind) -> (String, String) {
                 format!("`{min}..={max}` {unit}").trim_end().to_owned(),
             )
         }
+        KeyKind::Provided { capability } => (format!("provided ({capability})"), String::new()),
         KeyKind::Text => ("text".to_owned(), String::new()),
         KeyKind::Colour => ("colour".to_owned(), String::new()),
         KeyKind::Shortcut => ("shortcut".to_owned(), String::new()),

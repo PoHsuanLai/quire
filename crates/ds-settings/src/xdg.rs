@@ -47,8 +47,9 @@ pub fn base_dir(xdg: Option<&OsStr>, home: Option<&OsStr>, under_home: &str) -> 
 }
 
 /// The directories of a `:`-separated search list such as `$XDG_DATA_DIRS`: `value` when it is
-/// set and non-empty, else [`DEFAULT_DATA_DIRS`], with every empty or relative entry dropped.
-pub(crate) fn search_dirs(value: Option<&OsStr>) -> Vec<PathBuf> {
+/// set and non-empty, else `/usr/local/share:/usr/share`, with every empty or relative entry
+/// dropped.
+pub fn search_dirs(value: Option<&OsStr>) -> Vec<PathBuf> {
     let list = value
         .filter(|value| !value.is_empty())
         .unwrap_or_else(|| OsStr::new(DEFAULT_DATA_DIRS));

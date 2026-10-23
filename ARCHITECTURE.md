@@ -30,6 +30,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-settings-page` | `SettingsPage`: a settings schema drawn as grouped rows with the control each key kind gets, and room for an app's own rows; its own crate because it needs `ds` and `ds-settings`, which may not name each other |
 | `ds-settings` | `SettingsDoc` + `Store`: lenient load (a number outside its range held to it and reported), atomic save under the file's lock (a TOML file is merged into, so unknown keys and comments stay; a damaged file kept under a `.bad` name, never overwritten), `xdg` (the XDG base-directory rules, public: `base_dir` and the `*_UNDER_HOME` defaults), watch, schema, appearance file, portal, icon-theme lookup |
 | `ds-helpers` | the safe file reader and writer every quire crate shares (`files`: `read_capped`, `read_text_capped`, `write_atomic`, `update_atomic` (read, edit and write back under an in-process lock and a sidecar `flock`), `move_aside`; std plus `rustix` for the lock on Unix, no UI), and missing helpers: the helpers file (capability, probe, per-distro package alternatives), the PATH probe, the distro family and its install command, `OsRelease` (the `ID`, `ID_LIKE` and `VERSION_ID` of an os-release text, which `Family::detect` is built on), `DesktopFile` (a `.desktop` file's text as groups and keys: localized keys by `EntryLocale`, the value escapes, `;` lists, booleans, capped by `DESKTOP_ENTRY_CAP`; pure, the text comes from the caller; `Exec` field codes stay the caller's), the PackageKit installer (and a fake), the availability feed, and for a request nothing can install (no PackageKit, as on a stock Arch) the `Missing::install_lines` to copy |
+| `ds-extensions` | Extensions, as a library with no UI, runtime or bus: `Search` (explicit roots, or `from_env`) scans `<data>/quire/extensions/<id>/extension.toml` through bayonet's folder layout and returns every copy of every id unranked with the turned-off ones apart and named (`Found`, `Off`); `Found::resolve` checks and ranks the entries of this crate's words (`Capability`: `file_icons`, `look`; `Provision` is the bayonet `Provides` type and claims only those words, so another owner reparses the raw candidates itself); the checks (paths inside the folder, a stylesheet under `STYLESHEET_CAP_BYTES`) and the plain-words `Problem`; `Choices`/`choices_for`/`chosen` for a `Provided` settings key; `look::stylesheet_for`; `ExtensionsFile` (`quire/extensions.toml`, `extensions.off`) |
 | `ds-peer` | a deadline for every call to another process: `Deadline` (named waits: read, start, action, prompt), `within`, and the typed `NotAnswering` a screen shows as "X is not answering"; no runtime, no bus |
 | `ds-desktop` | which extras of our desktop are here: `Capability` with its D-Bus name, `Desktop::probe` and `watch` over name ownership (feature `dbus`), `Outputs` (the shell's per-output work area and scale from `org.quire.Outputs1`, empty without it; `Outputs::read`/`watch` need `dbus`), `use_desktop` (feature `dioxus`); everything `Absent` without `dbus` |
 | `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell`, `menus`, `debug-probe` (a test build only: `QUIRE_DEBUG_PROBE=<dir>` makes each window write its controls by role and name with their boxes, `ds-blitz::probe`) |
@@ -55,6 +56,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-shell` | `ds`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-settings-page` | `ds` (the rows and controls), `ds-settings` (the schema types) |
 | `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-behaviour` (the switcher and hot-corner settings convert into its machine params), `ds-helpers` (the capped reader and durable writer, `files`), `ds-settings-derive`, `ds-peer` (the deadline on each call to a daemon or the portal) |
+| `ds-extensions` | `ds-core`, `ds-settings` (the `Provided` kind and the schema'd `extensions.toml`), `ds-helpers` (the capped reader for a look's stylesheet); bayonet (a git dependency) for manifests, the folder scan and the registry. `ds-settings` never names it |
 | `ds-peer` | nothing of ours |
 | `ds-helpers` | `ds-peer` |
 | `ds-desktop` | `ds-peer` |
@@ -81,6 +83,7 @@ anyview, `examples/consumer`) depend on `ds` (+ `ds-shell` for the account and h
 | `ds-style` | `dioxus` unless feature `dioxus` (appearance, tokens, palettes, icons and CSS text are plain data, so a compositor links them without it) |
 | `ds-motion` | `dioxus` unless feature `dioxus` (recipes, keyframes, springs, throws, timelines, `Touch` as data; the hooks, timers and `Touch`'s event conversions are the feature) |
 | `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
+| `ds-extensions` | `zbus`, `tokio`, `winit`, `dioxus`, every `blitz*`, `dioxus-native*`, `anyrender*`, `wgpu`, `wgpu_context`, `pdfrum*` (a library every host links: no UI, no runtime, no bus) |
 | `ds-helpers` | every `blitz*`, `dioxus*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (zbus brings its own executor; the tests use tokio as a dev-dependency) |
 | `ds-desktop` | every `blitz*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (dev-dependency only); `zbus` unless feature `dbus`; `dioxus` unless feature `dioxus` |
 | `ds-blitz` | `zbus` unless feature `print` or `menus`; `memfd` unless `print`; `pdfrum*` unless `pdf` |
@@ -101,6 +104,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space` (palette, look, presets, frame vars, store, and `list`: the pure list of an app's Spaces), `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `machine` (the hooks that run a `Machine`: `use_machine`, `use_machine_in`, `use_machine_state`, `MachineRef`, `MachineState`), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-behaviour` | `dir` (`Dir`) < `switcher`, `hot_corner`, `modifier_tap` (`tap`, `hold`), `space_swipe` (`numbers`, `velocity`, `finish`; each concept holds `model`, `step`, `tests`) |
+| `ds-extensions` | `capability` (`Capability`) < `fault` < `look`, `file_icons` (one entry type each) < `provision` (`Provision`, the `Provides` impl) < `search` (`Search`, `Found`, `Off`) < `resolve` (`Found::resolve`, `Resolved`, `Problem`) < `choices` (`Choices`, `chosen`) < `extensions_file` |
 | `ds-peer` | `deadline` (`Deadline`) < `within` (`within`, `NotAnswering`) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `keys` (the window's chordkit keymap), `machine` (re-exports `ds_motion::machine`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `forms` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
@@ -331,7 +335,7 @@ The single place a concept lives. Extend it; never write a second one.
 | The names one app is known by (desktop id, window `app_id`, session-bus names, intents app) | `ds-helpers::AppIdentity`, read from the `X-Quire-WindowId`, `X-Quire-BusNames` and `X-Quire-IntentsApp` keys of the app's desktop entry; nothing guesses one name from another |
 | Settings file I/O (lenient load, atomic save, watch) | `ds-settings::store::Store` |
 | Settings schema | `ds-settings::schema` (derived) |
-| Where in Settings a link points (a page, a key, an account) and its text form | `ds_core::settings::SettingsTarget`, re-exported as `ds-settings::target::SettingsTarget` (`FromStr` and `Display` are the whole grammar; with `PageId`, `KeyPath`, `AccountRef`) |
+| Where in Settings a link points (a page, a key, an account, an Extension) and its text form | `ds_core::settings::SettingsTarget`, re-exported as `ds-settings::target::SettingsTarget` (`FromStr` and `Display` are the whole grammar; with `PageId`, `KeyPath`, `AccountRef`, `ExtensionId`) |
 | The pages of Settings: id, title, glyph, order, aliases; an unknown page tolerated | `ds-settings::schema::{PageTable, PageDecl, Listing}` (`PageId` is `ds_core::settings::PageId`) over the built-in `schema/pages.toml`; `Page` is the typed layer |
 | Which control draws a key, and the on/off pair rule | `ds-settings::schema::{Control, TogglePair}` (`KeyKind::default_control`, `KeySpec::control`); no program keeps its own table |
 | Changing one key of a settings file in place | `ds-settings::SettingsWriter::patch` |
@@ -796,6 +800,10 @@ are reached as `ds::components::app::X`, not through the prelude.
 3. New file: a struct with `impl SettingsDoc` (`FILE`, `FORMAT`); no other load or save path.
 4. Tests in `ds-settings/tests/`: round trip; a bad value keeps the rest of the file; an unknown
    key lands in `Loaded::unknown`; `Store::new(ConfigRoot::Scratch(dir), app)`, never real XDG.
+
+### Add an Extension capability
+
+See CONVENTIONS.md, "Add an Extension capability".
 
 ### Add a document-host capability
 

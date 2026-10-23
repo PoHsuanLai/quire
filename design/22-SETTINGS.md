@@ -110,6 +110,7 @@ hand-written. Where a note's default disagrees with the table, the table (the co
 | `appearance.motion_level` | choice {standard, reduced} | `standard` |  | Appearance | Settings |  |
 | `appearance.transparency` | choice {system, reduced} | `system` |  | Appearance | Settings |  |
 | `appearance.typeface` | choice {system, editorial} | `system` |  | Appearance | Settings |  |
+| `appearance.look` | provided (look) | `standard` |  | Appearance | Settings | may set |
 | `appearance.custom_styles` | choice {use, off} | `use` |  | Appearance | Settings | may set |
 | `appearance.material_tint_alpha` | number | `80` | `0..=100` % | Appearance | file only |  |
 | `appearance.material_highlight_light` | number | `30` | `0..=100` % | Appearance | file only |  |
@@ -128,6 +129,7 @@ hand-written. Where a note's default disagrees with the table, the table (the co
 | `appearance.motion_level` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
 | `appearance.transparency` | the portal has no key for it, so ours is a setting; `Reduced` paints every material solid and drops the vibrancy boost; the compositor reads it from this file, as it reads `theme` | `27-HIG-PARITY.md` section 3.1 | settled (adopted in 27) |
 | `appearance.typeface` | RETIRING: The second typeface (Editorial) is dropped (30 section 3.4): one voice, Inter, with Space Mono for code and `Kbd`. Target (clean-up phase): remove the key and `data-typeface`; a stored value is an unknown key | `02-TYPE.md#2-the-faces` | settled; to retire in the clean-up phase (2026-10-02) |
+| `appearance.look` | `standard`, or the id of an installed look Extension; a stored id that is not installed or is turned off reads as `standard` where the installed Extensions are known, and is reported once (`ds_extensions::chosen`). The choices come from the caller (9.1, `Provided`) | the customization design, sections 5 and 7.7 | proposed (2026-10-23) |
 | `appearance.custom_styles` | "Use my styles": `off` makes `Ds` draw none of the look, the desktop-wide `style.css` or the app's `style.css`, live; the way back from a broken style (customization design section 7.4) | `customization/DESIGN.md` section 7.4 | proposed (2026-10-23) |
 | `appearance.material_tint_alpha` | RETIRING with the tinted chrome: the Space no longer tints the bar, dock, launcher, control centre or OSD (21 section 3), so this key has no reader once the frame model goes | `21-SPACES.md#3-where-the-tint-applies` | settled; to retire in the clean-up phase |
 | `appearance.material_highlight_light` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
@@ -1054,7 +1056,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 
 | Settings app page | Keys shown |
 | --- | --- |
-| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `appearance.transparency`, `appearance.custom_styles`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome); under **Bar**: `bar.autohide` |
+| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.look`, `appearance.motion_level`, `appearance.transparency`, `appearance.custom_styles`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome); under **Bar**: `bar.autohide` |
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.indicators`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into the compositor's `system_actions` and `custom` shortcut files, and the chord the desktop already holds wins a clash, shown on the row (28 §7 decision 10) |
@@ -1160,6 +1162,7 @@ Widget by kind, fixed:
 | `Shortcut` | key-capture field |
 | `List` | rows editor |
 | `Rows` | rows editor with one cell per column |
+| `Provided` | `Menu`, once the caller has filled its choices (below) |
 
 `agent` is `AgentSetting::{HandsOff, Settable}`, set by the field attribute
 `#[settings(agent_settable)]` and written into the schema's `[[key]]` table as
@@ -1177,6 +1180,17 @@ switch labelled like macOS's "Reduce motion" or "Reduce transparency", on for th
 choice between two things, not a switch. The rule and its table test live in detent's
 `detent-model` (`control.rs`). All widgets are from `04-COMPONENTS.md`; the Settings app has no
 widgets of its own.
+
+A key that chooses among things somebody installed (a look, a set of file icons) is a field of
+type `Provided` with `#[settings(provided = "<capability>")]`, kind `Provided { capability }`
+(written `kind = "provided"` with `[key.kind.v] capability = "look"`). Its stored value is the bare
+word `standard` or the id of what was chosen. The schema lists no choices: the program that draws
+the key fills them in with `KeySpec::offering(words, labels)`, which turns the kind into a `Menu`
+(`standard` first, labels by id), so the `menu` control draws it and no widget is added.
+`ds-settings` knows nothing of what is installed. The reader of the key checks the stored id
+against what it found (`ds_extensions::chosen`): an id nobody installed, or one that is turned off,
+reads as `standard` and is reported once. A reader that predates the kind refuses the schema file
+it is in, as it does for any unknown kind (`Schema::discover` skips the file with a warning).
 
 A `Vec<T>` field takes its kind from `T`: `Vec<String>` is `List` of `Text`, `Vec<E>` for a
 `Word` enum `E` is `List` of `E`'s kind, and `Vec<R>` for a struct `R` that derives
@@ -1420,6 +1434,7 @@ quire's, sill's and detent's tests check their schemas against one source.
 | --- | --- | --- | --- |
 | `appearance.theme` | quire (`AppearanceSettings`) | "make it dark": a visible, instantly reversible preference | proposed (2026-10-03) |
 | `appearance.accent` | quire (`AppearanceSettings`) | the same, one of eight colours | proposed (2026-10-03) |
+| `appearance.look` | quire (`AppearanceSettings`) | "use the Paper look": the choice is among looks the person installed, and Standard undoes it in one click | proposed (2026-10-23) |
 | `appearance.custom_styles` | quire (`AppearanceSettings`) | "turn my styles off": the way back from a style that broke a surface, one switch, undone in one click | proposed (2026-10-23) |
 | `dock.magnification` | sill (`DockSettings`) | on/off, cosmetic | proposed (2026-10-03) |
 | `dock.tile_size_px` | sill (`DockSettings`) | bounded slider, cosmetic | proposed (2026-10-03) |
@@ -1437,18 +1452,19 @@ a program's own schema still decides which other keys it marks settable.
 agent that could raise its own budget or switch computer use on would be its own gatekeeper.
 
 The marks of sill's and detent's own keys live in their schemas; quire marks only what
-`quire/appearance.toml` owns (`appearance.theme`, `appearance.accent`,
+`quire/appearance.toml` owns (`appearance.theme`, `appearance.accent`, `appearance.look`,
 `appearance.custom_styles`).
 
 ### 9.8 Pages, controls, targets, patches and ranges (v0.3.36)
 
-Five additions to the schema contract, all additive: a schema or a file written before them reads
+Six additions to the schema contract, all additive: a schema or a file written before them reads
 unchanged.
 
 1. **Pages are data.** A schema may carry `[[page]]` tables (`id`, `title`, `symbol`, `order`,
    optional `aliases`). The built-in table is `crates/ds-settings/src/schema/pages.toml`: the
    twelve fixed pages (their old snake-case names are aliases of their kebab-case ids) and
-   `wallpaper`, `displays`, `wifi` and `bluetooth`. `Page` stays a typed layer over `PageId`; a key
+   `wallpaper`, `displays`, `wifi`, `bluetooth` and `extensions` (title "Extensions", symbol
+   `puzzle`, order 45, just after Appearance). `Page` stays a typed layer over `PageId`; a key
    whose page nobody declares is kept and reads as `Page::App(<id>)`, and
    `PageTable::status` says `Unknown`, so one new page never blanks a whole older schema. A key
    names its page with `page = Page::declared("wallpaper")`.
@@ -1459,8 +1475,8 @@ unchanged.
    or one that does not fit the kind, is ignored and the default control is drawn. `picture` is a
    grid of pictures with "Add Picture…" whose value is a path; it fits a text key. `corners` is the Hot Corners sheet: its value is the corner's list of bindings; it fits a text key.
 3. **A target for every entrance.** `SettingsTarget` (defined in `ds_core::settings`, pure, so a compositor holds it without `ds-settings`; re-exported as `ds_settings::target::SettingsTarget`) is `Page(PageId)`,
-   `Key(KeyPath)` or `Account(AccountRef)`, written `page:wallpaper`, `key:dock.tile_size_px`,
-   `account:<id>`. It is the payload of the `settings.page.show` intent. A page may say `listing = "hidden"`
+   `Key(KeyPath)`, `Account(AccountRef)` or `Extension(ExtensionId)`, written `page:wallpaper`,
+   `key:dock.tile_size_px`, `account:<id>`, `extension:<id>` (Settings > Extensions at that row). It is the payload of the `settings.page.show` intent. A page may say `listing = "hidden"`
    (`Listing::Hidden`): it resolves by id (`assistant-model-setup`, the model picker's first-run step)
    but `PageTable::sidebar()` leaves it out.
 4. **One key at a time.** `SettingsWriter::patch(key, value)` sets one key in the file under its
@@ -1469,6 +1485,12 @@ unchanged.
 5. **Ranges hold on load.** `SettingsDoc::limits()` gives a document the ranges of its schema
    (`Limits::of_schema`); a number outside its range is brought to the nearest end and reported in
    `Loaded::clamped`, whose line in `Loaded::diagnostics` is the one log line.
+6. **A choice among installed things.** `KeyKind::Provided { capability }` (9.1): the stored value
+   is `standard` or an id, the caller fills the choices (`KeySpec::offering`), and the `menu`
+   control draws it. `appearance.look` is the first. The Extensions that supply the choices, and
+   the `extensions.toml` file that turns them off (`extensions.off`, page `extensions`), are
+   `ds-extensions`' (the customization design, sections 4 and 5); this crate has no knowledge of
+   them, so it needs no dependency on that crate.
 
 The key tables of sections 3.1, 3.3 and 3.32 are generated from the schema between
 `<!-- keys:begin <domain> -->` and `<!-- keys:end <domain> -->` (`scripts/gen-doc-keys.sh`;

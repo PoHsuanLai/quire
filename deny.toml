@@ -65,6 +65,7 @@ unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 allow-git = [
     "https://github.com/PoHsuanLai/anyrender",
+    "https://github.com/PoHsuanLai/bayonet.git",
     "https://github.com/PoHsuanLai/blitz",
     "https://github.com/PoHsuanLai/chordkit.git",
     "https://github.com/PoHsuanLai/dioxus",

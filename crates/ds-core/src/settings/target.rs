@@ -1,9 +1,9 @@
-//! Where in Settings a link points: a page, one key, or one account. The payload of the
-//! `settings.page.show` intent and the one type every entrance to Settings hands over (the bar,
+//! Where in Settings a link points: a page, one key, one account, or one Extension. The payload of
+//! the `settings.page.show` intent and the one type every entrance to Settings hands over (the bar,
 //! the launcher, the control centre, the command line, an agent).
 //!
-//! The text form is `page:wallpaper`, `key:dock.magnified_size_px`, `account:<id>`. One
-//! `FromStr` and one `Display` are the whole grammar; they round-trip.
+//! The text form is `page:wallpaper`, `key:dock.magnified_size_px`, `account:<id>`,
+//! `extension:<id>`. One `FromStr` and one `Display` are the whole grammar; they round-trip.
 
 use std::fmt;
 use std::str::FromStr;
@@ -14,6 +14,10 @@ use super::{KeyPath, PageId};
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct AccountRef(pub String);
 
+/// An Extension, named by the reverse-DNS id its manifest gives it (`org.example.Paper`).
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct ExtensionId(pub String);
+
 /// A place in Settings.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsTarget {
@@ -23,17 +27,21 @@ pub enum SettingsTarget {
     Key(KeyPath),
     /// One account's detail: `account:<id>`.
     Account(AccountRef),
+    /// One Extension's row in Settings > Extensions: `extension:<id>`.
+    Extension(ExtensionId),
 }
 
 /// Why a text is not a [`SettingsTarget`].
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[non_exhaustive]
 pub enum TargetError {
-    /// The text does not start with `page:`, `key:` or `account:`.
-    #[error("{0:?} does not say where to go: expected page:<id>, key:<path> or account:<id>")]
+    /// The text does not start with `page:`, `key:`, `account:` or `extension:`.
+    #[error(
+        "{0:?} does not say where to go: expected page:<id>, key:<path>, account:<id> or extension:<id>"
+    )]
     NoKind(String),
-    /// A kind other than `page`, `key` or `account`.
-    #[error("{0:?} is not a place in Settings; expected page, key or account")]
+    /// A kind other than `page`, `key`, `account` or `extension`.
+    #[error("{0:?} is not a place in Settings; expected page, key, account or extension")]
     UnknownKind(String),
     /// Nothing after the colon.
     #[error("{0} needs a name after the colon")]
@@ -50,6 +58,7 @@ impl SettingsTarget {
             SettingsTarget::Page(_) => "page",
             SettingsTarget::Key(_) => "key",
             SettingsTarget::Account(_) => "account",
+            SettingsTarget::Extension(_) => "extension",
         }
     }
 
@@ -59,6 +68,7 @@ impl SettingsTarget {
             SettingsTarget::Page(id) => id.as_str(),
             SettingsTarget::Key(path) => &path.0,
             SettingsTarget::Account(account) => &account.0,
+            SettingsTarget::Extension(extension) => &extension.0,
         }
     }
 }
@@ -80,6 +90,7 @@ impl FromStr for SettingsTarget {
             "page" => "page",
             "key" => "key",
             "account" => "account",
+            "extension" => "extension",
             other => return Err(TargetError::UnknownKind(other.to_owned())),
         };
         if name.is_empty() {
@@ -91,14 +102,15 @@ impl FromStr for SettingsTarget {
         Ok(match kind {
             "page" => SettingsTarget::Page(PageId::new(name)),
             "key" => SettingsTarget::Key(KeyPath(name.to_owned())),
-            _ => SettingsTarget::Account(AccountRef(name.to_owned())),
+            "account" => SettingsTarget::Account(AccountRef(name.to_owned())),
+            _ => SettingsTarget::Extension(ExtensionId(name.to_owned())),
         })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{AccountRef, SettingsTarget, TargetError};
+    use super::{AccountRef, ExtensionId, SettingsTarget, TargetError};
     use crate::settings::{KeyPath, PageId};
 
     #[test]
@@ -119,6 +131,10 @@ mod tests {
             (
                 SettingsTarget::Account(AccountRef("work/mail".to_owned())),
                 "account:work/mail",
+            ),
+            (
+                SettingsTarget::Extension(ExtensionId("org.example.Paper".to_owned())),
+                "extension:org.example.Paper",
             ),
         ];
         for (target, text) in cases {
@@ -143,6 +159,15 @@ mod tests {
             ("page:", TargetError::NoName("page")),
             ("key:", TargetError::NoName("key")),
             ("account:", TargetError::NoName("account")),
+            ("extension:", TargetError::NoName("extension")),
+            (
+                "extension:org.example. Paper",
+                TargetError::BadName("org.example. Paper".to_owned()),
+            ),
+            (
+                "extensions:org.example.Paper",
+                TargetError::UnknownKind("extensions".to_owned()),
+            ),
             (
                 "key:dock. tile",
                 TargetError::BadName("dock. tile".to_owned()),

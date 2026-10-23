@@ -9,6 +9,12 @@ symbol = "sun-moon"
 order = 40
 
 [[page]]
+id = "extensions"
+title = "Extensions"
+symbol = "puzzle"
+order = 45
+
+[[page]]
 id = "wallpaper"
 title = "Wallpaper"
 symbol = "image"

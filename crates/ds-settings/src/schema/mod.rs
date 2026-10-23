@@ -21,6 +21,7 @@ mod page_decl;
 mod pages;
 mod place;
 mod program;
+mod provided;
 mod traits;
 
 pub use agent::{
@@ -46,4 +47,5 @@ pub use place::{ChoicePlace, CompanyName, EngineName, HostName};
 pub use program::{
     AppId, FilePath, ForeignTables, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,
 };
+pub use provided::{Provided, STANDARD};
 pub use traits::{ListElement, SettingsRow, SettingsSchema, choice_of, kind_of, to_value};

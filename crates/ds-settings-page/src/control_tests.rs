@@ -61,6 +61,12 @@ fn each_kind_gets_the_control_detent_gives_it() {
         (KeyKind::Text, Control::Shown),
         (KeyKind::Colour, Control::Shown),
         (KeyKind::Shortcut, Control::Shown),
+        (
+            KeyKind::Provided {
+                capability: "look".to_owned(),
+            },
+            Control::Shown,
+        ),
     ];
     for (kind, expect) in cases {
         assert_eq!(control_of(&kind), expect, "{kind:?}");

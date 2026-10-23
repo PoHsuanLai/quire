@@ -29,6 +29,12 @@ pub(crate) enum Shape {
     /// large enough on its own to blow up every other, data-less variant's size
     /// (`clippy::large_enum_variant`).
     List(Box<syn::Type>),
+    /// `#[settings(provided = "look")]` was given: a choice among installed things that provide
+    /// the capability.
+    Provided {
+        /// The capability the choices provide.
+        capability: String,
+    },
     /// Anything else: a closed enum, read through its `Word` at run time.
     EnumType,
 }
@@ -69,6 +75,7 @@ pub(crate) fn shape_of(field: &str, ty: &syn::Type, hint: KindHint) -> Result<Sh
     match hint {
         KindHint::Bounded { min, max } => return Ok(Shape::Bounded { min, max }),
         KindHint::Text => return Ok(Shape::Text),
+        KindHint::Provided { capability } => return Ok(Shape::Provided { capability }),
         KindHint::Infer => {}
     }
     let syn::Type::Path(type_path) = ty else {
@@ -168,6 +175,17 @@ mod tests {
             matches!(infer("Cow<'static, [u8]>"), Ok(Shape::EnumType)),
             "Cow of bytes is not text"
         );
+    }
+
+    #[test]
+    fn the_provided_attribute_makes_a_provided_key_whatever_the_type() {
+        let hint = KindHint::Provided {
+            capability: "look".to_owned(),
+        };
+        assert!(matches!(
+            shape_of("look", &ty("Provided"), hint),
+            Ok(Shape::Provided { capability }) if capability == "look"
+        ));
     }
 
     #[test]

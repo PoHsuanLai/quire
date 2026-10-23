@@ -130,6 +130,7 @@ impl AgentSetting {
 /// [`KeyKind::Menu`]; a newtype with `range` is [`KeyKind::Bounded`]; `String`, `PathBuf`,
 /// `Cow<str>` or a field marked `#[settings(text)]` is [`KeyKind::Text`]; `Hex` is [`KeyKind::Colour`]; `Vec<String>` and `Vec<Word enum>` are [`KeyKind::List`]; `Vec<T>` with
 /// `T: SettingsRow` is [`KeyKind::Rows`].
+/// [`KeyKind::Provided`] is a field of type `Provided` with `#[settings(provided = "<capability>")]`.
 /// [`KeyKind::Shortcut`] has no field-type rule yet (no settings key is a key binding today); a
 /// live D-Bus module (section 9.4) constructs it directly.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -161,6 +162,14 @@ pub enum KeyKind {
     /// A rows editor over a list of tables, one cell per column. Derived from a `Vec<T>` field
     /// whose `T` derives `SettingsRow`.
     Rows { columns: Vec<Column> },
+    /// A choice among things somebody installed (a look, a set of file icons): the stored value is
+    /// `"standard"` or the id of the thing chosen. The schema does not list the choices; it names
+    /// the `capability` they provide (`"look"`), and the caller that draws the key fills them in
+    /// ([`KeySpec::offering`]), as a menu. Written `kind = "provided"` with `v.capability`. A
+    /// reader that predates the kind refuses the schema file it is in, as it does for any kind it
+    /// does not know (the file is skipped with a warning); that is why a build that reads a newer
+    /// quire schema must be rebuilt with it.
+    Provided { capability: String },
     /// An action of a live module (section 9.4): a button, not a value. Setting the key runs the
     /// action in the service. Only a live module's schema carries it; a settings file has no such
     /// key. A live module's value keys use the ordinary kinds above.
@@ -242,6 +251,21 @@ impl KeySpec {
         }
         sections.retain(|section| !section.choices.is_empty());
         sections
+    }
+
+    /// This key with its choices filled in, for a key of kind [`KeyKind::Provided`]: the kind
+    /// becomes a [`KeyKind::Menu`] of `words` (the first is the one a person sees first, the
+    /// built-in `standard`) and `labels` names them. The stored value is unchanged. Any other
+    /// kind comes back as it is.
+    pub fn offering(&self, words: Vec<String>, labels: WordLabels) -> KeySpec {
+        match &self.kind {
+            KeyKind::Provided { .. } => KeySpec {
+                kind: KeyKind::Menu { variants: words },
+                labels,
+                ..self.clone()
+            },
+            _ => self.clone(),
+        }
     }
 
     /// Where the model behind `word` runs, if the schema says.
@@ -389,6 +413,67 @@ mod agent_tests {
     #[test]
     fn an_unknown_word_is_an_error_not_a_silent_hands_off() {
         let text = format!("agent = \"always\"\n{OLD}");
+        assert!(toml::from_str::<KeySpec>(&text).is_err());
+    }
+}
+
+#[cfg(test)]
+mod provided_tests {
+    use super::{KeyKind, KeySpec, WordLabels};
+    use crate::schema::Control;
+
+    const PROVIDED: &str = "path = \"appearance.look\"\ndefault = \"standard\"\nlabel = \"Look\"\nhelp = \"\"\nsection = \"\"\nexposure = \"basic\"\n[kind]\nkind = \"provided\"\n[kind.v]\ncapability = \"look\"\n[page]\nkind = \"appearance\"\n";
+
+    #[test]
+    fn a_provided_key_is_written_with_its_capability_and_read_back() {
+        let spec: KeySpec = toml::from_str(PROVIDED).expect("parses");
+        assert_eq!(
+            spec.kind,
+            KeyKind::Provided {
+                capability: "look".to_owned()
+            }
+        );
+        let text = toml::to_string(&spec).unwrap();
+        assert!(text.contains("kind = \"provided\""), "{text}");
+        assert!(text.contains("capability = \"look\""), "{text}");
+        assert_eq!(toml::from_str::<KeySpec>(&text).unwrap(), spec);
+    }
+
+    #[test]
+    fn a_provided_key_is_drawn_as_a_menu() {
+        let spec: KeySpec = toml::from_str(PROVIDED).expect("parses");
+        assert_eq!(spec.kind.default_control(), Control::Menu);
+        assert_eq!(spec.control(), Control::Menu);
+    }
+
+    #[test]
+    fn offering_fills_the_choices_and_leaves_other_kinds_alone() {
+        let spec: KeySpec = toml::from_str(PROVIDED).expect("parses");
+        let labels = WordLabels(
+            [("standard", "Standard"), ("org.example.Paper", "Paper")]
+                .into_iter()
+                .map(|(word, label)| (word.to_owned(), label.to_owned()))
+                .collect(),
+        );
+        let words = vec!["standard".to_owned(), "org.example.Paper".to_owned()];
+        let filled = spec.offering(words.clone(), labels.clone());
+        assert_eq!(filled.kind, KeyKind::Menu { variants: words });
+        assert_eq!(filled.labels, labels);
+        assert_eq!(filled.default, spec.default);
+        assert_eq!(filled.path, spec.path);
+        let text: KeySpec = toml::from_str(&PROVIDED.replace(
+            "[kind]\nkind = \"provided\"\n[kind.v]\ncapability = \"look\"\n",
+            "[kind]\nkind = \"text\"\n",
+        ))
+        .expect("parses");
+        assert_eq!(text.offering(vec!["x".to_owned()], labels), text);
+    }
+
+    #[test]
+    fn a_kind_this_build_does_not_know_refuses_the_key() {
+        // Unchanged behaviour: an unknown kind makes the schema file unreadable to an old reader,
+        // which skips the whole file with a warning (`discover`).
+        let text = PROVIDED.replace("provided", "hologram");
         assert!(toml::from_str::<KeySpec>(&text).is_err());
     }
 }

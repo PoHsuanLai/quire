@@ -410,6 +410,44 @@ costly (DESIGN.md section 7.5). It never blocks. The limits are constants in
 `Rule::BlitzUnsupported` lists. `UserStyleNoteKind::plain_words()` is the text Settings shows for
 each note; it names no property and no developer word.
 
+## 17. Add an Extension capability
+
+An Extension is a folder with one `extension.toml`; a capability is one word in its
+`[[provides]]` entries (`capability = "look"`). Every word has exactly one owning crate, which
+parses its entries. The list of words, owners and hosts is the table in the customization design,
+section 4.2; this is how a row gets added.
+
+1. **The word and its owner.** A data word (pictures or values, no program) is owned by
+   `ds-extensions`: a variant of `Capability` (`capability.rs`, snake case, the spelling a manifest
+   writes). A word that speaks a wire (a program) is owned by the crate that defines the wire
+   (anyview-plugin owns its six): that crate implements bayonet's `Provides` for its own type with
+   `owns()` claiming only its words, and reads the raw candidates of a `ds_extensions::Search::scan`
+   through `bayonet::reparse`. Never add a word to a crate that does not parse it, and never
+   claim a word you do not own.
+2. **The entry type.** For a data word, one file in `ds-extensions/src` (`look.rs`,
+   `file_icons.rs`): a private `Wire` struct with serde for what the manifest writes, a public
+   struct for what the host reads, `from_entry(Entry)`, and a variant in `Provision` with its
+   arms in `capability()` and `paths()`. A path an entry names goes through `Entry::resolve`, so
+   it is relative, stays in the folder, and an absolute path or a `..` is a refusal. Keys a newer
+   writer adds are ignored, not refused.
+3. **The checks.** What bayonet checks for you: every path in `paths()` is there, is a file,
+   and does not leave the folder through a link. What the entry checks itself, in its `fault()`:
+   a size under a named cap constant, a folder that is a folder. A failure is a `Fault` variant,
+   which becomes bayonet's `Unusable`; the Extension is set aside whole, never half used. Give
+   the failure its plain words in `Problem::words` ("Some files in this Extension could not be
+   read"); a person sees those, never a path or a protocol name.
+4. **The host.** One function a host calls: `Found::resolve(Capability::X)` gives the usable
+   Extensions in serving order, and a key that chooses among them is a `Provided` field
+   (`#[settings(provided = "x")]`) filled with `choices_for` (`standard` first). Say in the
+   word's doc comment what the host does with the entry; `ds-extensions` reads pictures or text,
+   it does not apply them.
+5. **The table.** Add the word's row to the capability table in the customization design
+   (owner, whether it carries a program, what it carries, who uses it) and to
+   `design/22-SETTINGS.md` if it adds a key.
+6. **Tests**, in the crate's one `it` binary, with scratch roots (`Search::new(&person, &system)`,
+   never the environment): found, a path that escapes, a file over its cap, an unknown word left
+   alone, the choices list.
+
 ---
 
 ## What each repo's ARCHITECTURE.md must contain

@@ -135,12 +135,13 @@ fn settable(schema: &Schema) -> Vec<&str> {
 }
 
 #[test]
-fn the_derive_marks_theme_accent_and_custom_styles_and_nothing_else_in_the_quire_schema() {
+fn the_derive_marks_theme_accent_look_and_custom_styles_and_nothing_else_in_the_quire_schema() {
     assert_eq!(
         settable(&quire_schema()),
         [
             "appearance.theme",
             "appearance.accent",
+            "appearance.look",
             "appearance.custom_styles"
         ]
     );
@@ -176,7 +177,7 @@ fn use_my_styles_is_a_use_off_switch_on_the_appearance_page_that_defaults_to_use
 fn a_mark_round_trips_derive_to_toml_to_loader_in_the_wire_form_detent_reads() {
     let schema = quire_schema();
     let text = schema.to_toml();
-    assert_eq!(text.matches("agent = \"settable\"").count(), 3, "{text}");
+    assert_eq!(text.matches("agent = \"settable\"").count(), 4, "{text}");
     // Detent reads the mark from the raw table; the same text must show it there.
     let table: toml::Table = text.parse().expect("the written schema is TOML");
     let marked: Vec<&str> = table["key"]
@@ -191,6 +192,7 @@ fn a_mark_round_trips_derive_to_toml_to_loader_in_the_wire_form_detent_reads() {
         [
             "appearance.theme",
             "appearance.accent",
+            "appearance.look",
             "appearance.custom_styles"
         ]
     );
@@ -239,6 +241,78 @@ fn the_design_doc_lists_exactly_the_proposed_keys() {
         "### 9.8 Pages, controls",
     );
     assert_eq!(in_doc, AGENT_SETTABLE_PROPOSED);
+}
+
+// ---------------------------------------------------------------------------------------------
+// A provided key (design/22-SETTINGS.md section 9.1, `KeyKind::Provided`)
+
+mod provided {
+    use ds_settings::schema::{Control, KeyKind, Provided, Schema, WordLabels};
+    use ds_settings::{AppearanceFile, quire_schema};
+
+    use crate::support::Scratch;
+
+    fn look_key() -> ds_settings::schema::KeySpec {
+        quire_schema()
+            .key
+            .into_iter()
+            .find(|key| key.path.0 == "appearance.look")
+            .expect("appearance.look is in the quire schema")
+    }
+
+    #[test]
+    fn appearance_look_is_a_provided_key_that_round_trips_in_the_schema_text() {
+        let key = look_key();
+        assert_eq!(
+            key.kind,
+            KeyKind::Provided {
+                capability: "look".to_owned()
+            }
+        );
+        assert_eq!(key.default, toml::Value::String("standard".to_owned()));
+        assert_eq!(key.label.0, "Look");
+        let schema = quire_schema();
+        let text = schema.to_toml();
+        assert!(text.contains("kind = \"provided\""), "{text}");
+        assert!(text.contains("capability = \"look\""), "{text}");
+        assert_eq!(Schema::from_toml(&text), Ok(schema));
+    }
+
+    #[test]
+    fn a_provided_key_is_drawn_by_the_menu_control_once_its_choices_are_filled() {
+        let key = look_key();
+        assert_eq!(key.control(), Control::Menu);
+        let words = vec!["standard".to_owned(), "org.example.Paper".to_owned()];
+        let labels = WordLabels(
+            [("standard", "Standard"), ("org.example.Paper", "Paper")]
+                .into_iter()
+                .map(|(word, label)| (word.to_owned(), label.to_owned()))
+                .collect(),
+        );
+        let filled = key.offering(words.clone(), labels);
+        assert_eq!(filled.kind, KeyKind::Menu { variants: words });
+        assert_eq!(filled.control(), Control::Menu);
+        assert_eq!(filled.labels.of("org.example.Paper"), Some("Paper"));
+    }
+
+    #[test]
+    fn the_stored_choice_is_a_bare_word_and_any_text_loads() {
+        let scratch = Scratch::new();
+        let store = scratch.store();
+        let mut file = AppearanceFile::default();
+        assert_eq!(file.appearance.look, Provided::standard());
+        file.appearance.look = Provided::new("org.example.Paper");
+        store.save(&file).expect("saves");
+        let text = std::fs::read_to_string(store.path::<AppearanceFile>().expect("path"))
+            .expect("the file is there");
+        assert!(text.contains("look = \"org.example.Paper\""), "{text}");
+        let loaded = store.load::<AppearanceFile>();
+        assert_eq!(
+            loaded.value.appearance.look.chosen(),
+            Some("org.example.Paper")
+        );
+        assert!(loaded.invalid.is_empty() && loaded.unknown.is_empty());
+    }
 }
 
 mod unavailable {

@@ -49,6 +49,7 @@ ds          = { path = "../quire/crates/ds" }
 ds-settings = { path = "../quire/crates/ds-settings", features = ["dioxus"] }  # `dioxus`: `use_environment`; `tokio`: zbus on tokio
 ds-blitz    = { path = "../quire/crates/ds-blitz" }    # only if you run on Blitz; features `pdf`, `print`, `spell`; `debug-probe` for scenario builds only
 ds-settings-page = { path = "../quire/crates/ds-settings-page" }  # only an app that draws a settings page from a schema (SettingsPage)
+ds-extensions = { path = "../quire/crates/ds-extensions" }  # only a program that finds, lists or reads Extensions (a look, file icons, anyview's plugins)
 ds-shell    = { path = "../quire/crates/ds-shell" }    # only an app that shows the account sheets, the consent alert or the missing-helper sheet
 
 [dev-dependencies]
@@ -1775,6 +1776,35 @@ rsx! {
 A page made only of your own rows is `SettingsPage { extras }` (or `SettingsPage { FormSection { .. } }`
 with no schemas): the same `Form` and `FormSection` look. Opening or raising the settings window at
 a page is window plumbing and stays in each app.
+
+### Extensions: finding, choosing and reading them
+
+`ds-extensions` is a library with no UI, runtime or bus. A host that reads Extensions:
+
+```rust,ignore
+use ds_extensions::{Capability, ExtensionsFile, Search, choices_for, chosen};
+use ds_extensions::look::stylesheet_for;
+
+// Off is stored and on is the default: read the file, hand the ids to the scan.
+let off = store.load::<ExtensionsFile>().value.off_ids();
+let found = Search::from_env().scan(&off);            // tests pass Search::new(&person, &system)
+
+// Every copy of every id, unranked: `found.candidates` (entries raw, for another owner's words),
+// `found.off` (turned off, with their names), `found.rejected`.
+let looks = found.resolve(Capability::Look);          // checked, then ranked
+let choices = choices_for(Capability::Look, looks.registry.installed());
+let key = choices.fill(&look_key);                    // a `Provided` key becomes a menu
+let now = chosen(&settings.appearance.look, &choices); // a stale id reads as standard: report `now.stale` once
+let sheet = stylesheet_for(&settings.appearance.look, &looks.registry); // text + folder, or None
+```
+
+An Extension that cannot be used is in `looks.problems()` with a line in plain words
+(`Problem::words`). When nothing serves a request and `found.off_serving("look")` is not empty,
+offer "Turn On…" (a link to the `extension:<id>` Settings target) instead of "missing". Another
+owner's words (anyview-plugin's six) are read from `found.candidates` through `bayonet::reparse`
+with that owner's own `Provides` type; `ds_extensions::bayonet` is the same bayonet, re-exported
+so the two agree. `ExtensionsFile` is `quire/extensions.toml`; its schema is
+`ds_extensions::extensions_schema()`.
 
 ## 8. What Blitz cannot do, and what to use instead
 

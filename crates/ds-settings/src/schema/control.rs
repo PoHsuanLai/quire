@@ -65,7 +65,10 @@ impl Control {
             Control::Picture | Control::Corners => matches!(kind, KeyKind::Text),
             Control::Menu => matches!(
                 kind,
-                KeyKind::Toggle { .. } | KeyKind::Segmented { .. } | KeyKind::Menu { .. }
+                KeyKind::Toggle { .. }
+                    | KeyKind::Segmented { .. }
+                    | KeyKind::Menu { .. }
+                    | KeyKind::Provided { .. }
             ),
             other => other == kind.default_control(),
         }
@@ -83,7 +86,7 @@ impl KeyKind {
                 None => Control::Segmented,
             },
             KeyKind::Segmented { .. } => Control::Segmented,
-            KeyKind::Menu { .. } => Control::Menu,
+            KeyKind::Menu { .. } | KeyKind::Provided { .. } => Control::Menu,
             KeyKind::Bounded { .. } => Control::Slider,
             KeyKind::Text => Control::Text,
             KeyKind::Colour => Control::Colour,
@@ -238,6 +241,12 @@ mod tests {
                 Control::Menu,
             ),
             (bounded, Control::Slider),
+            (
+                KeyKind::Provided {
+                    capability: "look".to_owned(),
+                },
+                Control::Menu,
+            ),
             (KeyKind::Text, Control::Text),
             (KeyKind::Colour, Control::Colour),
             (KeyKind::Shortcut, Control::Shortcut),

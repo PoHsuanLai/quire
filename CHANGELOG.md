@@ -46,6 +46,37 @@ first, with what a consumer has to change.
 - The gallery has a "Styling" page: every public part on a live example, generated from
   `ds::selectors`, with the surface number.
 
+### wh-e2b
+
+- New crate `ds-extensions`: Extensions as a library (no UI, no runtime, no bus). `Search::new(person,
+  system)` / `Search::from_env()` scan `<data>/quire/extensions/<id>/extension.toml` and return every
+  copy of every id unranked, with the turned-off ids and their names (`Found`, `Off`), so a host can
+  say "off" instead of "missing". `Found::resolve(Capability)` checks (paths stay in the folder, a
+  look's stylesheet at most 256 KiB) and ranks (usable first, protocol, the person's copy over the
+  system's, newer version, id) through bayonet; an Extension that fails is a `Problem` with a line in
+  plain words and is never half used. `Capability` is `file_icons` and `look`; `Provision` claims only
+  those words, so another owner (anyview-plugin) reparses the raw candidates itself.
+- `quire/extensions.toml` (`ExtensionsFile`, `extensions_schema()`): a schema'd file on the new
+  Extensions page (after Appearance) with one Rows key, `extensions.off`; not agent-settable.
+- `KeyKind::Provided { capability }` and `ds_settings::schema::Provided`: a key whose value is
+  `standard` or an Extension id, with `#[settings(provided = "look")]`. The caller fills the choices
+  (`ds_extensions::choices_for`, `Choices::fill`, `KeySpec::offering`) and the `menu` control draws it;
+  a stored id that is not installed or is off reads as `standard` (`ds_extensions::chosen`) and is
+  returned once as `Stale`. `appearance.look` is the first such key, agent-settable.
+- `look::stylesheet_for(choice, registry)` reads the chosen look's stylesheet and folder; wiring it
+  into `Ds`'s style props waits for the user-styles lane.
+- `SettingsTarget::Extension(ExtensionId)`, written `extension:<id>`.
+- design/22 section 9.1 (kind table, Provided) and 9.8 (item 6, the Extensions page, the target).
+- bayonet at 0f5897c3 is a quire dependency (outside the pinned block).
+
+**What a consumer changes**
+- `KeyKind` gains `Provided { capability }` and `SettingsTarget` gains `Extension`: an exhaustive
+  match needs an arm each. A reader built before `Provided` refuses a quire schema file that has it
+  (an unknown kind makes the file unreadable and `discover` skips it with a warning): rebuild
+  sill and detent with this quire.
+- `AppearanceSettings` gains `look` (a `Provided`).
+- `ds_settings::xdg::search_dirs` is public.
+
 ## v0.3.44
 
 Reorderable lists, a New Space that is named before it exists, and the CSS ellipsis allowed.

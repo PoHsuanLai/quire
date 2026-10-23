@@ -15,7 +15,8 @@ pub(crate) enum Control {
     Shown,
 }
 
-/// What draws `kind`.
+/// What draws `kind`. A provided key (`KeyKind::Provided`) is read-only here until the caller
+/// that knows what is installed fills its choices (`KeySpec::offering`), which makes it a menu.
 pub(crate) fn control_of(kind: &KeyKind) -> Control {
     match kind {
         KeyKind::Toggle { variants } => {
@@ -28,6 +29,7 @@ pub(crate) fn control_of(kind: &KeyKind) -> Control {
         | KeyKind::Text
         | KeyKind::Colour
         | KeyKind::Shortcut
+        | KeyKind::Provided { .. }
         | KeyKind::List(_)
         | KeyKind::Rows { .. }
         | KeyKind::Live { .. } => Control::Shown,

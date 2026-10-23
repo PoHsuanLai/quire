@@ -143,6 +143,9 @@ fn kind_expr(shape: Shape, ty: &syn::Type, unit: Option<&str>) -> TokenStream {
             quote! { ::ds_settings::schema::KeyKind::Bounded { min: #min, max: #max, unit: #unit } }
         }
         Shape::Text => quote! { ::ds_settings::schema::KeyKind::Text },
+        Shape::Provided { capability } => quote! {
+            ::ds_settings::schema::KeyKind::Provided { capability: #capability.to_owned() }
+        },
         Shape::Colour => quote! { ::ds_settings::schema::KeyKind::Colour },
         Shape::TextList => quote! {
             ::ds_settings::schema::KeyKind::List(::std::boxed::Box::new(
@@ -206,6 +209,18 @@ mod tests {
             let text = tokens.to_string();
             assert!(text.contains("KeyKind :: Text"), "{field}: {text}");
         }
+    }
+
+    #[test]
+    fn a_provided_field_is_a_provided_key_naming_its_capability() {
+        let source = format!(
+            "{HEAD} struct S {{ #[settings(label = \"L\", provided = \"look\")] f: Provided }}"
+        );
+        let text = expanded(&source)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .to_string();
+        assert!(text.contains("KeyKind :: Provided"), "{text}");
+        assert!(text.contains("\"look\""), "{text}");
     }
 
     #[test]
