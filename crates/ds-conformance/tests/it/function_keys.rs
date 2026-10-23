@@ -3,7 +3,7 @@
 
 use chordkit::{Action, Context, Desktop, Platform, StandardAction};
 use dioxus::prelude::*;
-use ds::keys::{on_action, ActionTaken};
+use ds::keys::{ActionTaken, on_action};
 use ds::prelude::*;
 use ds_blitz::FocusFallback;
 use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};

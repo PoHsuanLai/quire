@@ -70,11 +70,9 @@ pub fn Sidebar<K: Clone + PartialEq + Hash + 'static>(
                 },
             )),
             SidebarSection::Custom(content) => Some((at, "ds-sidebar-section", content)),
-            SidebarSection::Fill(content) if Some(at) == first_fill => Some((
-                at,
-                "ds-sidebar-section ds-sidebar-section-fill",
-                content,
-            )),
+            SidebarSection::Fill(content) if Some(at) == first_fill => {
+                Some((at, "ds-sidebar-section ds-sidebar-section-fill", content))
+            }
             SidebarSection::Fill(_) => None,
         })
         .collect();

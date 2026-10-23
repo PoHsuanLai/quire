@@ -54,7 +54,9 @@ fn key_of(name: &str) -> Result<ShortcutKey, ChordError> {
     if let Some((key, _)) = NAMED.iter().find(|(_, own)| *own == name) {
         return Ok(*key);
     }
-    let function = name.strip_prefix('F').and_then(|digits| digits.parse().ok());
+    let function = name
+        .strip_prefix('F')
+        .and_then(|digits| digits.parse().ok());
     if let Some(key) = function.and_then(ShortcutKey::function) {
         return Ok(key);
     }
