@@ -408,6 +408,15 @@ const SPECIMENS: &[Specimen] = &[
     }),
     ("sign-in-manual-imap", || sign_in(imap_form(), None)),
     ("sign-in-manual-jmap", || sign_in(jmap_form(), None)),
+    ("sign-in-server-url", || {
+        sign_in(
+            vec![
+                field(FieldRole::ServerUrl, plain("")),
+                field(FieldRole::ApiKey, FieldText::Secret(Hidden::default())),
+            ],
+            None,
+        )
+    }),
     ("sign-in-manual-advanced", || {
         sign_in(advanced_imap_form(), None)
     }),
@@ -742,6 +751,16 @@ fn the_steps_say_what_the_props_say() {
     );
     assert!(narrowed.contains("Fastmail"), "{narrowed}");
     assert!(narrowed.contains("Other"), "Other stays");
+}
+
+#[test]
+fn a_server_address_field_has_its_own_label_and_a_web_address_hint() {
+    let html = light("sign-in-server-url");
+    assert!(html.contains("Server address"), "{html}");
+    assert!(
+        html.contains("placeholder=\"https://server.example.org/v1\""),
+        "{html}"
+    );
 }
 
 #[test]

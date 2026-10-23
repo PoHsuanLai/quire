@@ -119,6 +119,11 @@ pub enum FieldRole {
     /// The address of a JMAP session resource.
     #[word(slug = "session-url")]
     SessionUrl,
+    /// The web address of a service's server, such as a model server's
+    /// `https://llm.example.org/v1`: https, or http only for this computer or one of the person's
+    /// own computers (porter's `SERVER_ADDRESS_RULE`).
+    #[word(slug = "server-url")]
+    ServerUrl,
 }
 
 /// Whether the person may leave a field empty.

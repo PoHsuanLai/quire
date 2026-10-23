@@ -90,6 +90,10 @@ first, with what a consumer has to change.
   `FileIconChoice` have a new variant each (`Puzzle`, `Artwork`): a consumer that matches them
   exhaustively adds the arm. The stylesheet golden moves (`.ds-file-artwork`).
 
+### shell ask
+
+- Accounts forms gain `FieldRole::ServerUrl` ("Server address", hint `https://server.example.org/v1`) for porter's `FieldKind::ServerUrl` (porter e91eb7a4). An exhaustive `match` on `FieldRole` needs one more arm.
+
 ## v0.3.45
 
 ### wh-e1a

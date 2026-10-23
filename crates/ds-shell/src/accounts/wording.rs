@@ -48,6 +48,7 @@ pub(crate) fn field_label(role: FieldRole) -> &'static str {
         FieldRole::OutgoingPort => "Outgoing port",
         FieldRole::OutgoingSecurity => "Outgoing security",
         FieldRole::SessionUrl => "Server web address",
+        FieldRole::ServerUrl => "Server address",
     }
 }
 
@@ -69,6 +70,7 @@ pub(crate) fn field_placeholder(role: FieldRole, requirement: Requirement) -> &'
         FieldRole::Port | FieldRole::OutgoingPort => "Usual port",
         FieldRole::OutgoingServer => "smtp.example.org",
         FieldRole::SessionUrl => "https://mail.example.org/session",
+        FieldRole::ServerUrl => "https://server.example.org/v1",
     }
 }
 
