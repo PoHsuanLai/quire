@@ -3,6 +3,12 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.47 (unreleased)
+
+### wh-q47b
+
+- New glyphs `Icon::Cloud`, `Icon::CloudDownload` (in the cloud only, click to download) and `Icon::CloudUpload` (waiting to upload), Lucide `cloud`, `cloud-download` and `cloud-upload` (outline by default, each with a solid form) for the files app's cloud-drive states. `Icon` is not `non_exhaustive`: an exhaustive `match` on it gains three arms.
+
 ## v0.3.46 (unreleased)
 
 ### wh-e4a

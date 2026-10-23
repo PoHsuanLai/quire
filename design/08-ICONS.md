@@ -83,6 +83,12 @@ colour (`--warn` when on). Lint: `CurrentColourOutsideStrokeFill` already allowe
 currentColor` as a whole value, so the rule is unchanged; its cases now pin `fill: currentColor`
 passing and a raw colour on `fill` failing.
 
+Cloud-drive states (2026-10-24): `Cloud`, `CloudDownload` and `CloudUpload` are Lucide `cloud`,
+`cloud-download` and `cloud-upload` (ISC), outline by default like the rest of the file-manager
+set. The solid forms are the same cloud filled; the arrow is knocked out of the body, wound the
+other way. They are status marks (Finder's "in the cloud only" and "waiting to upload"), drawn
+small beside a name, not actions.
+
 ### 1.2.2 Replaced glyphs (owner picks, 2026-10-09)
 
 `Native::Drawn` holds the paths (`drawn.rs`): filled shapes on the 24 grid, drawn the same in

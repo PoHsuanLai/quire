@@ -27,6 +27,9 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::Lines => LINES,
         Icon::Pdf => PDF,
         Icon::Puzzle => PUZZLE,
+        Icon::Cloud => CLOUD,
+        Icon::CloudDownload => CLOUD_DOWNLOAD,
+        Icon::CloudUpload => CLOUD_UPLOAD,
         _ => &[],
     }
 }
@@ -125,3 +128,20 @@ const PDF: &[Shape] = &[Shape::Solid(
 const PUZZLE: &[Shape] = &[Shape::Solid(
     "M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z",
 )];
+
+/// `Cloud` filled: Lucide's outline, closed (wound clockwise).
+const CLOUD: &[Shape] = &[Shape::Solid(
+    "M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z",
+)];
+
+/// `CloudDownload` filled: the cloud with a down arrow knocked out (wound the other way).
+const CLOUD_DOWNLOAD: &[Shape] = &[
+    Shape::Solid("M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"),
+    Shape::Solid("M11 10V14H8.5L12 17.5L15.5 14H13V10Z"),
+];
+
+/// `CloudUpload` filled: the cloud with an up arrow knocked out (wound the other way).
+const CLOUD_UPLOAD: &[Shape] = &[
+    Shape::Solid("M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"),
+    Shape::Solid("M12 10L8.5 13.5H11V17.5H13V13.5H15.5Z"),
+];

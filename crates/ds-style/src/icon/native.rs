@@ -178,4 +178,7 @@ pub(super) const TABLE: &[(Icon, Native)] = &[
     (Icon::Lines, Native::Outline),
     (Icon::Pdf, Native::Outline),
     (Icon::Puzzle, Native::Outline),
+    (Icon::Cloud, Native::Outline),
+    (Icon::CloudDownload, Native::Outline),
+    (Icon::CloudUpload, Native::Outline),
 ];

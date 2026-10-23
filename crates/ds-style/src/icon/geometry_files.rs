@@ -14,6 +14,8 @@
 //!   on the standard file icon.
 //! - `Lines`: Lucide `align-left`, the mark of a document on the standard file icon.
 //! - `Puzzle`: Lucide `puzzle`, the Extensions page's glyph.
+//! - `Cloud`, `CloudDownload`, `CloudUpload`: Lucide `cloud`, `cloud-download` and
+//!   `cloud-upload`, the files app's cloud-drive states (in the cloud only, waiting to upload).
 //!
 //! A Lucide `<line>` is written as the equivalent path, as in `geometry_shell`.
 
@@ -40,6 +42,9 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::Lines => LINES,
         Icon::Pdf => PDF,
         Icon::Puzzle => PUZZLE,
+        Icon::Cloud => CLOUD,
+        Icon::CloudDownload => CLOUD_DOWNLOAD,
+        Icon::CloudUpload => CLOUD_UPLOAD,
         _ => &[],
     }
 }
@@ -219,3 +224,22 @@ const PDF: &[Shape] = &[Shape::Path("M9 20V4h4.5a4 4 0 0 1 0 8H9")];
 const PUZZLE: &[Shape] = &[Shape::Path(
     "M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z",
 )];
+
+/// Lucide `cloud`.
+const CLOUD: &[Shape] = &[Shape::Path(
+    "M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z",
+)];
+
+/// Lucide `cloud-download`: a cloud with an arrow down, "in the cloud only".
+const CLOUD_DOWNLOAD: &[Shape] = &[
+    Shape::Path("M12 13v8l-4-4"),
+    Shape::Path("m12 21 4-4"),
+    Shape::Path("M4.393 15.269A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.436 8.284"),
+];
+
+/// Lucide `cloud-upload`: a cloud with an arrow up, "waiting to upload".
+const CLOUD_UPLOAD: &[Shape] = &[
+    Shape::Path("M12 13v8"),
+    Shape::Path("M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"),
+    Shape::Path("m8 17 4-4 4 4"),
+];

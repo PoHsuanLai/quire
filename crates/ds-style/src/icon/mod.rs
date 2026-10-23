@@ -372,6 +372,12 @@ pub enum Icon {
     Pdf,
     /// Lucide `puzzle`: a puzzle piece, the Extensions page (`geometry_files`).
     Puzzle,
+    /// Lucide `cloud`: a file kept in a cloud drive (`geometry_files`).
+    Cloud,
+    /// Lucide `cloud-download`: in the cloud only, click to download (`geometry_files`).
+    CloudDownload,
+    /// Lucide `cloud-upload`: waiting to upload (`geometry_files`).
+    CloudUpload,
 }
 
 impl Icon {
@@ -476,7 +482,10 @@ impl Icon {
             | Icon::FileApp
             | Icon::Lines
             | Icon::Pdf
-            | Icon::Puzzle => geometry_files::shapes(self),
+            | Icon::Puzzle
+            | Icon::Cloud
+            | Icon::CloudDownload
+            | Icon::CloudUpload => geometry_files::shapes(self),
             shell => geometry_shell::shapes(shell),
         }
     }
