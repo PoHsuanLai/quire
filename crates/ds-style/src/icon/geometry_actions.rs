@@ -68,6 +68,40 @@ pub(super) const ELLIPSIS_VERTICAL: &[Shape] = &[
     },
 ];
 
+/// Lucide `grip-vertical`: six dots, two columns of three.
+pub(super) const GRIP: &[Shape] = &[
+    Shape::Circle {
+        cx: "9",
+        cy: "5",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "15",
+        cy: "5",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "9",
+        cy: "12",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "15",
+        cy: "12",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "9",
+        cy: "19",
+        r: "1",
+    },
+    Shape::Circle {
+        cx: "15",
+        cy: "19",
+        r: "1",
+    },
+];
+
 // Lock and switcher parts (M11): the lock field's enter button and its caps-lock mark.
 
 /// Lucide `arrow-right`.

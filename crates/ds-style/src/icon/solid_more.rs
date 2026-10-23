@@ -31,6 +31,7 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::Phone => PHONE,
         Icon::Ellipsis => ELLIPSIS,
         Icon::EllipsisVertical => ELLIPSIS_VERTICAL,
+        Icon::Grip => GRIP,
         Icon::Switches => SWITCHES,
         Icon::ArrowRight => ARROW_RIGHT,
         Icon::CapsLock => CAPS_LOCK,
@@ -205,6 +206,16 @@ const ELLIPSIS_VERTICAL: &[Shape] = &[
     Shape::Solid(
         "M14 5a2 2 0 1 1 -4 0q 0 -.053 .005 -.102a1.996 1.996 0 0 1 1.995 -1.898a2 2 0 0 1 2 2",
     ),
+];
+
+/// quire's filled grip: six dots of radius 1.5 on `GRIP`'s centres, two columns of three.
+const GRIP: &[Shape] = &[
+    Shape::Solid("M10.5 5a1.5 1.5 0 1 1 -3 0a1.5 1.5 0 0 1 3 0"),
+    Shape::Solid("M16.5 5a1.5 1.5 0 1 1 -3 0a1.5 1.5 0 0 1 3 0"),
+    Shape::Solid("M10.5 12a1.5 1.5 0 1 1 -3 0a1.5 1.5 0 0 1 3 0"),
+    Shape::Solid("M16.5 12a1.5 1.5 0 1 1 -3 0a1.5 1.5 0 0 1 3 0"),
+    Shape::Solid("M10.5 19a1.5 1.5 0 1 1 -3 0a1.5 1.5 0 0 1 3 0"),
+    Shape::Solid("M16.5 19a1.5 1.5 0 1 1 -3 0a1.5 1.5 0 0 1 3 0"),
 ];
 
 /// drawn here, filled.

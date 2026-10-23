@@ -132,6 +132,7 @@ pub(super) const TABLE: &[(Icon, Native)] = &[
     (Icon::Phone, Native::Outline),
     (Icon::Ellipsis, Native::Outline),
     (Icon::EllipsisVertical, Native::Outline),
+    (Icon::Grip, Native::Outline),
     (Icon::Switches, Native::Outline),
     (Icon::ArrowRight, Native::Outline),
     (Icon::CapsLock, Native::Outline),
