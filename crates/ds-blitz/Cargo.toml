@@ -81,6 +81,8 @@ memfd = { workspace = true, optional = true }
 wayland-client = { workspace = true, optional = true }
 wayland-backend = { workspace = true, optional = true }
 wayland-protocols = { workspace = true, optional = true }
+# `quire_window`: the client bindings of our own quire_window_v1, generated from `protocols/` by macro.
+wayland-scanner = { workspace = true, optional = true }
 # `menus::ShellOnly` (the `peephole` feature): which program is calling, by its pidfd and the unit
 # manager's facts. Its own repo, taken by tag; Linux only, because it reads `/proc` and the system
 # manager's bus. `desktop` adds the desktop's role names.
@@ -96,7 +98,7 @@ default = ["quire-desktop"]
 # Our desktop's integration on Linux (design/36 section 1): xdg-activation on the app's own Wayland
 # connection (`WindowHandle::focus_with_token`). Without it a token is ignored and the window is
 # raised through winit, the same call with the same result type. `print` and `menus` need it too.
-quire-desktop = ["dep:wayland-client", "dep:wayland-backend", "dep:wayland-protocols"]
+quire-desktop = ["dep:wayland-client", "dep:wayland-backend", "dep:wayland-protocols", "dep:wayland-scanner"]
 # `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
 # Off by default, so an app that never prints builds no D-Bus client for it.
 print = ["quire-desktop", "dep:zbus", "dep:memfd", "dep:ds-peer"]

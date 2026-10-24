@@ -229,6 +229,10 @@ latchkey = { git = "https://github.com/PoHsuanLai/latchkey", rev = "b10ae1b8c49c
 zeroize = "1"
 # ---- END PINNED BLOCK ----
 
+# ds-blitz `quire_window`: client bindings for our own quire_window_v1 protocol, generated from the
+# vendored XML (the version matching wayland-client 0.31).
+wayland-scanner = "0.31"
+
 
 
 [workspace.lints.rust]

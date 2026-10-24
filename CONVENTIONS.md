@@ -268,6 +268,11 @@ remembers.
   copied verbatim into every workspace; a new dependency is a change to that file first, never
   to one crate alone. Never write what a dependency already does (a second PNG encoder); never
   add a dependency for something ten lines do.
+- **Vendored protocol XML stays in step.** `crates/ds-blitz/protocols/quire-window-v1.xml` is a
+  copy of `protocols/quire-window-v1.xml` in casement-protocols, a private repo public quire must
+  not depend on. A protocol change lands there first and is copied here byte for byte after its
+  header comment; never edit the copy alone. The bindings are generated from it by
+  `wayland-scanner`'s macros (`crates/ds-blitz/src/quire_window/proto.rs`).
 - **Small commits**, one concern each, compiling at every commit, message in the imperative.
 
 ## 11. Dev scripts

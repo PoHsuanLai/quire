@@ -74,6 +74,8 @@ mod phase;
 #[cfg(feature = "print")]
 mod print;
 mod probe;
+#[cfg(all(target_os = "linux", feature = "quire-desktop"))]
+mod quire_window;
 mod reveal;
 mod route;
 mod scheme;
@@ -98,6 +100,7 @@ mod window_activate;
 mod window_build;
 mod window_drop;
 mod window_fit;
+mod window_frame;
 mod window_hover;
 mod window_place;
 mod window_platform;

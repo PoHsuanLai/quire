@@ -4,21 +4,27 @@
 #![allow(unsafe_code)]
 
 use raw_window_handle::{DisplayHandle, RawDisplayHandle, RawWindowHandle, WindowHandle};
+use std::ffi::c_void;
 use std::marker::PhantomData;
+use std::ptr::NonNull;
 use wayland_backend::client::Backend;
 use wayland_backend::client::ObjectId;
 use wayland_client::protocol::wl_surface::WlSurface;
 use wayland_client::{Connection, Proxy};
+use wayland_protocols::xdg::shell::client::xdg_toplevel::XdgToplevel;
 
 /// Why a window's connection and surface could not be borrowed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
 pub(crate) enum AdoptError {
     /// The window or the display is not Wayland's.
     #[error("the window is not a Wayland window")]
-    NotWayland,
+    ForeignWindow,
     /// libwayland does not know the surface as a `wl_surface`.
     #[error("the window's surface is not a live wl_surface")]
-    NotASurface,
+    DeadSurface,
+    /// libwayland does not know the pointer as an `xdg_toplevel`.
+    #[error("the window's toplevel is not a live xdg_toplevel")]
+    DeadToplevel,
 }
 
 /// A window's `wl_surface`, and a connection over the display it lives on, both borrowed from
@@ -49,6 +55,18 @@ impl Adopted<'_> {
     pub(crate) fn surface(&self) -> &WlSurface {
         &self.surface
     }
+
+    /// The window's `xdg_toplevel`, from the pointer winit reports for it (`xdg_toplevel` of
+    /// winit's `WindowExtWayland`).
+    pub(crate) fn toplevel(&self, toplevel: NonNull<c_void>) -> Result<XdgToplevel, AdoptError> {
+        // SAFETY: `toplevel` is the `xdg_toplevel*` of the window these handles came from, live
+        // for as long as the window, which `Adopted<'a>` keeps borrowed; `from_ptr` checks the
+        // proxy's class against `xdg_toplevel` and answers an error, not a bad object, on a
+        // mismatch. Dropping the result destroys no protocol object.
+        let id = unsafe { ObjectId::from_ptr(XdgToplevel::interface(), toplevel.as_ptr().cast()) }
+            .map_err(|_| AdoptError::DeadToplevel)?;
+        XdgToplevel::from_id(&self.connection, id).map_err(|_| AdoptError::DeadToplevel)
+    }
 }
 
 /// The connection and surface behind a Wayland window's handles.
@@ -59,7 +77,7 @@ pub(crate) fn adopt<'a>(
     let (RawDisplayHandle::Wayland(display), RawWindowHandle::Wayland(window)) =
         (display.as_raw(), window.as_raw())
     else {
-        return Err(AdoptError::NotWayland);
+        return Err(AdoptError::ForeignWindow);
     };
     // SAFETY: `display` is the `wl_display*` of a live connection: raw-window-handle's contract
     // for the `DisplayHandle<'a>` it came from, which `Adopted<'a>` keeps borrowed for as long
@@ -72,8 +90,8 @@ pub(crate) fn adopt<'a>(
     // the proxy's class against `wl_surface` and answers an error, not a bad object, on a
     // mismatch.
     let id = unsafe { ObjectId::from_ptr(WlSurface::interface(), window.surface.as_ptr().cast()) }
-        .map_err(|_| AdoptError::NotASurface)?;
-    let surface = WlSurface::from_id(&connection, id).map_err(|_| AdoptError::NotASurface)?;
+        .map_err(|_| AdoptError::DeadSurface)?;
+    let surface = WlSurface::from_id(&connection, id).map_err(|_| AdoptError::DeadSurface)?;
     Ok(Adopted {
         connection,
         surface,
@@ -145,6 +163,6 @@ mod tests {
             window.display_handle().expect("a display handle"),
             window.window_handle().expect("a window handle"),
         );
-        assert_eq!(adopted.err(), Some(AdoptError::NotWayland));
+        assert_eq!(adopted.err(), Some(AdoptError::ForeignWindow));
     }
 }

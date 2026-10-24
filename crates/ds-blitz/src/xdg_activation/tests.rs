@@ -154,5 +154,5 @@ fn an_object_that_is_not_a_surface_is_not_adopted() {
         window.window_handle().expect("a window handle"),
     );
 
-    assert_eq!(adopted.err(), Some(AdoptError::NotASurface));
+    assert_eq!(adopted.err(), Some(AdoptError::DeadSurface));
 }

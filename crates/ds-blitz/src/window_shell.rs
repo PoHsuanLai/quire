@@ -42,6 +42,7 @@ use crate::phase::{Early, Layout, Phase};
 use crate::startup_token::LaunchTokens;
 use crate::window_activate::raise;
 use crate::window_build::{Base, Shape, WindowParts, WindowSlot, window_config};
+use crate::window_frame::WindowFrame;
 use crate::window_requests::{Request, WindowKey, WindowLife};
 use crate::window_screen::screen_area;
 use crate::window_scroll::{Frames, Intercept, WindowScroll};
@@ -69,6 +70,8 @@ struct Sub {
     scroll: WindowScroll,
     /// What the window's components decide about a request to close it.
     close: CloseGuard,
+    /// What the compositor was told about the window's shadow and corners.
+    frame: WindowFrame,
     /// The window's animation clock as the early step keeps it: the instant this application was
     /// built, a hair before its renderer's own animation timer starts.
     started: Instant,
@@ -98,6 +101,7 @@ impl Sub {
             phase,
             scroll,
             close,
+            frame: WindowFrame::default(),
             started: Instant::now(),
             renderer,
             relay,
@@ -107,6 +111,13 @@ impl Sub {
 
     fn window_id(&self) -> Option<WindowId> {
         self.slot.window().map(|window| window.id())
+    }
+
+    /// Tell the compositor how the window's frame is drawn, before the commit that shows it.
+    fn tell_frame(&mut self) {
+        if let Some(window) = self.slot.window() {
+            self.frame.tell(window.as_ref());
+        }
     }
 
     /// Give window scrolling `event` before the document hears it. `Taken` when the document
@@ -519,6 +530,7 @@ impl ApplicationHandler for Windows {
         let mut closes = Vec::new();
         if let Some(sub) = self.key_of(window_id).and_then(|key| self.sub_mut(key)) {
             if drawn {
+                sub.tell_frame();
                 closes = sub.scroll_step(event_loop);
                 closes.extend(sub.before_paint(event_loop));
             }

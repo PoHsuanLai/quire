@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Vendored copy of protocols/quire-window-v1.xml from casement-protocols (a private repo), so
+  public quire does not depend on it. Our own protocol, licensed MIT or Apache-2.0 (see the
+  copyright below). Keep it identical to casement-protocols' file: change it there first, then
+  copy it here (CONVENTIONS "Vendored protocol XML").
+-->
+<protocol name="quire_window_v1">
+  <copyright>
+    Copyright 2026 Po Hsuan Lai
+
+    Licensed under the MIT license or the Apache License, Version 2.0, at your option.
+
+    The MIT license:
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+    and associated documentation files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or
+    substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+    BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  </copyright>
+
+  <description summary="what an app can say about its window beyond xdg-shell">
+    A window extension any client may bind. It carries what a desktop-class app says about its
+    toplevel that xdg_toplevel cannot: which parts accept the first click while the window is
+    inactive, whether the compositor draws the shadow and rounds the corners, a placement the
+    person asked for through the app's own controls, the window's role, its accessibility root
+    and whether its document has unsaved changes. In return the client learns the window's
+    emphasis (key, main or inactive) and its current placement.
+
+    This protocol is a draft. Until it is declared stable, version 1 may change in place with
+    every client and the server updated together. Version 2 adds, after everything older, the
+    person's request that the whole app quit; the event it adds says `since="2"` and is sent
+    only to a client that bound the manager at version 2 or later.
+  </description>
+
+  <interface name="quire_window_manager_v1" version="2">
+    <description summary="extends xdg toplevels">
+      The global a client binds to extend its toplevels. Advertised on every connection.
+
+      The manager is also where the app hears that the person asked it to quit (`quit`,
+      version 2): a quit is about the whole app, not one window, and an app with no window
+      still has this object. A client that wants to hear it keeps a manager bound at version 2
+      or later for as long as it runs; destroying the manager ends the listening, and the
+      compositor then closes the app's windows one by one instead.
+    </description>
+
+    <enum name="error">
+      <entry name="already_constructed" value="0"
+             summary="the toplevel already has a quire_window_v1 object"/>
+    </enum>
+
+    <request name="get_window">
+      <description summary="extend a toplevel">
+        Creates the extension object of an xdg_toplevel. A toplevel has at most one; asking for
+        a second while the first exists raises `already_constructed`.
+      </description>
+      <arg name="id" type="new_id" interface="quire_window_v1"/>
+      <arg name="toplevel" type="object" interface="xdg_toplevel"/>
+    </request>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the manager">
+        Objects already created stay valid.
+      </description>
+    </request>
+
+    <event name="quit" since="2">
+      <description summary="the person asked the app to quit">
+        The person asked the app to quit (Command-Q, the Quit item of its menu, or the shell
+        asking for it): save or ask, then exit. This is macOS's applicationShouldTerminate.
+        It is sent in place of asking each window to close, and it reaches an app with no
+        window.
+
+        The app answers by acting, not by a reply: it exits, or it stays (a "Save changes?"
+        sheet, or it declines). The compositor shows the app as quitting for a short grace
+        and takes it for running again if it is still there after that. An app that does
+        nothing is not stuck: the person can close its windows one by one, and Force Quit
+        still ends it.
+
+        Sent to every manager of the connection bound at version 2 or later. A client bound
+        at version 1 never receives it, and the compositor closes its windows one by one.
+      </description>
+    </event>
+  </interface>
+
+  <interface name="quire_window_v1" version="1">
+    <description summary="one toplevel's extension">
+      Requests marked double-buffered take effect on the toplevel's next wl_surface.commit.
+      Destroying the xdg_toplevel first makes this object defunct: every request but `destroy`
+      then raises `defunct_toplevel`.
+    </description>
+
+    <enum name="error">
+      <entry name="defunct_toplevel" value="0" summary="the xdg_toplevel is gone"/>
+      <entry name="bad_role" value="1" summary="a role a client may not ask for"/>
+    </enum>
+
+    <enum name="window_role">
+      <description summary="what kind of window this is">
+        `dialog` and `shell` are known to the compositor from other protocols (xdg-dialog,
+        quire_shell_v1); a client cannot ask for them here.
+      </description>
+      <entry name="document" value="0" summary="an ordinary document or app window"/>
+      <entry name="utility" value="1" summary="a floating panel that serves a document window"/>
+      <entry name="dialog" value="2" summary="a dialog or sheet"/>
+      <entry name="pip" value="3" summary="picture in picture"/>
+      <entry name="shell" value="4" summary="a surface of the desktop shell"/>
+    </enum>
+
+    <enum name="tile_zone">
+      <description summary="the region a tiled window fills">
+        The eight zones of an output's usable area. `place_target` carries the same values for
+        the same zones.
+      </description>
+      <entry name="left" value="0" summary="the left half"/>
+      <entry name="right" value="1" summary="the right half"/>
+      <entry name="top" value="2" summary="the top half"/>
+      <entry name="bottom" value="3" summary="the bottom half"/>
+      <entry name="top_left" value="4" summary="the top-left quarter"/>
+      <entry name="top_right" value="5" summary="the top-right quarter"/>
+      <entry name="bottom_left" value="6" summary="the bottom-left quarter"/>
+      <entry name="bottom_right" value="7" summary="the bottom-right quarter"/>
+    </enum>
+
+    <enum name="place_target">
+      <description summary="where a window is asked to go">
+        A tile zone, or one of fill, centre and restore. The first eight values are
+        `tile_zone`'s.
+      </description>
+      <entry name="left" value="0" summary="the left half"/>
+      <entry name="right" value="1" summary="the right half"/>
+      <entry name="top" value="2" summary="the top half"/>
+      <entry name="bottom" value="3" summary="the bottom half"/>
+      <entry name="top_left" value="4" summary="the top-left quarter"/>
+      <entry name="top_right" value="5" summary="the top-right quarter"/>
+      <entry name="bottom_left" value="6" summary="the bottom-left quarter"/>
+      <entry name="bottom_right" value="7" summary="the bottom-right quarter"/>
+      <entry name="fill" value="8" summary="the whole usable area, still a window"/>
+      <entry name="centre" value="9" summary="centred on its output at its own size"/>
+      <entry name="restore" value="10" summary="the size and place before the last placement"/>
+    </enum>
+
+    <enum name="placement_mark">
+      <description summary="the window's current placement">
+        What the window's zoom control shows as current.
+      </description>
+      <entry name="free" value="0" summary="placed by hand, not tiled"/>
+      <entry name="left" value="1" summary="the left half"/>
+      <entry name="right" value="2" summary="the right half"/>
+      <entry name="top" value="3" summary="the top half"/>
+      <entry name="bottom" value="4" summary="the bottom half"/>
+      <entry name="top_left" value="5" summary="the top-left quarter"/>
+      <entry name="top_right" value="6" summary="the top-right quarter"/>
+      <entry name="bottom_left" value="7" summary="the bottom-left quarter"/>
+      <entry name="bottom_right" value="8" summary="the bottom-right quarter"/>
+      <entry name="fill" value="9" summary="the whole usable area"/>
+      <entry name="full_screen" value="10" summary="full screen in its own Space"/>
+    </enum>
+
+    <enum name="emphasis">
+      <description summary="how much the window stands out">
+        The key window takes keyboard input; the main window is the frontmost document window of
+        the active app while a utility window or panel is key; every other window is inactive.
+      </description>
+      <entry name="key" value="0" summary="takes keyboard input"/>
+      <entry name="main" value="1" summary="the active app's main window, not key"/>
+      <entry name="inactive" value="2" summary="neither key nor main"/>
+    </enum>
+
+    <enum name="frame_mode">
+      <description summary="who draws the window's frame effects"/>
+      <entry name="client" value="0" summary="the client draws its own shadow and corners"/>
+      <entry name="compositor_shadow" value="1"
+             summary="the compositor draws the shadow and clips the corners"/>
+    </enum>
+
+    <enum name="edited">
+      <description summary="whether the window's document has unsaved changes"/>
+      <entry name="saved" value="0" summary="no unsaved changes"/>
+      <entry name="unsaved" value="1" summary="unsaved changes"/>
+    </enum>
+
+    <request name="set_first_mouse">
+      <description summary="where a click on an inactive window acts at once">
+        Double-buffered. Inside `region` (surface-local) a click on the inactive window both
+        activates it and reaches the client; elsewhere it only activates. Null clears the region.
+      </description>
+      <arg name="region" type="object" interface="wl_region" allow-null="true"/>
+    </request>
+
+    <request name="set_frame">
+      <description summary="who draws the shadow and the corner clip">
+        Double-buffered. `corner_radius` is in logical pixels and is read only for
+        `compositor_shadow`.
+      </description>
+      <arg name="mode" type="uint" enum="frame_mode"/>
+      <arg name="corner_radius" type="uint" summary="logical pixels"/>
+    </request>
+
+    <request name="request_placement">
+      <description summary="ask for a placement">
+        Asks the compositor to place the window. `serial` is the serial of the input event that
+        led to the request; without a recent one from this client's seat the request is
+        ignored, so windows never move on their own.
+      </description>
+      <arg name="target" type="uint" enum="place_target"/>
+      <arg name="serial" type="uint" summary="serial of the user's input event"/>
+    </request>
+
+    <request name="set_role">
+      <description summary="declare the window's role">
+        `document`, `utility` or `pip`. `dialog` and `shell` raise `bad_role`.
+      </description>
+      <arg name="role" type="uint" enum="window_role"/>
+    </request>
+
+    <request name="set_a11y_root">
+      <description summary="where the window's accessibility tree lives">
+        The D-Bus name and object path of the window's root accessible object.
+      </description>
+      <arg name="bus_name" type="string"/>
+      <arg name="object_path" type="string"/>
+    </request>
+
+    <request name="set_edited">
+      <description summary="whether the document has unsaved changes"/>
+      <arg name="edited" type="uint" enum="edited"/>
+    </request>
+
+    <request name="destroy" type="destructor">
+      <description summary="drop the extension">
+        The compositor forgets every value set through this object.
+      </description>
+    </request>
+
+    <event name="emphasis">
+      <description summary="the window's emphasis changed">
+        Sent once after creation and on every change.
+      </description>
+      <arg name="emphasis" type="uint" enum="emphasis"/>
+    </event>
+
+    <event name="placement">
+      <description summary="the window's placement changed">
+        Sent once after creation and on every change.
+      </description>
+      <arg name="mark" type="uint" enum="placement_mark"/>
+    </event>
+  </interface>
+</protocol>

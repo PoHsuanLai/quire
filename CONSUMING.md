@@ -253,6 +253,12 @@ window_handle.focus_with_token(token);
 The request is queued and the event loop answers it, like `focus`; `WindowHandle` is
 `use_window_handle()`'s, or the handle `open_window` returned.
 
+**Shadow and rounded corners on our compositor.** A window asks the compositor to draw its
+shadow and clip its corners, at the radius its own edge is drawn with (`--r-window`), as soon as
+it exists; there is nothing to call. The ask goes out on the app's own connection and only to a
+compositor that offers it, so on GNOME, KDE and X11 a window looks as it did. It is part of the
+`quire-desktop` feature, which is on by default.
+
 **The pinned dependency block.** `ds`'s own manifest resolves its dependencies (`dioxus`,
 and for `ds-blitz`, the whole blitz/anyrender/wgpu stack) against *quire's own* workspace —
 a path dependency does not inherit your workspace's `[workspace.dependencies]`, because
