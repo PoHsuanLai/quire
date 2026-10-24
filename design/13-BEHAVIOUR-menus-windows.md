@@ -63,7 +63,7 @@ behaviour and numbers.
 | Pick | the chosen row blinks twice (two flashes of 70 ms), then the menu closes and the action runs | settled (design/30 §1.3, §2.4) |
 | Open animation | none: a menu opens Instant (design/30 §1.3, 27 §5.1) | settled |
 | Close animation | Fade over `--t-quick` (`Exit::Fade`); the owner's `onclose` runs after it ends | settled for Escape and outside click; a ds `Popover` does the same |
-| Highlight | a `Highlight` fill (accent `--sel-bg` with `--sel-ink` text and glyphs), snapping with no transition, follows the pointer and the keyboard | settled (design/30 §2.4, 27 §5.1) |
+| Highlight | a `Highlight` fill (accent `--sel-bg` with `--sel-ink` text and glyphs), snapping with no transition, follows the pointer and the keyboard; the pointer leaving the menu puts it out (nothing is lit, and a key starts again from an end), except on the parent of an open submenu, and a menu the pointer never entered keeps its keyboard highlight, as on macOS | settled (design/30 §2.4, 27 §5.1); leaving settled (owner, 2026-10-24) |
 | Keyboard | Up/Down move with **wrap** (A6); Left/Right switch to the adjacent bar menu or close/open a submenu; Enter, Space or Tab pick; Esc closes one level; typing filters (A6) | settled (A6) |
 | Position (bar menus) | design `placeFloat`: `x = title.left - 8`, `y = title.bottom + 6`; flip and clamp 8 px from output edges; status menus right-aligned to `item.right + 8` | settled (A6) |
 | Implementation | one reusable `xdg_popup` per bar; hover switch = `xdg_popup.reposition` + content swap, so no new grab (and no new input serial) is needed | proposed |
@@ -330,6 +330,7 @@ impl<K: Clone + PartialEq> MenuTrack<K> {
 | Tracking | Move onto title b != a | Tracking{b, same held} | Switch(b) (no animation) |
 | Tracking | Move onto item i (outside any Guard) | hot = i; if i has a submenu: Sub::Pending{i, now} | Highlight(i) |
 | Tracking{sub: Open{guard}} | Move inside the triangle | unchanged, `guard.from` = this point | |
+| Tracking{entered: Entered, sub: None or Pending} | Move outside the menu | hot = none, cursor = none, Sub::None | Highlight(none) |
 | Sub::Pending | Tick, `now - since >= 200 ms` | Sub::Open | OpenSub |
 | Sub::Open{guard} | Tick, `now - still_since >= 300 ms` | re-evaluate hot under pointer | |
 | Tracking | Key Esc | one level up / Closed | CloseSub / Close |

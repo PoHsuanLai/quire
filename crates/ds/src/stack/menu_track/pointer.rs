@@ -64,7 +64,10 @@ pub(super) fn moved<K: Clone + PartialEq>(
 }
 
 /// The pointer is at `at` over `target`, outside any safe triangle: highlight and submenus
-/// follow it.
+/// follow it. Leaving the menu after entering it puts the highlight out, the keyboard cursor's
+/// too, and drops a pending submenu, as a macOS menu does; the parent of an open submenu stays
+/// lit, since it owns that submenu, and a menu the pointer never entered (opened from the
+/// keyboard, or on its chosen value) keeps what it shows.
 fn retarget<K: Clone>(
     session: Session<K>,
     at: Point,
@@ -77,6 +80,9 @@ fn retarget<K: Clone>(
         MenuTarget::Item { .. } | MenuTarget::Menu => Entered::Entered,
         _ => session.entered,
     };
+    let left = matches!(target, MenuTarget::Outside)
+        && session.entered == Entered::Entered
+        && !matches!(session.sub, Submenu::Open { .. });
     let (hot, sub) = match &target {
         MenuTarget::Item {
             path,
@@ -90,14 +96,19 @@ fn retarget<K: Clone>(
             pick: Pickable::Inert,
             ..
         } => (None, close_sub(session.sub, &mut effects)),
+        MenuTarget::Outside if left => (None, Submenu::None),
         _ => (session.hot.clone(), session.sub),
     };
     if hot != session.hot {
         effects.insert(0, MenuTrackEffect::Highlight(hot.clone()));
     }
+    let cursor = match left {
+        true => None,
+        false => hot.clone().or_else(|| session.cursor.clone()),
+    };
     let session = Session {
         entered,
-        cursor: hot.clone().or_else(|| session.cursor.clone()),
+        cursor,
         hot,
         sub,
         pointer: at,

@@ -88,6 +88,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
     let probe = float.surface();
     let key_panel = panel.clone();
     let hover = panel.clone();
+    let leave = panel.clone();
     float.show(
         rsx! {
             div {
@@ -114,6 +115,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
                     });
                 },
                 onmousemove: move |event| hover.hovered(&event),
+                onmouseleave: move |event| leave.left(&event),
                 onkeydown: move |event| {
                     keyed.run(|| {
                         if key_panel.key(&event) == Decision::Back {

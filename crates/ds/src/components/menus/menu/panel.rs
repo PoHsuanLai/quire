@@ -135,6 +135,15 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
         });
     }
 
+    /// The pointer left the panel: the tracker puts the highlight out unless this panel's
+    /// submenu is open (the parent row owns it), and the root reports no choice.
+    pub(crate) fn left(&self, event: &MouseEvent) {
+        self.alive.run(|| {
+            self.tracker.point(client_point(event), MenuTarget::Outside);
+            self.left_items();
+        });
+    }
+
     /// The pointer is over no choice of this panel.
     pub(crate) fn left_items(&self) {
         self.alive.run(|| {

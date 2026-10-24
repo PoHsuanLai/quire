@@ -1,11 +1,11 @@
 //! The tracker's wake and its cursor as tables: when it next wants to be stepped, and where the
-//! keyboard cursor stands.
+//! keyboard cursor stands, the pointer leaving the menu included.
 
 use super::tests::{
     Event, Key, Script, at, click_open, inert, item, parent, path, pt, run, session, submenu_open,
     submenu_open_to,
 };
-use crate::stack::menu_track::types::{ItemPath, MenuPhase, MenuTrack};
+use crate::stack::menu_track::types::{ItemPath, MenuPhase, MenuTarget, MenuTrack, Submenu};
 use ds_core::machine::{Elapsed, Machine};
 use ds_core::time::stamp::Stamp;
 
@@ -136,5 +136,82 @@ fn the_cursor_stays_on_the_last_highlighted_item_while_the_pointer_is_over_somet
         let (phase, _) = run(script);
         assert_eq!(session(&phase).hot, hot, "{name}: highlight");
         assert_eq!(session(&phase).cursor, cursor, "{name}: cursor");
+    }
+}
+
+/// Name, script, the highlight after it, the cursor after it, whether a submenu is still open or
+/// pending.
+type Leave = (
+    &'static str,
+    Script,
+    Option<ItemPath>,
+    Option<ItemPath>,
+    bool,
+);
+
+#[test]
+fn the_pointer_leaving_the_menu_puts_the_highlight_out_unless_its_submenu_is_open() {
+    // As on macOS: out of the menu, nothing is lit, and a key starts again from an end; the
+    // parent of an open submenu stays lit, and a menu the pointer never entered keeps its
+    // keyboard highlight.
+    let out = |ms| (ms, Event::Move(pt(20.0, 400.0), MenuTarget::Outside));
+    let cases: Vec<Leave> = vec![
+        (
+            "off an item",
+            [
+                click_open(),
+                vec![(100, Event::Move(pt(20.0, 60.0), item(2))), out(150)],
+            ]
+            .concat(),
+            None,
+            None,
+            false,
+        ),
+        (
+            "off a parent whose submenu is still waiting: it never opens",
+            [
+                click_open(),
+                vec![(100, Event::Move(pt(20.0, 60.0), parent(2))), out(150)],
+            ]
+            .concat(),
+            None,
+            None,
+            false,
+        ),
+        (
+            "off a parent whose submenu is open: the parent stays lit",
+            [submenu_open(), vec![out(400)]].concat(),
+            Some(path(2)),
+            Some(path(2)),
+            true,
+        ),
+        (
+            "opened from the keyboard, never entered",
+            [click_open(), vec![(100, Event::Select(path(4))), out(150)]].concat(),
+            Some(path(4)),
+            Some(path(4)),
+            false,
+        ),
+        (
+            "back in, the item under the pointer lights",
+            [
+                click_open(),
+                vec![
+                    (100, Event::Move(pt(20.0, 60.0), item(2))),
+                    out(150),
+                    (200, Event::Move(pt(20.0, 80.0), item(3))),
+                ],
+            ]
+            .concat(),
+            Some(path(3)),
+            Some(path(3)),
+            false,
+        ),
+    ];
+    for (name, script, hot, cursor, sub) in cases {
+        let (phase, _) = run(script);
+        assert_eq!(session(&phase).hot, hot, "{name}: highlight");
+        assert_eq!(session(&phase).cursor, cursor, "{name}: cursor");
+        assert_eq!(session(&phase).sub != Submenu::None, sub, "{name}: submenu");
     }
 }

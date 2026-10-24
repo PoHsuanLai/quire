@@ -57,6 +57,7 @@ mod marquee;
 mod menu_cursor;
 mod menu_in_card;
 mod menu_keep_open;
+mod menu_leave;
 mod menu_pick;
 mod menu_rich_items;
 mod menu_scroll;

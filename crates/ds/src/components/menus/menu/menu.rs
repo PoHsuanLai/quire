@@ -255,7 +255,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
                 });
             },
             onmousemove: move |event| hover.hovered(&event),
-            onmouseleave: move |_| leave.left_items(),
+            onmouseleave: move |event| leave.left(&event),
             onmousedown: move |_| {
                 pressed.run(|| gesture.set(Gesture::Pressed));
             },

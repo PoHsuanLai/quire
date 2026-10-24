@@ -5,6 +5,10 @@ first, with what a consumer has to change.
 
 ## v0.3.49 (unreleased)
 
+### menu-leave
+
+- A menu's highlight goes out when the pointer leaves the menu, as a macOS menu's does: nothing is lit once the pointer is outside it, a key starts again from an end, and the pointer back in lights the row under it. The parent row of an open submenu stays lit, since it owns the submenu; a pending submenu the pointer leaves never opens; a menu the pointer never entered (opened from the keyboard, or on a pop-up's chosen value) keeps its highlight. Every ds `Menu` and its submenus have it (context, pop-up, pull-down, bar menus, pick lists, search suggestions); a caller's `MenuCursor::Controlled` highlight is the caller's and is not changed. No consumer change.
+
 ### wh-qframe
 
 - Windows ask the compositor for their shadow and corner clip. On a Wayland compositor that offers our `quire_window_v1`, each window sends `set_frame(compositor_shadow, radius)` once it exists, with the radius of its own drawn edge (`--r-window`, 10), and keeps the object for as long as the window lives. Before this a quire app on our compositor had square corners and no shadow. Other compositors (GNOME, KDE) and X11 are asked nothing and look as they did. The bindings are generated from the vendored `crates/ds-blitz/protocols/quire-window-v1.xml` with `wayland-scanner` (a new optional dependency of ds-blitz, on with `quire-desktop`); no consumer change.
