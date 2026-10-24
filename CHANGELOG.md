@@ -3,11 +3,13 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.49 (unreleased)
+## v0.3.50 (unreleased)
 
 ### menu-leave
 
 - A menu's highlight goes out when the pointer leaves the menu, as a macOS menu's does: nothing is lit once the pointer is outside it, a key starts again from an end, and the pointer back in lights the row under it. The parent row of an open submenu stays lit, since it owns the submenu; a pending submenu the pointer leaves never opens; a menu the pointer never entered (opened from the keyboard, or on a pop-up's chosen value) keeps its highlight. Every ds `Menu` and its submenus have it (context, pop-up, pull-down, bar menus, pick lists, search suggestions); a caller's `MenuCursor::Controlled` highlight is the caller's and is not changed. No consumer change.
+
+## v0.3.49
 
 ### wh-qframe
 
