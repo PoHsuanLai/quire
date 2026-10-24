@@ -9,6 +9,10 @@ first, with what a consumer has to change.
 
 - Windows ask the compositor for their shadow and corner clip. On a Wayland compositor that offers our `quire_window_v1`, each window sends `set_frame(compositor_shadow, radius)` once it exists, with the radius of its own drawn edge (`--r-window`, 10), and keeps the object for as long as the window lives. Before this a quire app on our compositor had square corners and no shadow. Other compositors (GNOME, KDE) and X11 are asked nothing and look as they did. The bindings are generated from the vendored `crates/ds-blitz/protocols/quire-window-v1.xml` with `wayland-scanner` (a new optional dependency of ds-blitz, on with `quire-desktop`); no consumer change.
 
+### wh-qstyle
+
+- ds-style builds without warnings when its default feature `icon-classify` is off (casement builds it that way): the colour imports only that feature uses are behind it.
+
 ## v0.3.48
 
 ### wh-q48

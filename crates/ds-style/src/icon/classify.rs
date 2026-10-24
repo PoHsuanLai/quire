@@ -10,7 +10,9 @@
 //! register the key in its own
 //! settings crate and pass the parsed value through (FINDINGS "Settings and schema").
 
+#[cfg(feature = "icon-classify")]
 use ds_core::colour::oklab::{Oklab, Oklch};
+#[cfg(feature = "icon-classify")]
 use ds_core::colour::srgb::Srgb;
 use ds_core::error::DsError;
 
