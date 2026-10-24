@@ -13,6 +13,10 @@ first, with what a consumer has to change.
 
 - ds-style builds without warnings when its default feature `icon-classify` is off (casement builds it that way): the colour imports only that feature uses are behind it.
 
+### wh-qpin
+
+- Blitz moves to our fork's 41134ff3 (blitz-kit 80938e37): a text input takes its element's whole font (family, weight, style, features), Return adds one line to a textarea instead of two, an arrow press moves the caret once on macOS, and a table cell is at least its content's width while its row grows to hold it. anyrender moves to 03fcbe4c (a skipped vello_hybrid frame is not carried into the next) and vello to 5c986661 (a test of the bitmap-glyph change). Consumers that build ds-blitz copy the new docs/fork-patches.toml and pinned block.
+
 ## v0.3.48
 
 ### wh-q48
