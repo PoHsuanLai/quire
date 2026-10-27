@@ -14,7 +14,6 @@ use ds::style::appearance::blur::BlurState;
 use ds::style::icon::render::Glyph;
 use ds::style::material::recipe::DEFAULT_TINT_ALPHA;
 use ds::style::tokens::control_size::ControlSize;
-use ds::style::tokens::status::StatusMetrics;
 
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
 fn wearer(material: Material) -> &'static str {
@@ -97,7 +96,7 @@ fn Panel(material: Material) -> Element {
     };
     match material {
         Material::Bar => rsx! {
-            div { class: "g-panel g-panel-bar g-row", style: StatusMetrics::default().style_attr(),
+            div { class: "g-panel g-panel-bar g-row", style: "--bar-status-box:22px;--bar-status-glyph:16px;",
                 Glyph { icon: Icon::Grid, size: IconSize::Bar }
                 span { class: "g-name", "Files" }
                 span { class: "g-code", "{state}" }

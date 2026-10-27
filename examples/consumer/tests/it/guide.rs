@@ -153,13 +153,7 @@ fn BarRoot() -> Element {
 /// Section 6, "Status items".
 #[component]
 fn StatusItems() -> Element {
-    use ds::style::tokens::status::StatusMetrics;
-
-    let metrics = StatusMetrics {
-        box_size: Px(22.0),
-        glyph: Px(16.0),
-    };
-    rsx! { div { class: "status", style: metrics.style_attr(), YourPage {} } }
+    rsx! { div { class: "status", style: "--bar-status-box:22px;--bar-status-glyph:16px;", YourPage {} } }
 }
 
 /// Section 6, "Focus waits out a busy document".

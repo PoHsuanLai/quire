@@ -39,7 +39,7 @@ use crate::tokens::{
     signal_colour::SignalColour,
     size_vars::SizeToken,
     spacing::SpacingToken,
-    status::StatusMetrics,
+    status,
     tag_colour::TagColour,
     terminal::{TerminalColour, TerminalMetric},
     timing::DurationToken,
@@ -156,7 +156,7 @@ fn ground(_: &Kits) -> Cow<'static, str> {
 fn inline_vars() -> Vec<String> {
     let named = MATERIAL_VARS
         .into_iter()
-        .chain([TINT_ALPHA, StatusMetrics::BOX_VAR, StatusMetrics::GLYPH_VAR])
+        .chain([TINT_ALPHA, status::BOX_VAR, status::GLYPH_VAR])
         .chain(STACK_INPUTS)
         .chain(LEVEL_VARS)
         .chain(ORB_VARS)

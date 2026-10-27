@@ -141,7 +141,7 @@ fuzzy matcher, the `MenuTrack` effects and the panel a menu and its `SubMenu`s s
 `peek` §24, `command_palette` §25, `appearance_picker` §26, `pin_tile`, `pin_tiles` and `pin_order` (design/30 §2.11; the old `account_tile` §27),
 `provider_mark` §28, `palette_lines`, `palette_select` and `palette_rows` (§25's pure lines, the
 selection, its own or the caller's, and the selected row's rect; FINDINGS "Launcher gaps"), `link_pill` §29, `icon_view` (08-ICONS §1.5: any icon slot's content),
-`press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` reports, and the keys that activate a control, FINDINGS "Pointer events", "Bar gaps"), `StatusMetrics` (`ds-style/tokens/status.rs`, read by `MenuBarItem`; 13 §13.3.1; FINDINGS "Bar gaps"), `send_pill` §31, `space_editor`
+`press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` reports, and the keys that activate a control, FINDINGS "Pointer events", "Bar gaps"), `status::{BOX_VAR, GLYPH_VAR}` (`ds-style/tokens/status.rs`, the stylesheet tokens `MenuBarItem` reads; 13 §13.3.1; FINDINGS "Bar gaps"), `send_pill` §31, `space_editor`
 §32, `edge_peek` (the old `edge_strip` §33), `today_tabs`, `space_switch`, `hover_open`, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
 (13 §13.3.1, the bar's item button, title or glyph), `workspace_pills` §37 and `dock/` §38 (`DockTile`,
 `DockLabel`, `RunningDot`, `DockFloor`; 10 §10.3.2).

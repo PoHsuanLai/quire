@@ -3,7 +3,15 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.53 (unreleased)
+## v0.3.54 (unreleased)
+
+### wh-qstat
+
+- `StatusMetrics` is gone: the bar status item's `--bar-status-box` and `--bar-status-glyph` are stylesheet tokens (sill's sheet declares 22 and 16), so nothing writes them inline. `ds::style::tokens::status::{BOX_VAR, GLYPH_VAR}` still name them for the lint.
+  **Consumer change:** drop `StatusMetrics` and its `style_attr()` write; to move the box or glyph, set the property in a stylesheet.
+- design/22 drops the rows of the 29 pixel keys sill retired (bar, dock, launcher, scroll bar, notifications, control center and OSD sizes, now stylesheet tokens) and retires §3.16 `osd`.
+
+## v0.3.53
 
 ### wh-qres
 

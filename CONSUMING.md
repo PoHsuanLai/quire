@@ -1246,15 +1246,14 @@ For a bar (FINDINGS "Bar gaps"):
 - **Status items.** sill's `MenuBarItem { image: ImagePosition::Only, icon, label, .. }` (`sill_shell_kit::prelude`) is a square of
   `--bar-status-box` holding its glyph (or external icon) at `--bar-status-glyph`,
   `--f-ink-soft` at rest, `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` when
-  `value` is `On` or `shown` is `Visible`. Write the two properties on any element around your items
-  with `ds::style::tokens::status::StatusMetrics` (the bar's `status_icon_box_px` and `status_glyph_px` settings, 22 and 16 by default):
+  `value` is `On` or `shown` is `Visible`. The two properties are stylesheet tokens (22 and 16 px
+  in sill's sheet; `ds::style::tokens::status::{BOX_VAR, GLYPH_VAR}` name them); a look or the
+  person's own sheet moves them, and your own element may set them:
 
   ```rust,ignore
-  let metrics = StatusMetrics { box_size: Px(22.0), glyph: Px(16.0) };
-  rsx! { div { class: "status", style: metrics.style_attr(), /* MenuBarItem { image: Only, .. } … */ } }
+  rsx! { div { class: "status", style: "--bar-status-box:22px;--bar-status-glyph:16px;", /* MenuBarItem { image: Only, .. } … */ } }
   ```
-  (`style_attr()` is `--bar-status-box:22px;--bar-status-glyph:16px;` at the defaults; custom
-  properties with lengths on your own element pass the markup lint.) An external icon in a
+  (Custom properties with lengths on your own element pass the markup lint.) An external icon in a
   status item is sized by the property too, whatever its `ExternalIcon::size`.
 - **Menu control.** `Menu` takes `on_hover: Option<EventHandler<Option<usize>>>` (the choice
   under the pointer, numbered as `expanded` counts; `None` once it is over none),

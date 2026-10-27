@@ -1,7 +1,7 @@
 //! Tuned tokens: a token whose value a look or a style sheet can move. The stylesheet declares
 //! the token on `.ds` as `var(--input, default)` with the default as the fallback
 //! (`--fs-shell-menu:var(--shell-menu-font,13px)`), and a consumer may write the input on any
-//! element around its surface (`StatusMetrics`, `DockMetrics`). Every nested `.ds` re-declares the
+//! element around its surface (`DockMetrics` in sill). Every nested `.ds` re-declares the
 //! token from the inherited input, so one inline write reaches every scope under it, where
 //! writing the token itself would be undone by the next nested scope. A family is tuned by
 //! `#[token(kind = tuned)]`; its variants name the `input` and the default `value`.

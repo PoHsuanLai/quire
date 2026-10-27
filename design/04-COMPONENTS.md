@@ -379,9 +379,9 @@ takes the variant's size below.
 | Pin | aspect-ratio 1, fills a 4-column grid cell, gap 6 | 12px | `--f-ink`, bg `--f-pill-hover` | content (§27) | Space frame |
 | Status | `--bar-status-box` square (default 22) | `--r-item` | `--f-ink-soft`, transparent; hover `--f-ink` on `--f-pill-hover`; pressed/expanded `--f-pill` | `--bar-status-glyph` (default 16), sized in CSS | Space frame (the bar) |
 
-Status is settled (bar gaps, sill Q12; 13 §13.3.1): a consumer writes the two properties with
-`ds::style::tokens::status::StatusMetrics` from `bar.status_icon_box_px`, `bar.status_glyph_px` and
-`bar.glyph_size_policy` (22-SETTINGS §3).
+Status is settled (bar gaps, sill Q12; 13 §13.3.1): the two properties are stylesheet tokens
+(sill's sheet declares 22 and 16; `ds::style::tokens::status::{BOX_VAR, GLYPH_VAR}` name them), and
+a look or the person's own sheet moves them; the settings keys are retired (2026-10-27).
 
 **The frame ground** (settled, bar gaps): the sidebar item's pattern (§19, `--f-*` inks on the
 frame) is a scope, not a per-component variant. Under `data-ground="frame"` (a Bar or Dock root,

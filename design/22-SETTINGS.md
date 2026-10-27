@@ -185,10 +185,7 @@ icon in both schemes) are no longer settings. The three constants with no reader
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `bar.height_px` | `Px` | `24` | 24-32 (macOS 24pt; items 22, status slots 30x22) | `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28`; `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | settled 2026-09-28 (user: 24) |
 | `bar.title_hit_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | RETIRING: no reader; a bar item's hit box is the item's own (`BarPointer`, design/30 section 2.10) |
-| `bar.status_icon_box_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `20-SURFACES.md#1-1-bar-spec-tier-1` (`IconSize::Bar`) | proposed |
-| `bar.status_glyph_px` | `Px` | `16` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
 | `bar.battery_low_percent` | `Percent` | `20` | `5..=50`; at or under this charge, on battery, the fill turns `--battery-low` and the item nudges once per discharge | `26-DETAILS.md` §5.1.3 G10, G11; sill FINDINGS F822 | proposed (D1, 2026-09-27) |
 | `bar.autohide` | `BarAutohide::{Always,DesktopOnly,FullScreenOnly,Never}` | `FullScreenOnly` | TOML words `always`, `desktop_only`, `full_screen_only`, `never`; macOS's "Automatically hide and show the menu bar" (Always, On Desktop Only, In Full Screen Only, Never); Appearance › Bar | `28-CUSTOMIZATION.md` (menu bar auto-hide is a scalar key, not a placement); sill's bar auto-hide | settled (shell, 2026-10-22) |
 
@@ -202,30 +199,21 @@ Pinned items live in `[[dock]]` rows of `~/.config/sill/layout.toml` (design/28 
 | `dock.magnification` | `Magnification::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (preference) |
 | `dock.tile_size_px` | `Px` | `48` | `32..=80` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
 | `dock.magnified_size_px` | `Px` | `72` | `32..=72` (was `tile_size..128` and 96 before the shell owner settled it on 72, 2026-10-20) | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
-| `dock.tile_gap_px` | `Px` | `8` | was 4 before the polish pass | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
 | `dock.progress_style` | `ProgressStyle::{Ring,Bar}` | `Ring` | alt `Bar` (macOS draws a bar under the icon) | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 2 | RETIRING: no reader; the Dock draws a bar under the icon, as macOS does (design/30 Part 4) |
 | `dock.autohide` | `AutoHide::{Off,On}` | `Off` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (preference) |
 | `dock.position` | `DockPosition::{Bottom,Left,Right}` | `Bottom` | Left/Right deferred | `10-BEHAVIOUR-dock.md#10-6-configuration` | RETIRING: no reader; the dock is always at the bottom until Left and Right are built |
 | `dock.indicators` | `Indicators::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
 | `dock.trash` | `TrashTile::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
-| `dock.pill_radius_px` | `Px` | `22` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
-| `dock.edge_clamp_px` | `Px` | `8` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
-| `dock.running_dot_diameter_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
 | `dock.badge_size_px` | `Px` | `18` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | RETIRING: no reader; quire's `Badge` and `ProgressIndicator` set their own sizes (`DockTile`) |
 | `dock.badge_radius_px` | `Px` | `9` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | RETIRING: no reader; quire's `Badge` and `ProgressIndicator` set their own sizes (`DockTile`) |
 | `dock.progress_ring_diameter_px` | `Px` | `20` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | RETIRING: no reader; quire's `Badge` and `ProgressIndicator` set their own sizes (`DockTile`) |
 | `dock.progress_ring_stroke_px` | `Px` | `3` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | RETIRING: no reader; quire's `Badge` and `ProgressIndicator` set their own sizes (`DockTile`) |
-| `dock.separator_height_px` | `Px` | `36` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
-| `dock.pill_padding_px` | `Px` | `6` | `0..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `dock.running_dot_gap_px` | `Px` | `3` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `dock.floor` | `DockFloor::{Off,On}` | `Off` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 
 ### 3.6 `launcher` (sill/settings.toml)
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `launcher.top_bar_gap_px` | `Px` | `24` | from `max(bar_h + 24, ...)` | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
-| `launcher.top_centre_bias_px` | `Px` | `230` | from `round(0.4 x output_h - 230)` | `13-BEHAVIOUR-menus-windows.md#13-3-9-launcher-appearance-spotlight-like` | proposed |
 | `launcher.clipboard_history` | `ClipboardHistory::{Memory,Off}` | `Memory` | memory only, forgotten when sill stops; password-manager copies never kept; Off watches nothing | `09-ARC-HEURISTICS.md` H4; sill M9 (Q301) | settled (user, 2026-09-27) |
 | `launcher.emoji_skin_tone` | `EmojiSkinTone::{Default,Light,MediumLight,Medium,MediumDark,Dark}` | `Default` | Unicode's five modifiers or the yellow default | `20-SURFACES.md` §1.3; sill M9 (Q301) | settled (user, 2026-09-27) |
 | `launcher.web_search` | `WebSearch::{On,Off}` | `On` | "Search the web for …" as the last result | `20-SURFACES.md` §1.3; sill M9 (Q301) | settled (user, 2026-09-27) |
@@ -247,13 +235,6 @@ palmrest's `feel` module; `scroll.speed` lives under `gestures` (3.9) in `palmre
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `scroll.scrollbars` | `ScrollbarVisibility::{WhenScrolling,Always}` | `WhenScrolling` | | `11-BEHAVIOUR-scroll.md#11-6-configuration` | proposed |
-| `scrollbar.track_thickness_px` | `Px` | `12` | hover `16` | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
-| `scrollbar.track_thickness_hover_px` | `Px` | `16` | | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
-| `scrollbar.thumb_thickness_px` | `Px` | `8` | hover `12` | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
-| `scrollbar.thumb_thickness_hover_px` | `Px` | `12` | | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
-| `scrollbar.thumb_min_length_px` | `Px` | `18` | | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
-| `scrollbar.legacy_track_width_px` | `Px` | `15` | used when `scroll.scrollbars = Always` | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
-| `scrollbar.other_axis_offset_px` | `Px` | `12` | vertical track stops short when horizontal is visible | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
 | `scrollbar.track_click_mode` | `TrackClick::{PageTowardClick,JumpToClick}` | `PageTowardClick` | macOS default is "jump to next page" | `11-BEHAVIOUR-scroll.md#11-3-12-overlay-scrollbar-our-own-thumb` | proposed |
 
 ### 3.9 `gestures` (palmrest/gestures.toml)
@@ -290,12 +271,7 @@ loads, the keys are ignored. The section number stays so later links hold.
 | --- | --- | --- | --- | --- | --- |
 | `notifications.dnd` | `Dnd::{On,Off}` | `Off` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
 | `notifications.banner_style` | `BannerStyle::{Banner,Alert,None}` per app | `Banner` | | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | settled (preference), R8 |
-| `notifications.position_right_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | settled (R8) |
-| `notifications.position_top_gap_px` | `Px` | `8` | on top of `bar.height_px` | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | settled (R8) |
-| `notifications.banner_width_px` | `Px` | `360` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
-| `notifications.icon_px` | `Px` | `32` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.banner_entry_direction` | `BannerEntry::{FromRight,FromBelow}` | `FromRight` | | `05-MOTION.md#12-open-decisions` item 7 | RETIRING: no reader; a banner slides in from and out to the right (design/30 section 1.3) |
-| `notifications.center_width_px` | `Px` | `384` | `280..=600` | `20-SURFACES.md#1-6-notifications`; `13-BEHAVIOUR-menus-windows.md#13-3-6`; sill M6 freeze | proposed (M6 freeze, 2026-09-25) |
 | `notifications.swipe` | `NotificationSwipe::{KeepInCenter,Dismiss}` | `KeepInCenter` | macOS keeps a swiped banner in Notification Center (design/13 said dismiss); to be confirmed when M6 lane a reports | `20-SURFACES.md#1-6-notifications`; `13-BEHAVIOUR-menus-windows.md#13-3-6`; sill M6 freeze | proposed (M6 freeze, 2026-09-25) |
 
 ### 3.13 `control_center` (sill/settings.toml)
@@ -306,11 +282,7 @@ until that comparison happens (see handback report).
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `control_center.width_px` | `Px` | `320` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed |
-| `control_center.grid_gap_px` | `Px` | `10` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
-| `control_center.grid_padding_px` | `Px` | `10` | | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `control_center.modules` | `Vec<ControlCenterModule>` | `[Wifi, Bluetooth, Focus, Display, KeyboardBrightness, Sound, NowPlaying, Appearance, Battery]` | KeyboardBrightness is drawn only where UPower reports a keyboard backlight | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center`; design/26 D2 (G25) | proposed (D2, 2026-09-27) |
-| `control_center.bottom_margin_px` | `Px` | `16` | `0..=64`; the panel scrolls past `output_h - bar_h - this` | `13-BEHAVIOUR-menus-windows.md#13-3-7-control-center` | proposed (M5 freeze, 2026-09-25) |
 | `control_center.menu_bar_wifi` | `InMenuBar::{Show,Hide}` | `Show` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
 | `control_center.menu_bar_bluetooth` | `InMenuBar::{Show,Hide}` | `Hide` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
 | `control_center.menu_bar_sound` | `InMenuBar::{Show,Hide}` | `Show` | the module as its own bar item, left of the control center item; a click opens that module's detail pane directly | `20-SURFACES.md#1-5-control-center`; user direction 2026-09-25 (controls at the top right, macOS "Show in Menu Bar") | proposed (M5 freeze, 2026-09-25) |
@@ -336,13 +308,11 @@ All Advanced (§5). The display service reads the EDID, classifies the panel's g
 | `display.night_warmth_strength` | `Percent` | `50` | `0..=100` | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 | `display.font_rendering` | `FontRendering::{Auto,Off}` | `Auto` | `Auto` sets hinting and subpixel positioning from the output's ppi | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 
-### 3.16 `osd` (sill/settings.toml)
+### 3.16 `osd` (retired)
 
-All Advanced (§5). The on-screen display for volume and brightness (design/20 §1.7): a Material::Osd card at the top right under the bar (as current macOS), styled like a control-center slider module, that takes the Space gradient tint, holds, then fades.
-
-| Key | Type | Default | Range / Alt | Source | Status |
-| --- | --- | --- | --- | --- | --- |
-| `osd.margin_px` | `Px` | `24` | `0..=400`; the gap from the bar's reserve (at the top) or the dock's (at the bottom) to the card; was `osd.bottom_margin_px` before the top-right decision | `20-SURFACES.md#1-7-osd`; sill FINDINGS "OSD" | proposed (2026-09-25) |
+Retired 2026-10-27: the on-screen display's margin is a stylesheet token in sill, and the
+`osd` domain is gone from sill's schema; a file that still has `osd.*` loads, the keys are
+ignored. The section number stays so later links hold.
 
 ### 3.17 `power_menu` (retired)
 
