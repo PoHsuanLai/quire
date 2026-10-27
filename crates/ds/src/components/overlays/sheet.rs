@@ -78,6 +78,8 @@ pub fn Sheet(
     // so Escape reaches whatever is under it.
     let up = matches!(presence, Presence::Entering | Presence::Present);
     let mut joined = use_hook(|| CopyValue::new(true));
+    // Before the early return below, so the hooks keep their order while the sheet comes and goes.
+    let keyed = use_hook(|| CopyValue::new(Keyed::Outside));
     if up != *joined.peek() {
         joined.set(up);
         queue_effect(move || {
@@ -92,7 +94,6 @@ pub fn Sheet(
         float.show(rsx! {}, onclose);
         return rsx! {};
     };
-    let keyed = use_hook(|| CopyValue::new(Keyed::Outside));
     let class = common.class("ds-sheet");
     let data = common.data_attributes();
     let panel = rsx! {
@@ -109,7 +110,10 @@ pub fn Sheet(
             tabindex: "-1",
             onfocusin: move |_| {
                 let mut keyed = keyed;
-                keyed.set(Keyed::Inside);
+                // A focus that lands after the sheet's scope is gone has nothing left to mark.
+                if let Ok(mut seen) = keyed.try_write() {
+                    *seen = Keyed::Inside;
+                }
             },
             onmounted: move |event: MountedEvent| {
                 take_keyboard(event.data(), keyed);
