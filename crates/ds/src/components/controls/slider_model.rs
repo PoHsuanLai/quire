@@ -11,18 +11,11 @@ pub enum SliderLook {
     /// settings row. The default for anything a person sets with a pointer.
     #[default]
     Linear,
-    /// The Mac's Control Center level slider (Display, Sound, Keyboard Brightness): a 22 high
+    /// The Control Center's level slider (Display, Sound, Keyboard Brightness): a 22 high
     /// capsule whose fill ends under a round white knob, the level's glyph inside the knob. The
     /// fill, the well and the knob are the material's level inks. Click anywhere jumps the knob,
     /// a drag moves it, the arrows step a sixteenth (design/29 section 16, design/34 section 3.4).
-    Mac,
-    /// The iOS pill: a thick capsule whose fill is the material's bright ink, its glyph inside at
-    /// the left end, two-toned where the fill covers it, and no knob. Nothing on a Mac draws it;
-    /// kept for the media `Capsule`'s volume and for a consumer not yet moved to [`Self::Mac`].
-    Capsule,
-    /// The capsule with a separate round knob riding the fill's end, the glyph before it, outside
-    /// the capsule. Superseded by [`Self::Mac`], which puts the glyph in the knob as macOS does.
-    CapsuleKnob,
+    Level,
 }
 
 /// The tick marks of a linear slider (`NSSlider.numberOfTickMarks`): none, or one every so much
@@ -127,7 +120,6 @@ mod tests {
         for look in SliderLook::ALL {
             assert_eq!(SliderLook::parse(look.slug()), Some(*look));
         }
-        assert_eq!(SliderLook::CapsuleKnob.slug(), "capsule-knob");
-        assert_eq!(SliderLook::Mac.slug(), "mac");
+        assert_eq!(SliderLook::Level.slug(), "level");
     }
 }

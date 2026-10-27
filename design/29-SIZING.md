@@ -466,7 +466,7 @@ values). The HIG says nothing about Control Center; the module rows are observat
 
 | Was | Is |
 | --- | --- |
-| `Slider` looks: `Linear`, `Capsule` (iOS pill, no knob, glyph inside the fill, drawn twice), `CapsuleKnob` (glyph beside the rail) | `Mac` added: knob carries the glyph (14 px, once), no lead glyph, the rail is the whole width. `Linear` stays the default (it is `NSSlider`: 4 px track, accent fill, 20 px knob, for settings rows). `Capsule` and `CapsuleKnob` stay only for the media `Capsule` bar's volume and for consumers not yet re-pinned; no Mac surface should draw them |
+| `Slider` looks: `Linear`, `Capsule` (iOS pill, no knob, glyph inside the fill, drawn twice), `CapsuleKnob` (glyph beside the rail) | `Level` added: knob carries the glyph (14 px, once), no lead glyph, the rail is the whole width. `Linear` stays the default (it is `NSSlider`: 4 px track, accent fill, 20 px knob, for settings rows). `Capsule` and `CapsuleKnob` are deleted (2026-10-27); the media `Capsule` bar's volume uses `Level` |
 | Control center level module: header glyph + title + percentage over a capsule 22 with the glyph beside it | Title and percentage over the Mac slider, no header glyph (the knob has it); height unchanged at 64 |
 | Volume/brightness OSD: the continuous capsule | The sixteen-square style (`LevelStyle::Discrete`), as the bezel draws it |
 
@@ -475,7 +475,7 @@ values). The HIG says nothing about Control Center; the module rows are observat
 | Token / value | Old | New |
 | --- | --- | --- |
 | `Slider` look default | `Linear` | `Linear` (unchanged) |
-| Control center level slider look | `CapsuleKnob` | `Mac` |
+| Control center level slider look | `CapsuleKnob` | `Level` (was `Mac`) |
 | Level glyph size | 22 (lead, outside the rail) or 16 (inside) | 14 (inside the knob) |
 | Rail height | 22 | 22 |
 | Knob | 20, empty | 20, holds the glyph in `--m-level-glyph-fill` |

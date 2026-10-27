@@ -50,20 +50,20 @@ pub const MUTED_SCALE: f32 = 0.04 / 0.07;
 pub const TINT_CHROMA_MAX: f32 = 0.07;
 
 impl Tint {
-    /// `icons.monochrome_tint = neutral`: no hue at all.
+    /// No hue at all: a neutral grey.
     pub const NEUTRAL: Tint = Tint {
         hue: 0.0,
         chroma: 0.0,
     };
 
-    /// `icons.monochrome_tint = space`: the hue and chroma of the accent the Space derives
-    /// (its first dot at Blue's weight, design/03-COLOR.md section 5), so the icons follow
-    /// the frame. Capped at [`TINT_CHROMA_MAX`].
+    /// The hue and chroma of the accent the Space derives (its first dot at Blue's weight,
+    /// design/03-COLOR.md section 5), so the icons follow the frame; the only tint Monochrome
+    /// uses (there is no `icons.monochrome_tint` setting). Capped at [`TINT_CHROMA_MAX`].
     pub fn space(dots: &[Dot]) -> Tint {
         Tint::from_hex(&derive(dots, Scheme::Light).accent).unwrap_or(Tint::NEUTRAL)
     }
 
-    /// `icons.monochrome_tint = accent`, or any `#RRGGBB`: its hue and chroma, capped. `None`
+    /// Any `#RRGGBB` (an accent's): its hue and chroma, capped. `None`
     /// when the text is not a hex colour.
     pub fn from_hex(hex: &str) -> Option<Tint> {
         let digits = hex.strip_prefix('#')?;

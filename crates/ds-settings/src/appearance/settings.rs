@@ -5,7 +5,6 @@
 
 use crate::region::RegionSettings;
 use crate::schema::{Page, Provided};
-use crate::units::{Fraction, Percent};
 use ds_core::word::Word;
 use ds_style::appearance::accent::Accent;
 use ds_style::appearance::appearance::Appearance;
@@ -98,76 +97,6 @@ pub struct AppearanceSettings {
         agent_settable
     )]
     pub custom_styles: CustomStyles,
-    /// `appearance.material_tint_alpha`: the tint's alpha over compositor blur (proposed 80).
-    #[settings(
-        label = "Material tint",
-        help = "How strong the tint is over the blur.",
-        section = "Materials",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub material_tint_alpha: Percent,
-    /// `appearance.material_highlight_light` (the macOS polish pass; percent, default 30).
-    #[settings(
-        label = "Highlight (light)",
-        help = "How strong the top highlight is on light materials.",
-        section = "Materials",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub material_highlight_light: Percent,
-    /// `appearance.material_highlight_dark` (the macOS polish pass; percent, default 12).
-    #[settings(
-        label = "Highlight (dark)",
-        help = "How strong the top highlight is on dark materials.",
-        section = "Materials",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub material_highlight_dark: Percent,
-    /// `appearance.material_hairline_light` (the macOS polish pass; percent, default 14).
-    #[settings(
-        label = "Hairline (light)",
-        help = "How strong the edge line is on light materials.",
-        section = "Materials",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub material_hairline_light: Percent,
-    /// `appearance.material_hairline_dark` (the macOS polish pass; percent, default 60).
-    #[settings(
-        label = "Hairline (dark)",
-        help = "How strong the edge line is on dark materials.",
-        section = "Materials",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub material_hairline_dark: Percent,
-    /// `appearance.material_shadow_strength` (the macOS polish pass; percent, default 100).
-    #[settings(
-        label = "Shadow strength",
-        help = "How strong shadows under floating panels are.",
-        section = "Materials",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub material_shadow_strength: Percent,
-    /// `appearance.material_vibrancy` (the macOS polish pass; percent, default 100).
-    #[settings(
-        label = "Vibrancy",
-        help = "How much the tint's colour is boosted.",
-        section = "Materials",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub material_vibrancy: Percent,
 }
 
 impl Default for AppearanceSettings {
@@ -181,13 +110,6 @@ impl Default for AppearanceSettings {
             look: Provided::standard(),
             file_icons: Provided::standard(),
             custom_styles: CustomStyles::Use,
-            material_tint_alpha: Percent(80),
-            material_highlight_light: Percent(30),
-            material_highlight_dark: Percent(12),
-            material_hairline_light: Percent(14),
-            material_hairline_dark: Percent(60),
-            material_shadow_strength: Percent(100),
-            material_vibrancy: Percent(100),
         }
     }
 }
@@ -209,34 +131,6 @@ impl AppearanceSettings {
     }
 }
 
-/// How a plate's glyph is coloured (`icons.plate_glyph_colour_policy`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
-#[serde(rename_all = "snake_case")]
-#[word(case = snake)]
-#[non_exhaustive]
-pub enum PlateGlyphPolicy {
-    /// macOS rule per accent: white ink where it reads at 3:1 on the fill, the deep ink of the hue otherwise (yellow, orange, green).
-    #[default]
-    Auto,
-    /// Always white.
-    ForceWhite,
-    /// Always ink.
-    ForceInk,
-}
-
-/// Whether third-party icons get a dark variant (`icons.dark_mode_variant`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
-#[serde(rename_all = "snake_case")]
-#[word(case = snake)]
-#[non_exhaustive]
-pub enum IconDarkVariant {
-    /// The freedesktop convention: the same icon in both schemes.
-    #[default]
-    SameAsLight,
-    /// A dark variant where the plate needs one.
-    Adaptive,
-}
-
 /// Which dialect our app icons are drawn in (`icons.style`, design/08-ICONS.md section 2.10).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
@@ -251,28 +145,11 @@ pub enum IconStyle {
     Monochrome,
 }
 
-/// Where a Monochrome icon takes its hue from (`icons.monochrome_tint`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
-#[serde(rename_all = "snake_case")]
-#[word(case = snake)]
-#[non_exhaustive]
-pub enum MonochromeTint {
-    /// The current workspace's Space: the accent `ds` derives from its first dot.
-    #[default]
-    Space,
-    /// The card accent the appearance settings pick.
-    Accent,
-    /// No hue: a neutral grey.
-    Neutral,
-}
-
-/// `icons.*`: how our app icons are drawn (`style`, `monochrome_tint`) and how the dock and
-/// launcher plate third-party icons (design/08-ICONS.md sections 2.10 and 4).
+/// `icons.*`: how our app icons are drawn (design/08-ICONS.md section 2.10).
 ///
-/// `style` and `monochrome_tint` are Basic (the Appearance page shows them); the other keys are
-/// Advanced (design/22-SETTINGS.md section 5: not listed on any Basic page),
-/// on the Appearance page since they live in `appearance.toml` alongside the `appearance`
-/// domain.
+/// Only `style` is a setting. The plate's inset and glyph shares are the `--plate-*` tokens
+/// (`ds_style::icon::family::PlateShare`), the symbolic chroma limit is
+/// `ChromaLimit::PROPOSED`, and a Monochrome icon takes its hue from the Space (design/08).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, crate::SettingsSchema)]
 #[serde(default)]
 #[settings(file = "quire/appearance.toml", domain = "icons", page = Page::Appearance)]
@@ -286,81 +163,12 @@ pub struct IconsSettings {
         section = "Icons"
     )]
     pub style: IconStyle,
-    /// `icons.monochrome_tint` (proposed Space): only read when `style` is Monochrome.
-    #[settings(
-        label = "Monochrome tint",
-        help = "Where Monochrome icons take their hue.",
-        section = "Icons"
-    )]
-    pub monochrome_tint: MonochromeTint,
-    /// `icons.plate_inset_percent` (proposed 72).
-    #[settings(
-        label = "Plate inset",
-        help = "How far other apps' icons sit inside their plate.",
-        section = "Icons",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub plate_inset_percent: Percent,
-    /// `icons.symbolic_fallback_glyph_percent` (proposed 56).
-    #[settings(
-        label = "Symbolic fallback size",
-        help = "Icon size when an app only has a symbolic one.",
-        section = "Icons",
-        range = "0..=100",
-        unit = "%",
-        advanced
-    )]
-    pub symbolic_fallback_glyph_percent: Percent,
-    /// `icons.squircle_detect_iou` (proposed 0.90).
-    #[settings(
-        label = "Squircle detection",
-        help = "How closely an icon must match a squircle to skip re-masking (900 is 0.90).",
-        section = "Icons",
-        range = "0..=1000",
-        advanced
-    )]
-    pub squircle_detect_iou: Fraction,
-    /// `icons.symbolic_chroma_max` (proposed 0.04): a tray or app icon with less colour than
-    /// this is drawn as a symbolic mask in the ink colour (design/08-ICONS.md section 1.5).
-    #[settings(
-        label = "Symbolic icon colour limit",
-        help = "Icons with less colour than this are drawn as masks (40 is 0.04).",
-        section = "Icons",
-        range = "0..=200",
-        advanced
-    )]
-    pub symbolic_chroma_max: Fraction,
-    /// `icons.plate_glyph_colour_policy`.
-    #[settings(
-        label = "Plate glyph colour",
-        help = "Auto picks white or dark ink for contrast.",
-        section = "Icons",
-        advanced
-    )]
-    pub plate_glyph_colour_policy: PlateGlyphPolicy,
-    /// `icons.dark_mode_variant`.
-    #[settings(
-        label = "Icon dark variant",
-        help = "Whether other apps' icons change for the dark appearance.",
-        section = "Icons",
-        advanced
-    )]
-    pub dark_mode_variant: IconDarkVariant,
 }
 
 impl Default for IconsSettings {
     fn default() -> Self {
         IconsSettings {
             style: IconStyle::Colour,
-            monochrome_tint: MonochromeTint::Space,
-            plate_inset_percent: Percent(72),
-            symbolic_fallback_glyph_percent: Percent(56),
-            squircle_detect_iou: Fraction(900),
-            symbolic_chroma_max: Fraction(40),
-            plate_glyph_colour_policy: PlateGlyphPolicy::Auto,
-            dark_mode_variant: IconDarkVariant::SameAsLight,
         }
     }
 }

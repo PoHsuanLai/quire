@@ -3,7 +3,16 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.50 (unreleased)
+## v0.3.51 (unreleased)
+
+### wh-qpru
+
+- Settings keep only what macOS offers or a real behaviour choice. Visual knobs are stylesheet tokens, timing and sizes are constants, and the "Mac way or other way" pairs keep the Mac one. `SliderLook` is now `Linear` and `Level` (the Control Center level slider, `data-look=level`); `Capsule` and `CapsuleKnob` are deleted and the media `Capsule`'s volume uses `Level`. The seven `appearance.material_*` keys are the tokens `--m-tint-alpha`, `--m-highlight-light`, `--m-highlight-dark`, `--m-hairline-light`, `--m-hairline-dark`, `--m-shadow-strength` and `--m-vibrancy`; `Ds` no longer writes them inline, so a look or the person's own sheet sets them. `icons` keeps only `style`. `switcher.*` and `hot_corners.dwell_ms`/`rearm_ms`/`size_px` are constants (`SwitcherParams::default()`, `CornerParams::default()`, `CornerParams::HOT_SPOT_PX`). A stored file that still holds a removed key loads as before: the key is reported as unknown and kept in the file. `appearance.typeface` stays for now: quire ships no look pack, so Editorial has no other home yet.
+  **Consumer change:** `SliderLook::Mac` is now `SliderLook::Level`, and `SliderLook::Capsule` and `SliderLook::CapsuleKnob` are gone (use `Level`). `Ds` loses the props `tint_alpha` and `stack`, and `ds_style::material::stack::MaterialStack` is deleted. `ds_settings::Environment::tint_alpha()` and `Environment::material_stack()` are deleted. `AppearanceSettings` loses `material_tint_alpha`, `material_highlight_light`, `material_highlight_dark`, `material_hairline_light`, `material_hairline_dark`, `material_shadow_strength` and `material_vibrancy`. `IconsSettings` loses `monochrome_tint`, `plate_inset_percent`, `symbolic_fallback_glyph_percent`, `squircle_detect_iou`, `symbolic_chroma_max`, `plate_glyph_colour_policy` and `dark_mode_variant`, and the types `MonochromeTint`, `PlateGlyphPolicy` and `IconDarkVariant` are deleted (a Monochrome icon takes `Tint::space`; the squircle test 0.90, the Auto glyph colour and the same-in-dark icon are now the plating program's constants). `ds_settings::schema::SwitcherSettings` is deleted, and `HotCornerSettings` loses `dwell_ms`, `rearm_ms`, `size_px` and `params()` (use `CornerParams::default()`). `ds-settings` no longer depends on `ds-behaviour`. The `.ds-slider-icon-lead` CSS class and the `capsule`, `capsule-knob` and `mac` slider looks are gone from the stylesheet.
+- design/22 drops the rows of the 96 keys sill removed in the same pass and retires sections 3.11 `menus`, 3.14 `spaces`, 3.17 `power_menu` and 3.18 `window`; the section numbers stay.
+- blitz-kit moves to 47b6ceac (one momentum curve and one rubber band: `ScrollMomentumModel`, `ScrollSettings.momentum_model`, `ScrollRubberBand` and `ScrollSettings.rubber_band`/`rubber_band_linear_divisor` are gone; a scroller that must not stretch is `Elastic::Rigid`). Consumers that pin blitz-kit move with it.
+
+## v0.3.50
 
 ### form-owner-gone
 

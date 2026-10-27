@@ -72,7 +72,6 @@ pub fn Scope(
         let axes = axes.read();
         (axes.motion, axes.look.clone())
     };
-    let tint = use_context::<Signal<Alpha>>();
     let theme = match scheme {
         Scheme::Light => Theme::Light,
         Scheme::Dark => Theme::Dark,
@@ -84,7 +83,6 @@ pub fn Scope(
             material,
             blur,
             stylesheet: Inject::Host,
-            tint_alpha: Some(tint()),
             // A specimen's root is the panel itself, so it paints in every material (a Popover,
             // Sheet or Toast root is transparent by default: it hosts floating cards).
             chrome: Some(RootChrome::Painted),

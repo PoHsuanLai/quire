@@ -26,8 +26,8 @@ pub enum FileIconStyle {
 }
 
 impl FileIconStyle {
-    /// The style for `icons.style` and `icons.monochrome_tint`, the pair sill already hands
-    /// `retint`: only Monochrome changes a file icon (Muted leaves it as designed).
+    /// The style for `icons.style` and the Space's tint (`Tint::space`), the pair sill already
+    /// hands `retint`: only Monochrome changes a file icon (Muted leaves it as designed).
     pub fn of(style: IconStyle, tint: Tint) -> FileIconStyle {
         match style {
             IconStyle::Monochrome => FileIconStyle::Monochrome(tint),

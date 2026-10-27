@@ -1182,7 +1182,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d045de693cb712d0b22c6a64be5b953f67b3ce00ab5ad3dd5d8b441886ab8e1a"
 dependencies = [
  "quote",
- "syn 2.0.119",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -1917,7 +1917,6 @@ version = "0.1.0"
 dependencies = [
  "dioxus",
  "ds",
- "ds-behaviour",
  "ds-core",
  "ds-helpers",
  "ds-peer",
@@ -5155,8 +5154,8 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d204abcbdf8e88729306a8d0ca01a79d8a49969fe1f84696909d6dbc4321c1a"
 dependencies = [
- "foldhash 0.1.5",
- "hashbrown 0.15.5",
+ "foldhash 0.2.0",
+ "hashbrown 0.17.1",
 ]
 
 [[package]]

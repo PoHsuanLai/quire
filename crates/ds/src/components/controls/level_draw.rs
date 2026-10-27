@@ -1,5 +1,5 @@
-//! Drawing a level (design/30 sections 2.1 and 2.9): the capsule, the capsule with a knob (the
-//! glyph beside it or, for `Mac`, in it), or sixteen squares, for the capsule `Slider` and the `LevelIndicator` alike. Each is the level as
+//! Drawing a level (design/30 sections 2.1 and 2.9): the capsule, the capsule with a knob that
+//! holds the glyph, or sixteen squares, for the level `Slider` and the `LevelIndicator`. Each is the level as
 //! `--f` on the root and plain boxes the stylesheet sizes: the capsule's well and fill with the
 //! glyph in both (the fill's copy clipped by the fill, which is how the glyph is knocked out
 //! without a blend mode), the knob riding the fill's end, or sixteen squares.
@@ -49,11 +49,9 @@ pub(crate) const INDICATOR: Parts = Parts {
 pub(crate) enum Shape {
     /// A capsule with the glyph inside at its left end.
     Capsule,
-    /// The capsule with a round knob at the fill's end; the glyph is drawn before it.
-    CapsuleKnob,
-    /// The Mac's level slider: the capsule with a round knob at the fill's end, the glyph drawn
+    /// The level slider: the capsule with a round knob at the fill's end, the glyph drawn
     /// inside the knob.
-    Mac,
+    Level,
     /// Sixteen squares that fill in one by one; the glyph is drawn before them.
     Segments,
 }
@@ -62,8 +60,8 @@ impl Shape {
     /// Whether the glyph stands before the rail rather than inside the capsule.
     pub(crate) fn glyph_leads(self) -> bool {
         match self {
-            Shape::Capsule | Shape::Mac => false,
-            Shape::CapsuleKnob | Shape::Segments => true,
+            Shape::Capsule | Shape::Level => false,
+            Shape::Segments => true,
         }
     }
 }
@@ -88,11 +86,7 @@ pub(crate) struct Drawn {
 pub(crate) fn body(drawn: Drawn) -> Element {
     match drawn.shape {
         Shape::Capsule => capsule(&drawn, Inside::Glyph),
-        Shape::CapsuleKnob => rsx! {
-            {capsule(&drawn, Inside::Nothing)}
-            div { class: drawn.parts.knob }
-        },
-        Shape::Mac => rsx! {
+        Shape::Level => rsx! {
             {capsule(&drawn, Inside::Nothing)}
             div { class: drawn.parts.knob, {in_knob(&drawn)} }
         },
@@ -183,8 +177,7 @@ mod tests {
     #[test]
     fn only_the_capsule_and_the_knob_hold_their_glyph_inside() {
         assert!(!Shape::Capsule.glyph_leads());
-        assert!(!Shape::Mac.glyph_leads());
-        assert!(Shape::CapsuleKnob.glyph_leads());
+        assert!(!Shape::Level.glyph_leads());
         assert!(Shape::Segments.glyph_leads());
     }
 }

@@ -335,8 +335,6 @@ fn App() -> Element {
 | `ground` | `Option<Ground>` | `None`: `Ground::of(material)` | `Paper` or `Frame`: which inks the content takes; Bar and Dock default to `Frame` |
 | `frame` | `Option<FrameTint>` | `None`: `FrameTint::of(material, chrome)` | `Opaque` (the window's frame), `Tinted` (the Space gradient at the tint alpha: bar, dock, a painted popover, OSD, widget) or `None` (the material's flat tint) |
 | `radius` | `Option<Corner>` | `None`: the material's own corner | `Corner::Token(Radius::…)` or `Corner::Px(Px(n))`: overrides `--m-radius` inline, for a root whose corner is a setting (the dock's `dock.pill_radius_px`) |
-| `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
-| `stack` | `Option<MaterialStack>` | `None` (the keys' defaults) | the material stack's six alphas (highlight and hairline per scheme, shadow strength, vibrancy; design/22-SETTINGS.md §3.1 `appearance.material_*`); pass `ds_settings::Environment::material_stack()` once you read a live `Environment`, as with `tint_alpha` |
 | `extent` | `RootExtent` | `RootExtent::Content` | `Content`: as tall as the root's content (a window, the bar, a card). `Viewport`: at least the viewport (`min-height:100vh; min-width:100vw`), **the option for an overlay surface** (an OSD, a sheet, a click catcher) whose content is all positioned and would otherwise leave the root, and everything it places, 0 px tall (FINDINGS "Root height") |
 | `scale` | `Option<Scale>` | `None`: the host's `ds::prelude::HostSignals` scale, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_blitz::launch`, `Harness` and `snapshot` provide `HostSignals` themselves; a host that is not `ds-blitz` passes `scale` |
 | `window` | `WindowFrame` | `WindowFrame::None`: the root is what it was | `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown, Hidden}, timing }` (or `WindowFrame::titlebar(title, lights)`): the client-decorated window's frame, a 28 px titlebar that moves and zooms the window, the traffic lights, the body and eight resize edges, all acting through the host's `ds::prelude::HostWindow` — section 6, "Window frame" |
@@ -1225,11 +1223,11 @@ For a bar (FINDINGS "Bar gaps"):
   Look with a flush window: the Space tints a sidebar's ground only and shell chrome is the
   material alone (design/30 §3.4, design/21 §3), so a consumer will pass `look` to the window
   that has a sidebar and nothing to Bar, Dock, Osd or Widget roots; the A/B layers, `.ds-frame`,
-  `--t-scene` and `appearance.material_tint_alpha` below are the code that is being removed.
+  `--t-scene` and `--m-tint-alpha` below are the code that is being removed.
   Until it lands, a `Ds` in `Bar`, `Dock`, `Osd`, `Widget` (and a
   `Popover` root passed `chrome: Some(RootChrome::Painted)`) draws the Space gradient, its A/B
   layers and grain as one `.ds-frame` group at the material's tint alpha
-  (`--m-frame-alpha`, scaled by `appearance.material_tint_alpha`) with `data-blur=on`, and at
+  (`--m-frame-alpha`, scaled by `--m-tint-alpha`) with `data-blur=on`, and at
   the solid floor .94 without blur; a `look` change cross-fades it over `--t-scene`. Pass the
   workspace's `SpaceLook` as `look` and paint nothing yourself: delete any tint layer of your
   own. The root becomes a stacking context (`position:relative`, `z-index:var(--z-raise)`).
@@ -1298,10 +1296,9 @@ For a bar (FINDINGS "Bar gaps"):
   `ds::style::icon::classify::ChromaLimit`) is design/08-ICONS.md §1.5 step 2: symbolic when every
   pixel with at least half coverage has OKLCH chroma below the limit; `ChromaLimit(n)` takes
   another threshold in thousandths. Pick `IconSource::Symbolic` or `Image` from it. The
-  0.04 default is `ChromaLimit::default()`; a settings value (design/22-SETTINGS.md §3.3
-  `icons.symbolic_chroma_max`, plain chroma, not thousandths) goes through
+  0.04 default is `ChromaLimit::default()`; a caller's own value (plain chroma, not thousandths) goes through
   `ChromaLimit::try_from(value)`, which refuses anything outside `0.0..=0.2`
-  (`DsError::ChromaLimitRange`); reading the key is the settings-owning side's job.
+  (`DsError::ChromaLimitRange`); there is no settings key for it.
 - **New glyph**: `Icon::Ethernet` (Lucide `ethernet-port`) for a wired network.
 
 For a launcher and a dock (FINDINGS "Launcher gaps"):

@@ -7,7 +7,7 @@ use ds_style::appearance::accent::Accent;
 
 use ds_style::appearance::motion::Motion;
 
-use ds_settings::{AppearanceFile, IconDarkVariant, Loaded, Percent, PlateGlyphPolicy};
+use ds_settings::{AppearanceFile, IconStyle, Loaded};
 use ds_style::appearance::theme::Theme;
 use ds_style::appearance::transparency::Transparency;
 use ds_style::kit::CustomStyles;
@@ -65,9 +65,7 @@ fn a_file_round_trips() {
             f.appearance.transparency = Transparency::Reduced;
         }),
         with(|f| {
-            f.appearance.material_tint_alpha = Percent(64);
-            f.icons.plate_glyph_colour_policy = PlateGlyphPolicy::ForceInk;
-            f.icons.dark_mode_variant = IconDarkVariant::Adaptive;
+            f.icons.style = IconStyle::Muted;
         }),
     ];
     for file in cases {
@@ -203,33 +201,16 @@ fn a_bad_value_costs_only_its_own_field() {
             clamped: &[],
         },
         Case {
-            name: "an out-of-range percent is clamped and reported, not refused",
-            text: "[appearance]\nmaterial_tint_alpha = 255\n",
-            want: with(|f| f.appearance.material_tint_alpha = Percent(100)),
-            invalid: &[],
-            clamped: &["appearance.material_tint_alpha"],
-        },
-        Case {
-            name: "a negative percent is held to zero and keeps the theme",
-            text: "[appearance]\nmaterial_tint_alpha = -4\ntheme = \"light\"\n",
-            want: with(|f| {
-                f.appearance.theme = Theme::Light;
-                f.appearance.material_tint_alpha = Percent(0);
-            }),
-            invalid: &[],
-            clamped: &["appearance.material_tint_alpha"],
-        },
-        Case {
             name: "a missing table is that table's defaults",
-            text: "[icons]\nplate_inset_percent = 60\n",
-            want: with(|f| f.icons.plate_inset_percent = Percent(60)),
+            text: "[icons]\nstyle = \"muted\"\n",
+            want: with(|f| f.icons.style = IconStyle::Muted),
             invalid: &[],
             clamped: &[],
         },
         Case {
             name: "a table that is not a table is its defaults",
-            text: "appearance = 3\n[icons]\ndark_mode_variant = \"adaptive\"\n",
-            want: with(|f| f.icons.dark_mode_variant = IconDarkVariant::Adaptive),
+            text: "appearance = 3\n[icons]\nstyle = \"monochrome\"\n",
+            want: with(|f| f.icons.style = IconStyle::Monochrome),
             invalid: &["appearance"],
             clamped: &[],
         },
@@ -307,7 +288,7 @@ fn a_save_of_a_fresh_file_is_what_the_encoder_writes() {
     let scratch = Scratch::new();
     let file = with(|f| {
         f.appearance.theme = Theme::Dark;
-        f.icons.dark_mode_variant = IconDarkVariant::Adaptive;
+        f.icons.style = IconStyle::Monochrome;
     });
     scratch
         .store()
@@ -318,5 +299,33 @@ fn a_save_of_a_fresh_file_is_what_the_encoder_writes() {
     assert_eq!(
         written,
         toml::to_string(&file).unwrap_or_else(|e| panic!("{e}"))
+    );
+}
+
+#[test]
+fn a_file_with_keys_that_became_tokens_or_constants_still_loads() {
+    const TEXT: &str = "[appearance]\ntheme = \"dark\"\nmaterial_tint_alpha = 64\n\
+        material_vibrancy = 50\n[icons]\nstyle = \"muted\"\nplate_inset_percent = 60\n\
+        monochrome_tint = \"accent\"\ndark_mode_variant = \"adaptive\"\n";
+    let scratch = Scratch::new();
+    write(&scratch, TEXT.as_bytes());
+    let read = scratch.store().load::<AppearanceFile>();
+    assert_eq!(
+        read.value,
+        with(|f| {
+            f.appearance.theme = Theme::Dark;
+            f.icons.style = IconStyle::Muted;
+        })
+    );
+    assert!(read.invalid.is_empty(), "{:?}", read.invalid);
+    assert_eq!(
+        unknown(&read),
+        [
+            "appearance.material_tint_alpha",
+            "appearance.material_vibrancy",
+            "icons.dark_mode_variant",
+            "icons.monochrome_tint",
+            "icons.plate_inset_percent",
+        ]
     );
 }

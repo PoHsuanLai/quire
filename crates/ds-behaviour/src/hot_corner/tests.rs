@@ -12,6 +12,11 @@ const PLAIN: CornerParams = CornerParams {
     rearm: Duration::from_millis(500),
 };
 
+#[test]
+fn the_default_timing_is_design_13s_numbers() {
+    assert_eq!(CornerParams::default(), PLAIN);
+}
+
 /// Name, state before, input, time, state after, outputs, next wake.
 type Case = (
     &'static str,

@@ -12,6 +12,7 @@ use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::prelude::*;
 use ds::style::appearance::blur::BlurState;
 use ds::style::icon::render::Glyph;
+use ds::style::material::recipe::DEFAULT_TINT_ALPHA;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::status::StatusMetrics;
 
@@ -38,25 +39,7 @@ fn wearer(material: Material) -> &'static str {
 /// The materials page.
 #[component]
 pub fn MaterialsPage() -> Element {
-    let mut tint = use_context::<Signal<Alpha>>();
-    let percent = tint().0 / 10;
     rsx! {
-        Section {
-            title: "Tint alpha",
-            note: "appearance.material_tint_alpha scales every translucent tint (the default 80 is design/03-COLOR.md section 17.2 as written). The bar, dock, popover panel, OSD and widget draw the Space gradient at that alpha, cross-fading on a Space switch (design/21-SPACES.md sections 3 and 5). The floors below follow it and measure the flat tint a Surface or a floating card paints; the gradient's own gates are ds's legibility tests. The solid fallback never moves.",
-            div { class: "g-row",
-                div { class: "g-col", style: "width:320px",
-                    Slider {
-                        label: "Material tint alpha",
-                        value: Fraction(tint().0),
-                        step: Fraction(10),
-                        onchange: move |next: Fraction| tint.set(Alpha(next.0.max(100))),
-                    }
-                }
-                span { class: "g-code", "material_tint_alpha = {percent}" }
-                Button { size: ControlSize::Mini, label: "Reset to 80", onclick: move |_| tint.set(Alpha(800)) }
-            }
-        }
         div { class: "g-grid2",
             for material in Material::ALL.iter().copied() {
                 Chrome { material }
@@ -71,8 +54,7 @@ fn Chrome(material: Material) -> Element {
     let axes = use_context::<Signal<Axes>>();
     let accent = axes.read().accent;
     let scheme = use_scope().scheme;
-    let tint = use_context::<Signal<Alpha>>()();
-    let measured = floors(material, scheme, tint);
+    let measured = floors(material, scheme, DEFAULT_TINT_ALPHA);
     rsx! {
         Section { title: material_label(material), note: wearer(material),
             div { class: "g-wall", style: "background-image:url(\"{wallpaper::uri()}\")",

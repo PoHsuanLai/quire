@@ -48,7 +48,7 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 | `ds-style/space/list/` (`model`, `ops`, `switch`, `remove`, `recall`, `first_run`, `wire`, `today*`, `time`) and `ds/components/app/spaces/` | 21-SPACES §13 | an app's Spaces as a kit: the pure list, the controller, head, foot, menu and Today (§13.6 is an experiment, not built) |
 | `ds-style/space/presets.rs` | 21-SPACES §4 | the eight presets as data (target (clean-up phase): one hue each, grain 0); `default_look` |
 | `ds-style/appearance/{material,blur}.rs`, `ds-style/material/recipe.rs`, `ds-style/tokens/tint.rs` | 03-COLOR §17.1-17.3; 21-SPACES §3 (no chrome tint) | `blur_region` is shell-host's (03-COLOR §17.1 "Blur region"); four tint alphas raised for legibility (§17.2) |
-| `ds-style/material/{stack,layer}.rs`, `ds-style/tokens/vibrancy.rs` | 03-COLOR §17.4 (material stack v2, the macOS polish pass) | `MaterialStack` (the highlight, hairline, shadow-strength and vibrancy keys, written inline by `Ds { stack }`); each layer written with its alpha read from its input; the vibrancy boost baked into the tint in OKLab |
+| `ds-style/material/{stack,layer}.rs`, `ds-style/tokens/vibrancy.rs` | 03-COLOR §17.4 (material stack v2, the macOS polish pass) | the highlight, hairline, shadow-strength and vibrancy tokens (stylesheet defaults, no settings keys); each layer written with its alpha read from its input; the vibrancy boost baked into the tint in OKLab |
 
 ## `ds`: tokens and stylesheet
 

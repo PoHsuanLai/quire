@@ -29,8 +29,8 @@ use crate::tokens::tint::{flat_tint, tint};
 use crate::tokens::{hex::Hex, layer::ZLayer, name::VarName};
 use ds_core::word::Word;
 
-/// The variable a root writes inline with `appearance.material_tint_alpha` as a fraction
-/// (`.8` at the default). Absent, every tint is section 17.2's own.
+/// The token that scales every tint over blur, as a fraction (`.8` at the default, which is
+/// absent: every tint is section 17.2's own). A look or the person's own sheet sets it.
 pub(crate) const TINT_ALPHA: VarName = VarName("--m-tint-alpha");
 
 /// The variables every material block declares, in the order it writes them. The last four
@@ -50,9 +50,8 @@ pub(crate) const MATERIAL_VARS: [VarName; 12] = [
     VarName("--m-inner"),
 ];
 
-/// The material recipes. The tint alpha over blur is a settings key
-/// (`appearance.material_tint_alpha`), so the stylesheet reads it from a variable the root
-/// writes inline rather than baking in `.80`.
+/// The material recipes. The tint alpha over blur is the `--m-tint-alpha`
+/// token, so the stylesheet reads it from a variable rather than baking in `.80`.
 pub fn materials_css() -> String {
     let mut css = String::new();
     for scheme in Scheme::ALL.iter().copied() {

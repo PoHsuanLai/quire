@@ -57,8 +57,6 @@ pub struct Axes {
     pub preset: PresetIndex,
     /// The Space the root is drawn with: the preset, as the Space editor has changed it.
     pub look: SpaceLook,
-    /// `appearance.material_tint_alpha`, as the root writes it.
-    pub tint_alpha: Alpha,
     /// Whether overlays wait for a click or open posed, for a snapshot.
     pub showcase: Showcase,
     /// The typeface the root speaks in.
@@ -90,7 +88,6 @@ impl Default for Axes {
             blur: BlurState::default(),
             preset: PresetIndex::default(),
             look: PresetIndex::default().look(),
-            tint_alpha: Alpha(u16::from(settings.material_tint_alpha.0) * 10),
             showcase: Showcase::Live,
             typeface: settings.typeface,
         }

@@ -7,7 +7,6 @@ use crate::lenient::Loaded;
 use crate::portal::{SystemPrefsSource, SystemPrefsWatch};
 use crate::region::ResolvedHours;
 use crate::store::Store;
-use crate::units::Percent;
 use crate::watch::Watch;
 use dioxus::prelude::*;
 use ds_core::spawner::Spawner;
@@ -15,6 +14,33 @@ use ds_style::appearance::system::SystemPrefs;
 use std::sync::Arc;
 
 /// The inputs to [`ds::prelude::resolve`], as they are now.
+///
+/// A consumer wires the environment into its root like this:
+///
+/// ```no_run
+/// use dioxus::prelude::*;
+/// use ds::prelude::*; use ds_core::spawner::Spawner;
+/// use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
+/// use std::sync::Arc;
+///
+/// #[component]
+/// fn Root(children: Element) -> Element {
+///     let spawn = use_context::<Arc<dyn Spawner>>();
+///     let store = Store::new(ConfigRoot::Xdg, AppName::MAILO);
+///     let env = use_environment(store, SystemPrefsSource::Portal, spawn);
+///     let now = env();
+///     rsx! {
+///         Ds {
+///             appearance: now.settings.appearance.appearance(),
+///             system: now.system,
+///             typeface: Some(now.settings.appearance.typeface()),
+///             custom_styles: now.settings.appearance.custom_styles,
+///             material: Material::Window,
+///             {children}
+///         }
+///     }
+/// }
+/// ```
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Environment {
     /// `appearance.toml`.
@@ -24,61 +50,10 @@ pub struct Environment {
 }
 
 impl Environment {
-    /// `appearance.material_tint_alpha` as the root's `tint_alpha` (a percent in thousandths:
-    /// 80 is 800). A consumer wires the environment into its root like this:
-    ///
-    /// ```no_run
-    /// use dioxus::prelude::*;
-    /// use ds::prelude::*; use ds_core::spawner::Spawner;
-    /// use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
-    /// use std::sync::Arc;
-    ///
-    /// #[component]
-    /// fn Root(children: Element) -> Element {
-    ///     let spawn = use_context::<Arc<dyn Spawner>>();
-    ///     let store = Store::new(ConfigRoot::Xdg, AppName::MAILO);
-    ///     let env = use_environment(store, SystemPrefsSource::Portal, spawn);
-    ///     let now = env();
-    ///     rsx! {
-    ///         Ds {
-    ///             appearance: now.settings.appearance.appearance(),
-    ///             system: now.system,
-    ///             tint_alpha: Some(now.tint_alpha()),
-    ///             typeface: Some(now.settings.appearance.typeface()),
-    ///             custom_styles: now.settings.appearance.custom_styles,
-    ///             material: Material::Window,
-    ///             {children}
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    pub fn tint_alpha(&self) -> ds_style::tokens::hex::Alpha {
-        ds_style::tokens::hex::Alpha(
-            u16::from(self.settings.appearance.material_tint_alpha.0.min(100)) * 10,
-        )
-    }
-
     /// The clock to draw in `locale` (a POSIX locale name, see
     /// [`time_locale`](crate::time_locale)): `region.hours`, with Automatic settled by the locale.
     pub fn hours(&self, locale: &str) -> ResolvedHours {
         self.settings.region.hours.resolve(locale)
-    }
-
-    /// The six `appearance.material_*` keys as the root's `stack` (`Ds { stack }`): highlight
-    /// and hairline alphas per scheme, shadow strength and vibrancy, each a percent in
-    /// thousandths like [`Environment::tint_alpha`].
-    pub fn material_stack(&self) -> ds_style::material::stack::MaterialStack {
-        let a = &self.settings.appearance;
-        let alpha =
-            |percent: Percent| ds_style::tokens::hex::Alpha(u16::from(percent.0.min(100)) * 10);
-        ds_style::material::stack::MaterialStack {
-            highlight_light: alpha(a.material_highlight_light),
-            highlight_dark: alpha(a.material_highlight_dark),
-            hairline_light: alpha(a.material_hairline_light),
-            hairline_dark: alpha(a.material_hairline_dark),
-            shadow_strength: alpha(a.material_shadow_strength),
-            vibrancy: alpha(a.material_vibrancy),
-        }
     }
 }
 
@@ -139,26 +114,6 @@ async fn follow_prefs(mut env: Signal<Environment>, mut prefs: SystemPrefsWatch)
 #[cfg(test)]
 mod tests {
     use super::Environment;
-    use crate::units::Percent;
-
-    #[test]
-    fn the_tint_key_becomes_the_roots_thousandths() {
-        const CASES: &[(u8, u16)] = &[(80, 800), (64, 640), (100, 1000), (0, 0)];
-        for &(percent, want) in CASES {
-            let mut env = Environment::default();
-            env.settings.appearance.material_tint_alpha = Percent(percent);
-            assert_eq!(
-                env.tint_alpha(),
-                ds_style::tokens::hex::Alpha(want),
-                "{percent}%"
-            );
-        }
-        assert_eq!(
-            Environment::default().tint_alpha(),
-            ds_style::tokens::hex::Alpha(800),
-            "the key's default is the root's default"
-        );
-    }
 
     #[test]
     fn the_clock_follows_the_hours_key_and_then_the_locale() {
@@ -168,14 +123,5 @@ mod tests {
         assert_eq!(env.hours("de_DE"), ResolvedHours::H24);
         env.settings.region.hours = HourCycle::H24;
         assert_eq!(env.hours("en_US.UTF-8"), ResolvedHours::H24);
-    }
-
-    #[test]
-    fn the_default_material_keys_are_the_stacks_defaults() {
-        let env = Environment::default();
-        assert_eq!(
-            env.material_stack(),
-            ds_style::material::stack::MaterialStack::default()
-        );
     }
 }

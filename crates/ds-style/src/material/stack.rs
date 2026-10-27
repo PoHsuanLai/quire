@@ -1,13 +1,12 @@
 //! Material stack v2 (the macOS polish pass, 2026-09-24; design/03-COLOR.md section 17.4): the
-//! layers macOS stacks on every chrome material and quire lacked, and the settings that tune
+//! layers macOS stacks on every chrome material and quire lacked, and the tokens that tune
 //! them. From the outside in: a 0.5 px dark outer hairline (`--m-hairline`), the tight contact
 //! shadow (`--m-shadow-contact`) and the wide ambient one (`--m-shadow-ambient`), then inside
 //! the 1 px top highlight (`--m-highlight`) over the tint, whose colour carries the vibrancy
-//! boost (`vibrancy.rs`). Each is written as an input on the root (`Ds`'s `stack`) or
-//! on any element around a surface.
+//! boost (`vibrancy.rs`). Each input is a stylesheet token with its default in the material
+//! blocks; a look or the person's own sheet sets it on the root or on any element around a surface.
 
-use super::layer::fraction;
-use crate::tokens::{hex::Alpha, name::VarName};
+use crate::tokens::name::VarName;
 
 /// `--m-highlight-light`: the top highlight's white alpha in the light scheme.
 pub(crate) const HIGHLIGHT_LIGHT: VarName = VarName("--m-highlight-light");
@@ -31,71 +30,3 @@ pub(crate) const STACK_INPUTS: [VarName; 6] = [
     SHADOW_STRENGTH,
     VIBRANCY,
 ];
-
-/// The material stack's settings (design/22-SETTINGS.md `appearance.material_*`, proposed).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct MaterialStack {
-    /// The top highlight's alpha, light scheme (`appearance.material_highlight_light`, .30).
-    pub highlight_light: Alpha,
-    /// The top highlight's alpha, dark scheme (`appearance.material_highlight_dark`, .12).
-    pub highlight_dark: Alpha,
-    /// The outer hairline's alpha, light scheme (`appearance.material_hairline_light`, .14).
-    pub hairline_light: Alpha,
-    /// The outer hairline's alpha, dark scheme (`appearance.material_hairline_dark`, .60).
-    pub hairline_dark: Alpha,
-    /// Both shadows' strength (`appearance.material_shadow_strength`, 1.00).
-    pub shadow_strength: Alpha,
-    /// The vibrancy boost's share of the tint (`appearance.material_vibrancy`, 1.00).
-    pub vibrancy: Alpha,
-}
-
-impl Default for MaterialStack {
-    /// The keys' defaults.
-    fn default() -> Self {
-        MaterialStack {
-            highlight_light: Alpha(300),
-            highlight_dark: Alpha(120),
-            hairline_light: Alpha(140),
-            hairline_dark: Alpha(600),
-            shadow_strength: Alpha(1000),
-            vibrancy: Alpha(1000),
-        }
-    }
-}
-
-impl MaterialStack {
-    /// Every input, inline: `--m-highlight-light:.3;…`.
-    pub fn style_attr(&self) -> String {
-        [
-            (HIGHLIGHT_LIGHT, self.highlight_light),
-            (HIGHLIGHT_DARK, self.highlight_dark),
-            (HAIRLINE_LIGHT, self.hairline_light),
-            (HAIRLINE_DARK, self.hairline_dark),
-            (SHADOW_STRENGTH, self.shadow_strength),
-            (VIBRANCY, self.vibrancy),
-        ]
-        .into_iter()
-        .map(|(var, value)| format!("{}:{};", var.as_str(), fraction(value)))
-        .collect()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::MaterialStack;
-    use crate::tokens::hex::Alpha;
-
-    #[test]
-    fn the_stack_writes_every_input() {
-        assert_eq!(
-            MaterialStack::default().style_attr(),
-            "--m-highlight-light:.3;--m-highlight-dark:.12;--m-hairline-light:.14;\
-             --m-hairline-dark:.6;--m-shadow-strength:1;--m-vibrancy:1;"
-        );
-        let flat = MaterialStack {
-            vibrancy: Alpha(0),
-            ..MaterialStack::default()
-        };
-        assert!(flat.style_attr().ends_with("--m-vibrancy:0;"));
-    }
-}

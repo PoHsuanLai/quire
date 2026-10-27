@@ -17,7 +17,7 @@ use ds_style::tokens::hex::Hex;
 use ds_style::tokens::token::Token;
 use ds_style::tokens::token::TokenScope;
 
-/// The alpha the settings key ships with (`appearance.material_tint_alpha = 80`).
+/// The alpha the `--m-tint-alpha` token ships with (.80).
 const DEFAULT_TINT_ALPHA: Alpha = Alpha(800);
 
 fn measured(fore: &str, back: &str) -> f64 {

@@ -1,6 +1,6 @@
 //! The overlay components (design/04-COMPONENTS.md sections 18, 20-25, 29-31): every component
 //! in every state rendered inside a `Ds` through dioxus-ssr and compared with a golden in
-//! `tests/snapshots/overlays/<component>/<state>.html`; the root's toast host and tint alpha;
+//! `tests/snapshots/overlays/<component>/<state>.html`; the root's toast host;
 //! the layer stack a floating component joins; and the goldens' markup against the stylesheet.
 //!
 //! `DS_BLESS=1 cargo test -p ds --test it components_overlays` rewrites the goldens.
@@ -34,7 +34,6 @@ use std::time::Duration;
 #[derive(Props, Clone)]
 struct HostProps {
     make: fn() -> Element,
-    tint: Option<Alpha>,
 }
 
 /// Never equal: the host renders once, and function addresses are not comparable anyway.
@@ -44,14 +43,13 @@ impl PartialEq for HostProps {
     }
 }
 
-/// A case inside a `Ds` that inlines no stylesheet, with a host tint alpha when given.
+/// A case inside a `Ds` that inlines no stylesheet.
 fn host(props: HostProps) -> Element {
     rsx! {
         Ds {
             appearance: Appearance::default(),
             material: Material::Popover,
             stylesheet: Inject::Host,
-            tint_alpha: props.tint,
             {(props.make)()}
         }
     }
@@ -59,8 +57,8 @@ fn host(props: HostProps) -> Element {
 
 /// Build the dom on a virtual clock, flush the effects that register overlays, and let `wait`
 /// of virtual time pass.
-fn built(make: fn() -> Element, tint: Option<Alpha>, wait: Duration) -> TimedDom {
-    let mut dom = TimedDom::new(|| VirtualDom::new_with_props(host, HostProps { make, tint }));
+fn built(make: fn() -> Element, wait: Duration) -> TimedDom {
+    let mut dom = TimedDom::new(|| VirtualDom::new_with_props(host, HostProps { make }));
     for _ in 0..3 {
         dom.render_immediate(&mut NoOpMutations);
     }
@@ -90,7 +88,7 @@ fn every_overlay_matches_its_golden() {
         .chain(hover_card_hooks::HOVER_CARD_HOOK_CASES)
         .chain(hover_card_flag::HOVER_CARD_FLAG_CASES)
         .filter_map(|case| {
-            let dom = built(case.make, None, case.wait);
+            let dom = built(case.make, case.wait);
             golden::check(&golden_name(case), &inside_root(&dom)).err()
         })
         .collect();
@@ -113,7 +111,7 @@ fn floating_surfaces_render_through_the_overlay_host() {
             }
         }
     }
-    let html = inside_root(&built(inside, None, Duration::ZERO));
+    let html = inside_root(&built(inside, Duration::ZERO));
     let paragraph = html
         .find("<p class=\"here\"></p>")
         .expect("the paragraph is empty");
@@ -151,7 +149,7 @@ fn the_newest_layer_takes_the_escape() {
     fn layered() -> Element {
         rsx! { Layered {} }
     }
-    let dom = built(layered, None, Duration::ZERO);
+    let dom = built(layered, Duration::ZERO);
     let stack = STACK.get().expect("the stack was read");
     let (first, second) = dom.in_runtime(|| {
         let now = stack.peek().clone();
@@ -184,7 +182,7 @@ fn an_empty_hub_lays_out_no_toast() {
     fn empty() -> Element {
         rsx! { p { "inside" } }
     }
-    let html = inside_root(&built(empty, None, Duration::from_millis(80)));
+    let html = inside_root(&built(empty, Duration::from_millis(80)));
     assert!(html.contains("<p>inside</p>"), "{html}");
     assert!(!html.contains("ds-toast"), "{html}");
 }
@@ -200,7 +198,7 @@ fn the_root_renders_the_toast_host_after_the_overlay_host() {
     fn pushed() -> Element {
         rsx! { p { "inside" } Pushed {} }
     }
-    let html = inside_root(&built(pushed, None, Duration::from_millis(80)));
+    let html = inside_root(&built(pushed, Duration::from_millis(80)));
     let child = html.find("<p>inside</p>").expect("the children");
     let toast = html.find("class=\"ds-toast\"").expect("the toast host");
     assert!(child < toast, "{html}");
@@ -220,7 +218,7 @@ fn a_toast_slides_in_and_is_dropped_after_it_slides_out() {
     }
     // It arrives sliding in from the right (`panel-in`, --t-move), and is present once that has
     // settled.
-    let mut dom = built(pushed, None, Duration::ZERO);
+    let mut dom = built(pushed, Duration::ZERO);
     dom.run_for(Duration::from_millis(5));
     dom.render_immediate(&mut NoOpMutations);
     let first = inside_root(&dom);
@@ -239,25 +237,6 @@ fn a_toast_slides_in_and_is_dropped_after_it_slides_out() {
     dom.run_for(Duration::from_millis(520));
     let gone = inside_root(&dom);
     assert!(!gone.contains("ds-toast"), "{gone}");
-}
-
-#[test]
-fn the_root_writes_the_tint_alpha() {
-    fn empty() -> Element {
-        rsx! {}
-    }
-    // The key's default, then a host's own value (thousandths: 640 is .64).
-    const CASES: &[(Option<Alpha>, &str)] = &[
-        (None, "--m-tint-alpha:.8;"),
-        (Some(Alpha(640)), "--m-tint-alpha:.64;"),
-        (Some(Alpha(1000)), "--m-tint-alpha:1;"),
-    ];
-    for (tint, want) in CASES {
-        let html = dioxus_ssr::render(&built(empty, *tint, Duration::ZERO));
-        let root = &html[..html.find('>').unwrap_or(html.len())];
-        assert!(root.contains(want), "{tint:?}: {root}");
-        assert_eq!(root.matches("--m-tint-alpha").count(), 1, "{root}");
-    }
 }
 
 /// Coherence rule 2 on the overlay goldens: every class is one the stylesheet styles and no

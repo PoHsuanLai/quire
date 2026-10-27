@@ -59,10 +59,10 @@ pub const NEUTRAL_DARK: (Hex, Hex, Hex) = (
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "plate-", kind = tuned)]
 pub enum PlateShare {
-    /// `--plate-glyph`: a glyph's share of the plate (`icons.symbolic_fallback_glyph_percent`, 56).
+    /// `--plate-glyph`: a glyph's share of the plate (56%; a stylesheet token, no setting).
     #[token(input = "--icons-glyph-share", value = "56%")]
     Glyph,
-    /// `--plate-inset`: a third-party icon's share of the plate (`icons.plate_inset_percent`, 72).
+    /// `--plate-inset`: a third-party icon's share of the plate (72%; a stylesheet token, no setting).
     #[token(input = "--icons-inset-share", value = "72%")]
     Inset,
 }

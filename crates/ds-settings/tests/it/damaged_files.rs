@@ -5,8 +5,9 @@
 
 use crate::support::{Scratch, make_fifo, make_readable, make_unreadable, names};
 
+use ds_settings::schema::Provided;
 use ds_settings::{
-    AppName, AppearanceFile, ConfigRoot, Fixup, Origin, Percent, Saved, SpacesLoad, SpacesStorage,
+    AppName, AppearanceFile, ConfigRoot, Fixup, Origin, Saved, SpacesLoad, SpacesStorage,
 };
 use ds_style::space::list::{Epoch, NoPark, Spaces, Today};
 use serde::{Deserialize, Serialize};
@@ -230,9 +231,9 @@ fn writers_racing_for_spaces_json_never_tear_it() {
 
 // ---- settings files (`Store`) ----
 
-fn themed(alpha: u8) -> AppearanceFile {
+fn themed(n: u8) -> AppearanceFile {
     let mut file = AppearanceFile::default();
-    file.appearance.material_tint_alpha = Percent(alpha);
+    file.appearance.look = Provided::new(&format!("look-{n}"));
     file
 }
 

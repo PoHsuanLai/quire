@@ -98,7 +98,7 @@ EDGES=(
   "ds-behaviour: ds-core"
   "ds: ds-core ds-intents ds-motion ds-style"
   "ds-shell: ds ds-core ds-motion ds-style"
-  "ds-settings: ds-behaviour ds-core ds-helpers ds-peer ds-style ds-settings-derive"
+  "ds-settings: ds-core ds-helpers ds-peer ds-style ds-settings-derive"
   "ds-settings-page: ds ds-settings"
   "ds-extensions: ds-core ds-helpers ds-settings ds-style"
   "ds-peer:"

@@ -31,14 +31,11 @@
 //! `Inject::Inline` writes: `None` is `ds::stylesheet()`, and a crate that adds components of its
 //! own passes the sheet its kits make (`ds_shell::stylesheet()`), so the root draws them too.
 //!
-//! The root also writes `--m-tint-alpha` inline: the materials' tint over blur scales by the
-//! `appearance.material_tint_alpha` settings key (design/22-SETTINGS.md section 3.1, default
-//! 80). A host passes the key as the `tint_alpha` prop (thousandths: 800
-//! is .8), which `ds_settings::Environment::tint_alpha` converts from the settings file; without
-//! one the root writes the key's default. A `radius` overrides the material's corner the same way
-//! (`--m-radius` inline): the dock's pill is its root, and its radius is `dock.pill_radius_px`
-//!. A `stack` writes the material stack's settings (`MaterialStack`: the
-//! highlight, hairline, shadow strength and vibrancy keys) the same way.
+//! The materials' tint over blur, highlight, hairline, shadow strength and vibrancy are
+//! stylesheet tokens (`--m-tint-alpha`, `--m-highlight-light`, ..., `--m-vibrancy`) with their
+//! defaults in the material blocks; the root writes none of them, so a look or the person's own
+//! sheet sets them. A `radius` overrides the material's corner (`--m-radius` inline): the dock's
+//! pill is its root, and its radius is `dock.pill_radius_px`.
 //!
 //! The root also writes the pixel tokens' inputs for its device scale (`scale`, else the host's
 //! `HostSignals`, else 1x; `tokens/pixel.rs`), so every hairline is whole device pixels at 1.25,
@@ -80,19 +77,15 @@ use ds_core::geometry::scale::Scale;
 use ds_core::vocab::{Activity, InputModality};
 use ds_core::word::Word;
 use ds_motion::hover_intent::HoverWarmth;
-use ds_style::appearance::transparency::Transparency;
 use ds_style::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };
 use ds_style::appearance::{blur::BlurState, material::Material};
 use ds_style::kit::{CustomStyles, Styles};
-use ds_style::material::recipe::DEFAULT_TINT_ALPHA;
-use ds_style::material::stack::MaterialStack;
 use ds_style::scale::use_root_scale;
 use ds_style::scope::{Scope, use_scope_provider};
 use ds_style::space::{frame_vars::FrameVars, look::SpaceLook, provided::use_space_look_provider};
 use ds_style::tokens::delay::TipDelay;
-use ds_style::tokens::hex::Alpha;
 use ds_style::tokens::{pixel::PixelToken, shape::Corner};
 use std::rc::Rc;
 
@@ -116,12 +109,10 @@ pub fn Ds(
     #[props(default)] blur: BlurState,
     #[props(default)] stylesheet: Inject,
     #[props(default)] sheet: Option<&'static str>,
-    #[props(default)] tint_alpha: Option<Alpha>,
     #[props(default)] chrome: Option<RootChrome>,
     #[props(default)] ground: Option<Ground>,
     #[props(default)] frame: Option<FrameTint>,
     #[props(default)] radius: Option<Corner>,
-    #[props(default)] stack: Option<MaterialStack>,
     #[props(default)] scale: Option<Scale>,
     #[props(default)] window: WindowFrame,
     #[props(default)] extent: RootExtent,
@@ -162,27 +153,14 @@ pub fn Ds(
     use_overlays_provider();
     let frame = FrameVars::of(&look, resolved.scheme);
     let layers = use_frame_layers(&frame.gradient);
-    let tint = tint_alpha.unwrap_or(DEFAULT_TINT_ALPHA);
     let corner = radius
         .map(crate::root::surface::radius_style)
         .unwrap_or_default();
-    // Reduce transparency drops the vibrancy boost everywhere, the person's own share included.
-    let stack = stack
-        .map(|stack| match resolved.transparency {
-            Transparency::System => stack,
-            Transparency::Reduced => MaterialStack {
-                vibrancy: Alpha(0),
-                ..stack
-            },
-        })
-        .map(|stack| stack.style_attr())
-        .unwrap_or_default();
     let pixels = PixelToken::style_attr(scale);
     let style = format!(
-        "{}{}--m-tint-alpha:{};{corner}{stack}{pixels}",
+        "{}{}{corner}{pixels}",
         frame.style_attr(),
         crate::root::surface::accent_text_style(material),
-        tint.css()
     );
     let framing = window.attribute();
     let hover = match hover.warmth() {

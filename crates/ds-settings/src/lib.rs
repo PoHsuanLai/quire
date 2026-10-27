@@ -41,10 +41,7 @@ mod when;
 mod writer;
 pub mod xdg;
 
-pub use appearance::{
-    AppearanceFile, AppearanceSettings, IconDarkVariant, IconStyle, IconsSettings, MonochromeTint,
-    PlateGlyphPolicy, quire_schema,
-};
+pub use appearance::{AppearanceFile, AppearanceSettings, IconStyle, IconsSettings, quire_schema};
 pub use damaged::{DamagedFile, Saved};
 pub use doc::{FileName, Format, SettingsDoc};
 pub use ds_settings_derive::{SettingsRow, SettingsSchema};

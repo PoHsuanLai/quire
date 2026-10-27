@@ -4,11 +4,8 @@
 //! fact about its app and is shown as it is.
 //!
 //! Near-grey is OKLCH chroma below a threshold (design/08 section 1.5 proposes 0.04). The
-//! settings key is `icons.symbolic_chroma_max` (design/22-SETTINGS.md section 3.3, default
-//! 0.04, range 0.0..=0.2); [`classify_with`] takes the default
-//! ([`ChromaLimit::default`]) or one built with [`ChromaLimit::try_from`]. `sill` still has to
-//! register the key in its own
-//! settings crate and pass the parsed value through (FINDINGS "Settings and schema").
+//! limit is a constant, 0.04 (range 0.0..=0.2; there is no setting); [`classify_with`] takes the
+//! default ([`ChromaLimit::default`]) or one built with [`ChromaLimit::try_from`].
 
 #[cfg(feature = "icon-classify")]
 use ds_core::colour::oklab::{Oklab, Oklch};
@@ -30,17 +27,15 @@ pub enum IconKind {
 pub struct ChromaLimit(pub u16);
 
 impl ChromaLimit {
-    /// design/08 section 1.5's proposed threshold, 0.04 — the same value
-    /// `icons.symbolic_chroma_max` (design/22-SETTINGS.md section 3.3) ships as its default.
+    /// design/08 section 1.5's threshold, 0.04, a constant (there is no setting).
     pub const PROPOSED: ChromaLimit = ChromaLimit(40);
 
-    /// The range `icons.symbolic_chroma_max` allows, in plain OKLCH chroma (design/22-SETTINGS.md
-    /// section 3.3: `0..0.2`).
+    /// The range a caller's own limit may take, in plain OKLCH chroma (`0..0.2`).
     pub const RANGE: std::ops::RangeInclusive<f32> = 0.0..=0.2;
 }
 
 impl Default for ChromaLimit {
-    /// `icons.symbolic_chroma_max`'s default, 0.04.
+    /// 0.04.
     fn default() -> Self {
         ChromaLimit::PROPOSED
     }
@@ -49,8 +44,8 @@ impl Default for ChromaLimit {
 impl TryFrom<f32> for ChromaLimit {
     type Error = DsError;
 
-    /// `chroma` as a settings key would carry it — plain OKLCH chroma, not thousandths — refusing
-    /// anything outside `icons.symbolic_chroma_max`'s range (`ChromaLimit::RANGE`, `0.0..=0.2`).
+    /// `chroma` as a caller would carry it — plain OKLCH chroma, not thousandths — refusing
+    /// anything outside `ChromaLimit::RANGE` (`0.0..=0.2`).
     fn try_from(chroma: f32) -> Result<Self, DsError> {
         if !ChromaLimit::RANGE.contains(&chroma) {
             return Err(DsError::ChromaLimitRange {

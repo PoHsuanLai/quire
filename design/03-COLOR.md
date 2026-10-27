@@ -397,18 +397,17 @@ macOS stacks layers on every chrome material that the section 17.2 recipe lacked
 looked flat beside it. Stack v2 adds them to every card-like material (Dock, Popover, Sheet,
 Toast, Osd, Widget) and a bottom hairline to the Bar; the Window is unchanged. The tints' alphas
 (and the legibility gates on them) do not move. Each layer is a `--m-*` variable a material block
-declares and `--m-box` lists outside in; each alpha reads an input the root writes from a
-settings key (`ds::style::material::stack::MaterialStack`, `Ds { stack }`), with the default below behind it.
+declares and `--m-box` lists outside in; each alpha reads a stylesheet token (`--m-highlight-light`, ...), with the default below behind it; there is no settings key (2026-10-27).
 
-| Layer | Variable | Light | Dark | Key (proposed name, design/22) |
+| Layer | Variable | Light | Dark | Token (no settings key) |
 | --- | --- | --- | --- | --- |
-| Vibrancy | baked into `--m-tint`, `--m-tint-solid` | OKLab chroma x1.4, lightness +.012 (surface `#f8f9f6` becomes `#fcfdf9`) | chroma x1.4, lightness kept (`#151814` becomes `#141813`, the raise `#2a2f28` becomes `#293026`) | `appearance.material_vibrancy`, percent, 100 (0 = section 17.2's flat colour, through `color-mix` on `--m-vibrancy`) |
-| Outer hairline | `--m-hairline` | `0 0 0 .5px rgba(0,0,0,.14)` (the widget's 1 px, M32) | `0 0 0 .5px rgba(0,0,0,.60)` | `appearance.material_hairline_light` 14, `_dark` 60 |
-| Contact shadow | `--m-shadow-contact` | `0 1px 2px rgba(0,0,0,.10)` | `0 1px 2px rgba(0,0,0,.30)` | `appearance.material_shadow_strength`, percent, 100 (scales both shadows) |
+| Vibrancy | baked into `--m-tint`, `--m-tint-solid` | OKLab chroma x1.4, lightness +.012 (surface `#f8f9f6` becomes `#fcfdf9`) | chroma x1.4, lightness kept (`#151814` becomes `#141813`, the raise `#2a2f28` becomes `#293026`) | `--m-vibrancy`, 1 (0 = section 17.2's flat colour, through `color-mix` on `--m-vibrancy`) |
+| Outer hairline | `--m-hairline` | `0 0 0 .5px rgba(0,0,0,.14)` (the widget's 1 px, M32) | `0 0 0 .5px rgba(0,0,0,.60)` | `--m-hairline-light` .14, `--m-hairline-dark` .6 |
+| Contact shadow | `--m-shadow-contact` | `0 1px 2px rgba(0,0,0,.10)` | `0 1px 2px rgba(0,0,0,.30)` | `--m-shadow-strength`, 1 (scales both shadows) |
 | Ambient shadow | `--m-shadow-ambient` (= `--m-shadow`) | menus, toast, OSD `0 12px 40px -12px rgba(0,0,0,.28)`; sheet `0 24px 60px -18px .40`; dock `0 10px 30px -10px .35`; widget `0 2px 8px .12` (M34, 2026-09-26; was `0 6px 16px -6px rgba(26,30,26,.3)`) | menus, toast, OSD `.55`; sheet `0 30px 70px -20px .65`; dock `.50`; widget `0 8px 20px -8px .50` | as above |
-| Inner top highlight | `--m-highlight` | `inset 0 1px 0 rgba(255,255,255,.30)` | `inset 0 1px 0 rgba(255,255,255,.12)` | `appearance.material_highlight_light` 30, `_dark` 12 |
+| Inner top highlight | `--m-highlight` | `inset 0 1px 0 rgba(255,255,255,.30)` | `inset 0 1px 0 rgba(255,255,255,.12)` | `--m-highlight-light` .3, `--m-highlight-dark` .12 |
 | Inner edge | `--m-edge` | `inset 0 0 0 .5px rgba(0,0,0,.08)` (the dock's `rgba(255,255,255,.55)`; the widget's `inset 0 0 0 1px rgba(255,255,255,.10)`, M33) | `rgba(255,255,255,.09)` | none (the `--f-line` values) |
-| Bar | `--m-hairline`, `--m-edge` | `0 .5px 0 rgba(0,0,0,.14)` under `inset 0 -.5px 0 rgba(0,0,0,.08)` | `0 .5px 0 rgba(0,0,0,.60)` | the hairline keys |
+| Bar | `--m-hairline`, `--m-edge` | `0 .5px 0 rgba(0,0,0,.14)` under `inset 0 -.5px 0 rgba(0,0,0,.08)` | `0 .5px 0 rgba(0,0,0,.60)` | the hairline tokens |
 
 **Pixel snapping (2026-09-25).** The .5 px widths in this table are `var(--hairline)` and the
 1 px highlight `var(--hair)` in the generated sheet (01-LAYOUT §2.1): identical at 1x and 2x, one

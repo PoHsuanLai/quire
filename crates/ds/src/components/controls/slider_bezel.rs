@@ -1,13 +1,12 @@
-//! The level sliders (`SliderLook::Mac`, `Capsule` and `CapsuleKnob`): a level with a glyph that
-//! follows it (in the knob, for `Mac`), the control center's volume and brightness (the user's brief of
-//! 2026-09-25; design/30 section 2.1).
+//! The level slider (`SliderLook::Level`): a level with a glyph that follows it in the knob, the
+//! control center's volume and brightness (design/30 section 2.1).
 //!
 //! Motion: while the pointer holds it, the fill follows the pointer with no easing; a level set
 //! from outside (a key, the service) slides over `--t-quick --e-out`. Keys step by a sixteenth,
 //! Shift by a sixty-fourth. The machine is `slider_machine.rs`; the drawing `level_draw.rs`.
 
 use crate::components::content::level_glyph::vocab::LevelSource;
-use crate::components::controls::level_draw::{Drawn, GlyphAt, SLIDER, Shape, body, lead};
+use crate::components::controls::level_draw::{Drawn, GlyphAt, SLIDER, Shape, body};
 use crate::components::controls::slider_machine::{Hold, KeyStep, LevelInput, Nudge, step};
 use crate::components::controls::slider_model::SliderLook;
 use crate::host::measure::client_rect;
@@ -18,15 +17,6 @@ use ds_core::vocab::{Availability, Fraction};
 use ds_core::word::Word;
 use ds_style::tokens::control_size::ControlSize;
 use std::rc::Rc;
-
-/// The shape a capsule look draws.
-fn shape_of(look: SliderLook) -> Shape {
-    match look {
-        SliderLook::Linear | SliderLook::Capsule => Shape::Capsule,
-        SliderLook::CapsuleKnob => Shape::CapsuleKnob,
-        SliderLook::Mac => Shape::Mac,
-    }
-}
 
 /// A level: the glyph that follows it and the capsule that shows it.
 /// `Availability::Disabled` draws it plainly unavailable: the capsule and glyph at the disabled
@@ -54,9 +44,8 @@ pub(crate) fn BezelSlider(
             onchange.call(next);
         }
     };
-    let shape = shape_of(look);
     let drawn = Drawn {
-        shape,
+        shape: Shape::Level,
         parts: SLIDER,
         value,
         glyph: glyph.map(|source| {
@@ -64,7 +53,6 @@ pub(crate) fn BezelSlider(
             GlyphAt { glyph, level }
         }),
     };
-    let leading = lead(&drawn);
     let pressed = state().phase().attr();
     let fill = value.css();
     let class = common.class("ds-slider");
@@ -108,7 +96,7 @@ pub(crate) fn BezelSlider(
                 if let Some(mounted) = rail() {
                     spawn(async move {
                         if let Some(measured) = client_rect(&mounted).await {
-                            apply(LevelInput::Measured { x, track: travel(measured, shape) }, value);
+                            apply(LevelInput::Measured { x, track: travel(measured) }, value);
                         }
                     });
                 }
@@ -128,7 +116,6 @@ pub(crate) fn BezelSlider(
                 }
             },
             ..data,
-            {leading}
             div {
                 class: "ds-slider-rail",
                 onmounted: move |event| rail.set(Some(event.data())),
@@ -141,24 +128,19 @@ pub(crate) fn BezelSlider(
     }
 }
 
-/// The span the pointer travels for `shape`: the whole rail, except under a knob, whose centre
-/// travels from half a knob in at each end.
-fn travel(rail: Rect, shape: Shape) -> Rect {
-    match shape {
-        Shape::Capsule | Shape::Segments => rail,
-        Shape::CapsuleKnob | Shape::Mac => {
-            let inset = rail.size.height.0 / 2.0;
-            Rect {
-                origin: Point {
-                    x: Px(rail.origin.x.0 + inset),
-                    y: rail.origin.y,
-                },
-                size: Size {
-                    width: Px((rail.size.width.0 - 2.0 * inset).max(0.0)),
-                    height: rail.size.height,
-                },
-            }
-        }
+/// The span the pointer travels: the whole rail less half a knob at each end, where the knob's
+/// centre stops.
+fn travel(rail: Rect) -> Rect {
+    let inset = rail.size.height.0 / 2.0;
+    Rect {
+        origin: Point {
+            x: Px(rail.origin.x.0 + inset),
+            y: rail.origin.y,
+        },
+        size: Size {
+            width: Px((rail.size.width.0 - 2.0 * inset).max(0.0)),
+            height: rail.size.height,
+        },
     }
 }
 

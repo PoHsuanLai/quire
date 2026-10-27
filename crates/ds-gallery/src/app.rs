@@ -14,8 +14,6 @@ use ds::root::chrome::Ground;
 pub fn App() -> Element {
     let axes = use_signal(starting);
     use_context_provider(|| axes);
-    // `appearance.material_tint_alpha`, which the materials page moves; every root is given it.
-    let tint = use_context_provider(|| Signal::new(axes.peek().tint_alpha));
     let now = axes();
     rsx! {
         Ds {
@@ -25,7 +23,6 @@ pub fn App() -> Element {
             look: now.look.clone(),
             material: now.material,
             blur: now.blur,
-            tint_alpha: Some(tint()),
             typeface: Some(now.typeface),
             // The page is the specimen sheet whatever material the toolbar picks: its root always
             // paints, and its components stay on paper.

@@ -6,7 +6,4 @@ mod schema;
 mod settings;
 
 pub use schema::quire_schema;
-pub use settings::{
-    AppearanceFile, AppearanceSettings, IconDarkVariant, IconStyle, IconsSettings, MonochromeTint,
-    PlateGlyphPolicy,
-};
+pub use settings::{AppearanceFile, AppearanceSettings, IconStyle, IconsSettings};

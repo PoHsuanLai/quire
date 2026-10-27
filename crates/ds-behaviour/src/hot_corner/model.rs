@@ -51,13 +51,28 @@ pub enum Corner {
     },
 }
 
-/// The corner's timing (`hot_corners.dwell_ms`, `hot_corners.rearm_ms`).
+/// The corner's timing: constants, not settings (design/13 §13.3.12).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CornerParams {
     /// How long the pointer rests in the corner before it fires.
     pub dwell: Duration,
     /// After firing, how long before the corner may fire again (once the pointer has left).
     pub rearm: Duration,
+}
+
+impl CornerParams {
+    /// The side of the invisible square that is the hot spot, in logical pixels.
+    pub const HOT_SPOT_PX: u16 = 2;
+}
+
+impl Default for CornerParams {
+    /// 150 ms to dwell, 500 ms to re-arm.
+    fn default() -> Self {
+        CornerParams {
+            dwell: Duration::from_millis(150),
+            rearm: Duration::from_millis(500),
+        }
+    }
 }
 
 /// What happened.

@@ -118,7 +118,7 @@ pub fn entry(page: Page) -> Entry {
         Page::Materials => Entry {
             page: Page::Materials,
             title: "Materials",
-            lede: "The eight materials as chrome over a wallpaper, blur on and off, with the ink's four legibility floors measured live at the tint alpha below.",
+            lede: "The eight materials as chrome over a wallpaper, blur on and off, with the ink's four legibility floors measured live at the default tint alpha.",
             height: 1700,
             body: crate::pages::foundations::materials::MaterialsPage,
         },

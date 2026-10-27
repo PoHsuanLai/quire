@@ -41,7 +41,6 @@ fn saved(scratch: &Scratch, doc: &Sill) -> String {
 
 const SPEC_EXAMPLE: &str = r#"
 [hot_corners]
-dwell_ms = 150
 
 [[hot_corners.top_left]]
 action = "workspaces"

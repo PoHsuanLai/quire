@@ -389,33 +389,13 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "slider",
-        state: "mac-volume",
-        make: || rsx! { Slider { label: "Volume", value: Fraction(400), look: SliderLook::Mac, glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {} } },
+        state: "level-volume",
+        make: || rsx! { Slider { label: "Volume", value: Fraction(400), look: SliderLook::Level, glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {} } },
     },
     Case {
         component: "slider",
-        state: "mac-brightness-disabled",
-        make: || rsx! { Slider { label: "Brightness", value: Fraction(0), look: SliderLook::Mac, glyph: LevelGlyph::Brightness, availability: Availability::Disabled } },
-    },
-    Case {
-        component: "slider",
-        state: "capsule-volume",
-        make: || rsx! { Slider { label: "Volume", value: Fraction(400), look: SliderLook::Capsule, glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {} } },
-    },
-    Case {
-        component: "slider",
-        state: "capsule-knob-brightness",
-        make: || rsx! { Slider { label: "Brightness", value: Fraction(300), look: SliderLook::CapsuleKnob, glyph: LevelGlyph::Brightness, onchange: |_| {} } },
-    },
-    Case {
-        component: "slider",
-        state: "capsule-muted",
-        make: || rsx! { Slider { label: "Volume", value: Fraction(400), look: SliderLook::Capsule, glyph: LevelGlyph::Volume(Muting::Muted), onchange: |_| {} } },
-    },
-    Case {
-        component: "slider",
-        state: "capsule-disabled",
-        make: || rsx! { Slider { label: "Brightness", value: Fraction(0), look: SliderLook::CapsuleKnob, glyph: LevelGlyph::Brightness, availability: Availability::Disabled } },
+        state: "level-brightness-disabled",
+        make: || rsx! { Slider { label: "Brightness", value: Fraction(0), look: SliderLook::Level, glyph: LevelGlyph::Brightness, availability: Availability::Disabled } },
     },
     // TextField.
     Case {

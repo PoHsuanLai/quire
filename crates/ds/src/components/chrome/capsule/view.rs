@@ -84,7 +84,7 @@ fn scrub(slot: &ScrubSlot, onscrub: EventHandler<ScrubEvent>) -> Element {
     }
 }
 
-/// The capsule's level: a capsule-look slider whose speaker is slashed at zero.
+/// The capsule's level: a level-look slider whose speaker is slashed at zero.
 fn level(slot: &LevelSlot, onlevel: EventHandler<Fraction>) -> Element {
     let muting = if slot.value == Fraction(0) {
         Muting::Muted
@@ -96,7 +96,7 @@ fn level(slot: &LevelSlot, onlevel: EventHandler<Fraction>) -> Element {
             Slider {
                 label: slot.label.clone(),
                 value: slot.value,
-                look: SliderLook::Capsule,
+                look: SliderLook::Level,
                 glyph: LevelGlyph::Volume(muting),
                 availability: slot.availability,
                 onchange: move |next| onlevel.call(next),

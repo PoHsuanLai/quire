@@ -98,10 +98,19 @@ pub enum SwOut {
     Expose(usize),
 }
 
-/// The switcher's timing (`switcher.show_delay_ms`).
+/// The switcher's timing: a constant, not a setting (design/13 §13.3.5).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SwitcherParams {
     /// How long the chord is held before the panel appears; a release inside it switches with
     /// no panel.
     pub show_delay: Duration,
+}
+
+impl Default for SwitcherParams {
+    /// 150 ms.
+    fn default() -> Self {
+        SwitcherParams {
+            show_delay: Duration::from_millis(150),
+        }
+    }
 }

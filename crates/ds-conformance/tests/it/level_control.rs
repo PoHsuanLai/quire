@@ -45,7 +45,7 @@ fn Level() -> Element {
                     label: "Volume",
                     value: VALUE(),
                     glyph: LevelGlyph::Volume(Muting::Audible),
-                    onchange: move |next| *VALUE.write() = next, look: SliderLook::Capsule }
+                    onchange: move |next| *VALUE.write() = next, look: SliderLook::Level }
             }
         }
     }
@@ -92,12 +92,20 @@ fn width(harness: &Harness, selector: &str) -> f32 {
     rect(harness, selector).size.width.0
 }
 
+/// Half the 22 px well: the knob's centre stops this far in from each end of the rail.
+const HALF_KNOB: f32 = 11.0;
+
+/// The fill's width at `level` of a 200 px rail: to the knob's centre.
+fn fill_at(level: f32) -> f32 {
+    HALF_KNOB + level * (200.0 - 2.0 * HALF_KNOB)
+}
+
 /// The fill's width `share` thousandths into `--t-quick` on the `--e-out` curve, from 20 % to
 /// 80 % of 200 px.
 fn on_the_curve(share: u16) -> f32 {
     let curve = EasingToken::Out.easing();
     let done = f32::from(curve.at(Fraction(share)).0) / 1000.0;
-    200.0 * (0.2 + 0.6 * done)
+    fill_at(0.2 + 0.6 * done)
 }
 
 #[test]
@@ -118,9 +126,16 @@ fn a_level_set_from_outside_slides_over_t_quick() {
         on_the_curve(250),
         on_the_curve(500)
     );
-    // The painted run ends a pixel or so short of the laid-out edge, where the round end turns.
-    assert!(before.abs_diff(40) <= 4, "20 % of 200 px: {before}");
-    assert!(after.abs_diff(160) <= 4, "80 % of 200 px: {after}");
+    // The painted run ends where the knob starts, half a knob short of the fill's edge.
+    let knob_left = |level: f32| (fill_at(level) - HALF_KNOB).round() as u32;
+    assert!(
+        before.abs_diff(knob_left(0.2)) <= 4,
+        "20 % of 200 px: {before}"
+    );
+    assert!(
+        after.abs_diff(knob_left(0.8)) <= 4,
+        "80 % of 200 px: {after}"
+    );
     assert!(
         before + 10 < half_painted && half_painted + 3 < after,
         "the fill jumped: {before} -> {half_painted} -> {after}"
@@ -138,7 +153,7 @@ fn under_the_pointer_the_fill_follows_with_no_easing() {
     let mut harness = start(200, Motion::Standard);
     let rail = rect(&harness, ".ds-slider-rail");
     let at = |share: f32| Point {
-        x: Px(rail.origin.x.0 + rail.size.width.0 * share),
+        x: Px(rail.origin.x.0 + fill_at(share)),
         y: Px(rail.origin.y.0 + 11.0),
     };
     harness.send(Input::pointer_down(at(0.3)));
@@ -156,14 +171,15 @@ fn under_the_pointer_the_fill_follows_with_no_easing() {
         Some("true")
     );
     assert!(
-        (pressed - 60.0).abs() <= 1.0,
+        (pressed - fill_at(0.3)).abs() <= 1.0,
         "the press jumps to the pointer: {pressed}"
     );
     assert!(
-        (moved - 140.0).abs() <= 1.0,
+        (moved - fill_at(0.7)).abs() <= 1.0,
         "16 ms after the move the fill is where the pointer is: {moved}"
     );
-    assert!(followed.abs_diff(140) <= 4, "painted {followed}");
+    let knob_left = (fill_at(0.7) - HALF_KNOB).round() as u32;
+    assert!(followed.abs_diff(knob_left) <= 4, "painted {followed}");
 }
 
 #[test]

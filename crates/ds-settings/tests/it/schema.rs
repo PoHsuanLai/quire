@@ -99,13 +99,13 @@ fn both_domains_resolve_to_quire_appearance_toml() {
     }
 }
 
-/// The icon style and its Monochrome tint are Basic (the Appearance page); the plating values
-/// are Advanced (design/22-SETTINGS.md section 5).
+/// The icon style is Basic (the Appearance page); any other icons key would be Advanced
+/// (design/22-SETTINGS.md section 5).
 #[test]
 fn icons_keys_exposure() {
-    const BASIC: [&str; 2] = ["icons.style", "icons.monochrome_tint"];
+    const BASIC: [&str; 1] = ["icons.style"];
     let icons = IconsSettings::schema();
-    assert_eq!(icons.key.len(), 8);
+    assert_eq!(icons.key.len(), 1);
     for key in &icons.key {
         let want = match BASIC.contains(&key.path.0.as_str()) {
             true => ds_settings::schema::Exposure::Basic,

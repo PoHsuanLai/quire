@@ -28,7 +28,7 @@ mod traits;
 pub use agent::{
     AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED, is_never_settable, never_settable_violation,
 };
-pub use behaviour::{CornerAction, HotCornerSettings, SwitcherSettings};
+pub use behaviour::{CornerAction, HotCornerSettings};
 pub use column::{Column, ColumnKind, ColumnName};
 pub use control::{Control, ControlName, TogglePair};
 pub use corners::{CornerBinding, CornerBindings, CornerDo, CornerKey, CornerKeys, OpenItem};

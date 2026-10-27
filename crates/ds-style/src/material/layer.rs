@@ -1,8 +1,7 @@
 //! One `box-shadow` layer of a material's stack, written two ways: with its default alpha (what
 //! [`super::recipe`] reports and the legibility tests read) and with its alpha read from the
-//! stack's tuning input (what the stylesheet declares), so a settings key moves it live.
+//! stack's tuning input (what the stylesheet declares), so a look or the person's own sheet moves it live.
 
-use crate::tokens::hex::thousandths;
 use crate::tokens::{
     hex::{Alpha, Hex},
     name::VarName,
@@ -82,11 +81,6 @@ pub(crate) fn joined(layers: &[Layer], each: impl Fn(Layer) -> String) -> String
             .collect::<Vec<_>>()
             .join(",")
     }
-}
-
-/// A fraction as CSS: `.3`.
-pub(crate) fn fraction(alpha: Alpha) -> String {
-    thousandths(i64::from(alpha.0))
 }
 
 #[cfg(test)]

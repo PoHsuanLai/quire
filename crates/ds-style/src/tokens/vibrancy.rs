@@ -5,8 +5,7 @@
 //! `saturate()`), so the boost is precomputed into the tint colour instead: in OKLab, chroma is
 //! raised by [`CHROMA_GAIN`] and, in the light scheme, lightness by [`LIGHT_LIFT`]. The dark
 //! scheme keeps its lightness so the light ink keeps its contrast. The boost is scaled at render
-//! time by the `appearance.material_vibrancy` key (percent, default 100) through the
-//! `--m-vibrancy` input the root writes: 0 is the flat section 17.2 tint.
+//! time by the `--m-vibrancy` token (default 1) a look or the person's own sheet may set: 0 is the flat section 17.2 tint.
 
 use crate::appearance::theme::Scheme;
 use crate::tokens::hex::Hex;

@@ -1,4 +1,4 @@
-//! Slider: the linear look at each size and with ticks, the two capsule looks, disabled and busy.
+//! Slider: the linear look at each size and with ticks, the level look, disabled and busy.
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
@@ -16,7 +16,7 @@ pub fn SliderSection() -> Element {
     let mut volume = use_signal(|| Fraction(600));
     let mut brightness = use_signal(|| Fraction(300));
     rsx! {
-        Section { title: "Slider", note: "NSSlider: drag, click or use the arrows; with ticks the value snaps to a mark and the knob springs to it on release; the capsule looks carry a glyph that follows the level.",
+        Section { title: "Slider", note: "NSSlider: drag, click or use the arrows; with ticks the value snaps to a mark and the knob springs to it on release; the level look carries a glyph that follows the level.",
             div { class: "g-grid2",
                 for size in ControlSize::ALL.iter().copied() {
                     Specimen { name: format!("linear {}", size.slug()),
@@ -42,14 +42,12 @@ pub fn SliderSection() -> Element {
                 }
             }
             div { class: "g-grid2",
-                for look in [SliderLook::Mac, SliderLook::Capsule, SliderLook::CapsuleKnob] {
-                    Specimen { name: look.slug().to_owned(),
-                        div { style: "width:260px; display:flex; flex-direction:column; gap:12px",
-                            Slider { label: "Volume", value: volume(), look, glyph: LevelGlyph::Volume(Muting::Audible), onchange: move |next| volume.set(next) }
-                            Slider { label: "Brightness", value: brightness(), look, glyph: LevelGlyph::Brightness, onchange: move |next| brightness.set(next) }
-                            Slider { label: "Muted", value: Fraction(400), look, glyph: LevelGlyph::Volume(Muting::Muted), onchange: |_| {} }
-                            Slider { label: "Disabled", value: Fraction(0), look, glyph: LevelGlyph::Brightness, availability: Availability::Disabled }
-                        }
+                Specimen { name: SliderLook::Level.slug().to_owned(),
+                    div { style: "width:260px; display:flex; flex-direction:column; gap:12px",
+                        Slider { label: "Volume", value: volume(), look: SliderLook::Level, glyph: LevelGlyph::Volume(Muting::Audible), onchange: move |next| volume.set(next) }
+                        Slider { label: "Brightness", value: brightness(), look: SliderLook::Level, glyph: LevelGlyph::Brightness, onchange: move |next| brightness.set(next) }
+                        Slider { label: "Muted", value: Fraction(400), look: SliderLook::Level, glyph: LevelGlyph::Volume(Muting::Muted), onchange: |_| {} }
+                        Slider { label: "Disabled", value: Fraction(0), look: SliderLook::Level, glyph: LevelGlyph::Brightness, availability: Availability::Disabled }
                     }
                 }
             }

@@ -14,9 +14,9 @@
 //! `tests/legibility.rs` checks 3:1 for `Material::Widget` (and the Space-tinted widget card)
 //! instead, and every other material still holds 4.5:1.
 //!
-//! The tint alpha over blur is a settings key (`appearance.material_tint_alpha`, default 80),
+//! The tint alpha over blur is the `--m-tint-alpha` token (default .80),
 //! so the recipe takes it rather than hard-coding `.80`. Section 17.2 gives each material its
-//! own alpha (the bar .70, the dock .59, …), and one key cannot name eight numbers, so the key
+//! own alpha (the bar .70, the dock .59, …), and one token cannot name eight numbers, so the token
 //! scales them: at the default 80 every tint is section 17.2's value, and at 100 each is 1.25
 //! times it (capped at opaque). That reading is this wave's, and it is proposed.
 
@@ -33,8 +33,7 @@ use crate::tokens::{
     token::{Token, TokenScope},
 };
 
-/// The settings key's default, `appearance.material_tint_alpha = 80` (design/22-SETTINGS.md
-/// section 3.1, proposed): the alpha at which every tint is section 17.2's own.
+/// The `--m-tint-alpha` token's default, .80: the alpha at which every tint is section 17.2's own.
 pub const DEFAULT_TINT_ALPHA: Alpha = Alpha(800);
 
 /// The solid fallback's alpha when blur is unavailable (section 17.1, settled: "alpha at least

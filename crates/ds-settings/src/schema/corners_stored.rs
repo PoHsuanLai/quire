@@ -7,7 +7,6 @@ use serde::Deserialize;
 
 use super::behaviour::{CornerAction, HotCornerSettings};
 use super::corners::{CornerBinding, CornerBindings, CornerDo};
-use crate::units::{Ms, Px};
 
 /// One corner's value in a file.
 #[derive(Deserialize)]
@@ -65,9 +64,6 @@ pub(super) struct StoredHotCorners {
     bottom_left_command: String,
     #[serde(default)]
     bottom_right_command: String,
-    dwell_ms: Option<Ms>,
-    rearm_ms: Option<Ms>,
-    size_px: Option<Px>,
 }
 
 impl TryFrom<StoredHotCorners> for HotCornerSettings {
@@ -78,15 +74,11 @@ impl TryFrom<StoredHotCorners> for HotCornerSettings {
             Some(value) => value.into_bindings(command),
             None => Ok(CornerBindings::default()),
         };
-        let kept = HotCornerSettings::default();
         Ok(HotCornerSettings {
             top_left: corner(stored.top_left, &stored.top_left_command)?,
             top_right: corner(stored.top_right, &stored.top_right_command)?,
             bottom_left: corner(stored.bottom_left, &stored.bottom_left_command)?,
             bottom_right: corner(stored.bottom_right, &stored.bottom_right_command)?,
-            dwell_ms: stored.dwell_ms.unwrap_or(kept.dwell_ms),
-            rearm_ms: stored.rearm_ms.unwrap_or(kept.rearm_ms),
-            size_px: stored.size_px.unwrap_or(kept.size_px),
         })
     }
 }

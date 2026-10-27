@@ -2,8 +2,7 @@
 //! values fall back to the field's default"): a bad value costs that one key, never the file.
 //!
 //! The doc sketches this as a `deserialize_with` helper that falls back to the field *type's*
-//! `Default`; that would turn a bad `material_tint_alpha` into 0 rather than the key's shipped
-//! 80. So the fallback is the *struct's* default for that key: start from `D::default()` as a
+//! `Default`; that would turn a bad number into 0 rather than the key's shipped default. So the fallback is the *struct's* default for that key: start from `D::default()` as a
 //! key tree, lay each key the file sets over it one at a time, and keep a key only if `D` still
 //! deserializes with it. A key `D` accepts but does not store back is one nobody reads: it is
 //! reported in [`Loaded::unknown`]. A TOML file's save leaves it in the file with the comments

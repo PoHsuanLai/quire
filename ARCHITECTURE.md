@@ -55,7 +55,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds` | `ds-intents`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-shell` | `ds`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-settings-page` | `ds` (the rows and controls), `ds-settings` (the schema types) |
-| `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-behaviour` (the switcher and hot-corner settings convert into its machine params), `ds-helpers` (the capped reader and durable writer, `files`), `ds-settings-derive`, `ds-peer` (the deadline on each call to a daemon or the portal) |
+| `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-helpers` (the capped reader and durable writer, `files`), `ds-settings-derive`, `ds-peer` (the deadline on each call to a daemon or the portal) |
 | `ds-extensions` | `ds-core`, `ds-settings` (the `Provided` kind and the schema'd `extensions.toml`), `ds-helpers` (the capped reader for a look's stylesheet, the atomic writer for Your changes, the MIME database the resolver reads), `ds-style` (the file kinds, folder kinds, extension label and `kind_for_mime` the standard set is; `ds` is above it, so the resolver answers in its own `IconPick` and the app maps it to `ds::FileIconChoice`); bayonet (a git dependency) for manifests, the folder scan and the registry. `ds-settings` never names it |
 | `ds-peer` | nothing of ours |
 | `ds-helpers` | `ds-peer` |
@@ -260,7 +260,7 @@ The single place a concept lives. Extend it; never write a second one.
 | A hot corner's dwell, fire and re-arm | `ds-behaviour::hot_corner` |
 | Command's double tap (summon) and hold (talk) | `ds-behaviour::modifier_tap` (`Tap`, `HoldKey`) |
 | The live Space swipe: follow, rubber band, commit, finish | `ds-behaviour::space_swipe` (`Swipe`; the numbers in `numbers`) |
-| The switcher and hot-corner settings, and their conversion into machine params | `ds-settings::schema::behaviour` (`SwitcherSettings`, `HotCornerSettings`, `params()`) |
+| The hot-corner setting; the switcher and corner timing are machine constants | `ds-settings::schema::behaviour` (`HotCornerSettings`); the timing is `CornerParams::default()` and `SwitcherParams::default()` in `ds-behaviour` |
 | A timed pure state machine and the one timer that drives it | `ds-core::machine` (`Machine`, `Elapsed`), `ds-motion::machine` (`use_machine`, `use_machine_in`, `use_machine_state`, `MachineRef`, `MachineState`; named `ds::machine` for apps) |
 | A word or state shown for one `DelayToken` and then gone ("Copied", "Sent") | `ds::components::app::hold_for` (`HoldFor`, `use_hold_for`) |
 | A recording's progress bar: loaded stretches, a time tooltip, a captured drag | `ds::components::controls::scrubber` (`Scrubber`; drawing in `scrubber_face`, machine in `scrubber_machine`, `BufferedRange`, `merged` and `time_text` in `scrubber_model`) |

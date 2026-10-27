@@ -99,7 +99,7 @@ impl FileIconChoice {
 }
 
 /// `choice` drawn `size` square (16 px by default; any size from 16 to 512 works). `style` is the
-/// icon style (`FileIconStyle::of(icons.style, icons.monochrome_tint)`). The accessible name is
+/// icon style (`FileIconStyle::of(icons.style, Tint::space(dots))`). The accessible name is
 /// `common.aria_label`, else the kind's plain name ("PDF document", "Folder").
 #[component]
 pub fn FileIcon(
