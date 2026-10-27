@@ -5,6 +5,10 @@ first, with what a consumer has to change.
 
 ## v0.3.50 (unreleased)
 
+### form-owner-gone
+
+- Blitz moves to our fork's 7649ca62 (blitz-kit 7da72633): a form control, `<style>` or `<title>` that is added and dropped before the mutator flushes is skipped, where the flush indexed its freed slot and panicked ("invalid SlotMap key used" in `reset_form_owner`; temor hit it when an input appeared and went in one batch). Consumers that build ds-blitz copy the new pinned block; docs/fork-patches.toml is unchanged.
+
 ### wh-qset
 
 - Settings explanations go where the Mac puts them. `#[settings(note = "...")]` sets the short line under a row (`KeySpec.note`, which the derive could not set before). `#[settings(range = "...", ends = ("Small", "Large"))]` labels a slider's two ends (`KeySpec.ends: Option<SliderEnds>`). A repeatable struct-level `#[settings(footnote(section = "...", text = "..."))]` adds a section footnote (`Schema.footnotes: Vec<Footnote>`, `[[footnote]]` in the file). All three are absent when unset, so older schemas read unchanged. **Consumer change:** code that builds a `KeySpec` field by field adds `ends: None`, and code that builds a `Schema` adds `footnotes: Vec::new()`. design/22 §9.1 has the grammar; design/27 §5.12 records Settings' colour tiles as the one exception to ink sidebar icons (owner, 2026-10-27).
