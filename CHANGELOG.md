@@ -9,6 +9,10 @@ first, with what a consumer has to change.
 
 - Settings explanations go where the Mac puts them. `#[settings(note = "...")]` sets the short line under a row (`KeySpec.note`, which the derive could not set before). `#[settings(range = "...", ends = ("Small", "Large"))]` labels a slider's two ends (`KeySpec.ends: Option<SliderEnds>`). A repeatable struct-level `#[settings(footnote(section = "...", text = "..."))]` adds a section footnote (`Schema.footnotes: Vec<Footnote>`, `[[footnote]]` in the file). All three are absent when unset, so older schemas read unchanged. **Consumer change:** code that builds a `KeySpec` field by field adds `ends: None`, and code that builds a `Schema` adds `footnotes: Vec::new()`. design/22 §9.1 has the grammar; design/27 §5.12 records Settings' colour tiles as the one exception to ink sidebar icons (owner, 2026-10-27).
 
+### wh-qcopy
+
+- Settings wording is shorter and plainer: help lines are one short sentence, and longer explanations move into notes under the row. The Appearance page is split into Colour, Accessibility, Style, Materials and Text and time. File icons move into Icons, and time format into Text and time. Only `help`, `note` and `section` strings change, so no keys, labels or stored values move.
+
 ### menu-leave
 
 - A menu's highlight goes out when the pointer leaves the menu, as a macOS menu's does: nothing is lit once the pointer is outside it, a key starts again from an end, and the pointer back in lights the row under it. The parent row of an open submenu stays lit, since it owns the submenu; a pending submenu the pointer leaves never opens; a menu the pointer never entered (opened from the keyboard, or on a pop-up's chosen value) keeps its highlight. Every ds `Menu` and its submenus have it (context, pop-up, pull-down, bar menus, pick lists, search suggestions); a caller's `MenuCursor::Controlled` highlight is the caller's and is not changed. No consumer change.

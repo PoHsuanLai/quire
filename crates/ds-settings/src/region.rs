@@ -94,9 +94,9 @@ pub struct RegionSettings {
     /// `region.hours`: Auto, 12 or 24.
     #[settings(
         label = "Time format",
-        help = "Write times with a 12-hour or a 24-hour clock everywhere. Automatic follows the \
-                language and region of the session.",
-        section = "Time"
+        help = "Writes times in 12 or 24 hours everywhere.",
+        note = "Automatic follows your language and region.",
+        section = "Text and time"
     )]
     pub hours: HourCycle,
 }

@@ -25,16 +25,16 @@ pub struct AppearanceSettings {
     /// `appearance.theme`: System, Light or Dark.
     #[settings(
         label = "Theme",
-        help = "Follow the desktop, or force light or dark mode.",
-        section = "Appearance",
+        help = "Follows the desktop, or stays in light or dark mode.",
+        section = "Colour",
         agent_settable
     )]
     pub theme: Theme,
     /// `appearance.accent`: one of macOS's eight.
     #[settings(
         label = "Accent",
-        help = "The colour of buttons, selection, switches and focus rings across the desktop.",
-        section = "Appearance",
+        help = "Colours buttons, selection, switches and focus rings.",
+        section = "Colour",
         agent_settable
     )]
     pub accent: Accent,
@@ -42,9 +42,9 @@ pub struct AppearanceSettings {
     /// overrides, or Reduced. Read as macOS's "Reduce motion": a switch that is on for Reduced.
     #[settings(
         label = "Reduce motion",
-        help = "Replace slides, scales and springs with cross-fades. The desktop's own \
-                reduce-motion setting always applies.",
-        section = "Appearance"
+        help = "Swaps slides and springs for fades.",
+        note = "The desktop's own reduce-motion setting always applies.",
+        section = "Accessibility"
     )]
     pub motion_level: Motion,
     /// `appearance.transparency`: System keeps translucent materials, Reduced paints every
@@ -52,17 +52,16 @@ pub struct AppearanceSettings {
     /// The compositor reads it from this file, as it reads `theme`.
     #[settings(
         label = "Reduce transparency",
-        help = "Make blurred and translucent areas solid. Windows, menus and panels stop \
-                showing what is behind them.",
-        section = "Appearance"
+        help = "Makes blurred and see-through areas solid.",
+        section = "Accessibility"
     )]
     pub transparency: Transparency,
     /// `appearance.typeface`: System (Inter) unless the person picks mail's editorial faces.
     #[settings(
         label = "Typeface",
-        help = "The text face of the desktop's windows and controls: System is Inter; \
-                Editorial is mail's Bricolage Grotesque and Karla. Code stays in Space Mono.",
-        section = "Appearance"
+        help = "The font of windows and controls.",
+        note = "System is Inter; Editorial is Bricolage Grotesque and Karla. Code stays in Space Mono.",
+        section = "Text and time"
     )]
     pub typeface: Typeface,
     /// `appearance.look`: `standard`, or the id of an installed look Extension (a stylesheet
@@ -70,9 +69,9 @@ pub struct AppearanceSettings {
     /// reads as `standard` where the installed Extensions are known and is reported once.
     #[settings(
         label = "Look",
-        help = "Standard, or a look you added in Extensions. A look restyles every window; \
-                choosing Standard puts the desktop back as it shipped.",
-        section = "Appearance",
+        help = "Restyles every window.",
+        note = "Standard puts the desktop back as it shipped.",
+        section = "Style",
         provided = "look",
         agent_settable
     )]
@@ -82,9 +81,9 @@ pub struct AppearanceSettings {
     /// off, reads as `standard` where the installed Extensions are known and is reported once.
     #[settings(
         label = "File icons",
-        help = "Standard, or a set of file icons you added in Extensions. A type a set has no \
-                picture for keeps the standard icon; choosing Standard puts them all back.",
-        section = "Files",
+        help = "Shows icons you added for each file type.",
+        note = "A file type without an icon keeps the standard one.",
+        section = "Icons",
         provided = "file_icons",
         agent_settable
     )]
@@ -93,17 +92,17 @@ pub struct AppearanceSettings {
     /// `off` is the way back from a style that broke a surface; it is a switch, "Use my styles".
     #[settings(
         label = "Use my styles",
-        help = "Draw the look you chose and your own style sheets. Turn this off if a style \
-                made something hard to use.",
-        section = "Appearance",
+        help = "Draws the look you chose and your own style sheets.",
+        note = "Turn this off if a style makes something hard to use.",
+        section = "Style",
         agent_settable
     )]
     pub custom_styles: CustomStyles,
     /// `appearance.material_tint_alpha`: the tint's alpha over compositor blur (proposed 80).
     #[settings(
         label = "Material tint",
-        help = "The tint's alpha over the compositor's behind-surface blur.",
-        section = "Appearance",
+        help = "How strong the tint is over the blur.",
+        section = "Materials",
         range = "0..=100",
         unit = "%",
         advanced
@@ -112,8 +111,8 @@ pub struct AppearanceSettings {
     /// `appearance.material_highlight_light` (the macOS polish pass; percent, default 30).
     #[settings(
         label = "Highlight (light)",
-        help = "The top highlight's alpha on a light material.",
-        section = "Appearance",
+        help = "How strong the top highlight is on light materials.",
+        section = "Materials",
         range = "0..=100",
         unit = "%",
         advanced
@@ -122,8 +121,8 @@ pub struct AppearanceSettings {
     /// `appearance.material_highlight_dark` (the macOS polish pass; percent, default 12).
     #[settings(
         label = "Highlight (dark)",
-        help = "The top highlight's alpha on a dark material.",
-        section = "Appearance",
+        help = "How strong the top highlight is on dark materials.",
+        section = "Materials",
         range = "0..=100",
         unit = "%",
         advanced
@@ -132,8 +131,8 @@ pub struct AppearanceSettings {
     /// `appearance.material_hairline_light` (the macOS polish pass; percent, default 14).
     #[settings(
         label = "Hairline (light)",
-        help = "The outer hairline's alpha on a light material.",
-        section = "Appearance",
+        help = "How strong the edge line is on light materials.",
+        section = "Materials",
         range = "0..=100",
         unit = "%",
         advanced
@@ -142,8 +141,8 @@ pub struct AppearanceSettings {
     /// `appearance.material_hairline_dark` (the macOS polish pass; percent, default 60).
     #[settings(
         label = "Hairline (dark)",
-        help = "The outer hairline's alpha on a dark material.",
-        section = "Appearance",
+        help = "How strong the edge line is on dark materials.",
+        section = "Materials",
         range = "0..=100",
         unit = "%",
         advanced
@@ -152,8 +151,8 @@ pub struct AppearanceSettings {
     /// `appearance.material_shadow_strength` (the macOS polish pass; percent, default 100).
     #[settings(
         label = "Shadow strength",
-        help = "How strong a floating material's contact and ambient shadows are.",
-        section = "Appearance",
+        help = "How strong shadows under floating panels are.",
+        section = "Materials",
         range = "0..=100",
         unit = "%",
         advanced
@@ -162,8 +161,8 @@ pub struct AppearanceSettings {
     /// `appearance.material_vibrancy` (the macOS polish pass; percent, default 100).
     #[settings(
         label = "Vibrancy",
-        help = "How much of the tint the vibrancy boost saturates.",
-        section = "Appearance",
+        help = "How much the tint's colour is boosted.",
+        section = "Materials",
         range = "0..=100",
         unit = "%",
         advanced
@@ -282,22 +281,22 @@ pub struct IconsSettings {
     /// `icons.style` (proposed Colour).
     #[settings(
         label = "App icon style",
-        help = "Colour draws each app icon as designed; Muted holds the colour down; \
-                Monochrome draws every icon in one hue.",
+        help = "How colourful app icons are.",
+        note = "Colour keeps each icon as designed; Muted holds the colour down; Monochrome uses one hue.",
         section = "Icons"
     )]
     pub style: IconStyle,
     /// `icons.monochrome_tint` (proposed Space): only read when `style` is Monochrome.
     #[settings(
         label = "Monochrome tint",
-        help = "Where Monochrome icons take their hue: the Space, the accent, or none.",
+        help = "Where Monochrome icons take their hue.",
         section = "Icons"
     )]
     pub monochrome_tint: MonochromeTint,
     /// `icons.plate_inset_percent` (proposed 72).
     #[settings(
         label = "Plate inset",
-        help = "How far a third-party icon sits inside its plate.",
+        help = "How far other apps' icons sit inside their plate.",
         section = "Icons",
         range = "0..=100",
         unit = "%",
@@ -307,7 +306,7 @@ pub struct IconsSettings {
     /// `icons.symbolic_fallback_glyph_percent` (proposed 56).
     #[settings(
         label = "Symbolic fallback size",
-        help = "The glyph's size when an app ships only a symbolic icon.",
+        help = "Icon size when an app only has a symbolic one.",
         section = "Icons",
         range = "0..=100",
         unit = "%",
@@ -317,8 +316,7 @@ pub struct IconsSettings {
     /// `icons.squircle_detect_iou` (proposed 0.90).
     #[settings(
         label = "Squircle detection",
-        help = "How closely an icon must already match a squircle to skip re-masking it \
-                (stored per-mille: 900 is 0.90).",
+        help = "How closely an icon must match a squircle to skip re-masking (900 is 0.90).",
         section = "Icons",
         range = "0..=1000",
         advanced
@@ -328,8 +326,7 @@ pub struct IconsSettings {
     /// this is drawn as a symbolic mask in the ink colour (design/08-ICONS.md section 1.5).
     #[settings(
         label = "Symbolic icon colour limit",
-        help = "An icon with less colour than this is drawn as a symbolic mask in the ink \
-                colour (stored per-mille: 40 is 0.04).",
+        help = "Icons with less colour than this are drawn as masks (40 is 0.04).",
         section = "Icons",
         range = "0..=200",
         advanced
@@ -338,7 +335,7 @@ pub struct IconsSettings {
     /// `icons.plate_glyph_colour_policy`.
     #[settings(
         label = "Plate glyph colour",
-        help = "Auto picks white or ink per family for contrast; the other two force one.",
+        help = "Auto picks white or dark ink for contrast.",
         section = "Icons",
         advanced
     )]
@@ -346,7 +343,7 @@ pub struct IconsSettings {
     /// `icons.dark_mode_variant`.
     #[settings(
         label = "Icon dark variant",
-        help = "Whether a third-party icon adapts to the dark scheme or stays the same.",
+        help = "Whether other apps' icons change for the dark appearance.",
         section = "Icons",
         advanced
     )]

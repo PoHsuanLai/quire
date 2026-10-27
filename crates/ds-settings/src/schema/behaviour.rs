@@ -23,7 +23,7 @@ use crate::units::{Ms, Px};
 pub struct SwitcherSettings {
     #[settings(
         label = "Show delay",
-        help = "How long the chord is held before the switcher appears.",
+        help = "How long to hold the keys before it appears.",
         section = "App switcher",
         range = "0..=500",
         unit = "ms",
@@ -32,7 +32,7 @@ pub struct SwitcherSettings {
     pub show_delay_ms: Ms,
     #[settings(
         label = "Icon size",
-        help = "The size of an app icon in the switcher.",
+        help = "How big app icons are.",
         section = "App switcher",
         range = "32..=256",
         unit = "px",
@@ -41,7 +41,7 @@ pub struct SwitcherSettings {
     pub icon_size_px: Px,
     #[settings(
         label = "Cell size",
-        help = "The size of one app's cell.",
+        help = "How big each app's cell is.",
         section = "App switcher",
         range = "48..=256",
         unit = "px",
@@ -59,7 +59,7 @@ pub struct SwitcherSettings {
     pub cell_gap_px: Px,
     #[settings(
         label = "Smallest icon",
-        help = "How small icons may shrink with many apps open.",
+        help = "How small icons shrink with many apps open.",
         section = "App switcher",
         range = "16..=128",
         unit = "px",
@@ -126,7 +126,7 @@ pub enum CornerAction {
 pub struct HotCornerSettings {
     #[settings(
         label = "Top left",
-        help = "What the top-left corner does.",
+        help = "What happens when the pointer rests there.",
         section = "Hot Corners",
         text,
         control = "corners"
@@ -134,7 +134,7 @@ pub struct HotCornerSettings {
     pub top_left: CornerBindings,
     #[settings(
         label = "Top right",
-        help = "What the top-right corner does.",
+        help = "What happens when the pointer rests there.",
         section = "Hot Corners",
         text,
         control = "corners"
@@ -142,7 +142,7 @@ pub struct HotCornerSettings {
     pub top_right: CornerBindings,
     #[settings(
         label = "Bottom left",
-        help = "What the bottom-left corner does.",
+        help = "What happens when the pointer rests there.",
         section = "Hot Corners",
         text,
         control = "corners"
@@ -150,7 +150,7 @@ pub struct HotCornerSettings {
     pub bottom_left: CornerBindings,
     #[settings(
         label = "Bottom right",
-        help = "What the bottom-right corner does.",
+        help = "What happens when the pointer rests there.",
         section = "Hot Corners",
         text,
         control = "corners"
@@ -158,7 +158,7 @@ pub struct HotCornerSettings {
     pub bottom_right: CornerBindings,
     #[settings(
         label = "Corner delay",
-        help = "How long the pointer rests in a corner before it acts.",
+        help = "How long the pointer rests before it acts.",
         section = "Hot Corners",
         range = "0..=2000",
         unit = "ms",
@@ -167,7 +167,7 @@ pub struct HotCornerSettings {
     pub dwell_ms: Ms,
     #[settings(
         label = "Corner re-arm time",
-        help = "After acting, a corner acts again only once the pointer has left it and this long has passed.",
+        help = "How long before a corner can act again.",
         section = "Hot Corners",
         range = "0..=5000",
         unit = "ms",
@@ -176,7 +176,7 @@ pub struct HotCornerSettings {
     pub rearm_ms: Ms,
     #[settings(
         label = "Corner size",
-        help = "The side of the invisible square in each active corner.",
+        help = "How big the hidden hot spot is.",
         section = "Hot Corners",
         range = "1..=8",
         unit = "px",
