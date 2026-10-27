@@ -5,6 +5,10 @@ first, with what a consumer has to change.
 
 ## v0.3.50 (unreleased)
 
+### blitz-select-scroll
+
+- Blitz moves to our fork's 841386a7 (`quire-pin-next`, with 5bcb2b4d and 7f8f6ace; blitz-kit 4ad80cdc): dragging a text selection towards or past the edge of a scroll container scrolls it, faster the further past, and keeps scrolling while the button is held and the pointer still, extending the selection to the pointer in the content that moved. What a container cannot scroll falls to the next one outward, from an `<iframe srcdoc>` sub-document through its host into the host document's scroll ancestors. A selection begun in a sub-document goes on while the pointer is outside the frame. A table row's block-level child is laid out in an anonymous cell, not dropped as a caption. Pinned block: the Blitz rev and the blitz-kit rev.
+
 ### form-owner-gone
 
 - Blitz moves to our fork's 7649ca62 (blitz-kit 7da72633): a form control, `<style>` or `<title>` that is added and dropped before the mutator flushes is skipped, where the flush indexed its freed slot and panicked ("invalid SlotMap key used" in `reset_form_owner`; temor hit it when an input appeared and went in one batch). Consumers that build ds-blitz copy the new pinned block; docs/fork-patches.toml is unchanged.
