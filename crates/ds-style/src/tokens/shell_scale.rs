@@ -1,8 +1,8 @@
 //! The bar's and the text menus' geometry on the size ladder (design/29-SIZING.md sections 5.1,
 //! 5.4 and 13): a 24 bar whose items are Regular controls (22), a status slot 30 wide with a 16
 //! glyph, and a menu rounded 8 with its rows inset 5 (the reference's highlight is 5, not
-//! concentric with the menu). The item heights, paddings and highlight a settings key can move
-//! stay [`ShellMetrics`](super::ShellMetrics) tokens; these are the fixed ones.
+//! concentric with the menu). The item heights, paddings and highlight a look can move
+//! stay [`ShellType`](super::shell_type::ShellType) tokens; these are the fixed ones.
 
 use crate::tokens::size_scale::WholePx;
 use crate::tokens::token::{CssValue, Token, TokenScope};

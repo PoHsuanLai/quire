@@ -234,7 +234,7 @@ Pinned items live in `[[dock]]` rows of `~/.config/sill/layout.toml` (design/28 
 ### 3.7 `scroll` (sill/settings.toml)
 
 `scroll.speed`, `scroll.lock_*` and the gain constants are **not** duplicated here: they are
-palmrest's `feel` module and live under `gestures` (3.10) in `palmrest/gestures.toml`, which
+palmrest's `feel` module; `scroll.speed` lives under `gestures` (3.9) in `palmrest/gestures.toml`, which
 `shell-host` reads read-only (`11-BEHAVIOUR-scroll.md#11-7-integration`).
 
 | Key | Type | Default | Range / Alt | Source | Status |
@@ -258,60 +258,22 @@ palmrest's `feel` module and live under `gestures` (3.10) in `palmrest/gestures.
 
 ### 3.9 `gestures` (palmrest/gestures.toml)
 
-Base table carried verbatim from `12-BEHAVIOUR-gestures.md#12-6-configuration`, plus values
-found elsewhere in the file that are not yet in that table.
+Retired 2026-10-27 except two rows: palmrest has only `scroll.speed` and the
+`gestures.gesture_action_map` rows (one per gesture). The other keys of
+`12-BEHAVIOUR-gestures.md#12-6-configuration` (the scroll lock and gains, `swipe.*`, `tap.*`,
+`foreign_output`, the G4 and live-workspace numbers, `contact_nibble_policy`) are constants in
+palmrest; a file that still has them loads, the keys are ignored.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `scroll.speed` | `Count` | `22` | `0..63` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled (Python) |
-| `scroll.lock_threshold` | `Units` | `40` | `10..200` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `scroll.lock_ratio` | `Fraction` | `1500` (1.5) | `1000..4000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `scroll.lock_timeout_ms` | `Ms` | `250` | `0..2000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `scroll.velocity_gain_max` | `Fraction` | `2000` (2.0) | `1000..4000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `scroll.repeat_gain_max` | `Fraction` | `2300` (2.3) | `1000..4000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `scroll.detent_px` | `Px` | `60` | `20..200` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed (mirrors `scroll.wheel_detent_px`, see 7) |
-| `swipe.threshold` | `Units` | `200` | `50..1000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `swipe.vertical_max` | `Units` | `150` | `20..1000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `swipe.cooldown_ms` | `Ms` | `500` | `0..2000` | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `swipe.workspace_mode` | `WorkspaceMode::{Trigger,Live}` | `Trigger` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled |
-| `swipe.repeat` | `SwipeRepeat::{AfterCooldown,OncePerGesture}` | `AfterCooldown` | | `12-BEHAVIOUR-gestures.md#12-6-configuration`; `12-BEHAVIOUR-gestures.md#12-9-open-decisions` item 1 | settled (Python) |
-| `tap.max_ms` | `Ms` | `200` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
-| `tap.gap_ms` | `Ms` | `350` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
-| `tap.max_move_units` | `Units` | `40` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
-| `tap.centroid_max_units` | `Units` | `300` | second tap must land within this of the first | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G6) | proposed |
-| `foreign_output` | `ForeignOutput::{Touchpad,Wheel,Off}` | `Touchpad` | | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
-| `gestures.g4_foreign_mode` | `G4Mode::{InjectAndScroll,Native}` | `InjectAndScroll` | `Native` = scroll-only, let the browser run its own overscroll nav | `12-BEHAVIOUR-gestures.md#12-9-open-decisions` item 2 | proposed — **flagged for review** (task shorthand "one-finger swipe Inject vs Native") |
-| `gestures.g4_travel_units` | `Units` | `300` | | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G4) | proposed |
-| `gestures.g4_max_duration_ms` | `Ms` | `400` | | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G4) | proposed |
-| `gestures.g4_axis_ratio` | `Fraction` | `2000` (2.0) | `|x| >= 2|y|` | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G4) | proposed |
-| `gestures.g4_settle_ms` | `Ms` | `50` | last motion before lift | `12-BEHAVIOUR-gestures.md#12-3-4-the-gesture-set` (G4) | proposed |
-| `gestures.host_swipe_D_units` | `Units` | `1000` | `~38mm`; on our own surfaces | `12-BEHAVIOUR-gestures.md#12-3-6-one-finger-swipe-on-our-surfaces-host-decided` | proposed |
-| `gestures.live_workspace_D_units` | `Units` | `1000` | alt `400` (R10 touchpad px) | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
-| `gestures.live_workspace_overshoot_scale` | `Fraction` | `250` (0.25) | `p' = bound + 0.25(p-bound)` | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
-| `gestures.live_workspace_overshoot_cap` | `Fraction` | `125` (0.125) | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
-| `gestures.live_workspace_velocity_window_ms` | `Ms` | `80` | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
-| `gestures.live_workspace_commit_velocity` | `Fraction` | `1500` (1.5 pages/s) | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
-| `gestures.live_workspace_finish_min_ms` | `Ms` | `100` | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
-| `gestures.live_workspace_finish_max_ms` | `Ms` | `400` | | `12-BEHAVIOUR-gestures.md#12-3-7-live-tracking-model-for-later-workspace-swipe-with-the-content-following` | proposed |
 | `gestures.gesture_action_map` | `Map<Gesture, Action>` | Apple mapping shipped (see `12-BEHAVIOUR-gestures.md#12-6-configuration` table) | every `Gesture` variant remappable | `12-BEHAVIOUR-gestures.md#12-6-configuration` | settled (preference) |
-| `gestures.contact_nibble_policy` | `ContactNibblePolicy::{PythonParity,KernelOnly}` | `PythonParity` | treats report nibble 1-2 as contact (current) vs only 3-4 ("down") | `12-BEHAVIOUR-gestures.md#12-9-open-decisions` item 3 | proposed |
 
-### 3.10 `palm_rejection` (palmrest/gestures.toml)
+### 3.10 `palm_rejection` (retired)
 
-| Key | Type | Default | Range / Alt | Source | Status |
-| --- | --- | --- | --- | --- | --- |
-| `rejection` | `Rejection::{On,Off}` | `On` | `Off` disables P1-P3 and P5 for Python bit-exact comparison | `12-BEHAVIOUR-gestures.md#12-6-configuration` | proposed |
-| `palm_rejection.light_touch_size_max` | `Units` | `8` | P1 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.side_band_x_min` | `Units` (signed) | `-900` | P2 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.side_band_x_max` | `Units` (signed) | `1060` | P2 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.rear_band_percent` | `Percent` | `15` | P2 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.resting_move_floor_units` | `Units` | `30` | P2, within `resting_window_ms` | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.resting_window_ms` | `Ms` | `150` | P2 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.large_contact_major_units` | `Units` | `64` | P3 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.click_guard_ms` | `Ms` | `200` | P4 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.mouse_moving_threshold_counts_s` | `Count` | `200` | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.mouse_moving_window_ms` | `Ms` | `100` | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
-| `palm_rejection.mouse_moving_lock_multiplier` | `Fraction` | `2000` (2.0x, 40->80) | P5 | `12-BEHAVIOUR-gestures.md#12-3-3-palm-and-rest-rejection` | proposed |
+Retired 2026-10-27: palmrest keeps only `scroll.speed` and the `gestures.gesture_action_map`
+rows (3.9), so `rejection` and every `palm_rejection.*` key are constants in palmrest; a file
+that still has them loads, the keys are ignored. The section number stays so later links hold.
 
 ### 3.11 `menus` (retired)
 
@@ -927,7 +889,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | --- | --- |
 | **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.look`, `appearance.file_icons`, `appearance.motion_level`, `appearance.transparency`, `appearance.custom_styles`, `icons.style`; under **Bar**: `bar.autohide` |
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.indicators`, `dock.trash` |
-| **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
+| **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into the compositor's `system_actions` and `custom` shortcut files, and the chord the desktop already holds wins a clash, shown on the row (28 §7 decision 10) |
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app) |
 | **Spotlight** (sill M9, Q303) | `launcher.clipboard_history` (a privacy choice people should find), `launcher.web_search`, `launcher.emoji_skin_tone`; the rest of `launcher.*` stays Advanced |

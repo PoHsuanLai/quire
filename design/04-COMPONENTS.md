@@ -2054,8 +2054,7 @@ text menus (design/13 section 13.3.3): rows at least `--shell-menu-row` 22 px, t
 `--fs-shell-menu` 13 at 400, the 22 px check column, the selection an inset highlight at
 `--r-shell-highlight` 6 inside the 5 px panel padding, separators 1 px `--line-soft` with
 `--shell-menu-sep` 5 px above and below and inset 8 px to the text, disabled rows at .35. Rich
-keeps its 34 px tiles. The sizes are tuned tokens (`ShellMetrics`), so `menus.item_height_px`
-and its siblings move them live. On a Popover root (the shell's) the card paints the material
+keeps its 34 px tiles. The sizes are tuned tokens (`ShellType`), so a look or a style sheet moves them by their inputs. On a Popover root (the shell's) the card paints the material
 stack v2 (03-COLOR section 17.4).
 
 ### 21. Popover

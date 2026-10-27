@@ -76,6 +76,7 @@ mod print;
 mod probe;
 #[cfg(all(target_os = "linux", feature = "quire-desktop"))]
 mod quire_window;
+mod resolved;
 mod reveal;
 mod route;
 mod scheme;
@@ -150,6 +151,7 @@ pub use pdf_thumb::{
 #[cfg(feature = "print")]
 pub use print::{PrintError, PrintOutcome, print_dialog};
 pub use quire_emoji::{EMOJI_FAMILY_ENV, EmojiChoice, colrv1_emoji_file};
+pub use resolved::Resolved;
 pub use shell_keys::ShellKeys;
 pub use snap::snap_to_device;
 pub use styles_guard::{StylesGuard, use_styles_guard};

@@ -1,16 +1,15 @@
 //! The shell type scale (the macOS polish pass, 2026-09-24): the bar's items, text menus, the
-//! launcher and tooltips, each size a tuned token a settings key can move. The defaults are
+//! launcher and tooltips, each size a tuned token whose default is declared in the stylesheet
+//! (`var(--shell-menu-font,13px)`); a look or a style sheet overrides the input. The defaults are
 //! the macOS numbers design/13-BEHAVIOUR-menus-windows.md section 13.2 records (menu bar text
 //! 13 pt, menu rows about 22 pt, 13 pt menu text) and the launcher's Spotlight-like scale
 //! (design/13 section 13.3.9); `MenuBarItem`, `Menu`, `CommandPalette`
 //! in a surface and `Tooltip` read them, so a consumer gets them with no prop.
 
 use crate::tokens::token::Token;
-use crate::tokens::tuned::px;
-use ds_core::geometry::units::Px;
 use ds_core::word::Word;
 
-/// One token of the shell type scale, each a tuned token a settings key can move.
+/// One token of the shell type scale, each a tuned token a look or style sheet can move.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "", kind = tuned)]
 pub enum ShellType {
@@ -75,168 +74,30 @@ pub enum ShellType {
     TipFont,
 }
 
-/// A CSS font weight: 400, 500, 700.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct FontWeight(pub u16);
-
-/// The bar's text items and their pill.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct BarType {
-    /// Text size, 13.
-    pub font: Px,
-    /// Text weight, 500.
-    pub weight: FontWeight,
-    /// The hover and open pill's height, 22.
-    pub item_height: Px,
-    /// The pill's side padding around a text item, 8.
-    pub item_padding: Px,
-    /// The pill's radius, 5.
-    pub item_radius: Px,
-}
-
-/// Text menus: the bar's, context and dock menus.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct MenuType {
-    /// Item text, 13.
-    pub font: Px,
-    /// Row height, 22.
-    pub row: Px,
-    /// Separator margin above and below, 5.
-    pub separator_margin: Px,
-    /// The selected row's highlight radius, 5.
-    pub highlight_radius: Px,
-}
-
-/// The launcher: its field and rows.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct LauncherType {
-    /// The query's size, 22.
-    pub field_font: Px,
-    /// The query's weight, 500.
-    pub field_weight: FontWeight,
-    /// The search glyph, 20.
-    pub field_glyph: Px,
-    /// A row's title, 14.
-    pub row_title: Px,
-    /// A row's detail, 12.
-    pub row_detail: Px,
-}
-
-/// The shell type scale from the settings, written as the tuned tokens' inputs on any element
-/// around the surfaces (the bar's root container, a popup's, the launcher's).
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct ShellMetrics {
-    /// The bar.
-    pub bar: BarType,
-    /// Text menus.
-    pub menu: MenuType,
-    /// The launcher.
-    pub launcher: LauncherType,
-    /// A tooltip's label, 12.
-    pub tip: Px,
-}
-
-impl Default for ShellMetrics {
-    /// The keys' defaults (settled 2026-09-24, design/13 sections 13.3.1, 13.3.3, 13.3.9; the bar
-    /// item and highlight on the size ladder, design/29-SIZING.md section 13).
-    fn default() -> Self {
-        ShellMetrics {
-            bar: BarType {
-                font: Px(13.0),
-                weight: FontWeight(500),
-                item_height: Px(22.0),
-                item_padding: Px(8.0),
-                item_radius: Px(5.0),
-            },
-            menu: MenuType {
-                font: Px(13.0),
-                row: Px(28.0),
-                separator_margin: Px(5.0),
-                highlight_radius: Px(8.0),
-            },
-            launcher: LauncherType {
-                field_font: Px(22.0),
-                field_weight: FontWeight(500),
-                field_glyph: Px(20.0),
-                row_title: Px(14.0),
-                row_detail: Px(12.0),
-            },
-            tip: Px(12.0),
-        }
-    }
-}
-
-impl ShellMetrics {
-    /// Every input, inline: `--shell-bar-font:13px;…`.
-    pub fn style_attr(&self) -> String {
-        let length = |value: Px| px(value.0.round().clamp(0.0, 999.0) as u16);
-        let weight = |value: FontWeight| value.0.to_string();
-        let ShellMetrics {
-            bar,
-            menu,
-            launcher,
-            tip,
-        } = *self;
-        [
-            ShellType::BarFont.write(&length(bar.font)),
-            ShellType::BarWeight.write(&weight(bar.weight)),
-            ShellType::BarItem.write(&length(bar.item_height)),
-            ShellType::BarPad.write(&length(bar.item_padding)),
-            ShellType::BarRadius.write(&length(bar.item_radius)),
-            ShellType::MenuFont.write(&length(menu.font)),
-            ShellType::MenuRow.write(&length(menu.row)),
-            ShellType::MenuSeparator.write(&length(menu.separator_margin)),
-            ShellType::HighlightRadius.write(&length(menu.highlight_radius)),
-            ShellType::FieldFont.write(&length(launcher.field_font)),
-            ShellType::FieldWeight.write(&weight(launcher.field_weight)),
-            ShellType::FieldGlyph.write(&length(launcher.field_glyph)),
-            ShellType::RowTitle.write(&length(launcher.row_title)),
-            ShellType::RowDetail.write(&length(launcher.row_detail)),
-            ShellType::TipFont.write(&length(tip)),
-        ]
-        .concat()
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{ShellMetrics, ShellType};
-    use crate::tokens::token::TokenScope;
+    use super::ShellType;
+    use crate::tokens::token::{Token, TokenScope};
     use ds_core::word::Word;
 
     #[test]
-    fn the_defaults_write_what_the_stylesheet_falls_back_to() {
-        let written = ShellMetrics::default().style_attr();
+    fn every_input_reads_with_its_default_behind_it() {
         for token in ShellType::ALL.iter().copied() {
-            let want = token.write(token.fallback(TokenScope::BASE));
-            assert!(written.contains(&want), "{want} not in {written}");
+            let value = token.css_value(TokenScope::BASE).to_string();
+            assert!(value.starts_with("var(--shell-"), "{token:?}: {value}");
+            assert!(value.contains(','), "{token:?}: {value}");
         }
     }
 
     #[test]
-    fn a_changed_key_moves_only_its_input() {
-        let mut metrics = ShellMetrics::default();
-        metrics.menu.row = ds_core::geometry::units::Px(24.0);
-        let written = metrics.style_attr();
-        assert!(written.contains("--shell-menu-row-h:24px;"));
-        assert!(written.contains("--shell-menu-font:13px;"));
-    }
-
-    #[test]
-    fn the_highlight_radius_key_drives_its_token() {
-        let mut metrics = ShellMetrics::default();
+    fn the_highlight_radius_default_is_the_concentric_menu_row() {
         let concentric = crate::tokens::shell_scale::SHELL_SCALE.menu_radius.0
             - crate::tokens::shell_scale::SHELL_SCALE.menu_inset.0;
-        assert!(
-            metrics
-                .style_attr()
-                .contains(&format!("--shell-highlight-radius:{concentric}px;"))
-        );
-        metrics.menu.highlight_radius = ds_core::geometry::units::Px(9.0);
-        assert!(
-            metrics
-                .style_attr()
-                .contains("--shell-highlight-radius:9px;")
+        assert_eq!(
+            ShellType::HighlightRadius
+                .css_value(TokenScope::BASE)
+                .to_string(),
+            format!("var(--shell-highlight-radius,{concentric}px)")
         );
     }
 }

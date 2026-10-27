@@ -175,7 +175,7 @@ mod tests {
     use super::{CONCENTRIC_FLOOR, Radius, concentric};
     use crate::tokens::control_size::ControlSize;
     use crate::tokens::shell_scale::SHELL_SCALE;
-    use crate::tokens::shell_type::ShellMetrics;
+    use crate::tokens::shell_type::ShellType;
     use crate::tokens::token::{Token, TokenScope};
     use ds_core::geometry::units::Px;
     use ds_core::word::Word;
@@ -228,7 +228,14 @@ mod tests {
                 .parse()
                 .unwrap_or(f32::NAN)
         };
-        let row = ShellMetrics::default().menu.highlight_radius.0;
+        let declared = ShellType::HighlightRadius
+            .css_value(TokenScope::BASE)
+            .to_string();
+        let row: f32 = declared
+            .rsplit(',')
+            .next()
+            .and_then(|tail| tail.trim_end_matches([')', 'p', 'x']).parse().ok())
+            .unwrap_or(f32::NAN);
         let menu = (SHELL_SCALE.menu_radius, SHELL_SCALE.menu_inset);
         let palette = (SHELL_SCALE.palette_radius, SHELL_SCALE.palette_inset);
         assert_eq!(px(Radius::Panel), f32::from(palette.0.0));

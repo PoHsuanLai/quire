@@ -3,7 +3,18 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.51 (unreleased)
+## v0.3.52 (unreleased)
+
+### wh-qtok
+
+- A focus that reaches a sheet after it closed no longer panics.
+- `ShellMetrics`, `BarType`, `MenuType`, `LauncherType`, `FontWeight` and `ShellMetrics::style_attr()` are deleted from `ds_style::tokens::shell_type`: the shell type scale's defaults were already the stylesheet's `var(--shell-menu-font, 13px)` fallbacks, so nothing writes them inline. `ShellType` (the token names and inputs) stays, and so does the `--shell-*` input a look pack or the person's own sheet can set, and `ds_style::tokens::tuned::px` is gone with its only caller.
+  **Consumer change:** drop the `ShellMetrics::default().style_attr()` write on the bar, popup and launcher roots (sill used only the default); to move a size, set its `--shell-*` input in a stylesheet. `StatusMetrics` and `DockMetrics` still write inline and are unchanged.
+- `ds_blitz::Resolved::length(doc, "--dock-gap") -> Option<Px>` and `Resolved::number(doc, "--x") -> Option<f32>` read a token's resolved value from the root element's computed style, after the cascade (looks and the person's sheet included), so Rust geometry follows a stylesheet token. `None` for a missing property or a value that is not a plain `<number>px` or `<number>`. Read again on the frame after the `Styles` signal changes.
+- design/22 drops every palmrest key row but `scroll.speed` and the `gestures.gesture_action_map` rows; 3.10 `palm_rejection` is retired (the number stays) and the "Mouse & Gestures" page lists `scroll.natural`, `scroll.speed` and `gestures.gesture_action_map`.
+- CONVENTIONS.md: "Proposed values are settings" becomes "Only choices are settings": a tuning number is a named constant beside its code, a visual value a stylesheet token.
+
+## v0.3.51
 
 ### wh-qpru
 
