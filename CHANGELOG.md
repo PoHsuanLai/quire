@@ -5,6 +5,10 @@ first, with what a consumer has to change.
 
 ## v0.3.50 (unreleased)
 
+### blitz-select-scroll
+
+- Blitz moves to our fork's 1b127540 (`quire-pin-next`; 5bcb2b4d and 7f8f6ace): dragging a text selection towards or past the edge of a scroll container scrolls it, faster the further past, and keeps scrolling while the button is held and the pointer still, extending the selection to the pointer in the content that moved. What a container cannot scroll falls to the next one outward, from an `<iframe srcdoc>` sub-document through its host into the host document's scroll ancestors. A selection begun in a sub-document goes on while the pointer is outside the frame. Pinned block: the Blitz rev and the blitz-kit rev (b6e8fb28, which only moves its own Blitz pin). Also 7f8f6ace: a table row's block-level child is laid out in an anonymous cell, not dropped as a caption.
+
 ### menu-leave
 
 - A menu's highlight goes out when the pointer leaves the menu, as a macOS menu's does: nothing is lit once the pointer is outside it, a key starts again from an end, and the pointer back in lights the row under it. The parent row of an open submenu stays lit, since it owns the submenu; a pending submenu the pointer leaves never opens; a menu the pointer never entered (opened from the keyboard, or on a pop-up's chosen value) keeps its highlight. Every ds `Menu` and its submenus have it (context, pop-up, pull-down, bar menus, pick lists, search suggestions); a caller's `MenuCursor::Controlled` highlight is the caller's and is not changed. No consumer change.
