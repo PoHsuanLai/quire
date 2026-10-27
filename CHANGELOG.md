@@ -3,7 +3,14 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.52 (unreleased)
+## v0.3.53 (unreleased)
+
+### wh-qres
+
+- `Resolved` reads a token where a component can see it. `Resolved::length(doc, node, name)` and `Resolved::number(doc, node, name)` read the custom property from `node`'s computed style, not the root's: tokens are declared on `.ds` (ds-lint bans `:root`) and inherit, so an element inside a surface sees them with a look's or the person's override. `use_tokens() -> Tokens` gives a component a reader of its own element: pass `Tokens::mounted` to `onmounted`, then `tokens.length("--dock-gap")` / `tokens.number(..)`; before the element mounts, or while the document is borrowed, a read is `None`.
+  **Consumer change:** `Resolved::length` and `Resolved::number` take the node after the document.
+
+## v0.3.52
 
 ### wh-qtok
 
