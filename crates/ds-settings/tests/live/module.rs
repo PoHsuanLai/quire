@@ -16,6 +16,7 @@ pub const REMOVE: &str = "accounts.a1.remove";
 
 pub fn spec(path: &str, kind: KeyKind, default: toml::Value) -> KeySpec {
     KeySpec {
+        ends: None,
         path: KeyPath(path.to_owned()),
         kind,
         default,

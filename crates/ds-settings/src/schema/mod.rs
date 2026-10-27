@@ -14,6 +14,7 @@ mod corners;
 mod corners_stored;
 mod deep_link;
 mod doc_table;
+mod footnote;
 mod key;
 mod live_action;
 mod page;
@@ -35,9 +36,11 @@ pub use corners_stored::fold_older_commands;
 pub use deep_link::{deep_link, deep_link_path};
 pub use doc_table::{DocTableError, key_table, regenerate};
 pub use ds_core::settings::{KeyPath, PageId};
+pub use footnote::{Footnote, FootnoteText};
 pub use key::{
     AgentSetting, ChoiceGroup, ChoiceUnavailable, ChoiceWord, Exposure, GroupedChoices, Help,
-    KeyKind, KeySpec, Label, Note, Section, UnavailableReason, WordLabels, kind_from_variants,
+    KeyKind, KeySpec, Label, Note, Section, SliderEnds, UnavailableReason, WordLabels,
+    kind_from_variants,
 };
 pub use live_action::{ActionLabel, ActionWeight, LiveAction};
 pub use page::Page;

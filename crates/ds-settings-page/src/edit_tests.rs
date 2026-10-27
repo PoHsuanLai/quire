@@ -9,6 +9,7 @@ fn text(word: &str) -> toml::Value {
 
 fn spelling() -> KeySpec {
     KeySpec {
+        ends: None,
         path: KeyPath("compose.spelling".to_owned()),
         kind: KeyKind::Toggle {
             variants: ["on".to_owned(), "off".to_owned()],

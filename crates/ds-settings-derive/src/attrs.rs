@@ -16,6 +16,27 @@ pub(crate) struct ContainerAttrs {
     pub domain: String,
     /// The `Page` variant expression, re-emitted verbatim so it resolves in the caller's scope.
     pub page: syn::Expr,
+    /// `footnote(section = "...", text = "...")`, any number of times: the text under that
+    /// section of this struct's page.
+    pub footnotes: Vec<FootnoteAttr>,
+}
+
+/// One `footnote(section = "...", text = "...")` on the struct.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct FootnoteAttr {
+    /// The section it goes under.
+    pub section: String,
+    /// What it says.
+    pub text: String,
+}
+
+/// `ends = ("Small", "Large")` on a ranged field: the words at the slider's two ends.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct EndsAttr {
+    /// At the low end.
+    pub low: String,
+    /// At the high end.
+    pub high: String,
 }
 
 /// What a field's attributes say about its kind, ahead of its type.
@@ -71,6 +92,11 @@ pub(crate) enum FieldAttrs {
         /// `control = "picture"`: the control that draws the key when its kind's default is not
         /// the one wanted.
         control: Option<String>,
+        /// `note = "..."`: the short line shown under the key.
+        note: Option<String>,
+        /// `ends = ("Small", "Large")`: only with `range`. Boxed: the rare field keeps the enum
+        /// small.
+        ends: Option<Box<EndsAttr>>,
     },
 }
 
@@ -84,6 +110,7 @@ pub(crate) fn container_attrs(
     let mut file = None;
     let mut domain = None;
     let mut page = None;
+    let mut footnotes = Vec::new();
     let mut found = false;
     for attr in settings_attrs(attrs) {
         found = true;
@@ -94,10 +121,12 @@ pub(crate) fn container_attrs(
                 domain = Some(lit_str(&meta)?);
             } else if meta.path.is_ident("page") {
                 page = Some(meta.value()?.parse::<syn::Expr>()?);
+            } else if meta.path.is_ident("footnote") {
+                footnotes.push(footnote(&meta)?);
             } else {
                 return Err(meta.error(
                     "unknown #[settings(...)] attribute on a struct; expected `file`, \
-                     `domain` or `page`",
+                     `domain`, `page` or `footnote`",
                 ));
             }
             Ok(())
@@ -115,7 +144,55 @@ pub(crate) fn container_attrs(
         file: file.ok_or_else(|| missing(span, "file"))?,
         domain: domain.ok_or_else(|| missing(span, "domain"))?,
         page: page.ok_or_else(|| missing(span, "page"))?,
+        footnotes,
     })
+}
+
+/// `footnote(section = "...", text = "...")`: both are needed and not empty.
+fn footnote(meta: &syn::meta::ParseNestedMeta<'_>) -> syn::Result<FootnoteAttr> {
+    let mut section = None;
+    let mut text = None;
+    meta.parse_nested_meta(|inner| {
+        if inner.path.is_ident("section") {
+            section = Some(lit_str(&inner)?);
+        } else if inner.path.is_ident("text") {
+            text = Some(lit_str(&inner)?);
+        } else {
+            return Err(inner.error("a footnote takes `section = \"...\"` and `text = \"...\"`"));
+        }
+        Ok(())
+    })?;
+    match (section, text) {
+        (Some(section), Some(text)) if !section.is_empty() && !text.is_empty() => {
+            Ok(FootnoteAttr { section, text })
+        }
+        _ => {
+            Err(meta.error("a footnote needs a non-empty `section = \"...\"` and `text = \"...\"`"))
+        }
+    }
+}
+
+/// `ends = ("Small", "Large")`: two non-empty strings.
+fn ends(meta: &syn::meta::ParseNestedMeta<'_>) -> syn::Result<EndsAttr> {
+    let tuple = meta.value()?.parse::<syn::ExprTuple>()?;
+    let words: Vec<String> = tuple
+        .elems
+        .iter()
+        .filter_map(|elem| match elem {
+            syn::Expr::Lit(syn::ExprLit {
+                lit: syn::Lit::Str(text),
+                ..
+            }) => Some(text.value()),
+            _ => None,
+        })
+        .collect();
+    match (tuple.elems.len(), words.as_slice()) {
+        (2, [low, high]) if !low.is_empty() && !high.is_empty() => Ok(EndsAttr {
+            low: low.clone(),
+            high: high.clone(),
+        }),
+        _ => Err(meta.error("`ends` takes two words: ends = (\"Small\", \"Large\")")),
+    }
 }
 
 /// The parsed `#[settings(...)]` on one field's `attrs`.
@@ -126,6 +203,8 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
     let mut range = None;
     let mut unit = None;
     let mut control = None;
+    let mut note = None;
+    let mut ends_at = None;
     let mut advanced = false;
     let mut skip = false;
     let mut agent = AgentMark::HandsOff;
@@ -145,6 +224,10 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
                 unit = Some(lit_str(&meta)?);
             } else if meta.path.is_ident("control") {
                 control = Some(lit_str(&meta)?);
+            } else if meta.path.is_ident("note") {
+                note = Some(lit_str(&meta)?);
+            } else if meta.path.is_ident("ends") {
+                ends_at = Some(ends(&meta)?);
             } else if meta.path.is_ident("range") {
                 let text = lit_str(&meta)?;
                 range = Some(parse_range(&text).map_err(|reason| meta.error(reason))?);
@@ -161,8 +244,8 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
             } else {
                 return Err(meta.error(
                     "unknown #[settings(...)] attribute on a field; expected `label`, `help`, \
-                     `section`, `range`, `unit`, `control`, `provided`, `advanced`, `text`, \
-                     `agent_settable` or `skip`",
+                     `note`, `section`, `range`, `ends`, `unit`, `control`, `provided`, \
+                     `advanced`, `text`, `agent_settable` or `skip`",
                 ));
             }
             Ok(())
@@ -202,6 +285,12 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
         (None, true, None) => KindHint::Text,
         (None, false, None) => KindHint::Infer,
     };
+    if ends_at.is_some() && !matches!(hint, KindHint::Bounded { .. }) {
+        return Err(syn::Error::new(
+            span,
+            "#[settings(...)]: `ends` labels a slider, so it needs `range`",
+        ));
+    }
     Ok(FieldAttrs::Key {
         label: label.ok_or_else(|| missing(span, "label"))?,
         help,
@@ -211,6 +300,8 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
         agent,
         hint,
         control,
+        note,
+        ends: ends_at.map(Box::new),
     })
 }
 
@@ -481,5 +572,60 @@ mod tests {
         for text in BAD {
             assert!(parse_range(text).is_err(), "{text} should not parse");
         }
+    }
+
+    #[test]
+    fn notes_ends_and_footnotes_are_checked() {
+        // name, field source, the error's words (empty: it parses)
+        let fields = [
+            (
+                "a note",
+                "#[settings(label = \"L\", note = \"N\")] f: bool",
+                "",
+            ),
+            (
+                "ends on a slider",
+                "#[settings(label = \"L\", range = \"1..=9\", ends = (\"Small\", \"Large\"))] f: u8",
+                "",
+            ),
+            (
+                "ends without a range",
+                "#[settings(label = \"L\", ends = (\"Small\", \"Large\"))] f: bool",
+                "needs `range`",
+            ),
+            (
+                "one end",
+                "#[settings(label = \"L\", range = \"1..=9\", ends = (\"Small\",))] f: u8",
+                "two words",
+            ),
+            (
+                "an empty end",
+                "#[settings(label = \"L\", range = \"1..=9\", ends = (\"\", \"Large\"))] f: u8",
+                "two words",
+            ),
+        ];
+        for (name, field, want) in fields {
+            let attrs = first_field_attrs(&format!("struct S {{ {field} }}"));
+            match (field_attrs(attrs[0].span(), &attrs), want) {
+                (Ok(_), "") => {}
+                (Err(err), want) if !want.is_empty() => {
+                    assert!(err.to_string().contains(want), "{name}: {err}");
+                }
+                (got, _) => panic!("{name}: {:?}", got.map(|_| ())),
+            }
+        }
+        let attrs = struct_attrs(
+            "#[settings(file = \"a/b.toml\", domain = \"d\", page = Page::Dock, \
+             footnote(section = \"S\", text = \"T\"), footnote(section = \"U\", text = \"V\"))] \
+             struct S;",
+        );
+        let parsed = container_attrs(attrs[0].span(), &attrs).unwrap();
+        assert_eq!(parsed.footnotes.len(), 2);
+        let attrs = struct_attrs(
+            "#[settings(file = \"a/b.toml\", domain = \"d\", page = Page::Dock, \
+             footnote(section = \"S\"))] struct S;",
+        );
+        let err = container_attrs(attrs[0].span(), &attrs).unwrap_err();
+        assert!(err.to_string().contains("footnote"), "{err}");
     }
 }

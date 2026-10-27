@@ -124,7 +124,7 @@ data test), **Doc** (a reviewer's CHECKLIST line).
 | 12 | Label hierarchy stops at three inks; text on a material uses card or frame inks instead of per-material vibrant inks | menus, bar, control center | Type (tokens) + Test | 3.11 |
 | 13 | Menus: text menus must open with no animation; context menus must hide unavailable items (they show their shortcuts: owner override, section 5.4); no titles or help lines in text menus | every menu | Type + Test | 5.1, 5.4 |
 | 14 | No state restoration: windows, panes, sidebar expansion, the last settings pane | every relaunch | Type + Test | 4.6 |
-| 15 | Sidebar metrics and icon colour: no Small/Medium/Large; icons in ink, not accent | every app sidebar | Type | 5.12 |
+| 15 | Sidebar metrics and icon colour: no Small/Medium/Large; icons in ink, not accent (Settings excepted: colour tiles, owner 2026-10-27) | every app sidebar | Type | 5.12 |
 | 16 | Glyph weight does not follow the adjacent text's weight; no symbol scales | every icon beside text | Type | 3.15 |
 | 17 | Nested corner radii are chosen by hand, not derived | cards, fields, highlights, focus rings | Type + Lint | 3.9 |
 | 18 | No privacy indicators for camera, microphone, screen capture | the bar | Doc + service | 3.13 |
@@ -634,7 +634,7 @@ connection per window, binds `org_kde_kwin_appmenu_manager` when it is advertise
 | **Apple** | Full window height on macOS; rounded selection highlight; three sizes from the General setting: **Small** row 24 pt, 16 px icon, 11 pt text; **Medium** row 28, 20 px icon, 13 pt text; **Large** row 32, 24 px icon, 15 pt text; 17 pt horizontal spacing between cells, 0 vertical; **icons use the accent colour** by default (fixed colours only where the colour means something); at most two levels; hide it by a known command; auto-collapse when the window narrows; no edit buttons at the bottom edge |
 | **quire today** | 01 §4 sidebar and 04 §19 `Row` in a `List{SourceList}` from `S` (the Arc lineage: drawn on the Space colour, pinned tiles, Today); icons in the frame's soft ink (`--f-ink-soft` under Arc); Mod+S hides it |
 | **Verdict** | Adapt: the Arc sidebar stays (00 §6); take the size setting and the auto-collapse |
-| **Rule** | `appearance.sidebar_size` (3.1) selects row 24/28/32, icon 16/20/24, text 11/13/15 for every sidebar; default Medium. Icon colour stays ink on the Space frame (the frame carries the hue; accent-coloured icons would put two hues on it), recorded as a deliberate difference. The selected row is the Mac's neutral rounded wash (`--sel-neutral`, foreground at 8 %), not an accent fill, whether or not the list holds the keyboard: a sidebar's selection says where you are, and the accent is left to the content beside it (accent text on the wash measured 2.98:1). The selected symbol keeps the ink too; the accent stays on the focus ring and the cursor (q20). `SidebarFill::Flat` gives a content-first app (terminal, editor) a one-tone ground, `--surface-2`, a single step above its `--paper` content. Auto-collapse below a width set per app. Hide/Show Sidebar moves to the View menu with Ctrl+Cmd+S (the Mac's), freeing Mod+S (6.2). 01 §4; `ds::components::list`; type |
+| **Rule** | `appearance.sidebar_size` (3.1) selects row 24/28/32, icon 16/20/24, text 11/13/15 for every sidebar; default Medium. Icon colour stays ink on the Space frame (the frame carries the hue; accent-coloured icons would put two hues on it), recorded as a deliberate difference. The selected row is the Mac's neutral rounded wash (`--sel-neutral`, foreground at 8 %), not an accent fill, whether or not the list holds the keyboard: a sidebar's selection says where you are, and the accent is left to the content beside it (accent text on the wash measured 2.98:1). The selected symbol keeps the ink too; the accent stays on the focus ring and the cursor (q20). `SidebarFill::Flat` gives a content-first app (terminal, editor) a one-tone ground, `--surface-2`, a single step above its `--paper` content. Auto-collapse below a width set per app. Hide/Show Sidebar moves to the View menu with Ctrl+Cmd+S (the Mac's), freeing Mod+S (6.2). **Exception, Settings (owner 2026-10-27):** Settings (detent) draws Apple's colour tiles (`RowLeading::Tile`) in its sidebar and its drill-in rows, as System Settings does; every other app keeps the ink icons. 01 §4; `ds::components::list`; type |
 
 ### 5.13 Split views (2023-11-24)
 
@@ -871,7 +871,8 @@ levels.
 
 1. **Density.** SETTLED: 13 px body for shell surfaces and system apps in the Mac Look (H5); mailo
    keeps its own 15 px density.
-2. **Sidebar icon colour.** SETTLED: keep ink on the Space colour (5.12).
+2. **Sidebar icon colour.** SETTLED: keep ink on the Space colour (5.12). Settings is the one
+   exception (owner 2026-10-27): colour tiles in its sidebar and drill-in rows.
 3. **Keyboard navigation default.** SETTLED: `All` by default (Tab reaches every control, 09 H5);
    the Mac's `TextAndLists` is a setting.
 4. **Dock and menu motion under the spring model.** SETTLED (proposal taken): the dock's bounce and

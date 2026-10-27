@@ -37,6 +37,7 @@ mod tests {
 
     fn key(path: &str, label: &str, help: &str) -> KeySpec {
         KeySpec {
+            ends: None,
             path: KeyPath(path.to_owned()),
             kind: KeyKind::Text,
             default: toml::Value::String(String::new()),
@@ -57,6 +58,7 @@ mod tests {
 
     fn schema(keys: Vec<KeySpec>) -> Schema {
         Schema {
+            footnotes: Vec::new(),
             app: AppId("quire".to_owned()),
             file: FilePath("quire/appearance.toml".to_owned()),
             version: 1,

@@ -1,6 +1,7 @@
 //! A whole program's settings schema: what a program ships, and what the Settings app
 //! discovers (design/22-SETTINGS.md sections 9.1-9.2).
 
+use super::footnote::Footnote;
 use std::io;
 use std::path::{Path, PathBuf};
 
@@ -61,6 +62,10 @@ pub struct Schema {
     pub pages: Vec<PageDecl>,
     /// One `[[key]]` table per entry, TOML's array-of-tables (section 9.2).
     pub key: Vec<KeySpec>,
+    /// One `[[footnote]]` table per section that has one. Absent means none, so older schemas
+    /// parse and write unchanged.
+    #[serde(default, rename = "footnote", skip_serializing_if = "Vec::is_empty")]
+    pub footnotes: Vec<Footnote>,
 }
 
 impl Schema {
@@ -265,12 +270,14 @@ mod tests {
 
     fn sample() -> Schema {
         Schema {
+            footnotes: Vec::new(),
             app: AppId("quire".to_owned()),
             file: FilePath("quire/appearance.toml".to_owned()),
             version: 1,
             foreign: Default::default(),
             pages: Default::default(),
             key: vec![crate::schema::KeySpec {
+                ends: None,
                 path: KeyPath("appearance.theme".to_owned()),
                 kind: KeyKind::Segmented {
                     variants: vec!["system".to_owned(), "light".to_owned(), "dark".to_owned()],

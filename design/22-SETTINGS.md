@@ -1174,6 +1174,20 @@ reads every key as hands-off (section 9.7).
 `labels` (`[key.labels]`, word = "Label") is optional and absent from older schemas; a word
 without a label is shown as its own words (`workspace_prev` as "Workspace prev").
 
+Explanations sit where the Mac puts them (2026-10-27, detent's style pass): a short grey line under
+the few rows that need one, a footnote under a section, and nothing on the rest.
+
+- `#[settings(note = "...")]` sets `KeySpec.note`, the line drawn under the row. `help` stays as
+  data (search, the assistant, a tooltip) and is not drawn inline.
+- `#[settings(range = "16..=128", ends = ("Small", "Large"))]` sets `KeySpec.ends`
+  (`SliderEnds { low, high }`, wire `ends = { low = "Small", high = "Large" }`): the words at the
+  slider's two ends. Only with `range`.
+- `#[settings(footnote(section = "Hiding", text = "..."))]` on the struct, any number of times,
+  adds a `[[footnote]]` table (`Footnote { page, section, text }`, the page being the struct's):
+  the paragraph under that section.
+
+All three are absent from the file when unset, so older schemas read and write unchanged.
+
 The schema's `kind` for a two-variant enum stays `toggle`; the Settings app decides between
 switch and segments from the words, so a program writes nothing extra. Two words are an on/off
 pair when either is `off`, `hide`, `never`, `none` or `nothing` (the other is the on side), or

@@ -6,6 +6,7 @@ use ds_settings::schema::{
 
 fn key(path: &str, section: &str) -> KeySpec {
     KeySpec {
+        ends: None,
         path: KeyPath(path.to_owned()),
         kind: KeyKind::Text,
         default: toml::Value::String(String::new()),
@@ -27,6 +28,7 @@ fn key(path: &str, section: &str) -> KeySpec {
 #[test]
 fn sections_keep_the_order_their_first_key_comes_in() {
     let schema = Schema {
+        footnotes: Vec::new(),
         app: AppId("test".to_owned()),
         file: FilePath("test/test.toml".to_owned()),
         version: 1,
@@ -64,6 +66,7 @@ fn naming_a_page_keeps_only_that_pages_keys() {
     let mut dock = key("d.one", "Magnification");
     dock.page = Page::Dock;
     let schema = Schema {
+        footnotes: Vec::new(),
         app: AppId("test".to_owned()),
         file: FilePath("test/test.toml".to_owned()),
         version: 1,

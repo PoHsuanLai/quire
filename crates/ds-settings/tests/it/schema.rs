@@ -326,6 +326,7 @@ mod unavailable {
 
     fn spec() -> KeySpec {
         KeySpec {
+            ends: None,
             path: KeyPath("ai.model.text.fast".to_owned()),
             kind: KeyKind::Menu {
                 variants: vec!["a".to_owned(), "b".to_owned()],
@@ -418,6 +419,7 @@ mod groups {
 
     fn spec(words: &[&str], groups: &[(&str, &str)]) -> KeySpec {
         KeySpec {
+            ends: None,
             path: KeyPath("ai.model.text.fast".to_owned()),
             kind: KeyKind::Menu {
                 variants: words.iter().map(|word| (*word).to_owned()).collect(),
@@ -556,6 +558,7 @@ mod places {
 
     fn spec() -> KeySpec {
         KeySpec {
+            ends: None,
             path: KeyPath("ai.model.text.fast".to_owned()),
             kind: KeyKind::Menu {
                 variants: vec!["a".to_owned(), "b".to_owned()],
@@ -684,5 +687,84 @@ mod places {
             })
         );
         assert_eq!(key.place_of("zzz"), None);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// notes, slider ends and section footnotes (detent's style pass, 2026-10-27)
+
+mod notes_and_footnotes {
+    use ds_settings::schema::{
+        Footnote, FootnoteText, Label, Note, Page, Schema, Section, SettingsSchema, SliderEnds,
+    };
+
+    #[derive(Debug, Default, ds_settings::SettingsSchema)]
+    #[settings(
+        file = "quire/test.toml",
+        domain = "dock",
+        page = Page::Dock,
+        footnote(section = "Hiding", text = "The Dock comes back when the pointer reaches the edge.")
+    )]
+    struct DockLike {
+        #[settings(label = "Size", range = "16..=128", ends = ("Small", "Large"))]
+        size: u8,
+        #[settings(
+            label = "Hide automatically",
+            section = "Hiding",
+            note = "Only on this display."
+        )]
+        hide: String,
+    }
+
+    fn key<'a>(schema: &'a Schema, path: &str) -> &'a ds_settings::schema::KeySpec {
+        schema
+            .key
+            .iter()
+            .find(|k| k.path.0 == path)
+            .unwrap_or_else(|| panic!("no {path}"))
+    }
+
+    #[test]
+    fn the_derive_sets_a_note_slider_ends_and_a_footnote() {
+        let schema = DockLike::schema();
+        assert_eq!(
+            key(&schema, "dock.size").ends,
+            Some(SliderEnds {
+                low: Label("Small".to_owned()),
+                high: Label("Large".to_owned()),
+            })
+        );
+        assert_eq!(key(&schema, "dock.size").note, None);
+        assert_eq!(
+            key(&schema, "dock.hide").note,
+            Some(Note("Only on this display.".to_owned()))
+        );
+        assert_eq!(key(&schema, "dock.hide").ends, None);
+        assert_eq!(
+            schema.footnotes,
+            vec![Footnote {
+                page: Page::Dock,
+                section: Section("Hiding".to_owned()),
+                text: FootnoteText(
+                    "The Dock comes back when the pointer reaches the edge.".to_owned(),
+                ),
+            }]
+        );
+    }
+
+    #[test]
+    fn they_round_trip_and_an_older_schema_reads_without_them() {
+        let schema = DockLike::schema();
+        let text = schema.to_toml();
+        assert!(text.contains("[[footnote]]"), "{text}");
+        assert_eq!(Schema::from_toml(&text).ok(), Some(schema));
+        let older = super::schemas().remove(0).to_toml();
+        assert!(
+            !older.contains("footnote") && !older.contains("ends"),
+            "{older}"
+        );
+        let back = Schema::from_toml(&older).unwrap_or_else(|e| panic!("{older}: {e}"));
+        assert!(back.footnotes.is_empty());
+        assert!(back.key.iter().all(|k| k.ends.is_none()));
     }
 }

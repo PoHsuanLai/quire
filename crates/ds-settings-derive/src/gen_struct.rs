@@ -6,7 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::spanned::Spanned;
 
-use crate::attrs::{AgentMark, FieldAttrs, container_attrs, field_attrs};
+use crate::attrs::{AgentMark, EndsAttr, FieldAttrs, FootnoteAttr, container_attrs, field_attrs};
 use crate::shape::{Shape, shape_of};
 
 pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::Result<TokenStream> {
@@ -45,6 +45,8 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
             agent,
             hint,
             control,
+            note,
+            ends,
         } = attrs
         else {
             // `#[settings(skip)]`: a catch-all field such as `extra: toml::Table`, not a key.
@@ -73,6 +75,21 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
         } else {
             quote! { ::std::option::Option::None }
         };
+        let note = match note {
+            Some(note) => quote! {
+                ::std::option::Option::Some(::ds_settings::schema::Note(#note.to_owned()))
+            },
+            None => quote! { ::std::option::Option::None },
+        };
+        let ends = match ends.map(|ends| *ends) {
+            Some(EndsAttr { low, high }) => quote! {
+                ::std::option::Option::Some(::ds_settings::schema::SliderEnds {
+                    low: ::ds_settings::schema::Label(#low.to_owned()),
+                    high: ::ds_settings::schema::Label(#high.to_owned()),
+                })
+            },
+            None => quote! { ::std::option::Option::None },
+        };
         pushes.push(quote! {
             key.push(::ds_settings::schema::KeySpec {
                 path: ::ds_settings::schema::KeyPath(#path.to_owned()),
@@ -88,12 +105,25 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
                 unavailable: ::std::default::Default::default(),
                 groups: ::std::default::Default::default(),
                 places: ::std::default::Default::default(),
-                note: ::std::default::Default::default(),
+                note: #note,
                 control: #control,
+                ends: #ends,
             });
         });
     }
 
+    let footnotes = container
+        .footnotes
+        .iter()
+        .map(|FootnoteAttr { section, text }| {
+            quote! {
+                ::ds_settings::schema::Footnote {
+                    page: #page,
+                    section: ::ds_settings::schema::Section(#section.to_owned()),
+                    text: ::ds_settings::schema::FootnoteText(#text.to_owned()),
+                }
+            }
+        });
     Ok(quote! {
         #(#guards)*
         impl ::ds_settings::schema::SettingsSchema for #ident {
@@ -108,6 +138,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
                     foreign: ::ds_settings::schema::ForeignTables::default(),
                     pages: ::std::vec::Vec::new(),
                     key,
+                    footnotes: ::std::vec![#(#footnotes),*],
                 }
             }
         }

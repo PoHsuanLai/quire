@@ -180,6 +180,7 @@ mod tests {
 
     fn key(kind: KeyKind, control: Option<&str>) -> KeySpec {
         KeySpec {
+            ends: None,
             path: KeyPath("a.b".to_owned()),
             kind,
             default: toml::Value::String(String::new()),

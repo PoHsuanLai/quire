@@ -21,6 +21,7 @@ fn words(list: &[&str]) -> Vec<String> {
 
 fn key(path: &str, label: &str, section: &str, kind: KeyKind, default: &str) -> KeySpec {
     KeySpec {
+        ends: None,
         path: KeyPath(path.to_owned()),
         kind,
         default: toml::Value::String(default.to_owned()),
@@ -44,6 +45,7 @@ fn schema() -> Schema {
         variants: [a.to_owned(), b.to_owned()],
     };
     Schema {
+        footnotes: Vec::new(),
         app: AppId("sample".to_owned()),
         file: FilePath("sample/sample.toml".to_owned()),
         version: 1,

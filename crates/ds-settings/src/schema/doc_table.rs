@@ -180,6 +180,7 @@ mod tests {
 
     fn schema() -> Schema {
         Schema {
+            footnotes: Vec::new(),
             app: AppId("sill".to_owned()),
             file: FilePath("sill/settings.toml".to_owned()),
             version: 1,

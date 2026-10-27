@@ -28,6 +28,16 @@ pub struct Help(pub String);
 #[serde(transparent)]
 pub struct Note(pub String);
 
+/// The words at a slider's two ends ("Small" and "Large"), as a Mac slider labels them: the
+/// value of [`KeySpec::ends`], for a bounded key.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SliderEnds {
+    /// At the low end.
+    pub low: Label,
+    /// At the high end.
+    pub high: Label,
+}
+
 /// What a picker calls each word of an enum key, by the stored word: `workspace_prev` is
 /// "Previous workspace". Optional: a word without an entry is shown as its own words.
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
@@ -214,6 +224,11 @@ pub struct KeySpec {
     /// the info button. Absent when `None`, so older schemas parse and write unchanged.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub note: Option<Note>,
+    /// The words at a bounded key's two ends, when its slider labels them. Wire form: `"ends":
+    /// {"low": "Small", "high": "Large"}`, absent when `None`, so older schemas parse and write
+    /// unchanged.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ends: Option<SliderEnds>,
     /// The control that draws the key, when its kind's default is not the one wanted: `"picture"`
     /// for a path chosen from a grid of pictures. Absent when `None`, so older schemas parse and
     /// write unchanged; a name this build does not know, or one that does not fit the kind, is

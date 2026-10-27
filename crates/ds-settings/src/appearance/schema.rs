@@ -9,6 +9,7 @@ use crate::schema::{AppId, FilePath, ForeignTables, Schema, SettingsSchema};
 /// (`cargo run -p ds-settings --example write_schema -- --write-schema <dir>`).
 pub fn quire_schema() -> Schema {
     Schema {
+        footnotes: Vec::new(),
         app: AppId("quire".to_owned()),
         file: FilePath("quire/appearance.toml".to_owned()),
         version: 1,
