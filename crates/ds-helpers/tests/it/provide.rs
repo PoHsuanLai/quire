@@ -3,7 +3,7 @@
 
 use ds_helpers::{
     CapabilityName, Catalog, Environment, Executable, FakeInstaller, Family, Helpers, InstallLine,
-    Installer, Missing, Outcome, PackageName, StandIn, ToolPresence,
+    Missing, Outcome, PackageName, StandIn,
 };
 use std::path::{Path, PathBuf};
 
@@ -104,7 +104,7 @@ fn missing(
 
 fn helpers(scratch: &Scratch, installer: FakeInstaller) -> Helpers {
     let catalog = Catalog::parse(ANYVIEW).expect("the example file parses");
-    Helpers::new(catalog, scratch.environment(), Installer::Fake(installer))
+    Helpers::new(catalog, scratch.environment(), installer)
 }
 
 #[test]
@@ -121,15 +121,12 @@ async fn provide_installs_then_reprobes_and_announces() {
     let fake = FakeInstaller::new(Outcome::Installed).leaving(scratch.bin(), &["mpv"]);
     let helpers = helpers(&scratch, fake);
     let video = cap("video-playback");
-    assert_eq!(helpers.available(&video), ToolPresence::Missing);
+    assert!(!helpers.available(&video));
     let mut feed = helpers.subscribe();
     assert_eq!(helpers.provide(&video).await, Outcome::Installed);
     let change = feed.next().await;
-    assert_eq!(
-        (change.capability, change.presence),
-        (video.clone(), ToolPresence::Present)
-    );
-    assert_eq!(helpers.available(&video), ToolPresence::Present);
+    assert_eq!((change.capability, change.present), (video.clone(), true));
+    assert!(helpers.available(&video));
     // Already there: no second request.
     assert_eq!(helpers.provide(&video).await, Outcome::Installed);
 }
@@ -244,15 +241,15 @@ async fn refresh_hears_of_a_tool_installed_some_other_way() {
     let helpers = helpers(&scratch, FakeInstaller::new(Outcome::Declined));
     let heic = cap("heic-decode");
     let mut feed = helpers.subscribe();
-    assert_eq!(helpers.refresh(&heic), ToolPresence::Missing);
+    assert!(!helpers.refresh(&heic));
     let file = scratch.bin().join("heif-convert");
     std::fs::write(&file, "#!/bin/sh\n").expect("tool");
     set_executable(&file);
-    assert_eq!(helpers.refresh(&heic), ToolPresence::Present);
-    assert_eq!(feed.next().await.presence, ToolPresence::Present);
+    assert!(helpers.refresh(&heic));
+    assert!(feed.next().await.present);
     std::fs::remove_file(&file).expect("removed");
-    assert_eq!(helpers.refresh(&heic), ToolPresence::Missing);
-    assert_eq!(feed.next().await.presence, ToolPresence::Missing);
+    assert!(!helpers.refresh(&heic));
+    assert!(!feed.next().await.present);
 }
 
 fn set_executable(path: &Path) {

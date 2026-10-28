@@ -192,7 +192,7 @@ impl AppConfig {
         self
     }
 
-    /// What a link clicked inside a frame does (default [`FrameLinks::Inert`]): a frame never
+    /// What a link clicked inside a frame does (default [`FrameLinks::default`]): a frame never
     /// navigates, so the app opens the link itself or nothing happens.
     pub fn with_frame_links(mut self, links: FrameLinks) -> Self {
         self.setup.frame_links = links;

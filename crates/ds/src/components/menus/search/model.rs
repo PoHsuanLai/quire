@@ -66,22 +66,14 @@ pub enum Panel {
     Shown,
 }
 
-/// What the arrow keys do at the first and last row.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Ends {
-    /// Down from the last row lands on the first, Up from the first on the last.
-    #[default]
-    Wrap,
-    /// The highlight stays on the last row (or the first).
-    Stop,
-}
-
 /// How a search field's panel and keys behave, gathered for the pure key step.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub(crate) struct Manner {
     pub(crate) escape: EscapeOrder,
     pub(crate) panel: Panel,
-    pub(crate) ends: Ends,
+    /// The arrow keys stop at the first and last row; otherwise Down from the last row lands on
+    /// the first and Up from the first on the last.
+    pub(crate) stop_at_ends: bool,
 }
 
 /// How the suggestions are presented.

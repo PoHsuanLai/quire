@@ -11,7 +11,7 @@
 
 use crate::components::chrome::resize_edges::ResizeEdges;
 use crate::components::chrome::titlebar_parts::{TitleArea, TitleParts};
-use crate::components::chrome::traffic_lights::{TilePose, TrafficLightGroup};
+use crate::components::chrome::traffic_lights::TrafficLightGroup;
 use crate::root::common::Common;
 use crate::window::grab::{Grab, GrabEffect};
 use crate::window::host::{WindowHost, use_window_host, use_window_state};
@@ -20,17 +20,8 @@ use crate::window::vocab::Zoom;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
+use ds_core::vocab::Shown;
 use ds_core::word::Word;
-
-/// Whether the window shows its traffic lights.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum TrafficLights {
-    /// Close, minimize and zoom at the titlebar's start.
-    #[default]
-    Shown,
-    /// None: a window whose controls live elsewhere (a panel, a kiosk).
-    Hidden,
-}
 
 /// Where a titlebar's title sits when the bar also carries a leading or trailing control.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
@@ -58,8 +49,9 @@ pub enum WindowFrame {
         title: String,
         /// What goes with the title: subtitle, proxy icon, the edited dot.
         parts: TitleParts,
-        /// Whether the lights are shown.
-        lights: TrafficLights,
+        /// Whether the lights are shown ([`Shown::Visible`]: close, minimize and zoom at the
+        /// titlebar's start; [`Shown::Hidden`]: a window whose controls live elsewhere).
+        lights: Shown,
         /// The move threshold and the tiling menu's delays, from the settings.
         timing: FrameTiming,
         /// What sits after the lights and before the title (a sidebar button). A press on it
@@ -73,7 +65,7 @@ pub enum WindowFrame {
 
 impl WindowFrame {
     /// A titlebar with the settings' default timing.
-    pub fn titlebar(title: impl Into<String>, lights: TrafficLights) -> Self {
+    pub fn titlebar(title: impl Into<String>, lights: Shown) -> Self {
         WindowFrame::Titlebar {
             title: title.into(),
             parts: TitleParts::default(),
@@ -180,7 +172,7 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
 }
 
 /// The titlebar alone: what `Ds { window }` draws at the top of a window, and what a gallery
-/// draws to pose it (`pose: TilePose::Open` shows the tiling menu as it mounts). A primary press
+/// draws to pose it (`pose: Shown::Visible` shows the tiling menu as it mounts). A primary press
 /// on its empty area that travels past `timing.move_threshold` starts the move, once; a
 /// double-click zooms. Neither happens on a light, nor while the window is maximized or
 /// fullscreen. `data-first-mouse` lets the first click of an inactive window through
@@ -194,9 +186,9 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
 pub fn WindowTitlebar(
     title: String,
     #[props(default)] parts: TitleParts,
-    #[props(default)] lights: TrafficLights,
+    #[props(default = Shown::Visible)] lights: Shown,
     #[props(default)] timing: FrameTiming,
-    #[props(default)] pose: TilePose,
+    #[props(default)] pose: Shown,
     #[props(default)] leading: Option<Element>,
     #[props(default)] trailing: Option<Element>,
     #[props(default)] title_room: TitleRoom,
@@ -244,7 +236,7 @@ pub fn WindowTitlebar(
                 }
             },
             ..data,
-            if lights == TrafficLights::Shown {
+            if lights == Shown::Visible {
                 TrafficLightGroup { timing, pose }
             }
             if let Some(leading) = leading {

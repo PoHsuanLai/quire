@@ -49,7 +49,7 @@ use ds_blitz::seam::{
 use ds_blitz::seam::{Layout as PhaseLayout, Phase};
 use ds_blitz::seam::{LinkInbox, frame_links, read_link};
 use ds_blitz::seam::{Provided, Wiring};
-use ds_blitz::{FrameHover, FrameImages, FrameMenu};
+use ds_blitz::{FrameHandler, FrameImageClick, FrameLinkHover, FrameLinkMenu};
 use ds_core::time::clock::now;
 use ds_core::vocab::{Activity, InputModality};
 use peniko::Color;
@@ -89,11 +89,11 @@ pub(crate) struct Headless {
     /// The document's frames and their tags.
     book: FrameBook,
     /// Whether the app hears the pointer cross links in frames, and the link it is on.
-    hover: (FrameHover, HoverTracker),
+    hover: (Option<FrameHandler<FrameLinkHover>>, HoverTracker),
     /// Whether the app hears a context menu asked over a link in a frame.
-    menu: FrameMenu,
+    menu: Option<FrameHandler<FrameLinkMenu>>,
     /// Whether the app hears a click on an image in a frame.
-    images: FrameImages,
+    images: Option<FrameHandler<FrameImageClick>>,
     /// The edit surfaces listening for IME events.
     pub(crate) listeners: EditListeners,
     /// The components listening for touchpad gestures.
@@ -469,30 +469,30 @@ impl Headless {
     /// The pointer moved to `at`: tell the app if it came onto or left a link in a frame.
     pub(crate) fn hover_at(&mut self, at: Point) {
         let (hover, tracker) = &mut self.hover;
-        if matches!(hover, FrameHover::Ignore) {
+        let Some(hover) = hover.as_ref() else {
             return;
-        }
+        };
         let under = link_under(&self.doc.inner.borrow(), at);
         let crossings = tracker.step(under, at, &self.book);
-        report_frame_hover(hover, crossings);
+        report_frame_hover(Some(hover), crossings);
     }
 
     /// The secondary button was released at `at`: tell the app if it was over a link in a frame.
     pub(crate) fn menu_at(&self, at: Point) {
-        if matches!(self.menu, FrameMenu::Ignore) {
+        if self.menu.is_none() {
             return;
         }
         let under = link_under(&self.doc.inner.borrow(), at);
-        report_frame_menu(&self.menu, ask_frame_menu(under, at, &self.book));
+        report_frame_menu(self.menu.as_ref(), ask_frame_menu(under, at, &self.book));
     }
 
     /// The primary button was released at `at`: tell the app if it was on an image in a frame.
     pub(crate) fn image_at(&self, at: Point) {
-        if matches!(self.images, FrameImages::Ignore) {
+        if self.images.is_none() {
             return;
         }
         let under = image_under(&self.doc.inner.borrow(), at);
-        report_frame_image(&self.images, ask_frame_image(under, at, &self.book));
+        report_frame_image(self.images.as_ref(), ask_frame_image(under, at, &self.book));
     }
 
     /// Paint the document as it was last resolved, over `backdrop`.

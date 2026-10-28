@@ -1,10 +1,9 @@
-//! `List { focus: ListFocus::OnMount }` takes the keyboard as it mounts, so the arrow keys work
+//! `List { autofocus: true }` takes the keyboard as it mounts, so the arrow keys work
 //! at once; the default leaves the keyboard where it was.
 
 use dioxus::prelude::*;
-use ds::components::lists::list::model::ListFocus;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -23,7 +22,7 @@ fn rows() -> Vec<ListItem<u8>> {
 fn Mounted() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            List::<u8> { label: "Applications", items: rows(), focus: ListFocus::OnMount }
+            List::<u8> { label: "Applications", items: rows(), autofocus: true }
         }
     }
 }
@@ -45,6 +44,6 @@ fn harness(app: fn() -> Element) -> Harness {
 
 #[test]
 fn a_list_opted_in_takes_the_keyboard_as_it_mounts_and_one_not_does_not() {
-    assert_eq!(harness(Mounted).focus_of(".ds-list"), FocusState::Focused);
-    assert_ne!(harness(Manual).focus_of(".ds-list"), FocusState::Focused);
+    assert!(harness(Mounted).focus_of(".ds-list"));
+    assert!(!harness(Manual).focus_of(".ds-list"));
 }

@@ -8,7 +8,7 @@ use ds::motion::detail::morph::Slashed;
 use ds::motion::detail::morph_glyph::MorphGlyph;
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{ClassPresence, Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -41,14 +41,8 @@ fn a_cross_fade_stacks_two_layers_only_while_it_plays() {
     assert_eq!(harness.count("#down .ds-morph-layer"), 1);
     harness.within(|| *ICON.write() = Icon::VolumeX);
     settle_until(&mut harness, |h| h.count("#down [*|data-morph=out]") == 1);
-    assert_eq!(
-        harness.has_class("#down [*|data-morph=in]", "a-morph-fade-in"),
-        ClassPresence::Present
-    );
-    assert_eq!(
-        harness.has_class("#down [*|data-morph=out]", "a-morph-fade-out"),
-        ClassPresence::Present
-    );
+    assert!(harness.has_class("#down [*|data-morph=in]", "a-morph-fade-in"));
+    assert!(harness.has_class("#down [*|data-morph=out]", "a-morph-fade-out"));
     settle_until(&mut harness, |h| h.count("#down .ds-morph-layer") == 1);
     assert_eq!(
         harness

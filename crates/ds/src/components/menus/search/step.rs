@@ -4,7 +4,7 @@
 //! `EscapeOrder` says: the panel then the text, or the text then the window). Tab is not here: it
 //! behaves as it always does.
 
-use crate::components::menus::search::model::{Ends, EscapeOrder, Manner, Panel};
+use crate::components::menus::search::model::{EscapeOrder, Manner, Panel};
 use crate::stack::roving::{Step, Wrap, moved_live};
 use ds_core::vocab::{Availability, Shown};
 
@@ -99,9 +99,10 @@ pub(crate) fn press(
     manner: Manner,
 ) -> (Suggesting, Act) {
     let open = state.is_open(live.len(), manner.panel);
-    let wrap = match manner.ends {
-        Ends::Wrap => Wrap::Wraps,
-        Ends::Stop => Wrap::Stops,
+    let wrap = if manner.stop_at_ends {
+        Wrap::Stops
+    } else {
+        Wrap::Wraps
     };
     match key {
         SuggestKey::Up | SuggestKey::Down => {
@@ -139,7 +140,7 @@ pub(crate) fn press(
 #[cfg(test)]
 mod tests {
     use super::{Act, SuggestKey, Suggesting, Text, press};
-    use crate::components::menus::search::model::{Ends, EscapeOrder, Manner, Panel};
+    use crate::components::menus::search::model::{EscapeOrder, Manner, Panel};
     use ds_core::vocab::Availability::{Disabled as D, Enabled as E};
     use ds_core::vocab::{Availability, Shown};
 
@@ -255,7 +256,7 @@ mod tests {
     fn the_arrows_stop_at_the_ends_when_asked() {
         let live: &[Availability] = &[E, E, E];
         let stop = Manner {
-            ends: Ends::Stop,
+            stop_at_ends: true,
             ..Manner::default()
         };
         let moved = |from, key, manner| press(at(from), key, live, Text::Filled, manner).0;

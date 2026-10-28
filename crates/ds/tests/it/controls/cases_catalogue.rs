@@ -16,7 +16,7 @@ use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
 use ds::components::controls::radio_group::Arrangement;
 use ds::components::controls::segmented::Tracking;
-use ds::components::controls::slider_model::{SliderLook, Ticks};
+use ds::components::controls::slider_model::SliderLook;
 use ds::components::fields::text_field_model::{FieldRows, Invalid};
 use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
@@ -380,7 +380,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "slider",
         state: "ticks-quarters",
-        make: || rsx! { Slider { label: "Level", value: Fraction(500), ticks: Ticks::Every(Fraction(250)), onchange: |_| {} } },
+        make: || rsx! { Slider { label: "Level", value: Fraction(500), ticks: Some(Fraction(250)), onchange: |_| {} } },
     },
     Case {
         component: "slider",

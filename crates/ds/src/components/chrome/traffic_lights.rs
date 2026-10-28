@@ -14,7 +14,7 @@ use crate::host::measure::{Anchor, MountedRef};
 use crate::window::hold::{Hold, HoldIn, HoldOut, HoldTiming, Wait};
 use crate::window::host::{WindowHost, use_window_host, use_window_state};
 use crate::window::timing::FrameTiming;
-use crate::window::vocab::{Maximized, Support, WindowTile, Zoom};
+use crate::window::vocab::{Maximized, WindowTile, Zoom};
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 use ds_core::vocab::{Availability, Shown};
@@ -22,31 +22,18 @@ use ds_core::word::Word;
 use ds_motion::machine::use_machine;
 use ds_style::icon::Icon;
 
-/// Whether the tiling menu is open as the lights mount: `Open` poses it (a gallery, a picture).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum TilePose {
-    /// Closed until asked for.
-    #[default]
-    Closed,
-    /// Open from the first frame.
-    Open,
-}
-
-/// The tiling menu: closed, or open with what the host said it can do, asked once as it opened.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum TileMenu {
-    Closed,
-    Open([Support; 4]),
-}
+/// The tiling menu: `None` while closed, or open with what the host said it can do, asked once
+/// as it opened.
+type TileMenu = Option<[bool; 4]>;
 
 /// The three lights, and the tiling menu the green one opens.
 #[component]
-pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element {
+pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: Shown) -> Element {
     let host = use_window_host();
     let state = use_window_state();
     let mut menu = use_signal(|| match pose {
-        TilePose::Open => TileMenu::Open(support(host.as_ref())),
-        TilePose::Closed => TileMenu::Closed,
+        Shown::Visible => Some(support(host.as_ref())),
+        Shown::Hidden => None,
     });
     let mut anchor = use_signal(|| None::<MountedRef>);
     let opener = Opener {
@@ -74,8 +61,8 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
         Maximized::Off => Mark::Zoom,
     };
     let expanded = match menu() {
-        TileMenu::Open(_) => Shown::Visible,
-        TileMenu::Closed => Shown::Hidden,
+        Some(_) => Shown::Visible,
+        None => Shown::Hidden,
     };
     rsx! {
         div { class: "ds-lights", role: "group", "aria-label": "Window",
@@ -125,13 +112,13 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
                 LightMark { mark: zoom_mark }
             }
         }
-        if let (TileMenu::Open(support), Some(anchor)) = (menu(), anchor()) {
+        if let (Some(support), Some(anchor)) = (menu(), anchor()) {
             Menu::<WindowTile> {
                 placement: MenuPlacement::Popup,
                 anchor: Anchor::Mounted(anchor),
                 items: entries(support),
                 onpick: move |tile| with(pick.as_ref(), |host| place(host, tile)),
-                onclose: move |()| menu.set(TileMenu::Closed),
+                onclose: move |()| menu.set(None),
             }
         }
     }
@@ -171,7 +158,7 @@ struct Opener {
 impl Opener {
     fn open(&self) {
         let mut menu = self.menu;
-        menu.set(TileMenu::Open(support(self.host.as_ref())));
+        menu.set(Some(support(self.host.as_ref())));
     }
 }
 
@@ -195,17 +182,15 @@ fn place(host: &WindowHost, tile: WindowTile) {
 }
 
 /// What the host can do, per placement in the menu's order; nothing without a host.
-fn support(host: Option<&WindowHost>) -> [Support; 4] {
+fn support(host: Option<&WindowHost>) -> [bool; 4] {
     std::array::from_fn(|index| {
-        host.map_or(Support::No, |host| {
-            host.host().supports(WindowTile::ALL[index])
-        })
+        host.is_some_and(|host| host.host().supports(WindowTile::ALL[index]))
     })
 }
 
 /// The menu's rows: a header, then each placement with its glyph, unavailable where the host
 /// said it cannot.
-fn entries(support: [Support; 4]) -> Vec<MenuItem<WindowTile>> {
+fn entries(support: [bool; 4]) -> Vec<MenuItem<WindowTile>> {
     let rows = WindowTile::ALL
         .iter()
         .copied()
@@ -219,9 +204,10 @@ fn entries(support: [Support; 4]) -> Vec<MenuItem<WindowTile>> {
             check: None,
             after: AfterPick::Close,
             text: Default::default(),
-            availability: match support {
-                Support::Yes => Availability::Enabled,
-                Support::No => Availability::Disabled,
+            availability: if support {
+                Availability::Enabled
+            } else {
+                Availability::Disabled
             },
         });
     std::iter::once(MenuItem::Header("Move & Resize".to_owned()))

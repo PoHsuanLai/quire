@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::controls::button_model::ButtonRole;
 use ds::components::lists::row::confirm::RowConfirm;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -92,9 +92,8 @@ fn pressing_the_action_makes_the_row_ask_in_place_of_its_words_and_buttons() {
 #[test]
 fn cancel_takes_the_keyboard_and_escape_puts_the_row_back() {
     let mut harness = started();
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-row-confirm .ds-button:nth-child(1)"),
-        FocusState::Focused,
         "Cancel holds the keyboard"
     );
     harness.send(Input::key(ShortcutKey::Escape));

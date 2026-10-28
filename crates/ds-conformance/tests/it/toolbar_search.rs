@@ -8,7 +8,7 @@ use ds::components::chrome::toolbar::search::{SearchSeat, ToolbarSearch};
 use ds::components::chrome::toolbar::view::Toolbar;
 use ds::components::menus::search::view::SearchField;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -110,10 +110,7 @@ fn pressing_the_magnifier_opens_the_field_in_place_with_the_caret_in_it() {
         harness.attr(".ds-toolbar-search", "data-seat").as_deref(),
         Some("expanded")
     );
-    assert_eq!(
-        harness.focus_of(".ds-toolbar-search .ds-input"),
-        FocusState::Focused
-    );
+    assert!(harness.focus_of(".ds-toolbar-search .ds-input"));
 }
 
 #[test]

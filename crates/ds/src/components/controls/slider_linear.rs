@@ -6,7 +6,7 @@
 //! a second of its speed on), and the thumb springs there carrying the hand's velocity; a key or a
 //! value from elsewhere springs it critically from where it is.
 
-use crate::components::controls::slider_model::{SliderLook, Ticks};
+use crate::components::controls::slider_model::{SliderLook, key_step, marks, snap};
 use crate::components::controls::track::fraction_at;
 use crate::host::measure::client_rect;
 use crate::root::common::Common;
@@ -135,7 +135,7 @@ pub(crate) fn LinearSlider(
     label: String,
     value: Fraction,
     step: Fraction,
-    ticks: Ticks,
+    ticks: Option<Fraction>,
     size: ControlSize,
     availability: Availability,
     onchange: EventHandler<Fraction>,
@@ -146,7 +146,7 @@ pub(crate) fn LinearSlider(
     let mut track = use_signal(|| None::<Rect>);
     let mut meter = use_signal(VelocityMeter::default);
     let value = value.clamped();
-    let step = ticks.key_step().unwrap_or_else(|| keyboard_step(step));
+    let step = key_step(ticks).unwrap_or_else(|| keyboard_step(step));
     let width = track
         .peek()
         .map_or(UNMEASURED_WIDTH, |rect| rect.size.width.0);
@@ -198,7 +198,7 @@ pub(crate) fn LinearSlider(
                         let _ = crate::focus::soon::focus_element(&mounted).await;
                         if let Some(measured) = client_rect(&mounted).await {
                             track.set(Some(measured));
-                            onchange.call(ticks.snap(fraction_at(measured, at.x)));
+                            onchange.call(snap(ticks, fraction_at(measured, at.x)));
                         }
                     });
                 }
@@ -212,7 +212,7 @@ pub(crate) fn LinearSlider(
                 let measured_now = meter.peek().moved(at.x, ds_core::time::clock::now());
                 meter.set(measured_now);
                 if let Some(measured) = track() {
-                    onchange.call(ticks.snap(fraction_at(measured, at.x)));
+                    onchange.call(snap(ticks, fraction_at(measured, at.x)));
                 }
             },
             onpointerup: move |event| {
@@ -221,7 +221,7 @@ pub(crate) fn LinearSlider(
                 meter.set(VelocityMeter::default());
                 let width = track.peek().map_or(0.0, |rect| rect.size.width.0);
                 if let (true, Some(to)) = (enabled, thrown_to(value, velocity, width)) {
-                    let to = ticks.snap(to);
+                    let to = snap(ticks, to);
                     let contact = Contact::from_event(&event).with_velocity(velocity);
                     let spec = SpringSpec::for_touch(Touch::Contact(contact))
                         .response(SpringResponse::Quick);
@@ -232,13 +232,13 @@ pub(crate) fn LinearSlider(
             },
             onkeydown: move |event| {
                 if let (true, Some(nudge)) = (enabled, nudge(&event.key())) {
-                    onchange.call(ticks.snap(stepped(value, step, nudge)));
+                    onchange.call(snap(ticks, stepped(value, step, nudge)));
                 }
             },
             ..data,
             div { class: "ds-slider-track",
                 div { class: "ds-slider-fill" }
-                for mark in ticks.marks() {
+                for mark in marks(ticks) {
                     span { key: "{mark.0}", class: "ds-slider-tick", style: "--f:{mark.css()}" }
                 }
             }

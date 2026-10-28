@@ -4,7 +4,7 @@
 //! ds-blitz, whatever the policy.
 
 use dioxus::prelude::*;
-use ds_blitz::{AppNet, FileRoots, NetDecision, NetPolicy, NetReply, NetRequest, RequestOrigin};
+use ds_blitz::{AppNet, FileRoots, FrameId, NetDecision, NetPolicy, NetReply, NetRequest};
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock, PoisonError};
@@ -54,7 +54,7 @@ fn RemoteImage() -> Element {
 /// Records every request put to it and answers as told.
 struct Recorder {
     decision: NetDecision,
-    seen: Mutex<Vec<(RequestOrigin, String)>>,
+    seen: Mutex<Vec<(Option<FrameId>, String)>>,
 }
 
 impl Recorder {
@@ -65,7 +65,7 @@ impl Recorder {
         })
     }
 
-    fn seen(&self) -> Vec<(RequestOrigin, String)> {
+    fn seen(&self) -> Vec<(Option<FrameId>, String)> {
         self.seen
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
@@ -148,10 +148,7 @@ fn a_custom_handler_sees_the_app_documents_request_and_answers_it() {
         let harness = Harness::new(RemoteImage, config);
         assert_eq!(
             recorder.seen(),
-            vec![(
-                RequestOrigin::Top,
-                "https://example.org/pixel.png".to_owned()
-            )],
+            vec![(None, "https://example.org/pixel.png".to_owned())],
             "{decision:?}"
         );
         assert_eq!(width(&harness, ".remote"), want, "{decision:?}");
@@ -225,11 +222,8 @@ fn a_custom_handler_sees_the_frames_requests_with_the_frame_as_origin() {
     assert_eq!(
         seen,
         vec![
-            (RequestOrigin::Frame(frame), file),
-            (
-                RequestOrigin::Frame(frame),
-                "https://example.org/frame.png".to_owned()
-            ),
+            (Some(frame), file),
+            (Some(frame), "https://example.org/frame.png".to_owned()),
         ],
         "the app's own file is served without asking; the frame's requests are put to the app"
     );

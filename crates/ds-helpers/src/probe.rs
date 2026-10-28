@@ -5,15 +5,6 @@ use crate::catalog::Entry;
 use std::ffi::OsString;
 use std::path::Path;
 
-/// Whether a tool can be run.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ToolPresence {
-    /// An executable for it is on `PATH`.
-    Present,
-    /// None is.
-    Missing,
-}
-
 /// The `PATH` and the `os-release` file to read; handed in so a test uses a scratch directory.
 #[derive(Debug, Clone)]
 pub struct Environment {
@@ -56,16 +47,13 @@ fn on_path(path: &OsString, executable: &Executable) -> bool {
 }
 
 /// Whether any of the entry's probe executables is on `path`.
-pub fn presence(path: &OsString, entry: &Entry) -> ToolPresence {
-    match entry.probe.iter().any(|exe| on_path(path, exe)) {
-        true => ToolPresence::Present,
-        false => ToolPresence::Missing,
-    }
+pub fn presence(path: &OsString, entry: &Entry) -> bool {
+    entry.probe.iter().any(|exe| on_path(path, exe))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{ToolPresence, presence};
+    use super::presence;
     use crate::capability::CapabilityName;
     use crate::catalog::Catalog;
 
@@ -99,20 +87,10 @@ mod tests {
         let path = std::env::join_paths([&other, &bin]).expect("path");
         let none = std::env::join_paths([&other]).expect("path");
         let table = [
-            (
-                "any one probe is enough",
-                "heic",
-                &path,
-                ToolPresence::Present,
-            ),
-            ("not on this path", "heic", &none, ToolPresence::Missing),
-            ("not executable", "data", &path, ToolPresence::Missing),
-            (
-                "a directory is not a tool",
-                "dir",
-                &path,
-                ToolPresence::Missing,
-            ),
+            ("any one probe is enough", "heic", &path, true),
+            ("not on this path", "heic", &none, false),
+            ("not executable", "data", &path, false),
+            ("a directory is not a tool", "dir", &path, false),
         ];
         for (name, cap, path, want) in table {
             assert_eq!(presence(path, entry(cap)), want, "{name}");

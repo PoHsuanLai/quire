@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{ClassPresence, Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -59,18 +59,12 @@ fn a_once_effect_fires_on_a_new_trigger_and_not_on_a_re_render() {
     harness.within(|| *BUMP.write() += 1);
     harness.advance(Duration::from_millis(100));
     assert_eq!(pose(&harness, "#lid"), None);
-    assert_eq!(
-        harness.has_class("#hop .ds-symbol", "a-bounce"),
-        ClassPresence::Absent
-    );
+    assert!(!harness.has_class("#hop .ds-symbol", "a-bounce"));
     assert_settles_to_zero_frames(&mut harness);
     // A new trigger fires both: the lid tips and the bounce class arrives.
     harness.within(|| *TRIGGER.write() = Trigger(1));
     settle_until(&mut harness, |h| pose(h, "#lid").is_some());
-    assert_eq!(
-        harness.has_class("#hop .ds-symbol", "a-bounce"),
-        ClassPresence::Present
-    );
+    assert!(harness.has_class("#hop .ds-symbol", "a-bounce"));
     assert_eq!(
         harness.attr("#hop .ds-symbol", "data-pulse").as_deref(),
         Some("a")
@@ -103,26 +97,15 @@ fn a_while_effect_runs_while_active_and_stops_asking_for_frames_when_idle() {
     let mut harness = harness();
     harness.within(|| *ACTIVITY.write() = EffectActivity::Active);
     settle_until(&mut harness, |h| pose(h, "#bell").is_some());
-    assert_eq!(
-        harness.has_class("#spin .ds-symbol", "a-turn"),
-        ClassPresence::Present
-    );
+    assert!(harness.has_class("#spin .ds-symbol", "a-turn"));
     // Still going well past one cycle: it does not run out.
     harness.advance(Duration::from_secs(5));
     assert!(harness.is_animating(), "the loop keeps asking for frames");
     harness.within(|| *ACTIVITY.write() = EffectActivity::Idle);
-    settle_until(&mut harness, |h| {
-        h.has_class("#spin .ds-symbol", "a-hold") == ClassPresence::Present
-    });
+    settle_until(&mut harness, |h| h.has_class("#spin .ds-symbol", "a-hold"));
     settle_until(&mut harness, |h| pose(h, "#bell").is_none());
-    assert_eq!(
-        harness.has_class("#spin .ds-symbol", "a-turn"),
-        ClassPresence::Absent
-    );
-    assert_eq!(
-        harness.has_class("#spin .ds-symbol", "a-hold"),
-        ClassPresence::Present
-    );
+    assert!(!harness.has_class("#spin .ds-symbol", "a-turn"));
+    assert!(harness.has_class("#spin .ds-symbol", "a-hold"));
     assert_settles_to_zero_frames(&mut harness);
 }
 

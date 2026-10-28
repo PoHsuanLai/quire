@@ -17,7 +17,7 @@ use crate::components::menus::menu::placement::MenuPlacement;
 use crate::components::menus::search::card::card;
 use crate::components::menus::search::highlight::{initial, shown_at, value_at};
 use crate::components::menus::search::model::{
-    CardPlace, Ends, EscapeOrder, InitialHighlight, Manner, Panel, SearchCursor, SuggestionSection,
+    CardPlace, EscapeOrder, InitialHighlight, Manner, Panel, SearchCursor, SuggestionSection,
     SuggestionsPresent, flatten,
 };
 use crate::components::menus::search::step::{Act, SuggestKey, Suggesting, Text, press};
@@ -94,8 +94,7 @@ impl<T: Clone + 'static> Moves<T> {
 /// `open` says who decides whether the panel is up: `Owned` (the default) is the field, which
 /// opens it after focus or typing; `Shown` is the host, whose rows are up whenever there are any,
 /// before any focus or typing, and an Escape on an empty field goes on to the window with the
-/// rows still up. `ends` says what the arrows do past the first and last row: `Wrap` (the
-/// default) or `Stop`.
+/// rows still up. `stop_at_ends: true` keeps the arrows on the first and last row; by default they wrap.
 ///
 /// `present` is `Popup` (a menu under the field) or `Card` (the field and its results as one
 /// surface, with `place` floating it at the window level and `ondismiss` hearing a press outside
@@ -117,7 +116,7 @@ pub fn SearchField<T: Clone + PartialEq + 'static>(
     #[props(default)] on_highlight: EventHandler<Option<T>>,
     #[props(default)] escape: EscapeOrder,
     #[props(default)] open: Panel,
-    #[props(default)] ends: Ends,
+    #[props(default)] stop_at_ends: bool,
     #[props(default)] present: SuggestionsPresent,
     #[props(default)] place: Option<CardPlace>,
     #[props(default)] ondismiss: EventHandler<()>,
@@ -152,7 +151,7 @@ pub fn SearchField<T: Clone + PartialEq + 'static>(
     let manner = Manner {
         escape,
         panel: open,
-        ends,
+        stop_at_ends,
     };
     let open = now.is_open(live.len(), manner.panel);
     let moves = Moves {

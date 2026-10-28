@@ -1,5 +1,7 @@
-//! The seam to whatever installs packages: the real PackageKit backend, and a scripted one for
-//! tests and the gallery. An enum, not a trait object, so no async-trait is needed.
+//! The seam to whatever installs packages: [`Install`], with the real PackageKit backend and a
+//! scripted one for tests and the gallery. The backend is a trait object so the handle that holds
+//! it, [`crate::Helpers`], needs no type parameter: an app picks the backend once, where it builds
+//! the handle, and everything that holds the handle is the same type either way.
 
 mod fake;
 // The D-Bus backend, or its stand-in that reports every install `Unsupported`.
@@ -17,6 +19,8 @@ use crate::capability::PackageName;
 use crate::family::Family;
 use crate::outcome::{Missing, Outcome};
 use ds_peer::Deadline;
+use std::future::Future;
+use std::pin::Pin;
 
 /// What to install: the alternatives for one tool, best first. The first that exists wins.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -30,25 +34,17 @@ pub struct Request {
     pub missing: Missing,
 }
 
-/// An installer backend.
-#[derive(Debug)]
-pub enum Installer {
-    /// The system's PackageKit daemon, which asks polkit for the password itself.
-    PackageKit(PackageKit),
-    /// A scripted installer.
-    Fake(FakeInstaller),
-}
-
-impl Installer {
+/// An installer backend: whatever installs a package for a [`Request`].
+///
+/// The future is boxed so a `dyn Install` can sit in [`crate::Helpers`].
+pub trait Install: std::fmt::Debug + Send + Sync {
     /// Install the first candidate that exists. [`Outcome::Installed`] means the package is in
     /// place; the caller still probes for the tool.
-    pub async fn install(&self, request: &Request) -> Outcome {
-        match self {
-            Installer::PackageKit(backend) => backend.install(request).await,
-            Installer::Fake(backend) => backend.install(request),
-        }
-    }
+    fn install<'a>(&'a self, request: &'a Request) -> BoxFuture<'a, Outcome>;
 }
+
+/// A boxed future that may run on another thread.
+pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + Send + 'a>>;
 
 /// How long each wait on the package manager may take before it counts as not answering.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

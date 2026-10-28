@@ -9,7 +9,7 @@ use ds::components::app::row_more::RowMore;
 use ds::components::app::thread_height::{ThreadLines, thread_card_gap, thread_card_height};
 use ds::components::app::thread_row::ThreadRow;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -113,13 +113,13 @@ fn it_is_hidden_until_the_row_is_hovered() {
 fn tab_reaches_it_and_shows_it() {
     let mut harness = settled(Three);
     for _ in 0..3 {
-        if harness.focus_of(MORE) == FocusState::Focused {
+        if harness.focus_of(MORE) {
             break;
         }
         harness.send(Input::key(ShortcutKey::Tab));
         harness.advance(Duration::from_millis(400));
     }
-    assert_eq!(harness.focus_of(MORE), FocusState::Focused);
+    assert!(harness.focus_of(MORE));
     assert_eq!(opacity(&harness), 1.0, "focus shows it with no pointer");
 }
 

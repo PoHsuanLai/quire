@@ -12,6 +12,7 @@
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::Button;
+use crate::components::forms::icon_tile::{TileFace, tile};
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::word::Word;
@@ -30,7 +31,10 @@ pub enum EmptyForm {
     Failure,
 }
 
-/// A placeholder for nothing to show. `icon` is a glyph above the title, drawn only when given; `description` is the
+/// A placeholder for nothing to show. `face` is a tile above the title (System Settings' empty
+/// state: a rounded colour tile with a white glyph, or an avatar), 48 px, drawn only when given;
+/// `icon` is a faint 48 px glyph above the title instead, for a pane that wants no colour, and
+/// is not drawn when there is a `face`; `description` is the
 /// line under the title, whole or as runs (a `RunTone::Code` run is a command to copy); `action` is an element of the caller's (a button that adds the first
 /// item); a `Failure` with `onretry` draws a Retry button, after the action. `common` puts the
 /// consumer's `id`, `data-*` and classes on the root, and `aria_label` names it in place of its
@@ -40,6 +44,7 @@ pub fn EmptyState(
     #[props(default)] form: EmptyForm,
     #[props(into)] title: String,
     #[props(default)] description: Option<TextLine>,
+    #[props(default)] face: Option<TileFace>,
     #[props(default)] icon: Option<Icon>,
     #[props(default)] action: Option<Element>,
     #[props(default)] onretry: Option<EventHandler<()>>,
@@ -57,7 +62,9 @@ pub fn EmptyState(
             "data-form": form.slug(),
             onmounted: move |event| common.mounted(event),
             ..data,
-            if let Some(icon) = icon {
+            if let Some(face) = face {
+                div { class: "ds-empty-state-icon", {tile(face)} }
+            } else if let Some(icon) = icon {
                 div { class: "ds-empty-state-icon",
                     IconView { source: icon.into(), size: IconSize::Tile48 }
                 }

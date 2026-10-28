@@ -4212,9 +4212,9 @@ moment ending in `assert_settles_to_zero_frames`, each with a Reduced case. Gall
 and, later, the shell's apps on shell-host toplevels. It moves, resizes and zooms the window
 through the host seam `ds::prelude::HostWindow` (design/13 section 13.3.11; FINDINGS "Window frame").
 **Props.** `Ds { window: WindowFrame }`. `WindowFrame::None` (default) draws nothing and leaves
-the root's markup as it was; `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown,
+the root's markup as it was; `WindowFrame::Titlebar { title, lights: Shown::{Visible,
 Hidden}, timing: FrameTiming }` (`WindowFrame::titlebar(title, lights)` takes the settings'
-default timing). `WindowTitlebar { title, lights, timing, pose: TilePose::{Closed, Open} }` is
+default timing). `WindowTitlebar { title, lights, timing, pose: Shown::{Hidden, Visible} }` is
 the titlebar alone, for a gallery.
 **Markup.** The root stamps `data-window-frame="titlebar"` and becomes a column:
 `div.ds-titlebar[data-window][data-activity][data-first-mouse]` holding

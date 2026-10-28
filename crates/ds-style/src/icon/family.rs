@@ -65,6 +65,10 @@ pub enum PlateShare {
     /// `--plate-inset`: a third-party icon's share of the plate (72%; a stylesheet token, no setting).
     #[token(input = "--icons-inset-share", value = "72%")]
     Inset,
+    /// `--plate-tile-glyph`: a glyph's share of a grouped row's icon tile (60%, so a 48 px tile
+    /// holds a 29 px glyph; a stylesheet token, no setting).
+    #[token(input = "--icons-tile-glyph-share", value = "60%")]
+    TileGlyph,
 }
 
 #[cfg(test)]

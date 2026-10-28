@@ -20,15 +20,6 @@ pub const PANE_MEDIA: Size = Size {
     height: Px(220.0),
 };
 
-/// Whether a text is drawn in the code face.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PaneMono {
-    /// `--font-code`: a clipboard snippet, a source file.
-    Monospace,
-    /// The text face.
-    Proportional,
-}
-
 /// What the pane previews.
 #[derive(Debug, Clone, PartialEq)]
 pub enum PaneContent {
@@ -43,8 +34,9 @@ pub enum PaneContent {
     Text {
         /// What is shown; the pane clips what does not fit.
         excerpt: String,
-        /// Its face.
-        mono: PaneMono,
+        /// Whether it is drawn in the code face (`--font-code`: a clipboard snippet, a source
+        /// file) rather than the text face.
+        mono: bool,
     },
     /// A PDF's first page, as `PdfThumb` draws it. ds reads no file: a Blitz app gets the page
     /// from `ds_blitz::use_pdf_page(Some(path), PANE_MEDIA)` (feature `pdf`).
@@ -139,10 +131,7 @@ pub(crate) fn media(content: &PaneContent) -> Element {
             }
         }
         PaneContent::Text { excerpt, mono } => {
-            let face = match mono {
-                PaneMono::Monospace => "mono",
-                PaneMono::Proportional => "prose",
-            };
+            let face = if *mono { "mono" } else { "prose" };
             rsx! {
                 div { class: "ds-preview-text", "data-face": face, "{excerpt}" }
             }

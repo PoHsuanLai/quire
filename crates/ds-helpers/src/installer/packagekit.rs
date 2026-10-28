@@ -4,7 +4,7 @@
 //! `/usr/share/dbus-1/interfaces`). The crate docs say why this route and not `Modify2`.
 
 use super::transaction::{Budget, Fault, PEER, Report, transact};
-use super::{Request, Timeouts};
+use super::{BoxFuture, Install, Request, Timeouts};
 use crate::outcome::{Missing, Outcome};
 use ds_peer::within;
 use zbus::Connection;
@@ -71,7 +71,7 @@ impl PackageKit {
         self
     }
 
-    pub(super) async fn install(&self, request: &Request) -> Outcome {
+    async fn run_install(&self, request: &Request) -> Outcome {
         let connection = match &self.bus {
             Bus::Given(connection) => connection.clone(),
             Bus::System => match within(self.timeouts.step, PEER, Connection::system()).await {
@@ -84,6 +84,12 @@ impl PackageKit {
             Ok(outcome) => outcome,
             Err(fault) => classify(&fault, &request.missing),
         }
+    }
+}
+
+impl Install for PackageKit {
+    fn install<'a>(&'a self, request: &'a Request) -> BoxFuture<'a, Outcome> {
+        Box::pin(self.run_install(request))
     }
 }
 

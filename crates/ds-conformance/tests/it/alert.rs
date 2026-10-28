@@ -10,7 +10,7 @@
 use dioxus::prelude::*;
 use ds::components::overlays::alert_model::{AlertButton, AlertRole};
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -130,15 +130,10 @@ fn press(harness: &mut Harness, key: ShortcutKey) {
 #[test]
 fn it_opens_with_the_keyboard_on_the_default_button() {
     let harness = start(AlertRole::Normal, Flow::Floating);
-    assert_eq!(
-        harness.focus_of(ACTION),
-        FocusState::Focused,
-        "the action is the default"
-    );
+    assert!(harness.focus_of(ACTION), "the action is the default");
     let harness = start(AlertRole::Destructive, Flow::Floating);
-    assert_eq!(
+    assert!(
         harness.focus_of(CANCEL),
-        FocusState::Focused,
         "a destructive action is not the default: Cancel is"
     );
 }
@@ -151,15 +146,10 @@ fn return_presses_the_default_wherever_the_keyboard_is() {
 
     let mut harness = start(AlertRole::Normal, Flow::Floating);
     press(&mut harness, ShortcutKey::Tab);
-    assert_eq!(
-        harness.focus_of(CANCEL),
-        FocusState::Focused,
-        "Tab moves to Cancel"
-    );
+    assert!(harness.focus_of(CANCEL), "Tab moves to Cancel");
     press(&mut harness, ShortcutKey::Tab);
-    assert_eq!(
+    assert!(
         harness.focus_of(ACTION),
-        FocusState::Focused,
         "and back: the keyboard stays in the alert"
     );
     press(&mut harness, ShortcutKey::Tab);
@@ -298,11 +288,7 @@ fn an_alert_with_an_arming_delay_answers_nothing_until_it_arms() {
             0,
             "{flow:?}"
         );
-        assert_eq!(
-            harness.focus_of(ACTION),
-            FocusState::Focused,
-            "{flow:?}: the keyboard arrives"
-        );
+        assert!(harness.focus_of(ACTION), "{flow:?}: the keyboard arrives");
         press(&mut harness, ShortcutKey::Enter);
         assert_eq!(
             log(&harness),
@@ -343,7 +329,7 @@ fn the_slot_stands_between_the_message_and_the_buttons_and_the_keys_still_work()
             "{flow:?}: {}",
             harness.html()
         );
-        assert_eq!(harness.focus_of(ACTION), FocusState::Focused, "{flow:?}");
+        assert!(harness.focus_of(ACTION), "{flow:?}");
         press(&mut harness, ShortcutKey::Enter);
         press(&mut harness, ShortcutKey::Escape);
         assert_eq!(log(&harness), "action,cancel", "{flow:?}");

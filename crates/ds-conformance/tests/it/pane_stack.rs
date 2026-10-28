@@ -10,7 +10,7 @@ use ds::components::lists::row::size::RowSize;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -200,7 +200,7 @@ fn a_chevron_row_pushes_its_detail_under_a_header_that_names_the_parent() {
             .as_deref(),
         Some("Back to Accounts")
     );
-    assert_eq!(harness.focus_of("#pane-back-detail"), FocusState::Focused);
+    assert!(harness.focus_of("#pane-back-detail"));
     assert_settles_to_zero_frames(&mut harness);
 }
 
@@ -234,9 +234,8 @@ fn every_way_back_pops_and_returns_the_focus_to_the_row() {
         );
         settle_until(&mut harness, at_rest);
         assert_eq!(title_shown(&harness), "Accounts", "{name}");
-        assert_eq!(
+        assert!(
             harness.focus_of("#open-dana"),
-            FocusState::Focused,
             "{name}: focus returns to the opener"
         );
         assert_settles_to_zero_frames(&mut harness);

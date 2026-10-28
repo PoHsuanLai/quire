@@ -10,10 +10,8 @@ use dioxus::prelude::*;
 use ds::base::press::PointerButton;
 use ds::prelude::*;
 use ds::window::host::use_window_host_provider;
-use ds::window::vocab::{Maximized, Support, TileError, WindowTile, Zoom};
-use ds_harness::{
-    Clock, FocusState, Harness, HarnessConfig, Input, PointerAction, PointerInput, Viewport,
-};
+use ds::window::vocab::{Maximized, TileError, WindowTile, Zoom};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, PointerAction, PointerInput, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -54,15 +52,16 @@ impl HostWindow for Stub {
     }
     fn tile(&self, tile: WindowTile) -> Result<(), TileError> {
         self.note(format!("tile:{tile:?}"));
-        match self.supports(tile) {
-            Support::Yes => Ok(()),
-            Support::No => Err(TileError::Unsupported),
+        if self.supports(tile) {
+            Ok(())
+        } else {
+            Err(TileError::Unsupported)
         }
     }
-    fn supports(&self, tile: WindowTile) -> Support {
+    fn supports(&self, tile: WindowTile) -> bool {
         match tile {
-            WindowTile::Fill => Support::Yes,
-            WindowTile::LeftHalf | WindowTile::RightHalf | WindowTile::Centre => Support::No,
+            WindowTile::Fill => true,
+            WindowTile::LeftHalf | WindowTile::RightHalf | WindowTile::Centre => false,
         }
     }
     fn state(&self) -> WindowState {
@@ -84,7 +83,7 @@ fn framed(maximized: Maximized) -> Element {
         Ds {
             appearance: Appearance::default(),
             material: Material::Window,
-            window: WindowFrame::titlebar("Inbox", TrafficLights::Shown),
+            window: WindowFrame::titlebar("Inbox", Shown::Visible),
             p { class: "log", {log().join(",")} }
         }
     }
@@ -332,18 +331,14 @@ fn a_maximized_window_neither_moves_nor_resizes_and_its_green_light_restores() {
 fn the_lights_take_tab_arrow_down_opens_the_menu_and_escape_closes_it() {
     let mut harness = start(Normal);
     harness.send(Input::key(ShortcutKey::Tab));
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-light[*|data-light=close]"),
-        FocusState::Focused,
         "{}",
         harness.html()
     );
     harness.send(Input::key(ShortcutKey::Tab));
     harness.send(Input::key(ShortcutKey::Tab));
-    assert_eq!(
-        harness.focus_of(".ds-light[*|data-light=zoom]"),
-        FocusState::Focused
-    );
+    assert!(harness.focus_of(".ds-light[*|data-light=zoom]"));
     harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(60));
     assert_eq!(harness.count(".ds-menu"), 1);

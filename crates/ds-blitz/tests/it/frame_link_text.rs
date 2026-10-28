@@ -186,7 +186,7 @@ fn moving_from_one_link_to_another_leaves_then_enters() {
 fn inert_links_report_no_hover() {
     let heard = Arc::new(Heard::default());
     let log = Arc::clone(&heard);
-    let links = FrameLinks::Inert.with_hover(move |hover| {
+    let links = FrameLinks::default().with_hover(move |hover| {
         log.hovers
             .lock()
             .unwrap_or_else(PoisonError::into_inner)

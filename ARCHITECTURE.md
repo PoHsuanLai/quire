@@ -529,7 +529,7 @@ pub trait SpellService { fn languages(&self) -> Vec<Lang>;
 pub trait HostWindow { fn begin_move(&self); fn begin_resize(&self, edge: ResizeEdge);
     fn zoom(&self, zoom: Zoom); fn minimize(&self); fn close(&self);
     fn tile(&self, tile: WindowTile) -> Result<(), TileError>;
-    fn supports(&self, tile: WindowTile) -> Support; fn state(&self) -> WindowState; }
+    fn supports(&self, tile: WindowTile) -> bool; fn state(&self) -> WindowState; }
 
 // ds-core::machine (time is ds-core::time::stamp::Stamp: whole ms from the caller's origin)
 pub trait Machine: Clone + PartialEq + 'static {      // no Default: the caller supplies the first state
@@ -595,10 +595,10 @@ impl Harness {
     pub fn text_of(&self, selector: &str) -> Option<String>;
     pub fn attr(&self, selector: &str, name: &str) -> Option<String>;
     pub fn count(&self, selector: &str) -> usize;
-    pub fn has_class(&self, selector: &str, class: &str) -> ClassPresence;
+    pub fn has_class(&self, selector: &str, class: &str) -> bool;
     pub fn ink_of(&self, selector: &str) -> Option<Srgba>;
     pub fn fill_of(&self, selector: &str, part: Part) -> Option<Srgba>;
-    pub fn focus_of(&self, selector: &str) -> FocusState;
+    pub fn focus_of(&self, selector: &str) -> bool;
 }
 pub enum Input {
     Pointer(PointerInput), Key(KeyInput), Wheel { at: Point, dx: Px, dy: Px },
@@ -691,7 +691,7 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Overlays | `Alert`, `DragGhost`, `HoverCard`, `InlineBanner`, `Loadable`, `Phase`, `Popover`, `Sheet`, `Skeleton`, `SkeletonShape`, `SkeletonLines`, `SkeletonRow`, `use_toasts`, `Tooltip`, `use_overlays` |
 | Progress and pending work | `ProgressIndicator`, `Progress`, `ProgressStyle`, `RingGap`, `Operation`, `PendingToken` |
 | Lists and content | `Avatar`, `ImageSource`, `PdfThumb`, `ProviderMark`, `TextLine`, `TextRun`, `EmojiGrid`, `List`, `ListItem`, `PreviewPane`, `Accessory`, `RowAction`, `RowChord`, `RowLeading`, `Row`, `SectionHeader` |
-| Chrome | `TrafficLights`, `WindowFrame`, `WindowHost`, `ResizeEdge`, `WindowState` |
+| Chrome | `WindowFrame`, `WindowHost`, `ResizeEdge`, `WindowState` |
 | Motion | `Anim`, `Cue`, `Detailed`, `Moment`, `use_detail` |
 | Host | `DocumentHost`, `use_document_host`, `Focused`, `Measured`, `HostSignals`, `SpellService`, `HostWindow` |
 | Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `MenuImage`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `PaletteClose`, `PaletteState`, `PaletteIn`, `PaletteOut`, `PaletteParams`, `PaletteIndex`, `PaletteMove`, `EmptyState`, `Flow`, `SidePanel`, `SpacesBar`, `SpaceTile`, `BarSpaceKey`, `BarExpansion`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
@@ -715,7 +715,7 @@ are reached as `ds::components::app::X`, not through the prelude.
 | `Cursor` (menus) | `MenuCursor` |
 | `Focus` (text field), `Key` (shortcut), `Env` | `FieldFocus`, `ShortcutKey`, `Scope` |
 | `Text`, `Run` (text runs) | `TextLine`, `TextRun` |
-| `Step` (month grid), `Provider` (provider mark), `Mono` (preview) | `MonthStep`, `MarkProvider`, `PaneMono` |
+| `Step` (month grid), `Provider` (provider mark) | `MonthStep`, `MarkProvider` |
 | `OsdPhase`, `Alias` (`shown_phase`), `ListPresence`, `Healing` | deleted / `Presence` / `roster::Heal` |
 
 ## 7. Recipes

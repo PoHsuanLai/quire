@@ -7,24 +7,6 @@ use blitz_dom::util::ToColorColor;
 use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
 use ds::prelude::*;
 
-/// Whether an element carries a class.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ClassPresence {
-    /// The element carries the class as a whole token.
-    Present,
-    /// It does not, or no element matched.
-    Absent,
-}
-
-/// Whether an element has the keyboard focus.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum FocusState {
-    /// The element has the keyboard focus.
-    Focused,
-    /// It does not, or no element matched.
-    Unfocused,
-}
-
 impl Harness {
     /// Run `read` on the document as it is now.
     pub fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
@@ -58,15 +40,9 @@ impl Harness {
     }
 
     /// Whether the first element matching `selector` carries `class` as a whole class token.
-    pub fn has_class(&self, selector: &str, class: &str) -> ClassPresence {
-        let carried = self
-            .attr(selector, "class")
-            .is_some_and(|classes| classes.split_ascii_whitespace().any(|token| token == class));
-        if carried {
-            ClassPresence::Present
-        } else {
-            ClassPresence::Absent
-        }
+    pub fn has_class(&self, selector: &str, class: &str) -> bool {
+        self.attr(selector, "class")
+            .is_some_and(|classes| classes.split_ascii_whitespace().any(|token| token == class))
     }
 
     /// The computed `color` of the first element matching `selector`.
@@ -100,16 +76,12 @@ impl Harness {
         })
     }
 
-    /// Whether the first element matching `selector` has the keyboard focus.
-    pub fn focus_of(&self, selector: &str) -> FocusState {
-        let focused = self.with_doc(|doc| {
+    /// Whether the first element matching `selector` has the keyboard focus. `false` too when no
+    /// element matched.
+    pub fn focus_of(&self, selector: &str) -> bool {
+        self.with_doc(|doc| {
             first(doc, selector).is_some_and(|node| doc.get_focussed_node_id() == Some(node))
-        });
-        if focused {
-            FocusState::Focused
-        } else {
-            FocusState::Unfocused
-        }
+        })
     }
 }
 

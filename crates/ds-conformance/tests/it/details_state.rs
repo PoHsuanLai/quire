@@ -14,7 +14,7 @@ use ds::motion::detail::touch::Touch;
 use ds::motion::detail::use_pending::use_pending;
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{ClassPresence, Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -114,7 +114,7 @@ fn reduced_keeps_the_loop_turning() {
 }
 
 fn shaking(harness: &Harness) -> bool {
-    harness.has_class("#shake", "a-shake-x") == ClassPresence::Present
+    harness.has_class("#shake", "a-shake-x")
 }
 
 #[test]

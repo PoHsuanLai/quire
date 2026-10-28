@@ -7,7 +7,7 @@ mod fake_pk;
 
 use bus::PrivateBus;
 use ds_helpers::{
-    CapabilityName, Deadline, Executable, Family, Installer, Missing, Outcome, PackageKit,
+    CapabilityName, Deadline, Executable, Family, Install, Missing, Outcome, PackageKit,
     PackageName, Request, Timeouts,
 };
 use fake_pk::{Behaviour, Calls, serve};
@@ -37,7 +37,7 @@ fn missing(names: &[&str]) -> Missing {
 }
 
 /// A fake daemon with `behaviour` and a client connection to the same private bus.
-async fn setup(tag: &str, behaviour: Behaviour) -> (PrivateBus, Installer, Calls) {
+async fn setup(tag: &str, behaviour: Behaviour) -> (PrivateBus, PackageKit, Calls) {
     let bus = PrivateBus::start(tag);
     let daemon = bus.connect().await;
     let calls = serve(&daemon, behaviour).await;
@@ -46,7 +46,7 @@ async fn setup(tag: &str, behaviour: Behaviour) -> (PrivateBus, Installer, Calls
     // connection is the client).
     std::mem::forget(daemon);
     let client = bus.connect().await;
-    (bus, Installer::PackageKit(PackageKit::on(client)), calls)
+    (bus, PackageKit::on(client), calls)
 }
 
 #[tokio::test]
@@ -158,7 +158,7 @@ async fn install_error_codes_map_to_outcomes() {
 async fn no_packagekit_on_the_bus_is_unsupported() {
     let bus = PrivateBus::start("nopk");
     let client = bus.connect().await;
-    let installer = Installer::PackageKit(PackageKit::on(client));
+    let installer = PackageKit::on(client);
     assert_eq!(
         installer.install(&request(&["mpv"])).await,
         Outcome::Unsupported(missing(&["mpv"]))
@@ -181,7 +181,7 @@ async fn signals_from_another_process_are_not_believed() {
     )
     .await;
     let client = bus.connect().await;
-    let installer = Installer::PackageKit(PackageKit::on(client));
+    let installer = PackageKit::on(client);
     assert_eq!(
         installer.install(&request(&["mpv"])).await,
         Outcome::Installed
@@ -199,9 +199,7 @@ async fn a_transaction_that_goes_quiet_is_cancelled_and_reported_as_not_answerin
     )
     .await;
     let client = bus.connect().await;
-    let installer = Installer::PackageKit(
-        PackageKit::on(client).with_timeouts(timeouts(Duration::from_millis(300))),
-    );
+    let installer = PackageKit::on(client).with_timeouts(timeouts(Duration::from_millis(300)));
     assert_eq!(
         installer.install(&request(&["mpv"])).await,
         Outcome::Failed("The installer is not answering".to_owned())
@@ -219,9 +217,7 @@ async fn a_package_manager_that_vanishes_ends_the_wait_at_once() {
     )
     .await;
     let client = bus.connect().await;
-    let installer = Installer::PackageKit(
-        PackageKit::on(client).with_timeouts(timeouts(Duration::from_secs(120))),
-    );
+    let installer = PackageKit::on(client).with_timeouts(timeouts(Duration::from_secs(120)));
     let vanish = async {
         while calls.installed().is_empty() {
             tokio::time::sleep(Duration::from_millis(20)).await;

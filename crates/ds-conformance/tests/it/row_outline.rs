@@ -14,7 +14,7 @@ use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -346,9 +346,7 @@ fn the_field_takes_the_titles_place_and_moves_nothing() {
 #[test]
 fn the_field_has_the_keyboard_with_its_text_selected() {
     let mut edit = started(renaming);
-    settle_until(&mut edit, |harness| {
-        harness.focus_of(FIELD) == FocusState::Focused
-    });
+    settle_until(&mut edit, |harness| harness.focus_of(FIELD));
     settle_until(&mut edit, |harness| {
         harness.selected_text(FIELD).as_deref() == Some("Projects")
     });
@@ -357,9 +355,7 @@ fn the_field_has_the_keyboard_with_its_text_selected() {
 #[test]
 fn a_press_and_typing_in_the_field_neither_toggle_nor_select_the_row() {
     let mut edit = started(renaming);
-    settle_until(&mut edit, |harness| {
-        harness.focus_of(FIELD) == FocusState::Focused
-    });
+    settle_until(&mut edit, |harness| harness.focus_of(FIELD));
     let at = edit.centre(FIELD).expect("the field is laid out");
     edit.send(Input::click(at));
     edit.advance(ms(50));
@@ -367,11 +363,7 @@ fn a_press_and_typing_in_the_field_neither_toggle_nor_select_the_row() {
         edit.send(Input::key(ShortcutKey::Char(c)));
         edit.advance(ms(20));
     }
-    assert_eq!(
-        edit.focus_of(FIELD),
-        FocusState::Focused,
-        "the field kept the keyboard"
-    );
+    assert!(edit.focus_of(FIELD), "the field kept the keyboard");
     assert_eq!(log(&edit), "", "no toggle, no select");
     assert_eq!(
         edit.attr(PROJECTS, "aria-expanded").as_deref(),
@@ -382,9 +374,7 @@ fn a_press_and_typing_in_the_field_neither_toggle_nor_select_the_row() {
 #[test]
 fn enter_and_escape_reach_the_fields_handler_and_end_the_rename() {
     let mut edit = started(renaming);
-    settle_until(&mut edit, |harness| {
-        harness.focus_of(FIELD) == FocusState::Focused
-    });
+    settle_until(&mut edit, |harness| harness.focus_of(FIELD));
     for c in "Work".chars() {
         edit.send(Input::key(ShortcutKey::Char(c)));
         edit.advance(ms(20));
@@ -398,9 +388,7 @@ fn enter_and_escape_reach_the_fields_handler_and_end_the_rename() {
         Some("Work")
     );
     let mut again = started(renaming);
-    settle_until(&mut again, |harness| {
-        harness.focus_of(FIELD) == FocusState::Focused
-    });
+    settle_until(&mut again, |harness| harness.focus_of(FIELD));
     again.send(Input::key(ShortcutKey::Escape));
     settle_until(&mut again, |harness| harness.count(FIELD) == 0);
     assert_eq!(log(&again), "escape");

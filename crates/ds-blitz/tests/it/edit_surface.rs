@@ -15,7 +15,7 @@ use ds::host::position::{TextPosition, TextRange};
 use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -142,7 +142,7 @@ fn near(a: f32, b: f32) -> bool {
 #[test]
 fn a_click_focuses_the_surface_and_switches_the_ime_on() {
     let harness = focused();
-    assert_eq!(harness.focus_of("#editor"), FocusState::Focused);
+    assert!(harness.focus_of("#editor"));
     assert_eq!(harness.ime_switch(), ImeSwitch::On);
     assert_eq!(FOCUS.with(|log| log.borrow().clone()), vec![EditFocus::In]);
 }

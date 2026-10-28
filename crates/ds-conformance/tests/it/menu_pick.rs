@@ -7,7 +7,7 @@ use ds::host::measure::Anchor;
 use ds::prelude::*;
 use ds::style::tokens::delay::DelayToken;
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -155,11 +155,7 @@ fn an_inline_menu_stands_in_its_card_off_the_overlay() {
     assert_eq!(harness.count(".card > .ds-menu[*|data-flow=inline]"), 1);
     assert_eq!(harness.count(".ds-overlay .ds-menu"), 0);
     assert_eq!(harness.count(".ds-overlay-catch"), 0, "no outside catcher");
-    assert_eq!(
-        harness.focus_of(".ds-menu"),
-        FocusState::Unfocused,
-        "the caller keeps the focus"
-    );
+    assert!(!harness.focus_of(".ds-menu"), "the caller keeps the focus");
     // The rows sit inside the card, where the flow put them.
     let card = harness.rect(".card").expect("the card");
     let first = harness.rect(".ds-menu-item").expect("a row");

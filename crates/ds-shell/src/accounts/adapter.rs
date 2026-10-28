@@ -16,7 +16,7 @@ use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::content::text_runs::TextLine;
 use ds::components::controls::button::Button;
-use ds::components::controls::button_model::{Answers, ButtonFocus, ButtonRole};
+use ds::components::controls::button_model::{Answers, ButtonRole};
 use ds::components::fields::text_field::TextField;
 use ds::components::fields::text_field_focus::FieldFocus;
 use ds::components::fields::text_field_model::{FieldKind, FieldText as HeldBy, Invalid, Validity};
@@ -227,16 +227,13 @@ pub(crate) fn Action(
         Intent::Cancel => Answers::Escape,
         Intent::Plain => Answers::Nothing,
     };
-    let focus = match landing {
-        Landing::Here => ButtonFocus::OnMount,
-        Landing::Anywhere => ButtonFocus::Manual,
-    };
+    let autofocus = matches!(landing, Landing::Here);
     rsx! {
         Button {
             label,
             answers,
             role: ButtonRole::Normal,
-            focus,
+            autofocus,
             availability,
             onclick: move |_| onclick.call(()),
         }

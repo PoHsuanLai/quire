@@ -2,7 +2,7 @@
 //! monochrome paint, and that the stylesheet knows every kind and token the markup names.
 
 use dioxus::core::VirtualDom;
-use ds::components::content::file_icon::{FileIcon, FileIconChoice, FileIconProps, LabelFit};
+use ds::components::content::file_icon::{FileIcon, FileIconChoice, FileIconProps, LABEL_MIN_PX};
 use ds::prelude::*;
 use ds_core::word::Word;
 use ds_style::icon::render::IconPx;
@@ -57,11 +57,7 @@ fn a_standard_page_has_paper_fold_edge_mark_and_label() {
 
 #[test]
 fn the_label_is_dropped_under_48_px_and_the_mark_stays() {
-    assert_eq!(LabelFit::at(16), LabelFit::Hidden);
-    assert_eq!(LabelFit::at(32), LabelFit::Hidden);
-    assert_eq!(LabelFit::at(47), LabelFit::Hidden);
-    assert_eq!(LabelFit::at(48), LabelFit::Shown);
-    assert_eq!(LabelFit::at(64), LabelFit::Shown);
+    assert_eq!(LABEL_MIN_PX, 48);
     for px in [16, 32] {
         let html = standard(FileKind::Archive, "zip", px);
         assert!(!html.contains("ds-file-label"), "{px}: {html}");

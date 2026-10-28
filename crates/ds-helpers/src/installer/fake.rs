@@ -1,7 +1,7 @@
 //! A scripted installer: answers what it was told, records what it was asked, and may drop
 //! executables into a directory the caller gave it (a scratch `PATH` entry) when it "installs".
 
-use super::Request;
+use super::{BoxFuture, Install, Request};
 use crate::outcome::Outcome;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, PoisonError};
@@ -66,7 +66,7 @@ impl FakeInstaller {
             .clone()
     }
 
-    pub(super) fn install(&self, request: &Request) -> Outcome {
+    fn record(&self, request: &Request) -> Outcome {
         self.asked
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
@@ -80,6 +80,12 @@ impl FakeInstaller {
             (Outcome::Unsupported(_), _) => Outcome::Unsupported(request.missing.clone()),
             (outcome, _) => outcome.clone(),
         }
+    }
+}
+
+impl Install for FakeInstaller {
+    fn install<'a>(&'a self, request: &'a Request) -> BoxFuture<'a, Outcome> {
+        Box::pin(std::future::ready(self.record(request)))
     }
 }
 

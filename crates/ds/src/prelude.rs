@@ -71,7 +71,7 @@ pub use ds_motion::detail::operation::PendingToken;
 pub use crate::components::menus::menu::cursor::MenuCursor;
 
 // Fields
-pub use crate::components::chrome::column::model::{ColumnAlign, ColumnExtent, ColumnGap};
+pub use crate::components::chrome::column::model::{ColumnAlign, ColumnExtent};
 pub use crate::components::chrome::column::view::Column;
 pub use crate::components::editor::raw_keys::RawKeySurface;
 pub use crate::components::editor::surface::EditSurface;
@@ -156,7 +156,6 @@ pub use crate::components::chrome::path_control::model::{PathPart, PathSegment};
 pub use crate::components::chrome::path_control::view::PathControl;
 pub use crate::components::chrome::status_bar::StatusBar;
 pub use crate::components::chrome::status_bar_model::item_count_text;
-pub use crate::components::chrome::window_frame::TrafficLights;
 pub use crate::components::chrome::window_frame::WindowFrame;
 pub use crate::window::host::WindowHost;
 pub use crate::window::icon::WindowIcon;
@@ -185,7 +184,7 @@ pub use crate::spell::service::SpellService;
 pub use crate::window::host::HostWindow;
 
 // Controls, menus and root pieces a consumer draws that the groups above omit
-pub use crate::components::app::spaces::{NewSpace, Showing, SpacesHandle};
+pub use crate::components::app::spaces::{Showing, SpacesHandle};
 pub use crate::components::content::label::Label;
 pub use crate::components::controls::button::Button;
 pub use crate::components::controls::choice::Choice;
@@ -210,7 +209,7 @@ pub use crate::components::menus::palette::palette_host::CommandPaletteHost;
 pub use crate::components::menus::pick_list::PickList;
 pub use crate::components::menus::pull_down_button::{PullDownButton, PullDownFace};
 pub use crate::components::menus::search::model::{
-    CardPlace, Ends, EscapeOrder, InitialHighlight, Panel, SearchCursor, SuggestionSection,
+    CardPlace, EscapeOrder, InitialHighlight, Panel, SearchCursor, SuggestionSection,
     SuggestionsPresent,
 };
 pub use crate::components::menus::search::view::SearchField;

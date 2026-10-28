@@ -23,29 +23,12 @@ pub(crate) const BLINK_OFF: Duration = Duration::from_millis(500);
 /// How long the caret blinks after it last moved before it holds still.
 pub(crate) const BLINK_FOR: Duration = Duration::from_secs(10);
 
-/// Which half of the blink the caret is in.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Blink {
-    /// The caret shows (also: the field has no caret, or the blink has stopped).
-    On,
-    /// The caret is hidden for the off half.
-    Off,
-}
-
-impl Blink {
-    /// The wrap's `data-blink`.
-    pub(crate) fn attr(self) -> Option<&'static str> {
-        match self {
-            Blink::On => None,
-            Blink::Off => Some("off"),
-        }
-    }
-}
-
 /// A field's blink: its phase and the task that toggles it.
 #[derive(Clone, Copy)]
 pub(crate) struct CaretBlink {
-    phase: Signal<Blink>,
+    /// Whether the caret shows: `false` for the off half. (Also `true` when the field has no
+    /// caret or the blink has stopped.)
+    lit: Signal<bool>,
     task: CopyValue<Option<Task>>,
     level: Level,
     owner: ScopeId,
@@ -55,16 +38,16 @@ impl CaretBlink {
     /// The hook: one per field, kept across renders.
     pub(crate) fn use_new() -> Self {
         CaretBlink {
-            phase: use_signal(|| Blink::On),
+            lit: use_signal(|| true),
             task: use_hook(|| CopyValue::new(None)),
             level: use_level(),
             owner: use_hook(current_scope_id),
         }
     }
 
-    /// The phase now.
-    pub(crate) fn phase(&self) -> Blink {
-        (self.phase)()
+    /// The wrap's `data-blink`: `off` in the hidden half, absent otherwise.
+    pub(crate) fn attr(&self) -> Option<&'static str> {
+        (!(self.lit)()).then_some("off")
     }
 
     /// The caret arrived, moved or was typed at: it shows, and blinks again from the start.
@@ -73,16 +56,16 @@ impl CaretBlink {
         if self.level.now() == MotionLevel::Reduced {
             return;
         }
-        let phase = self.phase;
+        let lit = self.lit;
         let task = spawn_in(self.owner, async move {
             let blinks = BLINK_FOR.as_millis() / (BLINK_ON + BLINK_OFF).as_millis();
             for _ in 0..blinks {
                 sleep(BLINK_ON).await;
-                if try_set_if_changed(phase, Blink::Off).is_err() {
+                if try_set_if_changed(lit, false).is_err() {
                     return;
                 }
                 sleep(BLINK_OFF).await;
-                if try_set_if_changed(phase, Blink::On).is_err() {
+                if try_set_if_changed(lit, true).is_err() {
                     return;
                 }
             }
@@ -101,6 +84,6 @@ impl CaretBlink {
         if let Some(running) = slot.write().take() {
             running.cancel();
         }
-        let _ = try_set_if_changed(self.phase, Blink::On);
+        let _ = try_set_if_changed(self.lit, true);
     }
 }

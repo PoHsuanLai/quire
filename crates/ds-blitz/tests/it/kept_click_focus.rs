@@ -16,7 +16,7 @@ use ds::focus::request::use_focus_request;
 use ds::prelude::*;
 use ds_blitz::FocusFallback;
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -102,20 +102,10 @@ const TRAILING: &str = ".tree .ds-row-trailing .ds-button";
 fn pressed_focuses(selector: &str, logged: &str, focused: &str) {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, selector);
-    settle_until(&mut harness, |harness| {
-        harness.focus_of(focused) == FocusState::Focused
-    });
-    assert_eq!(
-        harness.focus_of("html"),
-        FocusState::Unfocused,
-        "the keyboard is not on html"
-    );
+    settle_until(&mut harness, |harness| harness.focus_of(focused));
+    assert!(!harness.focus_of("html"), "the keyboard is not on html");
     harness.advance(Duration::from_millis(100));
-    assert_eq!(
-        harness.focus_of(focused),
-        FocusState::Focused,
-        "{focused} kept the keyboard"
-    );
+    assert!(harness.focus_of(focused), "{focused} kept the keyboard");
     harness.send(Input::key(ShortcutKey::Char('j')));
     assert_eq!(
         harness.text_of(".log").as_deref(),
@@ -144,13 +134,9 @@ fn a_trailing_slot_click_focuses_the_button_in_it() {
 fn a_kept_click_takes_the_keyboard_from_the_app() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".blank");
-    settle_until(&mut harness, |harness| {
-        harness.focus_of(".app") == FocusState::Focused
-    });
+    settle_until(&mut harness, |harness| harness.focus_of(".app"));
     click(&mut harness, TRAILING);
-    settle_until(&mut harness, |harness| {
-        harness.focus_of(TRAILING) == FocusState::Focused
-    });
+    settle_until(&mut harness, |harness| harness.focus_of(TRAILING));
 }
 
 /// The negative control: under Blitz's own behaviour a kept click leaves the keyboard nowhere,
@@ -162,8 +148,7 @@ fn under_blitz_default_a_kept_click_leaves_the_keyboard_nowhere() {
         click(&mut harness, selector);
         harness.advance(Duration::from_millis(200));
         assert!(
-            harness.focus_of(selector) == FocusState::Unfocused
-                && harness.focus_of(".app") == FocusState::Unfocused,
+            !harness.focus_of(selector) && !harness.focus_of(".app"),
             "{selector}: Blitz's own default gives no control the keyboard"
         );
     }
@@ -217,9 +202,7 @@ fn renaming() -> Harness {
         Renaming,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
-    settle_until(&mut harness, |harness| {
-        harness.focus_of(FIELD) == FocusState::Focused
-    });
+    settle_until(&mut harness, |harness| harness.focus_of(FIELD));
     harness
 }
 
@@ -231,11 +214,7 @@ fn a_press_in_the_rename_field_reaches_the_apps_pointerup() {
     click(&mut harness, FIELD);
     harness.advance(Duration::from_millis(100));
     assert_eq!(harness.text_of(".log").as_deref(), Some("up"));
-    assert_eq!(
-        harness.focus_of(FIELD),
-        FocusState::Focused,
-        "the field kept the keyboard"
-    );
+    assert!(harness.focus_of(FIELD), "the field kept the keyboard");
 }
 
 /// A kept click with its default prevented cannot blur a field, so a field that has the
@@ -252,9 +231,5 @@ fn a_field_with_the_keyboard_keeps_it_through_a_kept_click() {
         harness.text_of(".log").as_deref(),
         Some("up,toggle:archive")
     );
-    assert_eq!(
-        harness.focus_of(FIELD),
-        FocusState::Focused,
-        "the field kept the keyboard"
-    );
+    assert!(harness.focus_of(FIELD), "the field kept the keyboard");
 }

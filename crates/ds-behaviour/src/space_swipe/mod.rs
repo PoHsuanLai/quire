@@ -17,7 +17,6 @@ mod tests;
 mod velocity;
 
 pub use model::{
-    PageMilli, PagesPerSecMilli, Reduced, Samples, Swipe, SwipeIn, SwipeOut, SwipeParams,
-    SwipeSource,
+    PageMilli, PagesPerSecMilli, Samples, Swipe, SwipeIn, SwipeOut, SwipeParams, SwipeSource,
 };
 pub use numbers::{commit, finish_duration, rubber};

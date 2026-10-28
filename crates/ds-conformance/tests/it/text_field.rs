@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::components::fields::text_field_model::Invalid;
 use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -93,9 +93,8 @@ fn a_search_field_clears_from_its_button_and_keeps_the_caret() {
         0,
         "nothing left to clear"
     );
-    assert_eq!(
+    assert!(
         harness.focus_of("#search input"),
-        FocusState::Focused,
         "the caret is back in the field"
     );
 }

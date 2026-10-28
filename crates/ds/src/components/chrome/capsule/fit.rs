@@ -30,15 +30,6 @@ const LEVEL: u32 = 96;
 /// The widest a capsule that holds a progress bar grows, `.ds-capsule[data-span=wide]`.
 const WIDE_MOST: u32 = 640;
 
-/// Whether one slot is drawn.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SlotShown {
-    /// Drawn.
-    Shown,
-    /// Not drawn: no room.
-    Dropped,
-}
-
 /// How wide one slot draws, at its narrowest.
 fn width_of<T>(slot: &CapsuleSlot<T>) -> u32 {
     match slot {
@@ -64,21 +55,21 @@ enum Last {
 }
 
 /// `shown` with every divider that is at an end or beside another dropped too.
-fn without_stray_dividers<T>(slots: &[RankedSlot<T>], shown: &[SlotShown]) -> Vec<SlotShown> {
+fn without_stray_dividers<T>(slots: &[RankedSlot<T>], shown: &[bool]) -> Vec<bool> {
     let mut tidy = shown.to_vec();
     let mut last = Last::Nothing;
     for (at, (one, state)) in slots.iter().zip(shown).enumerate() {
-        if *state == SlotShown::Dropped {
+        if !*state {
             continue;
         }
         match (&one.slot, last) {
             (CapsuleSlot::Divider, Last::Control) => last = Last::Divider(at),
-            (CapsuleSlot::Divider, _) => tidy[at] = SlotShown::Dropped,
+            (CapsuleSlot::Divider, _) => tidy[at] = false,
             _ => last = Last::Control,
         }
     }
     if let Last::Divider(at) = last {
-        tidy[at] = SlotShown::Dropped;
+        tidy[at] = false;
     }
     tidy
 }
@@ -86,11 +77,11 @@ fn without_stray_dividers<T>(slots: &[RankedSlot<T>], shown: &[SlotShown]) -> Ve
 /// Whether the slots `shown` fit a stage `stage` pixels wide at their narrowest: the capsule's
 /// padding, a gap between slots and each slot at its least, in the room the stage leaves, which
 /// a capsule with a progress bar caps.
-fn fits<T>(slots: &[RankedSlot<T>], shown: &[SlotShown], stage: u32) -> bool {
+fn fits<T>(slots: &[RankedSlot<T>], shown: &[bool], stage: u32) -> bool {
     let drawn: Vec<&CapsuleSlot<T>> = slots
         .iter()
         .zip(shown)
-        .filter(|(_, state)| **state == SlotShown::Shown)
+        .filter(|(_, state)| **state)
         .map(|(one, _)| &one.slot)
         .collect();
     let gaps = u32::try_from(drawn.len().saturating_sub(1)).unwrap_or(u32::MAX) * S4;
@@ -125,8 +116,8 @@ fn ranks<T>(slots: &[RankedSlot<T>]) -> Vec<u8> {
 /// alike never thins piecemeal); dividers left with nothing to divide go with them. Essential
 /// slots stay however narrow the stage, and with no width to go by (the stage is not measured
 /// yet) every slot shows.
-pub fn fit<T>(slots: &[RankedSlot<T>], stage: Option<u32>) -> Vec<SlotShown> {
-    let mut shown = vec![SlotShown::Shown; slots.len()];
+pub fn fit<T>(slots: &[RankedSlot<T>], stage: Option<u32>) -> Vec<bool> {
+    let mut shown = vec![true; slots.len()];
     let Some(stage) = stage else {
         return shown;
     };
@@ -137,7 +128,7 @@ pub fn fit<T>(slots: &[RankedSlot<T>], stage: Option<u32>) -> Vec<SlotShown> {
         }
         for (state, one) in shown.iter_mut().zip(slots) {
             if one.priority == SlotPriority::Droppable(rank) {
-                *state = SlotShown::Dropped;
+                *state = false;
             }
         }
         tidy = without_stray_dividers(slots, &shown);

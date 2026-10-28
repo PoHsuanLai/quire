@@ -34,7 +34,7 @@ pub(crate) fn area(field: Field, value: &str) -> Element {
             "data-size": size.slug(),
             "data-kind": "multiline",
             "data-rows": rows.slug(),
-            "data-blink": blink.phase().attr(),
+            "data-blink": blink.attr(),
             textarea {
                 id,
                 class: "ds-input",

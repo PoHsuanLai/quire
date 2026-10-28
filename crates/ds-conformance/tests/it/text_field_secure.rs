@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -55,7 +55,7 @@ fn a_secret_is_typed_and_heard_but_never_written_into_the_markup() {
     let field = "#secret input";
     harness.send(Input::click(harness.centre(field).expect("the field")));
     harness.advance(ms(30));
-    assert_eq!(harness.focus_of(field), FocusState::Focused);
+    assert!(harness.focus_of(field));
     assert_eq!(harness.attr(field, "value"), None, "no value before typing");
 
     type_text(&mut harness, "abc");

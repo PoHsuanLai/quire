@@ -837,7 +837,7 @@ own caret and selection. The route needs no Blitz fork.
   markup resurrected inside the frame's own document, where the network is sealed and navigation
   frozen.
 - **Links.** Blitz's `IframeNavigationProvider` reloads a frame with a clicked link's target;
-  ds-blitz replaces it, so a frame never navigates: `FrameLinks::Inert` does nothing, and
+  ds-blitz replaces it, so a frame never navigates: `FrameLinks::default()` does nothing, and
   `Intercept` hands the app a `FrameLink { frame, tag, href, text, title }` through a channel,
   with the document free. The navigation provider hears only a URL, so the text is read at
   delivery (the anchor under the frame's hover node, else the focused one, else the first

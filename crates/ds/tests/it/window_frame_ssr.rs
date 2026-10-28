@@ -12,7 +12,7 @@ use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::prelude::*;
 use ds::window::host::use_window_host_provider;
-use ds::window::vocab::{Maximized, Support, TileError, WindowTile, Zoom};
+use ds::window::vocab::{Maximized, TileError, WindowTile, Zoom};
 use std::rc::Rc;
 
 /// A host that does nothing and reports `maximized`.
@@ -27,8 +27,8 @@ impl HostWindow for Still {
     fn tile(&self, _: WindowTile) -> Result<(), TileError> {
         Err(TileError::Unsupported)
     }
-    fn supports(&self, _: WindowTile) -> Support {
-        Support::No
+    fn supports(&self, _: WindowTile) -> bool {
+        false
     }
     fn state(&self) -> WindowState {
         WindowState {
@@ -38,7 +38,7 @@ impl HostWindow for Still {
     }
 }
 
-fn window(lights: TrafficLights) -> Element {
+fn window(lights: Shown) -> Element {
     rsx! {
         Ds {
             appearance: Appearance::default(),
@@ -55,14 +55,14 @@ type Case = (&'static str, fn() -> Element);
 
 const CASES: &[Case] = &[
     ("controls/window_frame/lights.html", || {
-        window(TrafficLights::Shown)
+        window(Shown::Visible)
     }),
     ("controls/window_frame/no-lights.html", || {
-        window(TrafficLights::Hidden)
+        window(Shown::Hidden)
     }),
     ("controls/window_frame/maximized.html", || {
         use_window_host_provider(|| Rc::new(Still(Maximized::On)));
-        window(TrafficLights::Shown)
+        window(Shown::Visible)
     }),
 ];
 

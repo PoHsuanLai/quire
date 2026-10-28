@@ -103,8 +103,8 @@ pub use files::{
 };
 pub use helpers::Helpers;
 pub use install_line::InstallLine;
-pub use installer::{FakeInstaller, Installer, PackageKit, Request, StandIn, Timeouts};
+pub use installer::{BoxFuture, FakeInstaller, Install, PackageKit, Request, StandIn, Timeouts};
 pub use os_release::OsRelease;
 pub use outcome::{Missing, Outcome};
-pub use probe::{Environment, ToolPresence};
+pub use probe::Environment;
 pub use watch::{Availability, Subscription};

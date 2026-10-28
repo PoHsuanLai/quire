@@ -5,8 +5,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{
-    AppNet, FrameLink, FrameLinks, FrameTag, NetDecision, NetPolicy, NetReply, NetRequest,
-    RequestOrigin,
+    AppNet, FrameId, FrameLink, FrameLinks, FrameTag, NetDecision, NetPolicy, NetReply, NetRequest,
 };
 use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
@@ -47,7 +46,7 @@ fn Reader() -> Element {
 }
 
 /// One request as the app saw it.
-type Seen = (RequestOrigin, Option<FrameTag>, String);
+type Seen = (Option<FrameId>, Option<FrameTag>, String);
 
 /// Every request put to it, refused.
 #[derive(Default)]
@@ -105,12 +104,12 @@ fn each_frames_request_carries_its_tag() {
         seen,
         vec![
             (
-                RequestOrigin::Frame(first),
+                Some(first),
                 tag("msg-1"),
                 "https://example.org/first.png".to_owned()
             ),
             (
-                RequestOrigin::Frame(second),
+                Some(second),
                 tag("msg-2"),
                 "https://example.org/second.png".to_owned()
             ),

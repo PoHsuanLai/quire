@@ -11,7 +11,7 @@ use ds::host::measure::Anchor;
 use ds::prelude::*;
 use ds::style::icon::url::IconUrl;
 use ds_blitz::FocusFallback;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use probe::rect;
 use std::time::Duration;
 
@@ -268,17 +268,15 @@ fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
 /// Opens the actions menu with Tab (a key the palette hands on), checks the menu is at the
 /// selected row and has the keyboard, and closes it with Escape.
 fn open_and_close_actions(harness: &mut Harness) {
-    assert_eq!(
+    assert!(
         harness.focus_of("#launcher-card .ds-input"),
-        FocusState::Focused,
         "the field starts focused"
     );
     harness.send(Input::key(ShortcutKey::Tab));
     settle_in(harness);
     assert!(log(harness).contains("key:Tab"), "{}", log(harness));
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-popover.ds-menu"),
-        FocusState::Focused,
         "the menu took the keyboard"
     );
     let menu = rect(harness, ".ds-popover.ds-menu");
@@ -309,9 +307,8 @@ fn a_focus_request_gives_the_field_the_keyboard_back() {
         Some("present")
     );
     open_and_close_actions(&mut harness);
-    assert_eq!(
+    assert!(
         harness.focus_of("#launcher-card .ds-input"),
-        FocusState::Focused,
         "focus came back"
     );
     assert_eq!(
@@ -327,9 +324,8 @@ fn a_focus_request_gives_the_field_the_keyboard_back() {
     );
     kept.advance(ms(700));
     open_and_close_actions(&mut kept);
-    assert_eq!(
-        kept.focus_of("#launcher-card .ds-input"),
-        FocusState::Unfocused,
+    assert!(
+        !kept.focus_of("#launcher-card .ds-input"),
         "without the request the field stays unfocused"
     );
     let mut handed = Harness::new(
@@ -338,9 +334,8 @@ fn a_focus_request_gives_the_field_the_keyboard_back() {
     );
     handed.advance(ms(700));
     open_and_close_actions(&mut handed);
-    assert_eq!(
+    assert!(
         handed.focus_of("#launcher-card .ds-input"),
-        FocusState::Focused,
         "the host handed the removed menu's keyboard back to the field"
     );
 }

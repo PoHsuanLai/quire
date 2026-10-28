@@ -1,5 +1,5 @@
 //! The window seam's vocabulary: what a frame asks of its host (`ResizeEdge`, `Zoom`,
-//! `WindowTile`) and what the host reports back (`WindowState`, `Support`, `TileError`). Closed
+//! `WindowTile`) and what the host reports back (`WindowState`, `TileError`). Closed
 //! sets, so a host that is not ds-blitz (shell-host's `SurfaceHandle`) maps each one exhaustively.
 
 use ds_core::vocab::Activity;
@@ -73,15 +73,6 @@ pub enum TileError {
     /// read or set its own position (FINDINGS "Window frame").
     #[error("the platform does not let this window place itself there")]
     Unsupported,
-}
-
-/// Whether a host can do something, asked before offering it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Support {
-    /// It can.
-    Yes,
-    /// It cannot: the control is shown unavailable.
-    No,
 }
 
 /// Whether the window fills its output's work area.

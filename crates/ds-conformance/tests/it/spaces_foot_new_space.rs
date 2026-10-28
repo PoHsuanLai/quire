@@ -1,5 +1,5 @@
 //! The Space foot on a real Blitz document: its New Space button is drawn by default and left
-//! out by `NewSpace::Hidden`, which keeps the dots; with one Space it draws no dots at all.
+//! out by `Shown::Hidden`, which keeps the dots; with one Space it draws no dots at all.
 
 use dioxus::prelude::*;
 use ds::components::app::spaces::{Spaces, SpacesFoot, Switched, use_spaces};
@@ -13,7 +13,7 @@ const VIEW: Viewport = Viewport {
     scale_percent: 100,
 };
 
-fn foot(new_space: NewSpace, count: usize) -> Element {
+fn foot(new_space: Shown, count: usize) -> Element {
     let spaces = use_spaces(
         move || Spaces::first_run((0..count).map(|_| ()), || ()),
         |_| {},
@@ -32,17 +32,17 @@ fn foot(new_space: NewSpace, count: usize) -> Element {
 
 #[allow(non_snake_case)]
 fn WithPlus() -> Element {
-    foot(NewSpace::Shown, 3)
+    foot(Shown::Visible, 3)
 }
 
 #[allow(non_snake_case)]
 fn WithoutPlus() -> Element {
-    foot(NewSpace::Hidden, 3)
+    foot(Shown::Hidden, 3)
 }
 
 #[allow(non_snake_case)]
 fn OneSpace() -> Element {
-    foot(NewSpace::Shown, 1)
+    foot(Shown::Visible, 1)
 }
 
 fn started(app: fn() -> Element) -> Harness {

@@ -8,7 +8,7 @@
 use dioxus::prelude::*;
 use ds::components::content::provider_mark::MarkProvider;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use ds_shell::accounts::model::{
     AccountChoice, AllowScope, ChoiceKey, ConsentAnswer, CopyState, FieldRole, FieldText,
     FormField, Limitation, ProviderEntry, ProviderKey, ProviderPick, Requirement, ServiceKey,
@@ -284,12 +284,7 @@ fn click(harness: &mut Harness, selector: &str) {
 #[test]
 fn the_form_opens_with_the_keyboard_on_the_first_field() {
     let harness = start(SignIn);
-    assert_eq!(
-        harness.focus_of(".ds-acc-step input"),
-        FocusState::Focused,
-        "{}",
-        harness.html()
-    );
+    assert!(harness.focus_of(".ds-acc-step input"), "{}", harness.html());
 }
 
 #[test]
@@ -380,9 +375,8 @@ fn a_host_that_empties_the_password_empties_the_field() {
 #[test]
 fn the_consent_alert_starts_on_allow_once_and_return_allows_the_first_account_once() {
     let mut harness = start(Consent);
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-alert-slot:nth-child(1) > .ds-button"),
-        FocusState::Focused,
         "Allow Once is the default"
     );
     press(&mut harness, ShortcutKey::Enter);
@@ -437,9 +431,8 @@ fn this_session_only_answers_the_session_scope() {
 #[test]
 fn the_search_narrows_the_list_and_return_picks_the_first_match() {
     let mut harness = start(Providers);
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-acc-step input"),
-        FocusState::Focused,
         "the search takes the keyboard"
     );
     let rows = |harness: &Harness| harness.count(".ds-acc-step .ds-avatar");
@@ -537,9 +530,8 @@ fn down_in_the_search_moves_the_cursor_through_the_rows_and_return_picks_it() {
     let mut harness = start(Providers);
     press(&mut harness, ShortcutKey::Down);
     press(&mut harness, ShortcutKey::Down);
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-acc-step input"),
-        FocusState::Focused,
         "the keyboard stays in the search"
     );
     press(&mut harness, ShortcutKey::Enter);

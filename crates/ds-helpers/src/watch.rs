@@ -2,7 +2,6 @@
 //! runtime behind it, so any executor drives it.
 
 use crate::capability::CapabilityName;
-use crate::probe::ToolPresence;
 use std::collections::HashMap;
 use std::future::poll_fn;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
@@ -13,13 +12,13 @@ use std::task::{Poll, Waker};
 pub struct Availability {
     /// The capability whose tool changed.
     pub capability: CapabilityName,
-    /// How it is now.
-    pub presence: ToolPresence,
+    /// Whether its tool is on `PATH` now.
+    pub present: bool,
 }
 
 #[derive(Debug, Default)]
 struct State {
-    known: HashMap<CapabilityName, ToolPresence>,
+    known: HashMap<CapabilityName, bool>,
     log: Vec<Availability>,
     wakers: Vec<Waker>,
 }
@@ -33,22 +32,22 @@ impl Log {
         self.0.lock().unwrap_or_else(PoisonError::into_inner)
     }
 
-    /// Record `presence`; announce it when it differs from the last one recorded (the first
+    /// Record `present`; announce it when it differs from the last one recorded (the first
     /// sighting of a capability is announced only when the tool is present).
-    pub(crate) fn record(&self, capability: &CapabilityName, presence: ToolPresence) {
+    pub(crate) fn record(&self, capability: &CapabilityName, present: bool) {
         let wakers = {
             let mut state = self.state();
-            let before = state.known.insert(capability.clone(), presence);
+            let before = state.known.insert(capability.clone(), present);
             let changed = match before {
-                Some(before) => before != presence,
-                None => presence == ToolPresence::Present,
+                Some(before) => before != present,
+                None => present,
             };
             if !changed {
                 return;
             }
             state.log.push(Availability {
                 capability: capability.clone(),
-                presence,
+                present,
             });
             std::mem::take(&mut state.wakers)
         };

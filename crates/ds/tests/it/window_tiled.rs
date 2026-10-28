@@ -5,7 +5,7 @@ use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::window::host::{use_window_host_provider, use_window_tiled};
 use ds::window::tiled::{TileEdge, Tiled};
-use ds::window::vocab::{ResizeEdge, Support, TileError, WindowTile, Zoom};
+use ds::window::vocab::{ResizeEdge, TileError, WindowTile, Zoom};
 use ds_core::word::Word;
 use std::rc::Rc;
 
@@ -21,8 +21,8 @@ impl HostWindow for Tiling {
     fn tile(&self, _: WindowTile) -> Result<(), TileError> {
         Err(TileError::Unsupported)
     }
-    fn supports(&self, _: WindowTile) -> Support {
-        Support::No
+    fn supports(&self, _: WindowTile) -> bool {
+        false
     }
     fn state(&self) -> WindowState {
         WindowState::default()

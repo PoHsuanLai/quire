@@ -4,7 +4,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use ds_helpers::mime::loader::mimeapps_paths;
-use ds_helpers::mime::{Associations, DesktopId, Installed, LoadError, MimeDb, NameGuess, XdgDirs};
+use ds_helpers::mime::{Associations, DesktopId, LoadError, MimeDb, NameGuess, XdgDirs};
 
 use super::{mt, name};
 
@@ -116,13 +116,7 @@ fn associations_load_files_and_caches_and_skip_uninstalled() {
         "usr/share/applications/mimeinfo.cache",
         "[MIME Cache]\ntext/plain=cached.desktop;\n",
     );
-    let installed = |id: &DesktopId| {
-        if id.as_str() == "kate.desktop" {
-            Installed::No
-        } else {
-            Installed::Yes
-        }
-    };
+    let installed = |id: &DesktopId| id.as_str() != "kate.desktop";
     let assoc = Associations::load(&dirs(&root), installed);
     let db = MimeDb::default();
     let want = ["gedit.desktop", "cached.desktop"].map(|t| DesktopId::new(t).unwrap());

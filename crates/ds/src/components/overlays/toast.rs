@@ -16,7 +16,7 @@
 //! instead of the bottom right: a sheet's buttons are at its bottom, and a toast over them would
 //! take the next press (its hold pauses under a still pointer).
 
-use crate::components::overlays::swipe_glue::{SwipeOn, use_swipe_glue};
+use crate::components::overlays::swipe_glue::use_swipe_glue;
 use crate::stack::host::use_overlays;
 use crate::stack::toast_hub::{ToastAction, ToastHub, ToastState, use_toast_hub};
 use dioxus::prelude::*;
@@ -61,7 +61,7 @@ pub fn ToastHost() -> Element {
         None,
     );
     let swipe = use_swipe_glue(
-        SwipeOn::Yes,
+        true,
         SwipeMetrics::default(),
         EventHandler::new(move |()| hub.hide()),
     );

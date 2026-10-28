@@ -8,18 +8,18 @@ use ds_core::machine::Machine;
 use ds_core::time::stamp::Stamp;
 
 use super::{
-    PageMilli, PagesPerSecMilli, Reduced, Swipe, SwipeIn, SwipeOut, SwipeParams, SwipeSource,
-    commit, finish_duration, rubber,
+    PageMilli, PagesPerSecMilli, Swipe, SwipeIn, SwipeOut, SwipeParams, SwipeSource, commit,
+    finish_duration, rubber,
 };
 
 const FOUR: SwipeParams = SwipeParams {
     spaces: 4,
-    reduced: Reduced::No,
+    reduced: false,
 };
 
 const FOUR_REDUCED: SwipeParams = SwipeParams {
     spaces: 4,
-    reduced: Reduced::Yes,
+    reduced: true,
 };
 
 const MOUSE: SwipeIn = SwipeIn::Began {

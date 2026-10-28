@@ -8,16 +8,8 @@ use super::db::MimeDb;
 use super::mimeapps::{MimeApps, MimeCache};
 use crate::desktop_entries::DesktopId;
 
-/// Whether an app is installed.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Installed {
-    /// Its desktop file exists.
-    Yes,
-    /// It does not.
-    No,
-}
-
-type InstalledCheck = dyn Fn(&DesktopId) -> Installed + Send + Sync;
+/// Whether an app is installed: its desktop file exists.
+type InstalledCheck = dyn Fn(&DesktopId) -> bool + Send + Sync;
 
 /// The `mimeapps.list` files and `mimeinfo.cache` files, in precedence order, and the check for
 /// an app being installed.
@@ -41,7 +33,7 @@ impl Associations {
     pub fn new(
         files: Vec<MimeApps>,
         caches: Vec<MimeCache>,
-        installed: impl Fn(&DesktopId) -> Installed + Send + Sync + 'static,
+        installed: impl Fn(&DesktopId) -> bool + Send + Sync + 'static,
     ) -> Associations {
         Associations {
             files,
@@ -90,7 +82,7 @@ impl Associations {
         }
         let mut apps: Vec<DesktopId> = Vec::new();
         for id in found {
-            if !apps.contains(&id) && (self.installed)(&id) == Installed::Yes {
+            if !apps.contains(&id) && (self.installed)(&id) {
                 apps.push(id);
             }
         }

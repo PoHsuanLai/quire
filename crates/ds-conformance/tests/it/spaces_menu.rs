@@ -7,7 +7,7 @@ use crate::support::spaces_page::{EditedOnAPage, One, Three, WithAccounts};
 use dioxus::prelude::Element;
 use ds::base::press::PointerButton;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -303,7 +303,7 @@ fn key(harness: &mut Harness, key: ShortcutKey) {
 }
 
 fn focused(harness: &Harness, selector: &str) -> bool {
-    harness.focus_of(selector) == FocusState::Focused
+    harness.focus_of(selector)
 }
 
 /// Open the menu, check it took the keyboard, and pick `row`.

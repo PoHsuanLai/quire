@@ -59,6 +59,5 @@ pub use input::{
     ImeInput, Input, KeyInput, PasteChord, PointerAction, PointerInput, RawKeyInput, RawKeyPhase,
 };
 pub use painter::PaintTime;
-pub use query::{ClassPresence, FocusState};
 pub use recorded_window::WindowHosting;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_placed, snapshot_with};

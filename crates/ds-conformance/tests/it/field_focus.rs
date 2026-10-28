@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::focus::request::use_focus_request;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -61,13 +61,13 @@ fn a_click_and_the_seam_both_report_focus_and_a_click_reports_blur() {
     let mut harness = Harness::new(Fields, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     assert_eq!(log(&harness), "focus:c", "the seam focused c on mount");
-    assert_eq!(harness.focus_of("#c input"), FocusState::Focused);
+    assert!(harness.focus_of("#c input"));
 
     let a = harness.centre("#a input").expect("the field");
     harness.send(Input::click(a));
     harness.advance(ms(50));
     assert_eq!(log(&harness), "focus:c,blur:c,focus:a");
-    assert_eq!(harness.focus_of("#a input"), FocusState::Focused);
+    assert!(harness.focus_of("#a input"));
 
     let b = harness.centre("#b input").expect("the field");
     harness.send(Input::click(b));
@@ -90,12 +90,7 @@ fn a_controlled_request_still_focuses_and_reports_it() {
     let button = harness.centre(".ds-button").expect("the request button");
     harness.send(Input::click(button));
     harness.advance(ms(100));
-    assert_eq!(
-        harness.focus_of("#c input"),
-        FocusState::Focused,
-        "{}",
-        harness.html()
-    );
+    assert!(harness.focus_of("#c input"), "{}", harness.html());
     let after = log(&harness);
     let added = after.strip_prefix(&before).unwrap_or(&after);
     assert!(

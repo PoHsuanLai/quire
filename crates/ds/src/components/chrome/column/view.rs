@@ -4,19 +4,20 @@
 //! Markup: `div.ds-column[data-align=start|center|end][data-gap=none][data-extent=fill|fixed]
 //! [data-size]` of `children`; a stepped gap enters as the custom property `--column-gap`.
 
-use crate::components::chrome::column::model::{ColumnAlign, ColumnExtent, ColumnGap};
+use crate::components::chrome::column::model::{ColumnAlign, ColumnExtent};
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::tokens::spacing::SpacingToken;
 
-/// A vertical stack: `gap` between children (a spacing step, 8 px unless given; `ColumnGap::None`
+/// A vertical stack: `gap` between children (a spacing step, 8 px unless given; `None`
 /// for none), `align` across the width (stretched unless given), `extent` along its height (as
 /// tall as the children unless given). `oncontextmenu` hears a right click anywhere in the column
 /// and keeps it from reaching the menu of whatever holds the column.
 #[component]
 pub fn Column(
     children: Element,
-    #[props(into, default)] gap: ColumnGap,
+    #[props(default = Some(SpacingToken::S8))] gap: Option<SpacingToken>,
     #[props(default)] align: ColumnAlign,
     #[props(default)] extent: ColumnExtent,
     #[props(default)] oncontextmenu: Option<EventHandler<MouseEvent>>,
@@ -24,17 +25,14 @@ pub fn Column(
 ) -> Element {
     let data = common.data_attributes();
     let (extent_kind, extent_size) = extent.attributes();
-    let gap_style = match gap {
-        ColumnGap::None => None,
-        ColumnGap::Step(step) => Some(format!("--column-gap:var({})", step.var().as_str())),
-    };
+    let gap_style = gap.map(|step| format!("--column-gap:var({})", step.var().as_str()));
     rsx! {
         div {
             id: common.id.clone(),
             class: common.class("ds-column"),
             style: gap_style,
             "aria-label": common.aria_label.clone(),
-            "data-gap": (gap == ColumnGap::None).then_some("none"),
+            "data-gap": gap.is_none().then_some("none"),
             "data-extent": extent_kind,
             "data-size": extent_size,
             "data-align": (align != ColumnAlign::Stretch).then(|| align.slug()),

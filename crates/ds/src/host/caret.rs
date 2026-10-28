@@ -71,25 +71,17 @@ pub enum FieldSelection {
 }
 
 /// Where a caret at byte `focus` of `text`, with the selection `collapsed` or not, sits.
-pub fn caret_at(text: &str, focus: usize, collapsed: Collapsed) -> Caret {
-    match collapsed {
-        Collapsed::Yes if focus >= text.len() => Caret::AtEnd,
-        Collapsed::Yes | Collapsed::No => Caret::Inside,
+pub fn caret_at(text: &str, focus: usize, collapsed: bool) -> Caret {
+    if collapsed && focus >= text.len() {
+        Caret::AtEnd
+    } else {
+        Caret::Inside
     }
-}
-
-/// Whether a field's selection is a bare caret.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Collapsed {
-    /// A caret, no characters selected.
-    Yes,
-    /// One character or more selected.
-    No,
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Caret, Collapsed, caret_at, stem_end};
+    use super::{Caret, caret_at, stem_end};
 
     #[test]
     fn a_stem_ends_at_the_last_dot_that_does_not_start_the_name() {
@@ -109,15 +101,15 @@ mod tests {
 
     #[test]
     fn only_a_bare_caret_after_the_last_character_is_at_the_end() {
-        const CASES: &[(&str, usize, Collapsed, Caret)] = &[
-            ("", 0, Collapsed::Yes, Caret::AtEnd),
-            ("abc", 3, Collapsed::Yes, Caret::AtEnd),
-            ("abc", 1, Collapsed::Yes, Caret::Inside),
-            ("abc", 0, Collapsed::Yes, Caret::Inside),
-            ("abc", 3, Collapsed::No, Caret::Inside),
+        const CASES: &[(&str, usize, bool, Caret)] = &[
+            ("", 0, true, Caret::AtEnd),
+            ("abc", 3, true, Caret::AtEnd),
+            ("abc", 1, true, Caret::Inside),
+            ("abc", 0, true, Caret::Inside),
+            ("abc", 3, false, Caret::Inside),
             // Bytes, not characters: "é" is two.
-            ("é", 2, Collapsed::Yes, Caret::AtEnd),
-            ("é", 1, Collapsed::Yes, Caret::Inside),
+            ("é", 2, true, Caret::AtEnd),
+            ("é", 1, true, Caret::Inside),
         ];
         for &(text, focus, collapsed, want) in CASES {
             assert_eq!(caret_at(text, focus, collapsed), want, "{text:?} {focus}");

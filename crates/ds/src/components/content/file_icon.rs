@@ -42,28 +42,8 @@ pub enum FileIconChoice {
     Artwork(ImageSource),
 }
 
-/// Whether the extension label is drawn at a size.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub enum LabelFit {
-    /// Room for it: 48 px and up.
-    Shown,
-    /// Too small to read; the mark takes the room.
-    Hidden,
-}
-
-impl LabelFit {
-    /// The smallest side that draws the label.
-    pub const MIN_PX: u8 = 48;
-
-    /// The fit at a side of `px`.
-    pub fn at(px: u8) -> LabelFit {
-        if px >= LabelFit::MIN_PX {
-            LabelFit::Shown
-        } else {
-            LabelFit::Hidden
-        }
-    }
-}
+/// The smallest side that draws the extension label; under it the mark takes the room.
+pub const LABEL_MIN_PX: u8 = 48;
 
 impl FileIconChoice {
     /// The `data-choice` word.
@@ -109,7 +89,7 @@ pub fn FileIcon(
     #[props(default)] common: Common,
 ) -> Element {
     let px = size.px();
-    let fit = LabelFit::at(px);
+    let fit = px >= LABEL_MIN_PX;
     let name = common.aria_label.clone().unwrap_or_else(|| choice.name());
     let data = common.data_attributes();
     let mounted = common.clone();
@@ -123,7 +103,7 @@ pub fn FileIcon(
             "data-choice": choice.slug(),
             "data-kind": choice.kind_slug(),
             "data-size": "{px}",
-            "data-label": fit.slug(),
+            "data-label": if fit { "shown" } else { "hidden" },
             "data-icon-style": style.slug(),
             style: inline,
             onmounted: move |event| mounted.mounted(event),

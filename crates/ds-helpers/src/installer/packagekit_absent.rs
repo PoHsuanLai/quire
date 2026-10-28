@@ -1,7 +1,7 @@
 //! The PackageKit backend's stand-in for a build without `quire-desktop`: no D-Bus client, so
 //! every install is [`Outcome::Unsupported`], the answer the app already handles.
 
-use super::{Request, Timeouts};
+use super::{BoxFuture, Install, Request, Timeouts};
 use crate::outcome::Outcome;
 
 /// The PackageKit backend, absent: it installs nothing.
@@ -19,8 +19,12 @@ impl PackageKit {
         let _ = timeouts;
         self
     }
+}
 
-    pub(super) async fn install(&self, request: &Request) -> Outcome {
-        Outcome::Unsupported(request.missing.clone())
+impl Install for PackageKit {
+    fn install<'a>(&'a self, request: &'a Request) -> BoxFuture<'a, Outcome> {
+        Box::pin(std::future::ready(Outcome::Unsupported(
+            request.missing.clone(),
+        )))
     }
 }

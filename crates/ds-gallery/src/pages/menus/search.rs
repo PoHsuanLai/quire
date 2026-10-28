@@ -196,7 +196,7 @@ fn HostShownSearch() -> Element {
                     placeholder: "Search mail, people",
                     suggestions: sections(&query()),
                     open: Panel::Shown,
-                    ends: Ends::Stop,
+                    stop_at_ends: true,
                     oninput: move |next: String| query.set(next),
                     onpick: move |value: String| picked.set(format!("picked {value}")),
                 }

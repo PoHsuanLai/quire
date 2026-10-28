@@ -146,14 +146,5 @@ pub struct SwipeParams {
     pub spaces: u32,
     /// Reduced motion: no live slide and no finish; a commit settles at once and the caller
     /// cross-fades (design/27 §3.1).
-    pub reduced: Reduced,
-}
-
-/// Whether motion is reduced.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Reduced {
-    /// Full motion.
-    No,
-    /// Reduced motion.
-    Yes,
+    pub reduced: bool,
 }

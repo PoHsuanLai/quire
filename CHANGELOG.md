@@ -3,6 +3,38 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.55 (unreleased)
+
+### wh-qres2
+
+- **ds-blitz `use_resolved`.** A component builds a value from the tokens its element sees with `use_resolved(|t: &Lookup| ..)`, gives `ResolvedTokens::mounted` to the element's `onmounted`, and reads `ResolvedTokens::value()` in render (`None` until the first frame after mount). The frame phase runs the reader after every resolved frame, outside render, and sets the signal only when the value changed, so a restyle re-renders the component with the new values and nothing waits on a timer. `Tokens` stays for reads in a handler or a task; its docs now say a read during render is always `None` (the document is borrowed then). The headless `Harness` provides the frame phase as a root context, as a window does.
+
+### wh-qw2
+
+Public items that were two-way enums, mirror types or enum-wrapped trait objects become plain Rust (bool, Option, a trait) under the 2026-10-28 type rule. Wire, JSON and TOML shapes, stylesheet class names and settings keys are unchanged.
+
+- **ds-blitz frame events.** `FrameLinks` is a struct of optional handlers: `FrameLinks::intercept(click)` plus `.with_hover(..)`, `.with_context_menu(..)` and `.with_image_click(..)` build it as before, and `FrameLinks::default()` is the inert set (the old `FrameLinks::Inert`; the `with_*` calls still do nothing on it). `FrameHover`, `FrameHoverHandler`, `FrameImages`, `FrameImageHandler`, `FrameMenu`, `FrameMenuHandler` and `FrameLinkHandler` are deleted; one alias `FrameHandler<E> = Arc<dyn Fn(E) + Send + Sync>` stands for them, and `FrameLinks::hover()`, `menu()` and `images()` return `Option<FrameHandler<..>>`. The seam `report_frame_hover`, `report_frame_menu` and `report_frame_image` take `Option<&FrameHandler<..>>`.
+  **Consumer change:** `FrameLinks::Inert` becomes `FrameLinks::default()`.
+- **`RequestOrigin` is gone.** `NetRequest::origin()` returns `Option<FrameId>`: `None` for the app's own document, `Some(frame)` for a frame.
+  **Consumer change:** `RequestOrigin::Top` becomes `None`, `RequestOrigin::Frame(f)` becomes `Some(f)`, and a stored `RequestOrigin` becomes `Option<FrameId>`.
+- **`Shown` replaces three copies.** `TrafficLights` (`Shown`/`Hidden`), `NewSpace` and `TilePose` (`Closed`/`Open`) are deleted; `WindowFrame::titlebar(title, lights)`, `WindowTitlebar { lights, pose }` and `SpacesFoot { new_space }` take `ds_core::vocab::Shown`, and their defaults are unchanged (lights and `+` visible, tiling menu closed).
+  **Consumer change:** `TrafficLights::Shown` and `NewSpace::Shown` become `Shown::Visible`; `TrafficLights::Hidden`, `NewSpace::Hidden` stay `Shown::Hidden`; `TilePose::Open` becomes `Shown::Visible`.
+- **`ButtonFocus` and `ListFocus` are `autofocus: bool`.** `Button { focus: ButtonFocus::OnMount }` is `Button { autofocus: true }`, and `List { focus: ListFocus::OnMount }` is `List { autofocus: true }`. `FieldFocus` is unchanged (it has a third state).
+- **ds-helpers installer is a trait.** `Installer` is deleted. `trait Install` (with `BoxFuture`) is implemented by `PackageKit` and `FakeInstaller`; `Helpers::new(catalog, environment, installer: impl Install + 'static)` keeps the backend behind an `Arc<dyn Install>`, so `Helpers` stays one type.
+  **Consumer change:** `Installer::PackageKit(PackageKit::system())` becomes `PackageKit::system()`; `Installer::Fake(fake)` becomes `fake`.
+- **`ToolPresence` is `bool`.** `Helpers::available` and `Helpers::refresh` return `bool`, and `Availability { capability, present: bool }` replaces `presence: ToolPresence`.
+  **Consumer change:** `change.presence != ToolPresence::Present` becomes `!change.present`.
+- **`ds_helpers::mime::Installed` is `bool`.** The `installed` check of `Associations::new` and `Associations::load` returns `bool`.
+- **ds-harness.** `Harness::has_class` and `Harness::focus_of` return `bool`; `ClassPresence` and `FocusState` are deleted.
+  **Consumer change:** `h.focus_of(sel) == FocusState::Focused` becomes `h.focus_of(sel)`, `assert_eq!(h.focus_of(sel), FocusState::Unfocused)` becomes `assert!(!h.focus_of(sel))`, and the same for `has_class` with `ClassPresence`.
+- **Window host.** `HostWindow::supports(tile)` returns `bool`; `Support` is deleted. `ds::host::caret::caret_at(text, focus, collapsed: bool)` replaces `Collapsed`. `use_swipe_glue(on: bool, ..)` replaces `SwipeOn`. `SwipeParams.reduced` is `bool` (`Reduced` is deleted).
+  **Consumer change:** `fn supports(&self, tile) -> Support` becomes `-> bool` (`Support::Yes` is `true`); `use_swipe_glue(SwipeOn::Yes, ..)` is `use_swipe_glue(true, ..)`.
+- **Component props.** `SearchField { ends: Ends::Stop }` is `SearchField { stop_at_ends: true }` (`Ends` is deleted; the default still wraps). `Column { gap }` is `Option<SpacingToken>` (default `Some(SpacingToken::S8)`); `ColumnGap::None` is `None`, a step is `Some(step)`, and `ColumnGap` is deleted. `Slider { ticks }` is `Option<Fraction>` (`Ticks::Every(share)` is `Some(share)`, `Ticks::None` is `None`; `Ticks` is deleted). `PaneContent::Text { mono }` is `bool` (`PaneMono::Monospace` is `true`; `PaneMono` is deleted). `SuggestionsPresent`, `Panel`, `RowHeight` and `AvatarSize` stay: a presentation choice, a who-decides choice, two payload shapes and a stylesheet class per size.
+- Private two-way enums that restated a bool are gone (`LabelFit`, `SlotShown`, `CaretMark`, the level glyph's `Showing`, the text field's `Blink`).
+- **IconTile glyph scales with the tile.** `.ds-icon-tile > .ds-ic` takes `width` and `height` of `--plate-tile-glyph` (60%, input `--icons-tile-glyph-share`, a new `PlateShare::TileGlyph`), so a 28 px tile holds a 17 px glyph and a 48 px tile a 29 px one. The glyph used to stay at 14 px.
+- **`EmptyState { face: Option<TileFace> }`** draws the tile (`tile(face)`) 48 px square above the title, inside the empty state's padding, as System Settings' empty state does. A `face` replaces `icon`; `icon` keeps its faint 48 px glyph for the old case.
+- Expected to move: `crates/ds-shell/tests/snapshots/stylesheet.css` (the icon tile and empty state rules, and the `--plate-tile-glyph` declaration), and any consumer's own stylesheet snapshot after a re-pin (sill-shell-kit's).
+
 ## v0.3.54 (unreleased)
 
 ### wh-qstat

@@ -228,12 +228,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "column",
         state: "gap-and-align",
-        make: || rsx! { Column { gap: SpacingToken::S20, align: ColumnAlign::Center, p { "First" } p { "Second" } } },
+        make: || rsx! { Column { gap: Some(SpacingToken::S20), align: ColumnAlign::Center, p { "First" } p { "Second" } } },
     },
     Case {
         component: "column",
         state: "gapless-fill",
-        make: || rsx! { Column { gap: ColumnGap::None, extent: ColumnExtent::Fill, p { "First" } p { "Second" } } },
+        make: || rsx! { Column { gap: None, extent: ColumnExtent::Fill, p { "First" } p { "Second" } } },
     },
     Case {
         component: "column",
@@ -388,6 +388,6 @@ pub const CASES: &[Case] = &[
     Case {
         component: "titlebar",
         state: "parts",
-        make: || rsx! { WindowTitlebar { title: "Report", parts: TitleParts { subtitle: Some("Edited today".to_owned()), proxy: Some(Icon::File), document: DocumentState::Edited }, lights: TrafficLights::Hidden } },
+        make: || rsx! { WindowTitlebar { title: "Report", parts: TitleParts { subtitle: Some("Edited today".to_owned()), proxy: Some(Icon::File), document: DocumentState::Edited }, lights: Shown::Hidden } },
     },
 ];

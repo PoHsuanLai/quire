@@ -213,23 +213,23 @@ pub(crate) fn Host(props: HostProps) -> Element {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
             keep(&mut keeper.borrow_mut(), &DocRef::Handle(handle.clone()));
         }
-        if let crate::frame_hover::FrameHover::Report(_) = hover {
+        if hover.is_some() {
             let crossings = hovering
                 .borrow_mut()
                 .crossings(event, factor, seen.borrow().as_ref());
-            report(&hover, crossings);
+            report(hover.as_ref(), crossings);
         }
-        if let crate::frame_menu::FrameMenu::Report(_) = menu {
+        if menu.is_some() {
             let asked = hovering
                 .borrow()
                 .menu(event, factor, seen.borrow().as_ref());
-            crate::frame_menu::report(&menu, asked);
+            crate::frame_menu::report(menu.as_ref(), asked);
         }
-        if let crate::frame_image::FrameImages::Report(_) = images {
+        if images.is_some() {
             let clicked = hovering
                 .borrow()
                 .image(event, factor, seen.borrow().as_ref());
-            crate::frame_image::report(&images, clicked);
+            crate::frame_image::report(images.as_ref(), clicked);
         }
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
             // The document hears the new factor after this hook: carry its zoom over now. The

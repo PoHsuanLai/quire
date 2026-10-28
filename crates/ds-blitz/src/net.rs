@@ -13,16 +13,17 @@
 use crate::frame_book::FrameBook;
 use crate::frame_tag::FrameTag;
 use crate::net_policy::{NetDecision, NetPolicy, NetReply, NetRequest};
-use crate::origin::{FrameId, RequestOrigin};
-use crate::route::{Document, Policy, Route, route};
+use crate::origin::FrameId;
+use crate::route::{Policy, Route, route};
 use blitz_kit::net::{FileRoots, LocalSource};
 use blitz_traits::net::{Bytes, NetHandler, NetProvider, NetWaker, Request};
 use std::sync::Arc;
 
 /// Serves one kind of document under the app's policy.
 pub struct DsNet {
-    /// The app's document or a frame's.
-    served: Served,
+    /// The book of a frame's requests when this provider serves frames; `None` for the app's
+    /// own document.
+    frames: Option<FrameBook>,
     /// The app's choice.
     policy: NetPolicy,
     /// Who answers the app document's other schemes under `NetPolicy::Local`, if anyone.
@@ -49,7 +50,7 @@ impl DsNet {
         roots: FileRoots,
     ) -> Arc<dyn NetProvider> {
         Arc::new(DsNet {
-            served: Served::Top,
+            frames: None,
             policy,
             fallback,
             waker,
@@ -64,21 +65,13 @@ impl DsNet {
         book: FrameBook,
     ) -> Arc<dyn NetProvider> {
         Arc::new(DsNet {
-            served: Served::Frame(book),
+            frames: Some(book),
             policy,
             fallback: None,
             waker,
             // A frame is never served `file:` (`crate::route`), so it holds no roots.
             roots: FileRoots::default(),
         })
-    }
-
-    /// Which kind of document this provider serves.
-    fn document(&self) -> Document {
-        match self.served {
-            Served::Top => Document::Top,
-            Served::Frame(_) => Document::Frame,
-        }
     }
 
     /// Hand `bytes` (if any) to the document and wake its host. A malformed data: URL or an
@@ -111,23 +104,14 @@ impl DsNet {
             request,
             handler,
         };
-        match &self.served {
-            Served::Top => asking.ask(RequestOrigin::Top, None),
-            Served::Frame(book) => {
+        match &self.frames {
+            None => asking.ask(None, None),
+            Some(book) => {
                 let frame = FrameId::of(doc_id);
-                book.ask(
-                    frame,
-                    Box::new(move |tag| asking.ask(RequestOrigin::Frame(frame), tag)),
-                );
+                book.ask(frame, Box::new(move |tag| asking.ask(Some(frame), tag)));
             }
         }
     }
-}
-
-/// Which document a provider serves, and for a frame, the book its requests wait in.
-enum Served {
-    Top,
-    Frame(FrameBook),
 }
 
 /// One request on its way to the app.
@@ -142,7 +126,7 @@ struct Asking {
 impl Asking {
     /// Put the request to the app as coming from `origin` (tagged `tag`), and fetch it through
     /// the app if it is admitted.
-    fn ask(self, origin: RequestOrigin, tag: Option<FrameTag>) {
+    fn ask(self, origin: Option<FrameId>, tag: Option<FrameTag>) {
         let asked = NetRequest::new(origin, tag, self.request.url);
         if self.app.decide(&asked) == NetDecision::Allow {
             let reply = NetReply::new(
@@ -159,7 +143,7 @@ impl Asking {
 impl NetProvider for DsNet {
     fn fetch(&self, doc_id: usize, request: Request, handler: Box<dyn NetHandler>) {
         match route(
-            self.document(),
+            self.frames.is_some(),
             request.url.scheme(),
             Policy::of(&self.policy),
         ) {

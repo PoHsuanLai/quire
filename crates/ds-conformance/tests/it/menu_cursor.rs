@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -104,16 +104,15 @@ fn a_field_drives_the_highlight_and_keeps_the_keyboard() {
     );
     harness.advance(ms(300));
     assert_eq!(highlighted(&harness).as_deref(), Some("Dana Okafor"));
-    assert_eq!(
+    assert!(
         harness.focus_of(".field .ds-input"),
-        FocusState::Focused,
         "the field kept the keyboard"
     );
     harness.send(Input::key(ShortcutKey::Down));
     harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(50));
     assert_eq!(highlighted(&harness).as_deref(), Some("Priya Raman"));
-    assert_eq!(harness.focus_of(".field .ds-input"), FocusState::Focused);
+    assert!(harness.focus_of(".field .ds-input"));
     harness.send(Input::key(ShortcutKey::Up));
     harness.advance(ms(50));
     assert_eq!(highlighted(&harness).as_deref(), Some("Sam Lindqvist"));
@@ -134,9 +133,8 @@ fn the_own_cursor_is_reported_as_it_moves() {
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     harness.advance(ms(300));
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-menu"),
-        FocusState::Focused,
         "an own cursor takes the keyboard"
     );
     harness.send(Input::key(ShortcutKey::Down));

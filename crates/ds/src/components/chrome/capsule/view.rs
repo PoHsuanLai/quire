@@ -14,7 +14,7 @@
 //! Its parent is a box with a size and `position:relative`, since Blitz places an absolutely
 //! positioned scope against its parent, not its nearest positioned ancestor.
 
-use crate::components::chrome::capsule::fit::{SlotShown, fit};
+use crate::components::chrome::capsule::fit::fit;
 use crate::components::chrome::capsule::model::{CapsuleSlot, LevelSlot, ScrubEvent, ScrubSlot};
 use crate::components::chrome::capsule::priority::RankedSlot;
 use crate::components::chrome::toolbar::model::ToolbarItem;
@@ -120,7 +120,7 @@ fn drawn<T>(slots: &[RankedSlot<T>], stage: Option<u32>) -> Vec<&CapsuleSlot<T>>
     slots
         .iter()
         .zip(fit(slots, stage))
-        .filter(|(_, state)| *state == SlotShown::Shown)
+        .filter(|(_, state)| *state)
         .map(|(one, _)| &one.slot)
         .collect()
 }

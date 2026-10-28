@@ -7,7 +7,7 @@ use ds::base::geometry::placement::{Align, Side};
 use ds::components::menus::search::view::SearchField;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -22,7 +22,7 @@ struct Setup {
     highlight: InitialHighlight,
     escape: EscapeOrder,
     open: Panel,
-    ends: Ends,
+    stop_at_ends: bool,
     present: SuggestionsPresent,
     floated: bool,
 }
@@ -32,7 +32,7 @@ thread_local! {
         highlight: InitialHighlight::None,
         escape: EscapeOrder::ClosePanelFirst,
         open: Panel::Owned,
-        ends: Ends::Wrap,
+        stop_at_ends: false,
         present: SuggestionsPresent::Popup,
         floated: false,
     }) };
@@ -79,7 +79,7 @@ fn Page() -> Element {
                     highlight: setup.highlight,
                     escape: setup.escape,
                     open: setup.open,
-                    ends: setup.ends,
+                    stop_at_ends: setup.stop_at_ends,
                     present: setup.present,
                     place,
                     cursor: SearchCursor::Is(lit()),
@@ -233,7 +233,7 @@ fn rows_the_host_shows_are_up_before_any_focus_and_survive_escape_on_an_empty_fi
     });
     let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(300));
-    assert_eq!(harness.focus_of(".ds-input"), FocusState::Unfocused);
+    assert!(!harness.focus_of(".ds-input"));
     assert_eq!(harness.count(".ds-menu-item"), 3, "rows on summon");
     let at = harness.centre(".ds-input").expect("the field");
     harness.send(Input::click(at));
@@ -246,7 +246,7 @@ fn rows_the_host_shows_are_up_before_any_focus_and_survive_escape_on_an_empty_fi
 #[test]
 fn the_arrows_stop_at_the_last_row_when_asked() {
     let mut harness = start(Setup {
-        ends: Ends::Stop,
+        stop_at_ends: true,
         ..popup()
     });
     (0..5).for_each(|_| press(&mut harness, ShortcutKey::Down));
@@ -287,7 +287,7 @@ fn a_floated_card_is_one_popover_holding_both() {
     assert_eq!(harness.count(".ds-popover"), 1);
     assert_eq!(harness.count(".ds-popover .ds-input"), 1);
     assert_eq!(harness.count(".ds-popover .ds-menu-item"), 3);
-    assert_eq!(harness.focus_of(".ds-input"), FocusState::Focused);
+    assert!(harness.focus_of(".ds-input"));
 }
 
 #[test]

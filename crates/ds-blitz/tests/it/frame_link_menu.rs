@@ -61,15 +61,12 @@ impl Heard {
 fn reader(links: FrameLinks) -> (Harness, Arc<Heard>) {
     let heard = Arc::new(Heard::default());
     let log = Arc::clone(&heard);
-    let links = match links {
-        FrameLinks::Inert => links.with_context_menu(|_| {}),
-        links => links.with_context_menu(move |menu| {
-            log.menus
-                .lock()
-                .unwrap_or_else(PoisonError::into_inner)
-                .push(menu);
-        }),
-    };
+    let links = links.with_context_menu(move |menu| {
+        log.menus
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .push(menu);
+    });
     let config = HarnessConfig::new(VIEW)
         .with_clock(Clock::Virtual)
         .with_frame_links(links);

@@ -29,7 +29,7 @@ fn Led() -> Element {
         Ds {
             appearance: Appearance::default(),
             material: Material::Window,
-            window: WindowFrame::titlebar("Inbox", TrafficLights::Shown).with_leading(leading),
+            window: WindowFrame::titlebar("Inbox", Shown::Visible).with_leading(leading),
             p { class: "log", {log().join(",")} }
             p { class: "picked", "{picked}" }
         }

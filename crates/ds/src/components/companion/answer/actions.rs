@@ -4,7 +4,7 @@
 use super::action::{ActionRole, CardAction, CardActionId};
 use crate::components::companion::effect::view::EffectTag;
 use crate::components::controls::button::Button;
-use crate::components::controls::button_model::{Answers, ButtonFocus, ButtonRole};
+use crate::components::controls::button_model::{Answers, ButtonRole};
 use dioxus::prelude::*;
 use ds_core::vocab::EffectMark;
 use ds_core::word::Word;
@@ -35,11 +35,8 @@ pub fn CardActions(
 }
 
 /// Whether the keyboard starts on the action at `index`.
-fn focus_of(focused: Option<usize>, index: usize) -> ButtonFocus {
-    match focused == Some(index) {
-        true => ButtonFocus::OnMount,
-        false => ButtonFocus::Manual,
-    }
+fn focus_of(focused: Option<usize>, index: usize) -> bool {
+    focused == Some(index)
 }
 
 /// How an action's rank draws: Primary is the default button, Destructive is never one.
@@ -59,7 +56,7 @@ fn tagged(effect: EffectMark) -> bool {
 #[component]
 fn CardActionButton(
     action: CardAction,
-    focus: ButtonFocus,
+    focus: bool,
     on_action: EventHandler<CardActionId>,
 ) -> Element {
     let (role, answers) = rank(action.role);
@@ -70,12 +67,12 @@ fn CardActionButton(
             class: "ds-card-action",
             "data-role": action.role.slug(),
             "data-effect": action.effect.slug(),
-            "data-focus": (focus == ButtonFocus::OnMount).then_some("keyboard"),
+            "data-focus": focus.then_some("keyboard"),
             Button {
                 label: action.label.clone(),
                 role,
                 answers,
-                focus,
+                autofocus: focus,
                 availability: action.availability,
                 title,
                 title_shortcut: action.keys.clone(),

@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::components::lists::list::model::ListStyle;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -74,7 +74,7 @@ fn log(harness: &Harness) -> String {
 fn the_field_keeps_its_keys_and_presses_from_the_list_and_the_row() {
     let mut harness = Harness::new(Folders, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(200));
-    assert_eq!(harness.focus_of(".ds-row-edit input"), FocusState::Focused);
+    assert!(harness.focus_of(".ds-row-edit input"));
     harness.send(Input::key(ShortcutKey::Char('x')));
     harness.send(Input::key(ShortcutKey::Down));
     harness.send(Input::key(ShortcutKey::Enter));

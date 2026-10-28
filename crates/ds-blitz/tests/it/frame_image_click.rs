@@ -71,7 +71,7 @@ fn reader(intercept: bool) -> (Harness, Arc<Heard>) {
                 .push(link.href);
         })
     } else {
-        FrameLinks::Inert
+        FrameLinks::default()
     };
     let frame_links = base.with_image_click(move |click| {
         images

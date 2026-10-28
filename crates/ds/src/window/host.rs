@@ -11,7 +11,7 @@
 
 use super::icon::WindowIcon;
 use super::tiled::Tiled;
-use super::vocab::{PageZoom, ResizeEdge, Support, TileError, WindowState, WindowTile, Zoom};
+use super::vocab::{PageZoom, ResizeEdge, TileError, WindowState, WindowTile, Zoom};
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -34,7 +34,7 @@ pub trait HostWindow {
     /// place itself, and answer [`TileError::Unsupported`] where it cannot.
     fn tile(&self, tile: WindowTile) -> Result<(), TileError>;
     /// Whether [`HostWindow::tile`] would place the window there, asked before the menu offers it.
-    fn supports(&self, tile: WindowTile) -> Support;
+    fn supports(&self, tile: WindowTile) -> bool;
     /// The window's state now.
     fn state(&self) -> WindowState;
     /// Change the window's title, the name the compositor shows in its switcher and task list.

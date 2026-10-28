@@ -18,7 +18,7 @@ use ds::root::common::Common;
 use ds::spell::lang::{Lang, Spell};
 use ds::spell::marks::SpellReplace;
 use ds_blitz::spell::{SpellConfig, provide_with};
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::time::Duration;
@@ -240,9 +240,7 @@ fn a_picked_suggestion_replaces_the_word_and_undo_restores_it() {
     let first = harness.centre(".ds-menu-item").expect("a suggestion");
     harness.send(Input::click(first));
     settle_on_worker(&mut harness, |h| paragraph(h) == "the cat");
-    settle_on_worker(&mut harness, |h| {
-        marks(h) == 0 && h.focus_of("#editor") == FocusState::Focused
-    });
+    settle_on_worker(&mut harness, |h| marks(h) == 0 && h.focus_of("#editor"));
     harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('z')));
     settle_on_worker(&mut harness, |h| paragraph(h) == "teh cat");
     settle_on_worker(&mut harness, |h| marks(h) == 1);

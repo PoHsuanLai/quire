@@ -1,7 +1,7 @@
 //! Parsing `mimeapps.list` and `mimeinfo.cache`, and the default and Open With resolution.
 
 use ds_helpers::mime::{
-    Associations, DesktopId, DesktopIdError, Installed, MimeApps, MimeCache, MimeDb, MimeLayer,
+    Associations, DesktopId, DesktopIdError, MimeApps, MimeCache, MimeDb, MimeLayer,
 };
 
 use super::mt;
@@ -18,13 +18,7 @@ fn assoc(files: &[&str], caches: &[&str], missing: &'static [&'static str]) -> A
     Associations::new(
         files.iter().map(|f| MimeApps::parse(f)).collect(),
         caches.iter().map(|c| MimeCache::parse(c)).collect(),
-        move |app| {
-            if missing.contains(&app.as_str()) {
-                Installed::No
-            } else {
-                Installed::Yes
-            }
-        },
+        move |app| !missing.contains(&app.as_str()),
     )
 }
 

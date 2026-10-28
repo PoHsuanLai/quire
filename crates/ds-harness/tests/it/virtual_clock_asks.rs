@@ -11,7 +11,7 @@ use ds::focus::request::use_focus_request;
 use ds::focus::soon::focus_soon;
 use ds::prelude::*;
 use ds_core::time::clock::sleep;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::time::{Duration, Instant};
 use tokio::sync::watch;
@@ -140,7 +140,7 @@ fn Shown() -> Element {
 /// time (`None` if it never did within 100 ms).
 fn focus_landed(harness: &mut Harness, start: Instant) -> Option<Duration> {
     for _ in 0..=100 {
-        if harness.focus_of("#target") == FocusState::Focused {
+        if harness.focus_of("#target") {
             return Some(harness.now() - start);
         }
         harness.advance(ms(1));

@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::components::menus::item::text::Marks;
 use ds::components::menus::search::view::SearchField;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -134,7 +134,7 @@ fn a_press_on_the_field_leaves_the_panel_open_and_the_keyboard_in_the_field() {
     harness.send(Input::click(at));
     harness.advance(ms(400));
     assert_eq!(panels(&harness), 1, "the press on the field is inside");
-    assert_eq!(harness.focus_of(".ds-input"), FocusState::Focused);
+    assert!(harness.focus_of(".ds-input"));
 }
 
 #[test]
@@ -148,11 +148,11 @@ fn a_panel_that_opens_mid_press_does_not_take_the_keyboard() {
         1,
         "opened by the press that focused the field"
     );
-    assert_eq!(harness.focus_of(".ds-input"), FocusState::Focused);
+    assert!(harness.focus_of(".ds-input"));
     harness.send(Input::pointer_up(at));
     harness.advance(ms(300));
     assert_eq!(panels(&harness), 1);
-    assert_eq!(harness.focus_of(".ds-input"), FocusState::Focused);
+    assert!(harness.focus_of(".ds-input"));
 }
 
 #[test]
@@ -171,7 +171,7 @@ fn the_arrows_move_the_highlight_and_the_keyboard_stays_in_the_field() {
     assert_eq!(highlighted(&harness).as_deref(), Some("Sam Lindqvist"));
     press_key(&mut harness, ShortcutKey::Up);
     assert_eq!(highlighted(&harness).as_deref(), Some("Dana Okafor"));
-    assert_eq!(harness.focus_of(".ds-input"), FocusState::Focused);
+    assert!(harness.focus_of(".ds-input"));
     assert_eq!(panels(&harness), 1);
 }
 
@@ -212,7 +212,7 @@ fn escape_closes_the_panel_first_and_clears_the_field_second() {
         Some(""),
         "the second clears the field"
     );
-    assert_eq!(harness.focus_of(".ds-input"), FocusState::Focused);
+    assert!(harness.focus_of(".ds-input"));
 }
 
 #[test]
@@ -232,7 +232,7 @@ fn tab_leaves_the_field_and_the_panel_goes_with_it() {
     focus_field(&mut harness);
     press_key(&mut harness, ShortcutKey::Tab);
     harness.advance(ms(400));
-    assert_ne!(harness.focus_of(".ds-input"), FocusState::Focused);
+    assert!(!harness.focus_of(".ds-input"));
     assert_eq!(panels(&harness), 0);
 }
 

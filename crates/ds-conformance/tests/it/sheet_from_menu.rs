@@ -3,12 +3,11 @@
 //! Application, opened from its context menu). Escape then closes the sheet.
 
 use dioxus::prelude::*;
-use ds::components::controls::button_model::ButtonFocus;
 use ds::focus::soon::focus_soon;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -72,9 +71,8 @@ fn a_sheet_opened_from_a_menu_pick_takes_the_keyboard_and_escape_closes_it() {
         h.count(".ds-sheet") == 1 && h.count(".ds-menu") == 0
     });
     harness.advance(Duration::from_millis(600));
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-sheet"),
-        FocusState::Focused,
         "the sheet has the keyboard:\n{}",
         harness.html()
     );
@@ -98,11 +96,7 @@ fn FirstStop(field: bool) -> Element {
     } else {
         FieldFocus::default()
     };
-    let button_focus = if field {
-        ButtonFocus::default()
-    } else {
-        ButtonFocus::OnMount
-    };
+    let button_focus = !field;
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "height:400px",
@@ -111,7 +105,7 @@ fn FirstStop(field: bool) -> Element {
                         TextField { label: "Path", value: "", focus: field_focus, oninput: |_| {} }
                     }
                     div { id: "cancel",
-                        Button { label: "Cancel", focus: button_focus, onclick: |_| {} }
+                        Button { label: "Cancel", autofocus: button_focus, onclick: |_| {} }
                     }
                 }
             }
@@ -137,11 +131,7 @@ fn a_first_stop_the_caller_asks_for_still_takes_the_keyboard_from_the_sheet() {
     ] {
         let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
         harness.advance(Duration::from_millis(600));
-        assert_eq!(harness.focus_of(stop), FocusState::Focused, "{stop}");
-        assert_eq!(
-            harness.focus_of(".ds-sheet"),
-            FocusState::Unfocused,
-            "{stop}"
-        );
+        assert!(harness.focus_of(stop), "{stop}");
+        assert!(!harness.focus_of(".ds-sheet"), "{stop}");
     }
 }

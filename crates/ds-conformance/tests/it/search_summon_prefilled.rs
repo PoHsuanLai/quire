@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::focus::select::Select;
 use ds::focus::selector::focus_by_selector;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -107,7 +107,7 @@ fn summoned(page: fn() -> Element) -> Harness {
     let at = harness.centre(".ds-button").expect("the summon button");
     harness.send(Input::click(at));
     let mut frames = 0;
-    while harness.focus_of(FIELD) != FocusState::Focused {
+    while !harness.focus_of(FIELD) {
         if !harness.step_frame() {
             harness.advance(ms(1));
         }

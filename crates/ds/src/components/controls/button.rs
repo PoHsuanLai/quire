@@ -14,7 +14,7 @@ use crate::components::controls::button_marks::leading as leading_mark;
 use crate::components::controls::button_marks::trailing as trailing_mark;
 use crate::components::controls::button_marks::{Leading, spoken_label};
 use crate::components::controls::button_model::{
-    Answers, Bezel, BusyLook, ButtonFocus, ButtonRole, IconSwap, ImagePosition,
+    Answers, Bezel, BusyLook, ButtonRole, IconSwap, ImagePosition,
 };
 use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::press::{
@@ -71,7 +71,7 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 ///
 /// `answers` says which window key the button answers (see [`Answers`]): a dialog that wants
 /// Return and Escape to press it routes them itself (a sheet's
-/// `on_return`, an alert's own keys). `focus: ButtonFocus::OnMount` gives it the keyboard as it
+/// `on_return`, an alert's own keys). `autofocus: true` gives it the keyboard as it
 /// mounts. A caller-controlled disabled state is `availability`.
 ///
 /// `busy: BusyLook::TurnIcon` replaces the busy spinner with the button's own `icon` turning
@@ -88,7 +88,7 @@ pub fn Button(
     #[props(default)] bezel: Bezel,
     #[props(default)] role: ButtonRole,
     #[props(default)] answers: Answers,
-    #[props(default)] focus: ButtonFocus,
+    #[props(default)] autofocus: bool,
     #[props(default)] size: ControlSize,
     #[props(default)] image: ImagePosition,
     #[props(default)] swap: IconSwap,
@@ -205,7 +205,7 @@ pub fn Button(
                 let tip = tip.clone();
                 move |event| {
                     tip.mounted(&event);
-                    if focus == ButtonFocus::OnMount {
+                    if autofocus {
                         focus_soon(event.data());
                     }
                     common.mounted(event);

@@ -4,9 +4,9 @@ use crate::capability::CapabilityName;
 use crate::catalog::{Catalog, Entry};
 use crate::family::Family;
 use crate::install_line::install_lines;
-use crate::installer::{Installer, Request};
+use crate::installer::{Install, Request};
 use crate::outcome::{Missing, Outcome};
-use crate::probe::{Environment, ToolPresence, presence};
+use crate::probe::{Environment, presence};
 use crate::watch::{Log, Subscription};
 use std::sync::Arc;
 
@@ -15,7 +15,7 @@ struct Inner {
     catalog: Catalog,
     environment: Environment,
     family: Option<Family>,
-    installer: Installer,
+    installer: Arc<dyn Install>,
     log: Log,
 }
 
@@ -26,7 +26,11 @@ pub struct Helpers(Arc<Inner>);
 impl Helpers {
     /// A handle over `catalog`, probing `environment` and installing through `installer`. The
     /// distro family is read from `environment.os_release` once, here.
-    pub fn new(catalog: Catalog, environment: Environment, installer: Installer) -> Helpers {
+    pub fn new(
+        catalog: Catalog,
+        environment: Environment,
+        installer: impl Install + 'static,
+    ) -> Helpers {
         let family = std::fs::read_to_string(&environment.os_release)
             .ok()
             .and_then(|text| Family::detect(&text));
@@ -34,7 +38,7 @@ impl Helpers {
             catalog,
             environment,
             family,
-            installer,
+            installer: Arc::new(installer),
             log: Log::default(),
         }))
     }
@@ -49,17 +53,15 @@ impl Helpers {
         self.0.family
     }
 
-    /// Is the tool there now? An undeclared capability is [`ToolPresence::Missing`].
-    pub fn available(&self, capability: &CapabilityName) -> ToolPresence {
+    /// Is the tool there now? An undeclared capability is not.
+    pub fn available(&self, capability: &CapabilityName) -> bool {
         self.entry(capability)
-            .map_or(ToolPresence::Missing, |entry| {
-                presence(&self.0.environment.path, entry)
-            })
+            .is_some_and(|entry| presence(&self.0.environment.path, entry))
     }
 
     /// Probe again and announce the result to subscribers if it changed (a tool the person
     /// installed some other way, or removed).
-    pub fn refresh(&self, capability: &CapabilityName) -> ToolPresence {
+    pub fn refresh(&self, capability: &CapabilityName) -> bool {
         let now = self.available(capability);
         self.0.log.record(capability, now);
         now
@@ -83,7 +85,7 @@ impl Helpers {
                 install_lines: Vec::new(),
             });
         };
-        if self.refresh(capability) == ToolPresence::Present {
+        if self.refresh(capability) {
             return Outcome::Installed;
         }
         let candidates = self.0.family.map(|f| (f, entry.candidates(f)));
@@ -102,13 +104,11 @@ impl Helpers {
             missing,
         };
         match self.0.installer.install(&request).await {
-            Outcome::Installed => match self.refresh(capability) {
-                ToolPresence::Present => Outcome::Installed,
-                ToolPresence::Missing => Outcome::Failed(format!(
-                    "{} was installed, but it is still not on your PATH.",
-                    entry.tool
-                )),
-            },
+            Outcome::Installed if self.refresh(capability) => Outcome::Installed,
+            Outcome::Installed => Outcome::Failed(format!(
+                "{} was installed, but it is still not on your PATH.",
+                entry.tool
+            )),
             other => other,
         }
     }

@@ -337,7 +337,7 @@ fn App() -> Element {
 | `radius` | `Option<Corner>` | `None`: the material's own corner | `Corner::Token(Radius::…)` or `Corner::Px(Px(n))`: overrides `--m-radius` inline, for a root whose corner is a setting (the dock's `dock.pill_radius_px`) |
 | `extent` | `RootExtent` | `RootExtent::Content` | `Content`: as tall as the root's content (a window, the bar, a card). `Viewport`: at least the viewport (`min-height:100vh; min-width:100vw`), **the option for an overlay surface** (an OSD, a sheet, a click catcher) whose content is all positioned and would otherwise leave the root, and everything it places, 0 px tall (FINDINGS "Root height") |
 | `scale` | `Option<Scale>` | `None`: the host's `ds::prelude::HostSignals` scale, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_blitz::launch`, `Harness` and `snapshot` provide `HostSignals` themselves; a host that is not `ds-blitz` passes `scale` |
-| `window` | `WindowFrame` | `WindowFrame::None`: the root is what it was | `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown, Hidden}, timing }` (or `WindowFrame::titlebar(title, lights)`): the client-decorated window's frame, a 28 px titlebar that moves and zooms the window, the traffic lights, the body and eight resize edges, all acting through the host's `ds::prelude::HostWindow` — section 6, "Window frame" |
+| `window` | `WindowFrame` | `WindowFrame::None`: the root is what it was | `WindowFrame::Titlebar { title, lights: Shown::{Visible, Hidden}, timing }` (or `WindowFrame::titlebar(title, lights)`): the client-decorated window's frame, a 28 px titlebar that moves and zooms the window, the traffic lights, the body and eight resize edges, all acting through the host's `ds::prelude::HostWindow` — section 6, "Window frame" |
 
 ### Pixel snapping: `scale`, the pixel tokens and `snap_to_device`
 
@@ -986,8 +986,8 @@ A few props worth knowing about before you read the signatures:
   `AlertColumn` is the same column without a sheet for a host's own window), and `Sheet { on_return: Some(handler), onclose }` routes Return (anywhere a
   control did not take it, a multi-line field's Enter included) to `on_return` and Escape to `onclose`.
   Pass `on_return: None` while the default button is disabled. The first stop of the keyboard in a sheet
-  is the caller's: `TextField { focus: FieldFocus::OnMount }` for its first field or `Button { focus:
-  ButtonFocus::OnMount }` for the default button.
+  is the caller's: `TextField { focus: FieldFocus::OnMount }` for its first field or `Button { autofocus:
+  true }` for the default button.
 - `Button { availability: Availability::Busy, busy: BusyLook::TurnIcon, icon, .. }` shows work in progress
   by turning the button's own icon (Mail's Get Mail arrow) instead of the default spinner in the leading
   slot: one linear turn a second (`turn`, `--t-turn`), no leading mark, input dropped and `aria-busy`
@@ -1512,12 +1512,12 @@ which carry none); `Family::detect` is built on it.
 | Need | API |
 | --- | --- |
 | Load the file | `Catalog::load("anyview", &data_dirs(std::env::var_os("XDG_DATA_DIRS").as_deref()))` (or `Catalog::parse(text)`) |
-| The handle | `Helpers::new(catalog, Environment::system(), Installer::PackageKit(PackageKit::system()))`; cheap to clone |
-| Is it there? | `helpers.available(&CapabilityName::new("heic-decode")?) -> ToolPresence::{Present, Missing}` |
+| The handle | `Helpers::new(catalog, Environment::system(), PackageKit::system())`; cheap to clone |
+| Is it there? | `helpers.available(&CapabilityName::new("heic-decode")?) -> bool` |
 | Words for the sheet | `helpers.entry(&capability) -> Option<&Entry>` (`tool`, `purpose`, `probe`) |
 | Install it | `helpers.provide(&capability).await -> Outcome::{Installed, Declined, NotFound(Missing), Unsupported(Missing), Failed(reason)}`; call it after the person pressed Install... `Missing { capability, package: Option<PackageName>, program: Option<Executable>, install_lines: Vec<InstallLine> }` is the first candidate package for this distro and the first probe program; `install_lines` is the same package as a command to copy (`sudo pacman -S mpv`, `.text()`), for the `Unsupported` answer where no PackageKit runs (stock Arch): one line for this distro's family, or one per family the file names when the distro is unknown |
 | Hear of changes | `let mut feed = helpers.subscribe(); feed.next().await -> Availability { capability, presence }`; `helpers.refresh(&capability)` probes again (a tool installed in a terminal) |
-| Tests and the gallery | `Installer::Fake(FakeInstaller::new(Outcome::Installed))`; `Environment { path, os_release }` takes scratch paths; `.leaving(dir, &["mpv"])` drops empty stand-in tools into `dir` on install, `.leaving_with(dir, vec![StandIn { name, body }])` gives each one a script |
+| Tests and the gallery | `FakeInstaller::new(Outcome::Installed)`; `Environment { path, os_release }` takes scratch paths; `.leaving(dir, &["mpv"])` drops empty stand-in tools into `dir` on install, `.leaving_with(dir, vec![StandIn { name, body }])` gives each one a script |
 
 `provide` returns `Installed` at once when the tool is already there, resolves the candidates
 through PackageKit (the first that exists in the repositories wins), installs it, probes again,
@@ -2275,10 +2275,10 @@ rsx! { Ds { appearance, material, look: spaces.look(),
 } }
 ```
 
-- `SpacesFoot { new_space: NewSpace::Hidden }` leaves the `+` out, for a foot whose one menu holds New
+- `SpacesFoot { new_space: Shown::Hidden }` leaves the `+` out, for a foot whose one menu holds New
   Space (Dia: leading icon, the dots, one chevron). Put a `PullDownButton` in `trailing` and make the
   Space from its pick: `let made = spaces.add(payload); spaces.show(made, at, Showing::Rename);`
-  (`SpacesHandle`, `Showing` and `NewSpace` are in the prelude). `new_payload` is still required.
+  (`SpacesHandle` and `Showing` are in the prelude). `new_payload` is still required.
 - The menu's Edit Space... opens `EditSpaceSheet` (the name and colour, live, with Cancel and Save);
   `SpaceMenu` draws it. To offer it from elsewhere (a settings pane's Edit button), call
   `spaces.show(id, at, Showing::Edit)` with `SpaceMenu` mounted. An app's own Escape handling that

@@ -43,16 +43,6 @@ pub enum Answers {
     Escape,
 }
 
-/// When the button takes the keyboard.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum ButtonFocus {
-    /// Only when the person or the caller puts it there.
-    #[default]
-    Manual,
-    /// As soon as it is mounted: the default button of a sheet whose first stop is not a field.
-    OnMount,
-}
-
 /// How a busy button shows it is working (`availability: Busy`), `data-busy`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum BusyLook {

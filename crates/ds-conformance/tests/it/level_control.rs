@@ -12,7 +12,7 @@ use ds::components::controls::slider_model::SliderLook;
 use ds::prelude::*;
 use ds::style::tokens::easing::EasingToken;
 use ds::style::tokens::timing::DurationToken;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, rect};
 use std::cell::Cell;
@@ -212,9 +212,8 @@ fn keys_step_by_sixteenths_and_shift_by_sixty_fourths() {
     harness.send(Input::click(at));
     harness.advance(ms(120));
     assert_eq!(level(&mut harness), 500, "a click at the middle keeps 50 %");
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-slider"),
-        FocusState::Focused,
         "the press focuses the control"
     );
     harness.send(Input::key(ShortcutKey::Right));

@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use ds_core::time::stamp::Stamp;
 
-use super::model::{PageMilli, PagesPerSecMilli, Reduced, Swipe, SwipeOut, SwipeParams};
+use super::model::{PageMilli, PagesPerSecMilli, Swipe, SwipeOut, SwipeParams};
 use super::numbers::{div_nearest, finish_duration, saturate};
 
 /// What a step wants done, beside the state it leaves.
@@ -72,12 +72,13 @@ pub(super) fn begin(
     now: Stamp,
     params: SwipeParams,
 ) -> Step {
-    match params.reduced {
-        Reduced::Yes => (
+    if params.reduced {
+        (
             Swipe::Idle { at: to },
             vec![SwipeOut::Committed { to }, SwipeOut::Settled { at: to }],
-        ),
-        Reduced::No => (
+        )
+    } else {
+        (
             Swipe::Finishing {
                 from,
                 to,
@@ -86,6 +87,6 @@ pub(super) fn begin(
                 since: now,
             },
             vec![SwipeOut::Committed { to }],
-        ),
+        )
     }
 }

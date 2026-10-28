@@ -40,21 +40,14 @@ impl CaretOwner {
     }
 }
 
-/// Whether the mask shows its caret.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum CaretMark {
-    /// A bar between `before` and `after`.
-    Shown,
-    /// None: the field is not focused, a range is selected, or the renderer draws it.
-    Hidden,
-}
-
 /// The mask's dots cut at the selection: `before`, the `selected` range, the caret, `after`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct MaskParts {
     pub before: String,
     pub selected: String,
-    pub caret: CaretMark,
+    /// Whether the mask draws a caret bar between `before` and `after`: not when the field is
+    /// unfocused, a range is selected, or the renderer draws it.
+    pub caret: bool,
     pub after: String,
 }
 
@@ -68,17 +61,13 @@ impl MaskParts {
         let whole = MaskParts {
             before: dots(count),
             selected: String::new(),
-            caret: CaretMark::Hidden,
+            caret: false,
             after: String::new(),
         };
         match (owner, selection) {
             (CaretOwner::Mask, FieldSelection::Focused { anchor, focus }) => {
                 let (low, high) = (anchor.min(focus).min(count), anchor.max(focus).min(count));
-                let caret = if low == high {
-                    CaretMark::Shown
-                } else {
-                    CaretMark::Hidden
-                };
+                let caret = low == high;
                 MaskParts {
                     before: dots(low),
                     selected: dots(high - low),
@@ -156,7 +145,7 @@ impl MaskCaret {
 
 #[cfg(test)]
 mod tests {
-    use super::{CaretMark, CaretOwner, MaskParts};
+    use super::{CaretOwner, MaskParts};
     use crate::host::caret::FieldSelection;
 
     fn at(anchor: usize, focus: usize) -> FieldSelection {
@@ -164,7 +153,7 @@ mod tests {
     }
 
     /// Four dots cut: how many before, selected and after, and whether the caret shows.
-    fn cut(selection: FieldSelection, owner: CaretOwner) -> (usize, usize, CaretMark, usize) {
+    fn cut(selection: FieldSelection, owner: CaretOwner) -> (usize, usize, bool, usize) {
         let parts = MaskParts::cut(4, selection, owner);
         (
             parts.before.chars().count(),
@@ -176,18 +165,17 @@ mod tests {
 
     #[test]
     fn the_mask_cuts_its_dots_at_the_caret_and_the_selection() {
-        use CaretMark::{Hidden, Shown};
         use CaretOwner::{Mask, Renderer};
-        assert_eq!(cut(at(4, 4), Mask), (4, 0, Shown, 0), "at the end");
-        assert_eq!(cut(at(1, 1), Mask), (1, 0, Shown, 3), "after the first");
-        assert_eq!(cut(at(0, 0), Mask), (0, 0, Shown, 4), "at the start");
-        assert_eq!(cut(at(3, 1), Mask), (1, 2, Hidden, 1), "a range, backwards");
-        assert_eq!(cut(at(9, 9), Mask), (4, 0, Shown, 0), "clamped to the dots");
+        assert_eq!(cut(at(4, 4), Mask), (4, 0, true, 0), "at the end");
+        assert_eq!(cut(at(1, 1), Mask), (1, 0, true, 3), "after the first");
+        assert_eq!(cut(at(0, 0), Mask), (0, 0, true, 4), "at the start");
+        assert_eq!(cut(at(3, 1), Mask), (1, 2, false, 1), "a range, backwards");
+        assert_eq!(cut(at(9, 9), Mask), (4, 0, true, 0), "clamped to the dots");
         assert_eq!(
             cut(FieldSelection::Unfocused, Mask),
-            (4, 0, Hidden, 0),
+            (4, 0, false, 0),
             "unfocused"
         );
-        assert_eq!(cut(at(1, 1), Renderer), (4, 0, Hidden, 0), "no host");
+        assert_eq!(cut(at(1, 1), Renderer), (4, 0, false, 0), "no host");
     }
 }

@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::app::space_editor::DotIndex;
 use ds::components::app::space_editor::rows::{MeasuredIn, MotionChoice};
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -51,7 +51,7 @@ fn typing_in_the_title_renames_the_space() {
     let field = ".ds-space-editor-title .ds-input";
     harness.send(Input::click(harness.centre(field).expect("the name field")));
     harness.advance(ms(30));
-    assert_eq!(harness.focus_of(field), FocusState::Focused);
+    assert!(harness.focus_of(field));
     harness.send(Input::key(ShortcutKey::Char('s')));
     harness.advance(ms(30));
     assert_eq!(harness.text_of(".name").as_deref(), Some("Works"));

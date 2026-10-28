@@ -6,7 +6,7 @@ use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState
 use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{ClassPresence, Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -131,10 +131,7 @@ fn a_failed_join_leaves_the_fan_faint_and_shakes_nothing() {
     let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, WifiState::Failed(EventStamp(1)));
     harness.advance(Duration::from_millis(60));
-    assert_eq!(
-        harness.has_class("#wifi .ds-status-glyph", "a-shake-x"),
-        ClassPresence::Absent
-    );
+    assert!(!harness.has_class("#wifi .ds-status-glyph", "a-shake-x"));
     assert_settles_to_zero_frames(&mut harness);
     assert_eq!(lit(&harness), 0, "the fan is faint");
 }

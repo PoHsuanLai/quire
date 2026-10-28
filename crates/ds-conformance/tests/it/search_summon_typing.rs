@@ -8,7 +8,7 @@ use ds::components::menus::search::view::SearchField;
 use ds::focus::select::Select;
 use ds::focus::selector::focus_by_selector;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -74,7 +74,7 @@ fn Page() -> Element {
                             value: query(),
                             suggestions: sections(&query(), drawn()),
                             open: Panel::Shown,
-                            ends: Ends::Stop,
+                            stop_at_ends: true,
                             present: SuggestionsPresent::Card,
                             oninput: move |next: String| query.set(next),
                             onfocus: move |()| in_a_field.set(true),
@@ -96,7 +96,7 @@ fn summoned() -> Harness {
     let at = harness.centre(".ds-button").expect("the summon button");
     harness.send(Input::click(at));
     let mut frames = 0;
-    while harness.focus_of(FIELD) != FocusState::Focused {
+    while !harness.focus_of(FIELD) {
         if !harness.step_frame() {
             harness.advance(ms(1));
         }

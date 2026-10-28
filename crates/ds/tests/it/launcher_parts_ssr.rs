@@ -14,7 +14,7 @@ use ds::assembly::ds::Inject;
 use ds::components::content::image_source::ImageSize;
 use ds::components::content::pdf_thumb::PdfPage;
 use ds::components::lists::emoji_grid::grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells};
-use ds::components::lists::preview::content::{PaneContent, PaneMono};
+use ds::components::lists::preview::content::PaneContent;
 use ds::components::lists::preview::pane::PaneAction;
 use ds::components::lists::row::shape::{ClipBody, RowShape};
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups, PaletteRow};
@@ -272,7 +272,7 @@ fn pane_text_mono() -> Element {
     pane(
         PaneContent::Text {
             excerpt: "let x = 1;".to_owned(),
-            mono: PaneMono::Monospace,
+            mono: true,
         },
         Some(1),
     )
@@ -282,7 +282,7 @@ fn pane_text_prose() -> Element {
     pane(
         PaneContent::Text {
             excerpt: "Pick up the keys.".to_owned(),
-            mono: PaneMono::Proportional,
+            mono: false,
         },
         None,
     )

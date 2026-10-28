@@ -1,6 +1,6 @@
 //! A link clicked inside a frame never navigates the frame. With
-//! `FrameLinks::Intercept` the app hears the click (mailo opens it in the browser); with the
-//! default `Inert` nothing happens. Either way no request is made for the link's target.
+//! `FrameLinks::intercept` the app hears the click (mailo opens it in the browser); with the
+//! default (inert) nothing happens. Either way no request is made for the link's target.
 
 use dioxus::prelude::*;
 use ds_blitz::{AppNet, FrameLink, FrameLinks, NetDecision, NetPolicy, NetReply, NetRequest};
@@ -101,7 +101,7 @@ fn an_intercepted_click_reaches_the_app_and_the_frame_stays() {
 
 #[test]
 fn an_inert_click_does_nothing() {
-    let (harness, before, requests) = click_the_link(FrameLinks::Inert);
+    let (harness, before, requests) = click_the_link(FrameLinks::default());
     let after = harness
         .frame("iframe.body")
         .expect("still a frame document");

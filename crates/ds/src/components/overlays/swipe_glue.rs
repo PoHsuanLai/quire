@@ -30,20 +30,13 @@ use ds_motion::{
 /// Pixels per line of a line-based wheel delta: what Blitz scrolls a line by.
 const LINE_PX: f64 = 20.0;
 
-/// Whether an element listens for a swipe at all.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SwipeOn {
-    /// A drag or a horizontal scroll to the right dismisses it.
-    Yes,
-    /// It cannot be swiped (a row the caller dismisses otherwise).
-    No,
-}
-
 /// One element's swipe for one render.
 #[derive(Clone, Copy)]
 pub struct SwipeGlue {
     swiper: Swiper,
-    on: SwipeOn,
+    /// Whether the element listens for a swipe at all: a drag or a horizontal scroll to the
+    /// right dismisses it. Off for a row the caller dismisses otherwise.
+    on: bool,
     spring: SpringMotion,
     meter: Signal<VelocityMeter>,
     released: CopyValue<Touch>,
@@ -52,11 +45,7 @@ pub struct SwipeGlue {
 
 /// An element's swipe: `on_dismiss` hears a release past a threshold. Hooks run whether or not
 /// the swipe is `on`, so the element's hook order never changes with its props.
-pub fn use_swipe_glue(
-    on: SwipeOn,
-    metrics: SwipeMetrics,
-    on_dismiss: EventHandler<()>,
-) -> SwipeGlue {
+pub fn use_swipe_glue(on: bool, metrics: SwipeMetrics, on_dismiss: EventHandler<()>) -> SwipeGlue {
     SwipeGlue {
         swiper: use_swipe(metrics, on_dismiss),
         on,
@@ -76,10 +65,7 @@ impl std::fmt::Debug for SwipeGlue {
 impl SwipeGlue {
     /// The swiper, while the swipe is on.
     fn live(&self) -> Option<Swiper> {
-        match self.on {
-            SwipeOn::Yes => Some(self.swiper),
-            SwipeOn::No => None,
-        }
+        self.on.then_some(self.swiper)
     }
 
     /// `data-swipe`: `live` while held, `rest`, or `gone`; nothing when the swipe is off.

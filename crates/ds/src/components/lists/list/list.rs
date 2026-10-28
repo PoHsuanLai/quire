@@ -11,7 +11,7 @@
 
 use crate::components::lists::list::entry::{ListEntry, SetPlace};
 use crate::components::lists::list::keys::{ListKey, labelled, list_key, moved};
-use crate::components::lists::list::model::{ListFocus, ListItem, ListStyle};
+use crate::components::lists::list::model::{ListItem, ListStyle};
 use crate::components::lists::list::reorder::{held_to, stand};
 use crate::components::lists::order::moved as reordered;
 use crate::focus::soon::focus_soon;
@@ -42,7 +42,8 @@ use std::rc::Rc;
 /// caller's: it puts each selected row's own state, and the list only moves the cursor. Keys are
 /// hashed to name the items' nodes, so a key must hash the same on every render.
 ///
-/// `focus: ListFocus::OnMount` gives the list the keyboard as it mounts (default `Manual`).
+/// `autofocus: true` gives the list the keyboard as it mounts, so the arrow keys work at once (a
+/// sheet's list, as Choose Application's); the default is off.
 ///
 /// `onreorder` makes the rows draggable by their grips; it hears the keys in their new order
 /// once a row is dropped somewhere else.
@@ -57,7 +58,7 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
     #[props(default)] onpick: Option<EventHandler<K>>,
     #[props(default = Exit::Row)] exit: Exit,
     #[props(default)] on_settled: Option<EventHandler<K>>,
-    #[props(default)] focus: ListFocus,
+    #[props(default)] autofocus: bool,
     #[props(default)] onreorder: Option<EventHandler<Vec<K>>>,
     #[props(default)] common: Common,
 ) -> Element {
@@ -150,7 +151,7 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
             "data-focus": away,
             "data-reorder": onreorder.map(|_| "grip"),
             onmounted: move |event: MountedEvent| {
-                if focus == ListFocus::OnMount {
+                if autofocus {
                     focus_soon(event.data());
                 }
                 mounted.mounted(event);

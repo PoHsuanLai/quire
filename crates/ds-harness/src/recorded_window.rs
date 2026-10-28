@@ -6,7 +6,7 @@
 
 use ds::window::host::HostWindow;
 use ds::window::icon::WindowIcon;
-use ds::window::vocab::{PageZoom, ResizeEdge, Support, TileError, WindowState, WindowTile, Zoom};
+use ds::window::vocab::{PageZoom, ResizeEdge, TileError, WindowState, WindowTile, Zoom};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -63,8 +63,8 @@ impl HostWindow for WindowLog {
         Err(TileError::Unsupported)
     }
 
-    fn supports(&self, _tile: WindowTile) -> Support {
-        Support::No
+    fn supports(&self, _tile: WindowTile) -> bool {
+        false
     }
 
     fn state(&self) -> WindowState {

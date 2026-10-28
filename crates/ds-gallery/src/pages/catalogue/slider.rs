@@ -3,7 +3,7 @@
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::content::level_glyph::vocab::LevelGlyph;
-use ds::components::controls::slider_model::{SliderLook, Ticks};
+use ds::components::controls::slider_model::SliderLook;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds_core::vocab::Muting;
@@ -25,9 +25,9 @@ pub fn SliderSection() -> Element {
                         }
                     }
                 }
-                Specimen { name: "ticks every quarter".to_owned(), code: "Ticks::Every(250)".to_owned(),
+                Specimen { name: "ticks every quarter".to_owned(), code: "ticks: Some(Fraction(250))".to_owned(),
                     div { style: "width:220px",
-                        Slider { label: "Level", value: ticked(), ticks: Ticks::Every(Fraction(250)), onchange: move |next| ticked.set(next) }
+                        Slider { label: "Level", value: ticked(), ticks: Some(Fraction(250)), onchange: move |next| ticked.set(next) }
                     }
                 }
                 Specimen { name: "disabled".to_owned(),

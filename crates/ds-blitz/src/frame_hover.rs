@@ -4,11 +4,10 @@
 
 use crate::frame_book::FrameBook;
 use crate::frame_hit::LinkUnder;
+use crate::frame_links::FrameHandler;
 use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
 use ds::prelude::*;
-use std::fmt;
-use std::sync::Arc;
 
 /// The pointer came onto a link in a frame, or left it.
 #[derive(Debug, Clone, PartialEq)]
@@ -36,42 +35,6 @@ pub enum HoverPhase {
     Enter,
     /// It left the link (onto another, onto nothing, or out of the frame).
     Leave,
-}
-
-/// Whether the app hears the pointer crossing links in frames.
-#[derive(Clone, Default)]
-pub enum FrameHover {
-    /// No: nothing is hit-tested.
-    #[default]
-    Ignore,
-    /// Yes, on the UI thread, with the document free.
-    Report(FrameHoverHandler),
-}
-
-/// The app's handler for [`FrameHover::Report`].
-#[derive(Clone)]
-pub struct FrameHoverHandler(Arc<dyn Fn(FrameLinkHover) + Send + Sync>);
-
-impl FrameHoverHandler {
-    /// Call `handler` with each crossing.
-    pub fn new(handler: impl Fn(FrameLinkHover) + Send + Sync + 'static) -> Self {
-        FrameHoverHandler(Arc::new(handler))
-    }
-}
-
-impl fmt::Debug for FrameHover {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(match self {
-            FrameHover::Ignore => "Ignore",
-            FrameHover::Report(_) => "Report(..)",
-        })
-    }
-}
-
-impl fmt::Debug for FrameHoverHandler {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("FrameHoverHandler(..)")
-    }
 }
 
 /// The link the pointer was last reported on, if any.
@@ -129,8 +92,8 @@ fn crossing(
 }
 
 /// Hand each of `crossings` to the app, if it listens.
-pub fn report(hover: &FrameHover, crossings: Vec<FrameLinkHover>) {
-    if let FrameHover::Report(FrameHoverHandler(handler)) = hover {
+pub fn report(hover: Option<&FrameHandler<FrameLinkHover>>, crossings: Vec<FrameLinkHover>) {
+    if let Some(handler) = hover {
         for crossing in crossings {
             handler(crossing);
         }

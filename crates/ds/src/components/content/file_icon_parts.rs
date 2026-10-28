@@ -3,7 +3,6 @@
 //! a tint changes a part's `color` and nothing in the markup. Sizes are written as attributes in
 //! pixels (an `svg`'s width and height are presentation attributes in Blitz).
 
-use crate::components::content::file_icon::LabelFit;
 use crate::components::content::image_source::ImageSource;
 use dioxus::prelude::*;
 use ds_style::icon::Icon;
@@ -60,10 +59,10 @@ fn layer(
 }
 
 /// The standard page: shadow, paper, fold, hairline edge, the kind's mark and the label.
-pub(crate) fn page(kind: FileKind, label: Option<&ExtLabel>, px: u8, fit: LabelFit) -> Element {
+pub(crate) fn page(kind: FileKind, label: Option<&ExtLabel>, px: u8, fit: bool) -> Element {
     let size = page_box(px);
     let side = f32::from(px);
-    let label = label.filter(|_| fit == LabelFit::Shown);
+    let label = label.filter(|_| fit);
     let mark_side = match label {
         Some(_) => side * 0.30,
         None => side * 0.5,

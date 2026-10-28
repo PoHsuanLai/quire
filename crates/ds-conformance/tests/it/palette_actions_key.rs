@@ -9,7 +9,7 @@ use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::focus::request::use_focus_request;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -96,7 +96,7 @@ fn a_second_actions_key_closes_the_menu_and_gives_the_field_the_keyboard_back() 
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     harness.advance(ms(300));
-    assert_eq!(harness.focus_of("#card .ds-input"), FocusState::Focused);
+    assert!(harness.focus_of("#card .ds-input"));
     harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k')));
     harness.advance(ms(200));
     assert_eq!(
@@ -104,9 +104,8 @@ fn a_second_actions_key_closes_the_menu_and_gives_the_field_the_keyboard_back() 
         1,
         "the first Ctrl+K opens it"
     );
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-popover.ds-menu"),
-        FocusState::Focused,
         "the menu has the keyboard"
     );
     harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k')));
@@ -116,9 +115,8 @@ fn a_second_actions_key_closes_the_menu_and_gives_the_field_the_keyboard_back() 
         0,
         "the second Ctrl+K closes it"
     );
-    assert_eq!(
+    assert!(
         harness.focus_of("#card .ds-input"),
-        FocusState::Focused,
         "the field has the keyboard back"
     );
 }

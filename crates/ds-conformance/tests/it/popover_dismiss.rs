@@ -10,7 +10,7 @@ use ds::base::vocab::Dismiss;
 use ds::components::overlays::popover::Arrow;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -67,11 +67,7 @@ fn start(dismiss: Dismiss, arrow: Arrow) -> Harness {
 fn take_keyboard(harness: &mut Harness) {
     harness.send(Input::key(ShortcutKey::Tab));
     harness.advance(ms(16));
-    assert_eq!(
-        harness.focus_of("#inside"),
-        FocusState::Focused,
-        "the button took the keyboard"
-    );
+    assert!(harness.focus_of("#inside"), "the button took the keyboard");
 }
 
 fn click_outside(harness: &mut Harness) {

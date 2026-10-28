@@ -5,7 +5,7 @@
 //! pop-up button's open state is the caller's; a sheet's Return presses its default button.
 
 use dioxus::prelude::*;
-use ds::components::controls::button_model::{Answers, ButtonFocus};
+use ds::components::controls::button_model::Answers;
 use ds::components::fields::text_field_model::Invalid;
 use ds::components::menus::pop_up_button::PopUpButton;
 use ds::components::overlays::sheet::Sheet;
@@ -13,7 +13,7 @@ use ds::components::overlays::sheet_attach::Attach;
 use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -149,9 +149,8 @@ fn submitting_hands_over_the_text_and_a_value_the_caller_empties_empties_the_fie
     assert_eq!(harness.text_of(".sent").as_deref(), Some("hunter2"));
     assert_eq!(dots(&harness), 0, "the caller emptied it");
     harness.advance(ms(100));
-    assert_eq!(
+    assert!(
         harness.focus_of("#secret input"),
-        FocusState::Focused,
         "the caret stays in the field it was in"
     );
     type_text(&mut harness, "q");
@@ -395,11 +394,7 @@ fn Asking() -> Element {
 fn return_in_a_sheet_presses_its_default_button_while_that_is_enabled() {
     let mut harness = harness(Asking);
     harness.advance(ms(600));
-    assert_eq!(
-        harness.focus_of("#who input"),
-        FocusState::Focused,
-        "first field"
-    );
+    assert!(harness.focus_of("#who input"), "first field");
     harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(30));
     assert_eq!(
@@ -425,7 +420,7 @@ fn Confirming() -> Element {
                 Button {
                     label: "Remove",
                     answers: Answers::Return,
-                    focus: ButtonFocus::OnMount,
+                    autofocus: true,
                     onclick: |_| {},
                     common: Common { id: Some("default".into()), ..Common::default() },
                 }
@@ -438,7 +433,7 @@ fn Confirming() -> Element {
 fn a_default_button_can_take_the_keyboard_as_its_sheet_opens() {
     let mut harness = harness(Confirming);
     harness.advance(ms(600));
-    assert_eq!(harness.focus_of("#default"), FocusState::Focused);
+    assert!(harness.focus_of("#default"));
 }
 
 /// A sheet whose only stop is a toggle row, with a default button.

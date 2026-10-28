@@ -2,7 +2,7 @@
 //! its parent, and a fixed column is as tall as a control of its size.
 
 use dioxus::prelude::*;
-use ds::components::chrome::column::model::{ColumnExtent, ColumnGap};
+use ds::components::chrome::column::model::ColumnExtent;
 use ds::components::chrome::column::view::Column;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
@@ -32,13 +32,13 @@ enum Layout {
 fn Page() -> Element {
     let body = match LAYOUT.with(Cell::get) {
         Layout::Gapless => rsx! {
-            Column { gap: ColumnGap::None, div { class: "a", style: "height:20px" } div { class: "b", style: "height:20px" } }
+            Column { gap: None, div { class: "a", style: "height:20px" } div { class: "b", style: "height:20px" } }
         },
         Layout::Stepped => rsx! {
-            Column { gap: SpacingToken::S20, div { class: "a", style: "height:20px" } div { class: "b", style: "height:20px" } }
+            Column { gap: Some(SpacingToken::S20), div { class: "a", style: "height:20px" } div { class: "b", style: "height:20px" } }
         },
         Layout::Filling => rsx! {
-            Column { extent: ColumnExtent::Fill, gap: ColumnGap::None, div { class: "a", style: "height:20px" } }
+            Column { extent: ColumnExtent::Fill, gap: None, div { class: "a", style: "height:20px" } }
         },
         Layout::Fixed => rsx! {
             Column { extent: ColumnExtent::Fixed(ControlSize::Large), div { class: "a" } }

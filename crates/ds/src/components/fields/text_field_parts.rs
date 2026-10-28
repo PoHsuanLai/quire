@@ -5,7 +5,7 @@ use crate::components::fields::text_field_area::area;
 use crate::components::fields::text_field_blink::CaretBlink;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_ime::{Composition, FieldIme};
-use crate::components::fields::text_field_mask::{CaretMark, MaskCaret, MaskParts};
+use crate::components::fields::text_field_mask::{MaskCaret, MaskParts};
 use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows};
 use crate::components::fields::text_field_secret::takes_text_out;
 use crate::focus::targets::Told;
@@ -114,7 +114,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
             class: "ds-input-wrap",
             "data-variant": bezel.slug(),
             "data-size": size.slug(),
-            "data-blink": blink.phase().attr(),
+            "data-blink": blink.attr(),
             input {
                 id,
                 class: "ds-input",
@@ -193,7 +193,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
                     if !parts.selected.is_empty() {
                         span { class: "ds-input-mask-selected", "{parts.selected}" }
                     }
-                    if parts.caret == CaretMark::Shown {
+                    if parts.caret {
                         span { class: "ds-input-caret" }
                     }
                     "{parts.after}"

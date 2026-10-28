@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::components::menus::palette::palette_group::PaletteGroup;
 use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Layout, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Layout, Viewport};
 use image::RgbaImage;
 use probe::rect;
 use std::time::Duration;
@@ -197,9 +197,8 @@ fn TabPassed() -> Element {
 fn tab_keeps_the_field(page: fn() -> Element) -> bool {
     let mut harness = Harness::new(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(200));
-    assert_eq!(
+    assert!(
         harness.focus_of("#card .ds-input"),
-        FocusState::Focused,
         "the field starts focused"
     );
     harness.send(Input::key(ShortcutKey::Tab));
@@ -209,7 +208,7 @@ fn tab_keeps_the_field(page: fn() -> Element) -> bool {
         Some("1"),
         "the caller heard Tab"
     );
-    harness.focus_of("#card .ds-input") == FocusState::Focused
+    harness.focus_of("#card .ds-input")
 }
 
 /// A Tab the caller takes (`prevent_default` on the event `onkey` hands it) leaves the
@@ -317,18 +316,16 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
         "hidden lays out nothing: {laid:?}"
     );
     let hidden = harness.render().expect("a frame");
-    assert_eq!(
-        harness.focus_of("#card .ds-input"),
-        FocusState::Unfocused,
+    assert!(
+        !harness.focus_of("#card .ds-input"),
         "hidden takes no keyboard"
     );
 
     toggle(&mut harness);
     harness.advance(ms(40));
     let first_mid = harness.render().expect("a frame");
-    assert_eq!(
+    assert!(
         harness.focus_of("#card .ds-input"),
-        FocusState::Focused,
         "shown, it takes the keyboard"
     );
     harness.send(Input::key(ShortcutKey::Char('f')));
@@ -339,9 +336,8 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
     toggle(&mut harness);
     harness.advance(ms(40));
     let second_mid = harness.render().expect("a frame");
-    assert_eq!(
+    assert!(
         harness.focus_of("#card .ds-input"),
-        FocusState::Focused,
         "shown again, it has the keyboard"
     );
     assert_eq!(

@@ -7,6 +7,9 @@
   border-radius:var(--r-icon-tile); background-color:var(--tile-bg); background-image:linear-gradient(180deg, var(--tile-top), var(--tile-bg));
   color:var(--on-hue);
 }
+/* The glyph scales with the tile: `--plate-tile-glyph` (60%) of its side, so a 48 px tile holds a
+   29 px glyph. The glyph's own width and height attributes are the size before the sheet loads. */
+.ds-icon-tile > .ds-ic{ width:var(--plate-tile-glyph); height:var(--plate-tile-glyph); }
 /* A family tile (`data-family`, `TileFace::Plate`): the plate family's paint (`--plate-base`,
    `--plate-deep`, `--plate-ink`, declared with the plate's rules, the neutral one dark paper in the
    dark scheme), top to bottom as the tile's own gradient runs. The neutral paper is the group's

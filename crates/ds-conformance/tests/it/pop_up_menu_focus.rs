@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::components::menus::pop_up_button::PopUpButton;
 use ds::prelude::*;
 use ds_blitz::FocusFallback;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -64,10 +64,7 @@ fn the_button_has_the_keyboard_after_a_pick_by_keys() {
     harness.advance(Duration::from_millis(800));
     assert_eq!(harness.count(".ds-menu"), 0, "the menu closed");
     assert_eq!(chosen(&harness).as_deref(), Some("2"), "the pick landed");
-    assert_eq!(
-        harness.focus_of(".ds-popup .ds-button"),
-        FocusState::Focused
-    );
+    assert!(harness.focus_of(".ds-popup .ds-button"));
 }
 
 #[test]
@@ -78,10 +75,7 @@ fn the_button_has_the_keyboard_after_escape() {
     harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(Duration::from_millis(800));
     assert_eq!(harness.count(".ds-menu"), 0, "the menu closed");
-    assert_eq!(
-        harness.focus_of(".ds-popup .ds-button"),
-        FocusState::Focused
-    );
+    assert!(harness.focus_of(".ds-popup .ds-button"));
 }
 
 /// A press `frames` frames after the menu opened, at the place its second item settles.
@@ -129,8 +123,5 @@ fn escape_right_after_the_click_closes_the_menu_and_leaves_the_keyboard_on_the_b
             .as_deref(),
         Some("true")
     );
-    assert_eq!(
-        harness.focus_of(".ds-popup .ds-button"),
-        FocusState::Focused
-    );
+    assert!(harness.focus_of(".ds-popup .ds-button"));
 }

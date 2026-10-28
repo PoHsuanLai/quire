@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::focus::request::use_focus_request;
 use ds::focus::soon::focus_soon;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -64,7 +64,7 @@ fn Plain() -> Element {
 fn a_controlled_focus_with_select_all_selects_the_whole_value() {
     let mut harness = Harness::new(Rename, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
-    assert_eq!(harness.focus_of("#name input"), FocusState::Focused);
+    assert!(harness.focus_of("#name input"));
     assert_eq!(
         harness.selected_text("#name input").as_deref(),
         Some("Archive")
@@ -90,7 +90,7 @@ fn the_value_is_selected_in_the_frame_the_focus_lands() {
     let again = harness.centre("#again .ds-button").expect("the button");
     harness.send(Input::click(again));
     let mut frames = 0;
-    while harness.focus_of("#name input") != FocusState::Focused {
+    while !harness.focus_of("#name input") {
         if !harness.step_frame() {
             harness.advance(ms(1));
         }
@@ -111,11 +111,11 @@ fn a_request_after_moving_away_selects_it_again() {
     let other = harness.centre("#other input").expect("the other field");
     harness.send(Input::click(other));
     harness.advance(ms(50));
-    assert_eq!(harness.focus_of("#other input"), FocusState::Focused);
+    assert!(harness.focus_of("#other input"));
     let again = harness.centre("#again .ds-button").expect("the button");
     harness.send(Input::click(again));
     harness.advance(ms(100));
-    assert_eq!(harness.focus_of("#name input"), FocusState::Focused);
+    assert!(harness.focus_of("#name input"));
     assert_eq!(
         harness.selected_text("#name input").as_deref(),
         Some("Archive")
@@ -126,7 +126,7 @@ fn a_request_after_moving_away_selects_it_again() {
 fn a_controlled_focus_without_select_all_selects_nothing() {
     let mut harness = Harness::new(Plain, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
-    assert_eq!(harness.focus_of("#name input"), FocusState::Focused);
+    assert!(harness.focus_of("#name input"));
     assert_eq!(harness.selected_text("#name input"), None);
 }
 
@@ -149,14 +149,9 @@ fn Shell() -> Element {
 #[test]
 fn an_app_focuses_its_own_element_through_focus_soon() {
     let mut harness = Harness::new(Shell, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
-    assert_eq!(harness.focus_of(".app"), FocusState::Unfocused);
+    assert!(!harness.focus_of(".app"));
     let back = harness.centre("#back .ds-button").expect("the button");
     harness.send(Input::click(back));
     harness.advance(ms(50));
-    assert_eq!(
-        harness.focus_of(".app"),
-        FocusState::Focused,
-        "{}",
-        harness.html()
-    );
+    assert!(harness.focus_of(".app"), "{}", harness.html());
 }

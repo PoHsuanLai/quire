@@ -8,7 +8,7 @@
 use crate::components::content::level_glyph::vocab::LevelSource;
 use crate::components::controls::slider_bezel::BezelSlider;
 use crate::components::controls::slider_linear::LinearSlider;
-use crate::components::controls::slider_model::{SliderLook, Ticks};
+use crate::components::controls::slider_model::SliderLook;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::vocab::{Availability, Fraction};
@@ -16,8 +16,8 @@ use ds_style::tokens::control_size::ControlSize;
 
 /// A value in a range, `value` in thousandths.
 ///
-/// `look: Linear` is the thin track under a round knob (`NSSlider`, the default); `ticks` puts
-/// marks on it and snaps the value to them, and `step` is a key's step without them (zero is a
+/// `look: Linear` is the thin track under a round knob (`NSSlider`, the default); `ticks` (a mark at every multiple of
+/// that share of the range) puts marks on it and snaps the value to them, and `step` is a key's step without them (zero is a
 /// twentieth). `look: Level` is the Control Center's level slider: a 22 high capsule under a round
 /// knob that carries the glyph. The level look carries `glyph`,
 /// a `LevelGlyph` that follows `value` or a `VolumeState` (both convert): the speaker then draws
@@ -30,7 +30,7 @@ pub fn Slider(
     value: Fraction,
     #[props(default)] look: SliderLook,
     #[props(default)] step: Fraction,
-    #[props(default)] ticks: Ticks,
+    #[props(default)] ticks: Option<Fraction>,
     #[props(default)] glyph: Option<LevelSource>,
     #[props(default)] size: ControlSize,
     #[props(default)] availability: Availability,

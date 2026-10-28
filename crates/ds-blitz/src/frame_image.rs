@@ -6,11 +6,10 @@
 
 use crate::frame_book::FrameBook;
 use crate::frame_hit::ImageUnder;
+use crate::frame_links::FrameHandler;
 use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
 use ds::prelude::*;
-use std::fmt;
-use std::sync::Arc;
 
 /// An image clicked inside a frame.
 #[derive(Debug, Clone, PartialEq)]
@@ -28,42 +27,6 @@ pub struct FrameImageClick {
     pub at: Point,
 }
 
-/// Whether the app hears clicks on images in frames.
-#[derive(Clone, Default)]
-pub enum FrameImages {
-    /// No: nothing is hit-tested.
-    #[default]
-    Ignore,
-    /// Yes, on the UI thread, with the document free.
-    Report(FrameImageHandler),
-}
-
-/// The app's handler for [`FrameImages::Report`].
-#[derive(Clone)]
-pub struct FrameImageHandler(Arc<dyn Fn(FrameImageClick) + Send + Sync>);
-
-impl FrameImageHandler {
-    /// Call `handler` with each click on an image.
-    pub fn new(handler: impl Fn(FrameImageClick) + Send + Sync + 'static) -> Self {
-        FrameImageHandler(Arc::new(handler))
-    }
-}
-
-impl fmt::Debug for FrameImages {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(match self {
-            FrameImages::Ignore => "Ignore",
-            FrameImages::Report(_) => "Report(..)",
-        })
-    }
-}
-
-impl fmt::Debug for FrameImageHandler {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("FrameImageHandler(..)")
-    }
-}
-
 /// The click released at `at`, over `under`: nothing when it was not on an image in a frame.
 pub fn ask(under: Option<ImageUnder>, at: Point, book: &FrameBook) -> Option<FrameImageClick> {
     under.map(|under| FrameImageClick {
@@ -76,8 +39,8 @@ pub fn ask(under: Option<ImageUnder>, at: Point, book: &FrameBook) -> Option<Fra
 }
 
 /// Hand `click` to the app, if it listens.
-pub fn report(listen: &FrameImages, click: Option<FrameImageClick>) {
-    if let (FrameImages::Report(FrameImageHandler(handler)), Some(click)) = (listen, click) {
+pub fn report(listen: Option<&FrameHandler<FrameImageClick>>, click: Option<FrameImageClick>) {
+    if let (Some(handler), Some(click)) = (listen, click) {
         handler(click);
     }
 }

@@ -232,7 +232,7 @@ The frame quire draws for a window that asks for no server decorations
 | Double-click the titlebar | `zoom(Toggle)`: maximized restores, anything else maximizes (macOS's "double-click a window's title bar to zoom", its default) | settled |
 | Resize | a primary press on an edge zone (4 px sides, 12 px corners): `begin_resize(edge)` at once. No zones while maximized or fullscreen | settled |
 | Green light | a click is `zoom(Toggle)`; its mark is "restore" while maximized | settled |
-| Tiling menu | held for the `LongPress` delay (500 ms, `input.long_press_ms`), rested on `window.tile_menu_hover_ms` (800 = the 450 ms hover intent + 350), right-click, or ArrowDown on the focused light: Move & Resize with Fill (= maximize), Left half, Right half, Centre; a placement the host reports `Support::No` for is unavailable. The hold that opened it does not also zoom | settled shape (macOS Sequoia), delays proposed |
+| Tiling menu | held for the `LongPress` delay (500 ms, `input.long_press_ms`), rested on `window.tile_menu_hover_ms` (800 = the 450 ms hover intent + 350), right-click, or ArrowDown on the focused light: Move & Resize with Fill (= maximize), Left half, Right half, Centre; a placement the host reports unsupported (`supports` is false) is unavailable. The hold that opened it does not also zoom | settled shape (macOS Sequoia), delays proposed |
 | First click | the titlebar, the lights and the edge zones carry `data-first-mouse` (13.3.8) | settled |
 | Keyboard | Tab reaches close, minimize, zoom; Enter or Space presses; Escape closes the menu | settled |
 | Placement on Wayland | Left half, Right half and Centre are unavailable: a toplevel can neither read nor set its position (FINDINGS "Window frame") | limit |

@@ -3,7 +3,7 @@
 //! blitz-shell's `request_window_close`, which drops the window and ends the event loop as the
 //! compositor's close does. The left half, right half and centre placements need a client that
 //! can read and set its own position: winit answers `outer_position` with `NotSupported` on
-//! Wayland and ignores `set_outer_position` there, so they are `Support::No` on Wayland and work
+//! Wayland and ignores `set_outer_position` there, so they are unsupported on Wayland and work
 //! on X11 (and wherever winit can place a window).
 //!
 //! `launch` provides it as `ds::prelude::WindowHost` and refreshes the state on every resize and focus
@@ -19,9 +19,7 @@ use dioxus_native::winit::window::{ResizeDirection, Window};
 use dioxus_native_dom::NodeHandle;
 use ds::prelude::*;
 use ds::window::icon::WindowIcon;
-use ds::window::vocab::{
-    Activation, Fullscreen, Maximized, PageZoom, Support, TileError, WindowTile, Zoom,
-};
+use ds::window::vocab::{Activation, Fullscreen, Maximized, PageZoom, TileError, WindowTile, Zoom};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -81,11 +79,11 @@ impl WinitWindow {
     }
 
     /// Whether the client can place itself: it can read its own position and its output's.
-    fn placeable(&self) -> Support {
-        match (self.window.outer_position(), self.output()) {
-            (Ok(_), Some(_)) => Support::Yes,
-            _ => Support::No,
-        }
+    fn placeable(&self) -> bool {
+        matches!(
+            (self.window.outer_position(), self.output()),
+            (Ok(_), Some(_))
+        )
     }
 }
 
@@ -123,7 +121,7 @@ impl HostWindow for WinitWindow {
             self.window.set_maximized(true);
             return Ok(());
         }
-        let (Support::Yes, Some(output)) = (self.placeable(), self.output()) else {
+        let (true, Some(output)) = (self.placeable(), self.output()) else {
             return Err(TileError::Unsupported);
         };
         let size = self.window.outer_size();
@@ -144,9 +142,9 @@ impl HostWindow for WinitWindow {
         Ok(())
     }
 
-    fn supports(&self, tile: WindowTile) -> Support {
+    fn supports(&self, tile: WindowTile) -> bool {
         match tile {
-            WindowTile::Fill => Support::Yes,
+            WindowTile::Fill => true,
             WindowTile::LeftHalf | WindowTile::RightHalf | WindowTile::Centre => self.placeable(),
         }
     }

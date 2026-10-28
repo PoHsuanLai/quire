@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -105,11 +105,7 @@ fn a_press_on_a_row_reaches_it_and_escape_closes() {
     harness.advance(ms(300));
     assert_eq!(harness.text_of(".log").as_deref(), Some("pick:1"));
     let mut harness = laid_out(Fitted);
-    assert_eq!(
-        harness.focus_of(".ds-menu"),
-        FocusState::Focused,
-        "the menu has the keyboard"
-    );
+    assert!(harness.focus_of(".ds-menu"), "the menu has the keyboard");
     harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-menu"), 0);

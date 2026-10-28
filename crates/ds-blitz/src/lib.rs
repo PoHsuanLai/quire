@@ -126,10 +126,10 @@ pub use content_fit::{ContentFit, use_content_fit};
 pub use contexts::RootContexts;
 pub use error::{LaunchError, OpenWindowError, RuntimeError};
 pub use fonts::font_context;
-pub use frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover, HoverPhase};
-pub use frame_image::{FrameImageClick, FrameImageHandler, FrameImages};
-pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
-pub use frame_menu::{FrameLinkMenu, FrameMenu, FrameMenuHandler};
+pub use frame_hover::{FrameLinkHover, HoverPhase};
+pub use frame_image::FrameImageClick;
+pub use frame_links::{FrameHandler, FrameLink, FrameLinks};
+pub use frame_menu::FrameLinkMenu;
 pub use frame_tag::FrameTag;
 pub use gpu_request::GpuRequest;
 pub use keymap_detect::system_key_source;
@@ -137,7 +137,7 @@ pub use launch::{AppConfig, RuntimeGuard, TokioSpawner, enter_runtime, launch, l
 pub use link_open::{LinkFailureHandler, LinkOpenError};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use open_window::{WindowHandle, WindowSpec, open_window, open_window_with, use_window_handle};
-pub use origin::{FrameId, RequestOrigin};
+pub use origin::FrameId;
 #[cfg(feature = "pdf")]
 pub use pdf::{
     ContentPx, Margins, PageSize, PageSpec, PdfError, Pt, content_size, pdf, print_document,

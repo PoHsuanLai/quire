@@ -9,7 +9,7 @@ use ds::focus::field::{FieldHandle, use_field_handle};
 use ds::focus::select::Select;
 use ds::focus::selector::{FocusError, focus_by_selector};
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -123,7 +123,7 @@ fn reached(app: fn() -> Element) -> Harness {
 #[test]
 fn a_field_focused_by_its_handle_hears_it_once_with_its_value_selected() {
     let harness = reached(ByHandle);
-    assert_eq!(harness.focus_of(".rename input"), FocusState::Focused);
+    assert!(harness.focus_of(".rename input"));
     assert_eq!(log(&harness), "focus");
     assert_eq!(
         harness.selected_text(".rename input").as_deref(),
@@ -134,7 +134,7 @@ fn a_field_focused_by_its_handle_hears_it_once_with_its_value_selected() {
 #[test]
 fn a_field_focused_by_selector_hears_it_once_with_its_value_selected() {
     let harness = reached(BySelector);
-    assert_eq!(harness.focus_of(".rename input"), FocusState::Focused);
+    assert!(harness.focus_of(".rename input"));
     assert_eq!(log(&harness), "found,focus");
     assert_eq!(
         harness.selected_text(".rename input").as_deref(),
@@ -147,7 +147,7 @@ fn a_handle_blur_is_heard_once_and_leaves_the_field() {
     let mut harness = reached(ByHandle);
     press(&mut harness, "#out button");
     harness.advance(ms(150));
-    assert_eq!(harness.focus_of(".rename input"), FocusState::Unfocused);
+    assert!(!harness.focus_of(".rename input"));
     assert_eq!(log(&harness), "focus,blur");
 }
 
@@ -171,7 +171,7 @@ fn an_unknown_selector_is_no_such_element() {
     press(&mut harness, "#go button");
     harness.advance(ms(1_000));
     assert_eq!(log(&harness), "no-such-element");
-    assert_eq!(harness.focus_of(".rename input"), FocusState::Unfocused);
+    assert!(!harness.focus_of(".rename input"));
 }
 
 #[test]

@@ -35,7 +35,7 @@ mod tables;
 mod text;
 
 pub use crate::desktop_entries::{DesktopId, DesktopIdError};
-pub use assoc::{Associations, Installed};
+pub use assoc::Associations;
 pub use db::{IconName, MimeDb, MimeLayer, Relation};
 pub use error::{LoadError, MimeError, NameError};
 pub use file_name::FileName;

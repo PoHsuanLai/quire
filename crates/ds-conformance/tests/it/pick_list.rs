@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups, PaletteRow};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -124,9 +124,8 @@ fn titles(harness: &Harness) -> Vec<String> {
 fn it_opens_with_the_field_holding_the_keyboard_and_the_first_row_selected() {
     let harness = started();
     assert_eq!(harness.count(".ds-pick-list"), 1);
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-pick-list input"),
-        FocusState::Focused,
         "the field has the keyboard"
     );
     assert_eq!(titles(&harness), LABELS);
@@ -216,9 +215,8 @@ fn a_query_already_in_the_field_is_continued_not_prefixed() {
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     harness.advance(ms(400));
-    assert_eq!(
+    assert!(
         harness.focus_of(".ds-pick-list input"),
-        FocusState::Focused,
         "the field has the keyboard"
     );
     type_text(&mut harness, "v");

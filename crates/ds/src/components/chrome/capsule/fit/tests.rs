@@ -78,7 +78,7 @@ fn names(slots: &[Slot], stage: Option<u32>) -> Vec<String> {
     slots
         .iter()
         .zip(fit(slots, stage))
-        .filter(|(_, state)| *state == SlotShown::Shown)
+        .filter(|(_, state)| *state)
         .map(|(one, _)| name(&one.slot))
         .collect()
 }
@@ -143,11 +143,7 @@ fn a_narrower_stage_drops_the_least_important_first() {
 #[test]
 fn every_slot_shows_when_they_all_fit() {
     let slots = player();
-    assert!(
-        fit(&slots, Some(2000))
-            .iter()
-            .all(|state| *state == SlotShown::Shown)
-    );
+    assert!(fit(&slots, Some(2000)).iter().all(|state| *state));
 }
 
 #[test]
@@ -205,10 +201,7 @@ fn a_wider_stage_only_ever_brings_slots_back() {
     for stage in 1..900 {
         let now = fit(&slots, Some(stage));
         assert_eq!(now.len(), slots.len(), "one entry per slot at {stage}");
-        let lost = before
-            .iter()
-            .zip(&now)
-            .any(|(was, is)| *was == SlotShown::Shown && *is == SlotShown::Dropped);
+        let lost = before.iter().zip(&now).any(|(was, is)| *was && !*is);
         assert!(!lost, "a slot left as the stage widened to {stage}");
         before = now;
     }
@@ -221,7 +214,7 @@ fn no_divider_is_left_at_an_end_or_beside_another() {
         let shown: Vec<CapsuleSlot<String>> = slots
             .iter()
             .zip(fit(&slots, Some(stage)))
-            .filter(|(_, state)| *state == SlotShown::Shown)
+            .filter(|(_, state)| *state)
             .map(|(one, _)| one.slot.clone())
             .collect();
         let divided = |at: usize| matches!(shown.get(at), Some(CapsuleSlot::Divider));

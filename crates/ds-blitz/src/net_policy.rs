@@ -4,7 +4,7 @@
 //! the app's, so a sanitiser miss must not turn into a read of the disk.
 
 use crate::frame_tag::FrameTag;
-use crate::origin::RequestOrigin;
+use crate::origin::FrameId;
 use blitz_traits::net::{Bytes, NetHandler, NetWaker, Url};
 use std::fmt;
 use std::sync::Arc;
@@ -58,18 +58,20 @@ pub enum NetDecision {
 /// One request a document made, and where it came from.
 #[derive(Debug, Clone)]
 pub struct NetRequest {
-    origin: RequestOrigin,
+    origin: Option<FrameId>,
     tag: Option<FrameTag>,
     url: Url,
 }
 
 impl NetRequest {
-    pub(crate) fn new(origin: RequestOrigin, tag: Option<FrameTag>, url: Url) -> Self {
+    pub(crate) fn new(origin: Option<FrameId>, tag: Option<FrameTag>, url: Url) -> Self {
         NetRequest { origin, tag, url }
     }
 
-    /// The document that asked.
-    pub fn origin(&self) -> RequestOrigin {
+    /// The frame that asked: `None` for the app's own document, whose markup is the app's. A
+    /// frame's markup is someone else's (a mail body), so nothing is served to it unless the
+    /// app says so for that request.
+    pub fn origin(&self) -> Option<FrameId> {
         self.origin
     }
 

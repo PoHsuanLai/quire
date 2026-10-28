@@ -10,7 +10,7 @@ use ds::edit::input::{EditInput, KeyInput};
 use ds::edit::pointer::{EditFocus, EditPointer};
 use ds::prelude::*;
 use ds_blitz::FocusFallback;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -109,7 +109,7 @@ fn bubble_press_keeps_the_surface(fallback: FocusFallback) {
     };
     harness.send(Input::drag(from, to, 3));
     harness.advance(Duration::from_millis(600));
-    assert_eq!(harness.focus_of("#editor"), FocusState::Focused);
+    assert!(harness.focus_of("#editor"));
     drain(&POINTER);
     drain(&FOCUS);
     drain(&INPUT);
@@ -124,11 +124,7 @@ fn bubble_press_keeps_the_surface(fallback: FocusFallback) {
         Some("1"),
         "the press still acted"
     );
-    assert_eq!(
-        harness.focus_of("#editor"),
-        FocusState::Focused,
-        "the body kept the keyboard"
-    );
+    assert!(harness.focus_of("#editor"), "the body kept the keyboard");
     assert_eq!(drain(&FOCUS), Vec::new(), "the surface heard no blur");
     assert_eq!(drain(&POINTER), Vec::new(), "the selection did not move");
 

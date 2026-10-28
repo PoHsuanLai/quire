@@ -15,9 +15,7 @@ use crate::blitz_host::FindDocument;
 use crate::node_ref::{DocRef, FoundNode, NodeRef, Written};
 use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
 use dioxus::prelude::*;
-use ds::host::caret::{
-    Caret, CaretOwed, Collapsed, FieldSelection, InitialCaret, caret_at, stem_end,
-};
+use ds::host::caret::{Caret, CaretOwed, FieldSelection, InitialCaret, caret_at, stem_end};
 use ds::host::found::Found;
 use ds::prelude::*;
 use std::rc::Rc;
@@ -182,15 +180,10 @@ pub(crate) fn caret(element: &MountedData) -> Caret {
     node.read(|doc| {
         let input = doc.get_node(node.node)?.element_data()?.text_input_data()?;
         let selection = input.editor.raw_selection();
-        let collapsed = if selection.is_collapsed() {
-            Collapsed::Yes
-        } else {
-            Collapsed::No
-        };
         Some(caret_at(
             input.editor.raw_text(),
             selection.focus().index(),
-            collapsed,
+            selection.is_collapsed(),
         ))
     })
     .flatten()

@@ -3,7 +3,6 @@
 //! marks are drawn where the value would stop.
 
 use dioxus::prelude::*;
-use ds::components::controls::slider_model::Ticks;
 use ds::prelude::*;
 use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
@@ -28,7 +27,7 @@ fn Page() -> Element {
                 Slider {
                     label: "Level",
                     value: VALUE(),
-                    ticks: Ticks::Every(Fraction(250)),
+                    ticks: Some(Fraction(250)),
                     onchange: move |next| *VALUE.write() = next,
                 }
             }

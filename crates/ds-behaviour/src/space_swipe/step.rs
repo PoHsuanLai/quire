@@ -159,11 +159,12 @@ fn follow(
         p,
         samples: record(samples, at, p),
     };
-    let draws = match params.reduced {
-        super::model::Reduced::No => vec![SwipeOut::Offset {
+    let draws = if params.reduced {
+        Vec::new()
+    } else {
+        vec![SwipeOut::Offset {
             p: rubber(p, 0, last_space(params)),
-        }],
-        super::model::Reduced::Yes => Vec::new(),
+        }]
     };
     (state, draws)
 }

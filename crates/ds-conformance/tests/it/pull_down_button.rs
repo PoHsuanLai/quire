@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_blitz::FocusFallback;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -65,7 +65,7 @@ fn down_opens_the_menu_while_the_button_has_the_keyboard() {
     let mut harness = started();
     harness.send(Input::key(ShortcutKey::Tab));
     settle(&mut harness);
-    assert_eq!(harness.focus_of(BUTTON), FocusState::Focused);
+    assert!(harness.focus_of(BUTTON));
     harness.send(Input::key(ShortcutKey::Down));
     settle(&mut harness);
     assert_eq!(harness.count(".ds-menu"), 1);
@@ -94,7 +94,7 @@ fn escape_closes_the_menu_and_the_button_has_the_keyboard() {
     harness.send(Input::key(ShortcutKey::Escape));
     settle(&mut harness);
     assert_eq!(harness.count(".ds-menu"), 0, "the menu closed");
-    assert_eq!(harness.focus_of(BUTTON), FocusState::Focused);
+    assert!(harness.focus_of(BUTTON));
 }
 
 fn chevron_page() -> Element {

@@ -21,7 +21,7 @@ fn titled(title: &'static str) -> Element {
         Ds {
             appearance: Appearance::default(),
             material: Material::Window,
-            window: WindowFrame::titlebar(title, TrafficLights::Shown),
+            window: WindowFrame::titlebar(title, Shown::Visible),
             p { "body" }
         }
     }

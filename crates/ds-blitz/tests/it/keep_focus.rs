@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds_blitz::FocusFallback;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -116,7 +116,7 @@ fn click(harness: &mut Harness, selector: &str) {
 fn a_click_on_plain_text_leaves_the_shell_focused_and_it_hears_the_next_key() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".plain");
-    assert_eq!(harness.focus_of(".app"), FocusState::Focused);
+    assert!(harness.focus_of(".app"));
     harness.send(Input::key(ShortcutKey::Char('j')));
     assert_eq!(log(&harness), "key:j");
 }
@@ -125,7 +125,7 @@ fn a_click_on_plain_text_leaves_the_shell_focused_and_it_hears_the_next_key() {
 fn with_blitz_default_the_click_clears_the_focus() {
     let mut harness = harness(FocusFallback::BlitzDefault);
     click(&mut harness, ".plain");
-    assert_eq!(harness.focus_of(".app"), FocusState::Unfocused);
+    assert!(!harness.focus_of(".app"));
     harness.send(Input::key(ShortcutKey::Char('j')));
     assert_eq!(log(&harness), "");
 }
@@ -139,7 +139,7 @@ fn a_second_click_keeps_the_shell_focused_without_a_blur() {
     click(&mut harness, ".plain");
     harness.advance(ms(600));
     click(&mut harness, ".plain");
-    assert_eq!(harness.focus_of(".app"), FocusState::Focused);
+    assert!(harness.focus_of(".app"));
     assert_eq!(log(&harness), "", "the shell heard no blur");
 }
 
@@ -148,7 +148,7 @@ fn a_double_click_still_arrives() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".plain");
     click(&mut harness, ".plain");
-    assert_eq!(harness.focus_of(".app"), FocusState::Focused);
+    assert!(harness.focus_of(".app"));
     assert_eq!(log(&harness), "dblclick");
 }
 
@@ -156,9 +156,9 @@ fn a_double_click_still_arrives() {
 fn a_field_the_click_leaves_hears_its_blur_and_the_shell_takes_the_keyboard() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".field input");
-    assert_eq!(harness.focus_of(".field input"), FocusState::Focused);
+    assert!(harness.focus_of(".field input"));
     click(&mut harness, ".plain");
-    assert_eq!(harness.focus_of(".app"), FocusState::Focused);
+    assert!(harness.focus_of(".app"));
     assert_eq!(log(&harness), "field-blur");
 }
 
@@ -167,8 +167,8 @@ fn inside_an_edit_surface_its_own_focus_wins() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".plain");
     click(&mut harness, ".inside");
-    assert_eq!(harness.focus_of("#editor"), FocusState::Focused);
-    assert_eq!(harness.focus_of(".app"), FocusState::Unfocused);
+    assert!(harness.focus_of("#editor"));
+    assert!(!harness.focus_of(".app"));
 }
 
 #[test]
@@ -177,7 +177,7 @@ fn a_press_on_a_panels_empty_space_keeps_the_keyboard_and_escape_still_closes_it
     // A plain button takes no focus in Blitz; the press on it leaves the panel as it was.
     click(&mut harness, ".inside");
     click(&mut harness, ".empty");
-    assert_eq!(harness.focus_of(".panel"), FocusState::Focused);
+    assert!(harness.focus_of(".panel"));
     harness.send(Input::key(ShortcutKey::Escape));
     assert_eq!(log(&harness), "closed");
 }

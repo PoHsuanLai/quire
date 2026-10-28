@@ -67,13 +67,6 @@ impl Part {
     }
 }
 
-/// Whether a part is showing: `data-on`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub(crate) enum Showing {
-    On,
-    Off,
-}
-
 /// The parts `glyph` draws, in paint order.
 pub(crate) fn parts(glyph: LevelGlyph) -> &'static [Part] {
     match glyph {
@@ -101,8 +94,8 @@ pub(crate) fn waves(value: Fraction) -> u8 {
 }
 
 /// Whether `part` of `glyph` shows at `value`.
-pub(crate) fn showing(part: Part, glyph: LevelGlyph, value: Fraction) -> Showing {
-    let on = match (part, glyph) {
+pub(crate) fn showing(part: Part, glyph: LevelGlyph, value: Fraction) -> bool {
+    match (part, glyph) {
         (
             Part::Body | Part::Core | Part::Rays | Part::KeyBody | Part::KeyCore | Part::KeyRays,
             _,
@@ -116,8 +109,7 @@ pub(crate) fn showing(part: Part, glyph: LevelGlyph, value: Fraction) -> Showing
             Part::Slash | Part::Wave1 | Part::Wave2 | Part::Wave3,
             LevelGlyph::Brightness | LevelGlyph::KeyboardBrightness,
         ) => false,
-    };
-    if on { Showing::On } else { Showing::Off }
+    }
 }
 
 /// How much of the slash's gap is cut out of `part`: all of it from a muted speaker's body.
@@ -141,7 +133,7 @@ pub(crate) fn LevelGlyphView(glyph: LevelGlyph, value: Fraction, size: IconSize)
                     key: "{part.slug()}",
                     class: "ds-ic ds-level-part",
                     "data-part": part.slug(),
-                    "data-on": showing(part, glyph, value).slug(),
+                    "data-on": if showing(part, glyph, value) { "on" } else { "off" },
                     width: "{px}",
                     height: "{px}",
                     view_box: "0 0 24 24",
@@ -180,7 +172,7 @@ fn shape_child(shape: &Shape) -> Element {
 
 #[cfg(test)]
 mod tests {
-    use super::{Part, Shape, Showing, showing, waves};
+    use super::{Part, Shape, showing, waves};
     use crate::components::content::level_glyph::vocab::LevelGlyph;
     use ds_core::vocab::Fraction;
     use ds_core::vocab::Muting;
@@ -193,15 +185,12 @@ mod tests {
             [0, 1, 333, 334, 667, 1000].map(|v| waves(Fraction(v))),
             [0, 1, 1, 2, 3, 3]
         );
-        assert_eq!(showing(Part::Wave3, heard, Fraction(400)), Showing::Off);
-        assert_eq!(showing(Part::Wave2, heard, Fraction(400)), Showing::On);
-        assert_eq!(showing(Part::Slash, heard, Fraction(400)), Showing::Off);
-        assert_eq!(showing(Part::Slash, muted, Fraction(400)), Showing::On);
-        assert_eq!(showing(Part::Wave1, muted, Fraction(1000)), Showing::Off);
-        assert_eq!(
-            showing(Part::Rays, LevelGlyph::Brightness, Fraction(0)),
-            Showing::On
-        );
+        assert!(!showing(Part::Wave3, heard, Fraction(400)));
+        assert!(showing(Part::Wave2, heard, Fraction(400)));
+        assert!(!showing(Part::Slash, heard, Fraction(400)));
+        assert!(showing(Part::Slash, muted, Fraction(400)));
+        assert!(!showing(Part::Wave1, muted, Fraction(1000)));
+        assert!(showing(Part::Rays, LevelGlyph::Brightness, Fraction(0)));
     }
 
     #[test]
@@ -213,7 +202,7 @@ mod tests {
         );
         assert_eq!(Part::KeyRays.shapes().len(), 5);
         for part in super::parts(glyph) {
-            assert_eq!(showing(*part, glyph, Fraction(0)), Showing::On, "{part:?}");
+            assert!(showing(*part, glyph, Fraction(0)), "{part:?}");
         }
     }
 

@@ -11,7 +11,7 @@ use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
 use ds::host::caret::Caret;
 use ds::prelude::*;
-use ds_harness::{ClassPresence, Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -96,9 +96,8 @@ fn the_cursor_moves_through_the_grid_in_two_dimensions_and_leaves_it() {
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     harness.advance(ms(200));
-    assert_eq!(
+    assert!(
         harness.focus_of("#card .ds-input"),
-        FocusState::Focused,
         "the field has the keyboard"
     );
     assert_eq!(selected(&harness), "One");
@@ -126,9 +125,8 @@ fn the_cursor_moves_through_the_grid_in_two_dimensions_and_leaves_it() {
         assert_eq!(selected(&harness), *want, "step {step}: {key:?}");
     }
     assert_eq!(harness.count(".ds-emoji-cell[*|aria-selected=true]"), 1);
-    assert_eq!(
+    assert!(
         harness.has_class("#card .ds-emoji-grid", "ds-emoji-text"),
-        ClassPresence::Present,
         "the grid paints in the colour face"
     );
     harness.send(Input::key(ShortcutKey::Enter));
@@ -498,12 +496,9 @@ fn a_grid_on_its_own_moves_with_the_arrows_and_stops_at_its_edges() {
     harness.advance(ms(100));
     let first = harness.centre(".ds-emoji-cell").expect("a cell");
     harness.send(Input::click(first));
-    ds_harness::harness::settle_until(&mut harness, |harness| {
-        harness.focus_of(".ds-emoji-grid") == FocusState::Focused
-    });
-    assert_eq!(
+    ds_harness::harness::settle_until(&mut harness, |harness| harness.focus_of(".ds-emoji-grid"));
+    assert!(
         harness.focus_of(".ds-emoji-grid"),
-        FocusState::Focused,
         "the grid has the keyboard"
     );
     let at = |harness: &Harness| {

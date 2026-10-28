@@ -15,10 +15,7 @@ use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
-use ds_harness::{
-    ClassPresence, Clock, FocusState, Harness, HarnessConfig, Input, PointerAction, PointerInput,
-    Viewport,
-};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, PointerAction, PointerInput, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -96,14 +93,8 @@ fn centre(harness: &Harness, selector: &str) -> Point {
 #[test]
 fn the_surface_carries_the_apps_class_and_data() {
     let harness = fresh();
-    assert_eq!(
-        harness.has_class("#editor", "ds-edit"),
-        ClassPresence::Present
-    );
-    assert_eq!(
-        harness.has_class("#editor", "c-body"),
-        ClassPresence::Present
-    );
+    assert!(harness.has_class("#editor", "ds-edit"));
+    assert!(harness.has_class("#editor", "c-body"));
     assert_eq!(harness.attr("#editor", "data-draft").as_deref(), Some("42"));
 }
 
@@ -113,7 +104,7 @@ fn a_programmatic_focus_does_what_a_press_does() {
     assert_eq!(harness.ime_switch(), ImeSwitch::Off);
     harness.within(|| handle().focus());
     harness.advance(ms(50));
-    assert_eq!(harness.focus_of("#editor"), FocusState::Focused);
+    assert!(harness.focus_of("#editor"));
     assert_eq!(drain(&FOCUS), vec![EditFocus::In]);
     assert_eq!(harness.ime_switch(), ImeSwitch::On);
     harness.send(Input::ime_update("か", 3));
@@ -132,7 +123,7 @@ fn a_programmatic_focus_does_what_a_press_does() {
     );
     harness.within(|| handle().blur());
     harness.advance(ms(50));
-    assert_eq!(harness.focus_of("#editor"), FocusState::Unfocused);
+    assert!(!harness.focus_of("#editor"));
     assert_eq!(drain(&FOCUS), vec![EditFocus::Out]);
     assert_eq!(harness.ime_switch(), ImeSwitch::Off);
     harness.send(Input::ime_commit("x"));

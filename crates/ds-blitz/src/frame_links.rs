@@ -12,9 +12,9 @@
 
 use crate::frame_anchor::LinkFacts;
 use crate::frame_book::FrameBook;
-use crate::frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover};
-use crate::frame_image::{FrameImageClick, FrameImageHandler, FrameImages};
-use crate::frame_menu::{FrameLinkMenu, FrameMenu, FrameMenuHandler};
+use crate::frame_hover::FrameLinkHover;
+use crate::frame_image::FrameImageClick;
+use crate::frame_menu::FrameLinkMenu;
 use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
 use blitz_traits::navigation::{NavigationOptions, NavigationProvider};
@@ -39,149 +39,100 @@ pub struct FrameLink {
     pub title: Option<String>,
 }
 
+/// The app's handler for one kind of thing heard inside a frame: it runs on the UI thread, with
+/// the document free.
+pub type FrameHandler<E> = Arc<dyn Fn(E) + Send + Sync>;
+
 /// What a link clicked inside a frame does. The frame never navigates either way.
+///
+/// The default is inert: the click is dropped and nothing else is heard. A handler per kind of
+/// event is optional, and the app hears only the kinds it set.
 #[derive(Clone, Default)]
-pub enum FrameLinks {
-    /// Nothing: the click is dropped.
-    #[default]
-    Inert,
-    /// The app hears it (mailo opens it in the browser), on the UI thread, with the document
-    /// free; and, if `hover` reports, hears the pointer come onto and leave each link.
-    Intercept {
-        /// Called with each click.
-        click: FrameLinkHandler,
-        /// Whether the pointer crossing a link is reported too.
-        hover: FrameHover,
-        /// Whether a context menu asked over a link is reported too.
-        menu: FrameMenu,
-        /// Whether a click on an image (outside any link) is reported too.
-        image: FrameImages,
-    },
+pub struct FrameLinks {
+    /// Called with each click. `None`: the click is dropped, and the other handlers are never
+    /// called either (a link that does nothing has nothing to preview).
+    click: Option<FrameHandler<FrameLink>>,
+    /// Called as the pointer crosses a link.
+    hover: Option<FrameHandler<FrameLinkHover>>,
+    /// Called when a context menu is asked over a link.
+    menu: Option<FrameHandler<FrameLinkMenu>>,
+    /// Called on a click on an image (outside any link).
+    image: Option<FrameHandler<FrameImageClick>>,
 }
 
 impl FrameLinks {
-    /// Call `handler` with every link clicked inside a frame.
+    /// Call `handler` with every link clicked inside a frame (mailo opens it in the browser).
     pub fn intercept(handler: impl Fn(FrameLink) + Send + Sync + 'static) -> Self {
-        FrameLinks::Intercept {
-            click: FrameLinkHandler(Arc::new(handler)),
-            hover: FrameHover::Ignore,
-            menu: FrameMenu::Ignore,
-            image: FrameImages::Ignore,
+        FrameLinks {
+            click: Some(Arc::new(handler)),
+            ..FrameLinks::default()
         }
     }
 
     /// Also call `handler` as the pointer comes onto and leaves a link inside a frame (a link
-    /// pill). `Inert` stays inert: a link that does nothing has nothing to preview.
+    /// pill). A set that has no click handler stays inert: a link that does nothing has nothing
+    /// to preview.
     pub fn with_hover(self, handler: impl Fn(FrameLinkHover) + Send + Sync + 'static) -> Self {
-        match self {
-            FrameLinks::Inert => FrameLinks::Inert,
-            FrameLinks::Intercept {
-                click, menu, image, ..
-            } => FrameLinks::Intercept {
-                click,
-                hover: FrameHover::Report(FrameHoverHandler::new(handler)),
-                menu,
-                image,
-            },
-        }
+        self.when_clicking(|links| links.hover = Some(Arc::new(handler)))
     }
 
     /// Also call `handler` when a context menu (a secondary press) is asked over a link inside
     /// a frame (mailo's "Copy Link"): the link is the nearest enclosing `a[href]`, resolved
     /// against the frame's base URL. It is heard just before the page's own `oncontextmenu`
-    /// for the same press, so the app can keep it for the menu that handler opens. `Inert`
-    /// stays inert.
+    /// for the same press, so the app can keep it for the menu that handler opens. A set that
+    /// has no click handler stays inert.
     pub fn with_context_menu(
         self,
         handler: impl Fn(FrameLinkMenu) + Send + Sync + 'static,
     ) -> Self {
-        match self {
-            FrameLinks::Inert => FrameLinks::Inert,
-            FrameLinks::Intercept {
-                click,
-                hover,
-                image,
-                ..
-            } => FrameLinks::Intercept {
-                click,
-                hover,
-                menu: FrameMenu::Report(FrameMenuHandler::new(handler)),
-                image,
-            },
-        }
+        self.when_clicking(|links| links.menu = Some(Arc::new(handler)))
     }
 
     /// Also call `handler` when a primary click is released on an image inside a frame
     /// (mailo opens an inline image in Peek): an `img` with a `src`, resolved against the frame's
     /// base URL (a `cid:` reference stays `cid:`), and no link above it, since a click on a linked
-    /// image is the link's. `Inert` stays inert.
+    /// image is the link's. A set that has no click handler stays inert.
     pub fn with_image_click(
         self,
         handler: impl Fn(FrameImageClick) + Send + Sync + 'static,
     ) -> Self {
-        match self {
-            FrameLinks::Inert => FrameLinks::Inert,
-            FrameLinks::Intercept {
-                click, hover, menu, ..
-            } => FrameLinks::Intercept {
-                click,
-                hover,
-                menu,
-                image: FrameImages::Report(FrameImageHandler::new(handler)),
-            },
-        }
+        self.when_clicking(|links| links.image = Some(Arc::new(handler)))
     }
 
-    /// Whether a click on an image is reported.
-    pub fn images(&self) -> FrameImages {
-        match self {
-            FrameLinks::Inert => FrameImages::Ignore,
-            FrameLinks::Intercept { image, .. } => image.clone(),
-        }
+    /// The handler for a click on an image, if the app set one.
+    pub fn images(&self) -> Option<FrameHandler<FrameImageClick>> {
+        self.image.clone()
     }
 
-    /// Whether a context menu asked over a link is reported.
-    pub fn menu(&self) -> FrameMenu {
-        match self {
-            FrameLinks::Inert => FrameMenu::Ignore,
-            FrameLinks::Intercept { menu, .. } => menu.clone(),
-        }
+    /// The handler for a context menu asked over a link, if the app set one.
+    pub fn menu(&self) -> Option<FrameHandler<FrameLinkMenu>> {
+        self.menu.clone()
     }
 
-    /// Whether the pointer crossing a link is reported.
-    pub fn hover(&self) -> FrameHover {
-        match self {
-            FrameLinks::Inert => FrameHover::Ignore,
-            FrameLinks::Intercept { hover, .. } => hover.clone(),
+    /// The handler for the pointer crossing a link, if the app set one.
+    pub fn hover(&self) -> Option<FrameHandler<FrameLinkHover>> {
+        self.hover.clone()
+    }
+
+    /// `set` applied to the set, unless it is inert.
+    fn when_clicking(mut self, set: impl FnOnce(&mut Self)) -> Self {
+        if self.click.is_some() {
+            set(&mut self);
         }
+        self
     }
 }
 
 impl fmt::Debug for FrameLinks {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            FrameLinks::Inert => f.write_str("Inert"),
-            FrameLinks::Intercept {
-                hover, menu, image, ..
-            } => f
-                .debug_struct("Intercept")
-                .field("hover", hover)
-                .field("menu", menu)
-                .field("image", image)
-                .finish_non_exhaustive(),
-        }
+        f.debug_struct("FrameLinks")
+            .field("click", &self.click.is_some())
+            .field("hover", &self.hover.is_some())
+            .field("menu", &self.menu.is_some())
+            .field("image", &self.image.is_some())
+            .finish()
     }
 }
-
-impl fmt::Debug for FrameLinkHandler {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("FrameLinkHandler(..)")
-    }
-}
-
-/// The app's handler for [`FrameLinks::Intercept`].
-#[derive(Clone)]
-pub struct FrameLinkHandler(Arc<dyn Fn(FrameLink) + Send + Sync>);
 
 /// A click as the frame's navigation provider hears it, before the app is told.
 #[derive(Debug)]
@@ -210,7 +161,7 @@ impl NavigationProvider for FrameNav {
 /// Where the clicks a document's frames report are delivered to the app.
 pub struct LinkInbox {
     receiver: UnboundedReceiver<Clicked>,
-    handler: Option<FrameLinkHandler>,
+    handler: Option<FrameHandler<FrameLink>>,
     /// Where the clicked frame's tag is read.
     book: FrameBook,
 }
@@ -238,7 +189,7 @@ impl LinkInbox {
     }
 
     fn deliver(&self, clicked: Clicked, read: &dyn Fn(FrameId, &str) -> LinkFacts) {
-        if let Some(FrameLinkHandler(handler)) = &self.handler {
+        if let Some(handler) = &self.handler {
             let facts = read(clicked.frame, &clicked.href);
             handler(FrameLink {
                 frame: clicked.frame,
@@ -258,9 +209,9 @@ pub fn frame_links(
     book: FrameBook,
 ) -> (Arc<dyn NavigationProvider>, LinkInbox) {
     let (sender, receiver) = unbounded_channel();
-    let (sender, handler) = match links {
-        FrameLinks::Inert => (None, None),
-        FrameLinks::Intercept { click, .. } => (Some(sender), Some(click.clone())),
+    let (sender, handler) = match &links.click {
+        None => (None, None),
+        Some(click) => (Some(sender), Some(click.clone())),
     };
     (
         Arc::new(FrameNav { sender }),

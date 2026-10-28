@@ -5,7 +5,7 @@ use dioxus::prelude::*;
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::components::controls::chip_dot::ChipDot;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -74,7 +74,7 @@ fn a_click_presses_the_chip_and_its_state_follows() {
 fn return_and_space_press_the_focused_chip() {
     let mut harness = harness();
     harness.send(Input::key(ShortcutKey::Tab));
-    assert_eq!(harness.focus_of(FACE), FocusState::Focused);
+    assert!(harness.focus_of(FACE));
     harness.send(Input::key(ShortcutKey::Enter));
     assert_eq!(count(&harness, ".probe-presses"), "1");
     harness.send(Input::key(ShortcutKey::Space));

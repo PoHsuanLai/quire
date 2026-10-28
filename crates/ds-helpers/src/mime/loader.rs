@@ -4,7 +4,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use super::assoc::{Associations, Installed};
+use super::assoc::Associations;
 use super::db::{MimeDb, MimeLayer};
 use super::error::LoadError;
 use super::mimeapps::{MimeApps, MimeCache};
@@ -157,7 +157,7 @@ impl Associations {
     /// `applications/mimeinfo.cache`; what is missing or unreadable is left out.
     pub fn load(
         dirs: &XdgDirs,
-        installed: impl Fn(&DesktopId) -> Installed + Send + Sync + 'static,
+        installed: impl Fn(&DesktopId) -> bool + Send + Sync + 'static,
     ) -> Associations {
         let files = mimeapps_paths(dirs)
             .iter()
