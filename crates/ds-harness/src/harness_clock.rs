@@ -36,17 +36,14 @@ pub enum Clock {
     Virtual,
 }
 
-/// The clock a running harness holds.
+/// The clock a running harness holds: the wall clock, installed explicitly so a virtual harness
+/// built earlier on this thread and still alive does not leak its time into this one, or the
+/// virtual clock, installed on the harness's thread until the guard drops.
 #[derive(Debug)]
-pub(crate) enum HarnessClock {
-    /// The wall clock, installed explicitly so a virtual harness built earlier on this thread
-    /// and still alive does not leak its time into this one.
-    Wall { _installed: ClockGuard },
-    /// The virtual clock, installed on the harness's thread until the guard drops.
-    Virtual {
-        clock: VirtualClock,
-        _installed: ClockGuard,
-    },
+pub(crate) struct HarnessClock {
+    /// The virtual clock; `None` on the wall clock.
+    virtual_clock: Option<VirtualClock>,
+    _installed: ClockGuard,
 }
 
 impl HarnessClock {
@@ -54,14 +51,15 @@ impl HarnessClock {
     /// render already reads the harness's clock.
     pub(crate) fn start(choice: Clock) -> Self {
         match choice {
-            Clock::Wall => HarnessClock::Wall {
+            Clock::Wall => HarnessClock {
+                virtual_clock: None,
                 _installed: install_wall(),
             },
             Clock::Virtual => {
                 let clock = VirtualClock::new();
                 let installed = clock.install();
-                HarnessClock::Virtual {
-                    clock,
+                HarnessClock {
+                    virtual_clock: Some(clock),
                     _installed: installed,
                 }
             }
@@ -70,26 +68,22 @@ impl HarnessClock {
 
     /// Which clock this is.
     pub(crate) fn choice(&self) -> Clock {
-        match self {
-            HarnessClock::Wall { .. } => Clock::Wall,
-            HarnessClock::Virtual { .. } => Clock::Virtual,
+        match self.virtual_clock {
+            None => Clock::Wall,
+            Some(_) => Clock::Virtual,
         }
     }
 
     /// Now on this clock.
     pub(crate) fn now(&self) -> Instant {
-        match self {
-            HarnessClock::Wall { .. } => Instant::now(),
-            HarnessClock::Virtual { clock, .. } => clock.now(),
-        }
+        self.virtual_clock
+            .as_ref()
+            .map_or_else(Instant::now, VirtualClock::now)
     }
 
     /// The virtual clock, if this is one.
     pub(crate) fn virtual_clock(&self) -> Option<VirtualClock> {
-        match self {
-            HarnessClock::Wall { .. } => None,
-            HarnessClock::Virtual { clock, .. } => Some(clock.clone()),
-        }
+        self.virtual_clock.clone()
     }
 }
 

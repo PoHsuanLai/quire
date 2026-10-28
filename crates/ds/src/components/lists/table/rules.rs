@@ -35,30 +35,17 @@ pub enum HeaderRule {
     Never,
 }
 
-/// Whether a table's rows are scrolled away from the top.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub(crate) enum Scrolled {
-    /// The rows sit under the header.
-    Yes,
-    /// The rows start at the top.
-    No,
-}
-
-impl Scrolled {
-    /// Scrolled when the content is `offset` past the top.
-    pub(crate) fn at(offset: Px) -> Self {
-        match offset.0 > 0.0 {
-            true => Scrolled::Yes,
-            false => Scrolled::No,
-        }
-    }
+/// The value of `data-scrolled`: `yes` when the content is `offset` past the top, so the rows sit
+/// under the header, and `no` when the rows start at the top.
+pub(crate) fn scrolled_word(offset: Px) -> &'static str {
+    if offset.0 > 0.0 { "yes" } else { "no" }
 }
 
 impl HeaderRule {
     /// The value the `data-scrolled` attribute carries; `None` when the header never has a line.
     pub(crate) fn attribute(self, offset: Px) -> Option<&'static str> {
         match self {
-            HeaderRule::WhenScrolled => Some(Scrolled::at(offset).slug()),
+            HeaderRule::WhenScrolled => Some(scrolled_word(offset)),
             HeaderRule::Never => None,
         }
     }

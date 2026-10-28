@@ -2,8 +2,8 @@
 //! and the step the loop runs.
 
 use super::book::{Book, WatchId};
-use super::caret::{Early, caret_box, selection_boxes};
-use super::read::{Moved, apply, border_box, scroll_of};
+use super::caret::{caret_box, selection_boxes};
+use super::read::{apply, border_box, scroll_of};
 use crate::node_ref::{DocRef, NodeRef, Written};
 use crate::probe::Probe;
 use dioxus::core::{Runtime, RuntimeGuard};
@@ -116,17 +116,13 @@ impl Phase {
     /// Whether a caret moved since the phase last read it: the loop then lays out and runs the
     /// phase before it paints (`Phase::run` with [`Layout::Resolved`]), so the caret is drawn in
     /// the frame that draws the text it follows.
-    pub fn early(&self) -> Early {
+    pub fn wants_early_run(&self) -> bool {
         let book = self.shared.book.borrow();
-        let moved = book.carets.iter().any(super::book::CaretWatch::moved)
+        book.carets.iter().any(super::book::CaretWatch::moved)
             || book
                 .selections
                 .iter()
-                .any(super::book::SelectionWatch::moved);
-        match moved {
-            true => Early::Wanted,
-            false => Early::Idle,
-        }
+                .any(super::book::SelectionWatch::moved)
     }
 
     /// Run one step: apply the queued writes, then (once layout is [`Layout::Resolved`]) publish
@@ -167,7 +163,7 @@ impl Phase {
                 .collect();
         });
         match written {
-            Written::Done => moved.iter().filter(|moved| **moved == Moved::Yes).count(),
+            Written::Done => moved.iter().filter(|moved| **moved).count(),
             Written::Busy => {
                 if layout == Layout::Resolved {
                     // Put back what was taken, behind anything queued since.

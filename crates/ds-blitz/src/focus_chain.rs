@@ -19,15 +19,6 @@ pub(crate) struct Mark {
     tag: LocalName,
 }
 
-/// Whether a remembered element is still the one that was remembered.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Presence {
-    /// In the document, with the same tag.
-    Here,
-    /// Removed (or its id now names another kind of element).
-    Gone,
-}
-
 impl Mark {
     /// The element `node` is, if it is an element.
     pub(crate) fn of(node: &Node) -> Option<Mark> {
@@ -42,25 +33,20 @@ impl Mark {
         self.node
     }
 
-    /// Whether the element is still in `doc`.
-    pub(crate) fn presence(&self, doc: &BaseDocument) -> Presence {
-        match doc.get_node(self.node) {
-            Some(node)
-                if node.flags.is_in_document()
-                    && node
-                        .element_data()
-                        .is_some_and(|element| element.name.local == self.tag) =>
-            {
-                Presence::Here
-            }
-            _ => Presence::Gone,
-        }
+    /// Whether the element is still in `doc`, with the same tag: false once it is removed or its
+    /// id now names another kind of element.
+    pub(crate) fn is_here(&self, doc: &BaseDocument) -> bool {
+        doc.get_node(self.node).is_some_and(|node| {
+            node.flags.is_in_document()
+                && node
+                    .element_data()
+                    .is_some_and(|element| element.name.local == self.tag)
+        })
     }
 
     /// Whether the element is still in `doc` and can take the keyboard.
     fn takes_focus(&self, doc: &BaseDocument) -> bool {
-        self.presence(doc) == Presence::Here
-            && doc.get_node(self.node).is_some_and(Node::is_focussable)
+        self.is_here(doc) && doc.get_node(self.node).is_some_and(Node::is_focussable)
     }
 }
 

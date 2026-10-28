@@ -2201,3 +2201,12 @@ apps (first detent's Settings, "install llama.cpp" with a copyable command) reus
   more accessors than `DesktopFile` has (`only_show_in`, `not_show_in`, `flatpak`, `startup_wm_class`, `dbus_activatable`, `Iter`'s
   directory walk and app ids), which stay with the caller as plain `string`/`list`/`is_true` reads. Whether to move is the owner's call;
   the reader is additive and nothing in quire uses it yet.
+
+## Type rules (2026-10-28)
+
+CONVENTIONS section 4 now follows the owner's plain-Rust-first rule: `bool` is fine for fields, returns
+and private functions; an enum earns its place only at a public `f(true, false)`, a realistic third state
+or a persisted value; newtypes only with a rule; one fact, one type; two-way outcomes are `Result` or
+`Option`; growing sets are data. Two-variant enums that were `bool` or one fact twice are gone from the
+private and crate-internal code (the `Held`, `Near`, `Seen`, `Over` and similar flags, `FileKindColour`,
+`TagColour`, the second display-server enum); the rest wait on consumers (see the enum audit report).

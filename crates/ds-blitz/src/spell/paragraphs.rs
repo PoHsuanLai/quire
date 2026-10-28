@@ -11,13 +11,6 @@ use ds::spell::words::WordSpan;
 /// Elements whose text is code, not prose.
 const CODE: &[&str] = &["code", "pre", "kbd", "samp", "tt", "var"];
 
-/// Whether the text inside an element is prose or code.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Prose {
-    Yes,
-    Code,
-}
-
 /// Every addressable text element inside `surface`, in document order.
 pub(crate) fn paragraphs(doc: &BaseDocument, surface: NodeId) -> Vec<Paragraph> {
     let mut found = Vec::new();
@@ -42,7 +35,7 @@ fn collect(doc: &BaseDocument, parent: NodeId, found: &mut Vec<Paragraph>) {
                 text: String::new(),
                 skips: Vec::new(),
             };
-            own(doc, child, prose_of(doc, child), &mut paragraph);
+            own(doc, child, is_code(doc, child), &mut paragraph);
             found.push(paragraph);
         }
         collect(doc, child, found);
@@ -50,7 +43,7 @@ fn collect(doc: &BaseDocument, parent: NodeId, found: &mut Vec<Paragraph>) {
 }
 
 /// Append the text nodes whose nearest addressable ancestor is `parent`'s paragraph.
-fn own(doc: &BaseDocument, parent: NodeId, prose: Prose, paragraph: &mut Paragraph) {
+fn own(doc: &BaseDocument, parent: NodeId, code: bool, paragraph: &mut Paragraph) {
     let Some(node) = doc.get_node(parent) else {
         return;
     };
@@ -61,29 +54,21 @@ fn own(doc: &BaseDocument, parent: NodeId, prose: Prose, paragraph: &mut Paragra
         if let Some(text) = child_node.text_data() {
             let start = paragraph.text.len();
             paragraph.text.push_str(&text.content);
-            if prose == Prose::Code {
+            if code {
                 paragraph
                     .skips
                     .push(WordSpan::new(start, paragraph.text.len()));
             }
         } else if mark_of(child_node).is_none() && !is_hidden(child_node) {
-            let inner = match prose {
-                Prose::Code => Prose::Code,
-                Prose::Yes => prose_of(doc, child),
-            };
-            own(doc, child, inner, paragraph);
+            own(doc, child, code || is_code(doc, child), paragraph);
         }
     }
 }
 
-/// Code when the element is a code element (a paragraph may itself be a `pre`).
-fn prose_of(doc: &BaseDocument, id: NodeId) -> Prose {
-    let code = doc
-        .get_node(id)
+/// Whether the element is a code element, whose text is code, not prose (a paragraph may itself
+/// be a `pre`).
+fn is_code(doc: &BaseDocument, id: NodeId) -> bool {
+    doc.get_node(id)
         .and_then(|node| node.element_data())
-        .is_some_and(|element| CODE.contains(&&*element.name.local));
-    match code {
-        true => Prose::Code,
-        false => Prose::Yes,
-    }
+        .is_some_and(|element| CODE.contains(&&*element.name.local))
 }

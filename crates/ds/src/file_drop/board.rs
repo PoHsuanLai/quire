@@ -2,7 +2,7 @@
 //! and the host's own hit test through the document ([`FileDropHost`](crate::host::parts::FileDropHost)).
 
 use crate::file_drop::drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop};
-use crate::file_drop::track::{DragTrack, Over, Step, TargetView, acceptance, step, target_view};
+use crate::file_drop::track::{DragTrack, Step, TargetView, acceptance, step, target_view};
 use crate::host::document::DocumentHost;
 use crate::host::drop_hit::DropHit;
 use dioxus::prelude::*;
@@ -80,7 +80,7 @@ impl FileDropBoard {
                 Some((board.targets.get(at)?.clone(), files))
             });
             show(&board, &track, turn, landed.as_ref());
-            let answer = acceptance(&track, board.under.map_or(Over::No, |_| Over::Yes));
+            let answer = acceptance(&track, board.under.is_some());
             board.track = track;
             (landed, answer)
         };
@@ -134,11 +134,8 @@ enum Turn {
 }
 
 /// Whether the target at `at` is the one `under` the pointer.
-fn over_at(under: Option<usize>, at: usize) -> Over {
-    match under {
-        Some(under) if under == at => Over::Yes,
-        _ => Over::No,
-    }
+fn over_at(under: Option<usize>, at: usize) -> bool {
+    under == Some(at)
 }
 
 /// Write every target's view. A target files landed on shows `Dropped` until the next drag

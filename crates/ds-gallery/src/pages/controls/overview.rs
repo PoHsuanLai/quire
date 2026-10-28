@@ -23,7 +23,7 @@ use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::hex::{Colour, Hex};
 use ds::style::tokens::label_hue::LabelHue;
-use ds::style::tokens::tag_colour::TagColour;
+use ds::style::tokens::system_hue::SystemHue;
 use ds_core::colour::contrast::Verdict;
 
 /// The chord the specimens start with: Shift and Command and K.
@@ -240,10 +240,10 @@ fn Chips() -> Element {
                 Chip { variant: ChipVariant::Person(person), text: "No remove" }
             }
             div { class: "g-row",
-                for tag in TagColour::ALL.iter().copied() {
+                for tag in SystemHue::ALL.iter().copied() {
                     Chip { variant: ChipVariant::Neutral, text: "", dot: ChipDot::Tag(tag) }
                 }
-                Chip { variant: ChipVariant::Neutral, text: "Work", dot: ChipDot::Tag(TagColour::Gray) }
+                Chip { variant: ChipVariant::Neutral, text: "Work", dot: ChipDot::Tag(SystemHue::Gray) }
                 Chip { variant: ChipVariant::Neutral, text: "Travel", dot: ChipDot::Colour("#336699".to_owned()), onpress: |_| {} }
             }
         }

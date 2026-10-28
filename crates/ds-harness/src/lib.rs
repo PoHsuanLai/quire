@@ -54,7 +54,7 @@ pub use harness_input::HeldButtons;
 pub use harness_pdf::pdf_app;
 pub use harness_style::{Part, Srgba};
 pub use headless::{Backdrop, Layout};
-pub use headless_step::{PhaseOrder, Stepped};
+pub use headless_step::PhaseOrder;
 pub use input::{
     ImeInput, Input, KeyInput, PasteChord, PointerAction, PointerInput, RawKeyInput, RawKeyPhase,
 };

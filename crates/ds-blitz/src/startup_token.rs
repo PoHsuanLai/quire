@@ -9,6 +9,7 @@
 //! undefined behaviour on glibc, and the Tokio runtime and the event loop start threads. What was
 //! read waits in a [`LaunchTokens`] for the first window, which knows its session by then.
 
+use crate::window_platform::DisplayServer;
 use dioxus_native::winit::event_loop::ActiveEventLoop;
 #[cfg(target_os = "linux")]
 use dioxus_native::winit::platform::startup_notify::reset_activation_token_env;
@@ -21,13 +22,6 @@ const WAYLAND_VAR: &str = "XDG_ACTIVATION_TOKEN";
 
 /// The variable an X11 launcher sets.
 const X11_VAR: &str = "DESKTOP_STARTUP_ID";
-
-/// Which session a window is created in: which variable's token it can use.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Session {
-    Wayland,
-    X11,
-}
 
 /// The tokens the process was started with, until the first window takes them.
 #[derive(Debug, Default)]
@@ -68,9 +62,9 @@ impl LaunchTokens {
     #[cfg(target_os = "linux")]
     pub(crate) fn take(&mut self, event_loop: &dyn ActiveEventLoop) -> Option<ActivationToken> {
         let session = if event_loop.is_wayland() {
-            Session::Wayland
+            DisplayServer::Wayland
         } else {
-            Session::X11
+            DisplayServer::X11
         };
         self.take_for(session)
     }
@@ -82,11 +76,11 @@ impl LaunchTokens {
 
     /// The token of `session`; both are spent, whichever answered.
     #[cfg(any(target_os = "linux", test))]
-    fn take_for(&mut self, session: Session) -> Option<ActivationToken> {
+    fn take_for(&mut self, session: DisplayServer) -> Option<ActivationToken> {
         let (wayland, x11) = (self.wayland.take(), self.x11.take());
         match session {
-            Session::Wayland => wayland,
-            Session::X11 => x11,
+            DisplayServer::Wayland => wayland,
+            DisplayServer::X11 => x11,
         }
         .map(ActivationToken::from_raw)
     }
@@ -120,7 +114,7 @@ mod tests {
         let (mut tokens, resets) = read(&[(WAYLAND_VAR, "wl"), (X11_VAR, "x")]);
         assert_eq!(resets, 1);
         assert_eq!(
-            raw(tokens.take_for(Session::Wayland)).as_deref(),
+            raw(tokens.take_for(DisplayServer::Wayland)).as_deref(),
             Some("wl")
         );
     }
@@ -128,28 +122,40 @@ mod tests {
     #[test]
     fn a_window_takes_its_own_sessions_token_and_spends_both() {
         let (mut tokens, _) = read(&[(WAYLAND_VAR, "wl"), (X11_VAR, "x")]);
-        assert_eq!(raw(tokens.take_for(Session::X11)).as_deref(), Some("x"));
-        assert_eq!(raw(tokens.take_for(Session::X11)), None, "spent");
-        assert_eq!(raw(tokens.take_for(Session::Wayland)), None, "both spent");
+        assert_eq!(
+            raw(tokens.take_for(DisplayServer::X11)).as_deref(),
+            Some("x")
+        );
+        assert_eq!(raw(tokens.take_for(DisplayServer::X11)), None, "spent");
+        assert_eq!(
+            raw(tokens.take_for(DisplayServer::Wayland)),
+            None,
+            "both spent"
+        );
     }
 
     /// name, the environment, the session asked for, how many variables are reset.
     type Case = (
         &'static str,
         &'static [(&'static str, &'static str)],
-        Session,
+        DisplayServer,
         u32,
     );
 
     #[test]
     fn a_missing_token_is_no_token_and_resets_the_environment_only_for_a_token_that_was_there() {
         let cases: [Case; 3] = [
-            ("another session's", &[(X11_VAR, "x")], Session::Wayland, 1),
-            ("no variable", &[], Session::Wayland, 0),
+            (
+                "another session's",
+                &[(X11_VAR, "x")],
+                DisplayServer::Wayland,
+                1,
+            ),
+            ("no variable", &[], DisplayServer::Wayland, 0),
             (
                 "an empty variable",
                 &[(WAYLAND_VAR, "")],
-                Session::Wayland,
+                DisplayServer::Wayland,
                 0,
             ),
         ];

@@ -18,13 +18,6 @@ pub(crate) const MAX_ROUNDS: usize = 64;
 /// Every round, counted or not, before the harness panics whatever woke them.
 const MAX_TOTAL: usize = MAX_ROUNDS * 16;
 
-/// What a round that produced more work leaves of the budget.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Spent {
-    Within,
-    Over,
-}
-
 /// The rounds one `flush` or one `frame` has spent.
 #[derive(Debug)]
 pub(crate) struct RoundBudget {
@@ -42,8 +35,8 @@ impl RoundBudget {
         }
     }
 
-    /// Record a round that produced more work.
-    pub(crate) fn spend(&mut self) -> Spent {
+    /// Record a round that produced more work; true once the budget is over.
+    pub(crate) fn spend(&mut self) -> bool {
         let sleeps = wall_sleeps_finished();
         let driven_by_time = sleeps != self.sleeps_seen;
         self.sleeps_seen = sleeps;
@@ -51,17 +44,13 @@ impl RoundBudget {
         if !driven_by_time {
             self.own += 1;
         }
-        if self.own >= MAX_ROUNDS || self.total >= MAX_TOTAL {
-            Spent::Over
-        } else {
-            Spent::Within
-        }
+        self.own >= MAX_ROUNDS || self.total >= MAX_TOTAL
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{MAX_ROUNDS, MAX_TOTAL, RoundBudget, Spent};
+    use super::{MAX_ROUNDS, MAX_TOTAL, RoundBudget};
     use ds_core::time::clock::{install_wall, sleep};
     use std::future::Future;
     use std::pin::pin;
@@ -81,9 +70,9 @@ mod tests {
     #[test]
     fn rounds_of_the_documents_own_work_run_out() {
         let mut budget = RoundBudget::new();
-        let spent: Vec<Spent> = (0..MAX_ROUNDS).map(|_| budget.spend()).collect();
-        assert!(spent[..MAX_ROUNDS - 1].iter().all(|s| *s == Spent::Within));
-        assert_eq!(spent[MAX_ROUNDS - 1], Spent::Over);
+        let over: Vec<bool> = (0..MAX_ROUNDS).map(|_| budget.spend()).collect();
+        assert!(over[..MAX_ROUNDS - 1].iter().all(|over| !over));
+        assert!(over[MAX_ROUNDS - 1]);
     }
 
     #[test]
@@ -91,7 +80,7 @@ mod tests {
         let mut budget = RoundBudget::new();
         for _ in 0..MAX_ROUNDS * 4 {
             finish_a_sleep();
-            assert_eq!(budget.spend(), Spent::Within);
+            assert!(!budget.spend());
         }
     }
 
@@ -101,7 +90,7 @@ mod tests {
         let rounds = (1..)
             .find(|_| {
                 finish_a_sleep();
-                budget.spend() == Spent::Over
+                budget.spend()
             })
             .expect("ends");
         assert_eq!(rounds, MAX_TOTAL);

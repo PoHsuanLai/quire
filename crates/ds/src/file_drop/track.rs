@@ -129,17 +129,17 @@ fn dropped(contents: Contents, point: Option<Point>, modifiers: Modifiers) -> St
     }
 }
 
-/// What one target shows while the drag is `track`, the pointer `over` it or not: `Over` and
+/// What one target shows while the drag is `track`, the pointer `over` it or not: `FileDrag::Over` and
 /// `DropState::Target` under the pointer, `DropState::Accepts` elsewhere while files are
 /// dragged, nothing otherwise.
-pub(crate) fn target_view(track: &DragTrack, over: Over) -> TargetView {
+pub(crate) fn target_view(track: &DragTrack, over: bool) -> TargetView {
     match (track, over) {
         (
             DragTrack::Dragging {
                 contents: Contents::Files(paths),
                 point: Some(point),
             },
-            Over::Yes,
+            true,
         ) => TargetView {
             drag: FileDrag::Over(FileDrop {
                 paths: paths.clone(),
@@ -163,24 +163,17 @@ pub(crate) fn target_view(track: &DragTrack, over: Over) -> TargetView {
 }
 
 /// Whether the window takes the drag with the pointer over a target or not.
-pub(crate) fn acceptance(track: &DragTrack, over: Over) -> DropAcceptance {
+pub(crate) fn acceptance(track: &DragTrack, over: bool) -> DropAcceptance {
     match (track, over) {
         (
             DragTrack::Dragging {
                 contents: Contents::Waiting | Contents::Files(_),
                 ..
             },
-            Over::Yes,
+            true,
         ) => DropAcceptance::Copy,
         _ => DropAcceptance::Refuse,
     }
-}
-
-/// Whether the pointer is over a given target.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Over {
-    Yes,
-    No,
 }
 
 /// What one target shows.
@@ -361,7 +354,7 @@ mod tests {
         let cases = [
             (
                 &over_files,
-                Over::Yes,
+                true,
                 FileDrag::Over(FileDrop {
                     paths: files(),
                     point: at(3.0, 4.0),
@@ -372,28 +365,28 @@ mod tests {
             ),
             (
                 &over_files,
-                Over::No,
+                false,
                 FileDrag::Idle,
                 DropState::Accepts,
                 DropAcceptance::Refuse,
             ),
             (
                 &waiting,
-                Over::Yes,
+                true,
                 FileDrag::Idle,
                 DropState::Idle,
                 DropAcceptance::Copy,
             ),
             (
                 &other,
-                Over::Yes,
+                true,
                 FileDrag::Idle,
                 DropState::Idle,
                 DropAcceptance::Refuse,
             ),
             (
                 &DragTrack::Idle,
-                Over::Yes,
+                true,
                 FileDrag::Idle,
                 DropState::Idle,
                 DropAcceptance::Refuse,

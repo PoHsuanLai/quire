@@ -319,13 +319,14 @@ pub(crate) fn Host(props: HostProps) -> Element {
         nav
     });
     let runtime = use_hook(Runtime::current);
-    let mut installed = use_signal(|| Installed::Pending);
+    // Whether the document has the app's providers yet; until then the app is not rendered.
+    let mut installed = use_signal(|| false);
     let setup = props.setup.clone();
     let root = props.root.clone();
     rsx! {
         // The app waits one frame for its document's providers: a frame in its first render
         // would otherwise be parsed with the parent's `file:` provider (`crate::frames`).
-        if installed() == Installed::Done {
+        if installed() {
             match root {
                 Root::Plain(App) => rsx! { App {} },
                 Root::Shared(root) => rsx! { Rooted { root: SharedRoot(root) } },
@@ -340,20 +341,11 @@ pub(crate) fn Host(props: HostProps) -> Element {
                     install(handle, &setup, &clipboard, (frame_nav.clone(), book.clone()));
                     phase.attach(DocRef::Handle(handle.clone()), runtime.clone());
                     document.replace(Some(handle.clone()));
-                    installed.set(Installed::Done);
+                    installed.set(true);
                 }
             },
         }
     }
-}
-
-/// Whether the document has the app's providers yet.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Installed {
-    /// Not yet: the app is not rendered.
-    Pending,
-    /// Yes: the app renders.
-    Done,
 }
 
 /// Find the frames attached under the document's `iframe`s since the last frame (each asked

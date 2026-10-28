@@ -1,5 +1,5 @@
 use super::{
-    Click, Sample, Speed, SwipeEffect, SwipeInput as I, SwipeLook, SwipeMetrics, SwipeState,
+    Sample, Speed, SwipeEffect, SwipeInput as I, SwipeLook, SwipeMetrics, SwipeState,
     release_speed, shaped,
 };
 use ds_core::geometry::units::Px;
@@ -173,24 +173,24 @@ fn a_scroll_wakes_the_machine_a_quiet_spell_after_the_last_delta() {
 #[test]
 fn a_drag_swallows_the_click_that_ends_it_and_a_press_does_not() {
     #[rustfmt::skip]
-    let cases: &[(&str, &[Timed], Click)] = &[
+    let cases: &[(&str, &[Timed], bool)] = &[
         ("a press", &[
             (0, I::Down { x: Px(10.0) }),
             (10, I::Move { x: Px(11.0) }),
             (20, I::Up),
-        ], Click::Passes),
+        ], false),
         ("a drag back to where it began", &[
             (0, I::Down { x: Px(10.0) }),
             (100, I::Move { x: Px(40.0) }),
             (300, I::Move { x: Px(10.0) }),
             (400, I::Up),
-        ], Click::Swallowed),
+        ], true),
     ];
     for (name, inputs, want) in cases {
         let (state, _) = run(inputs);
-        assert_eq!(state.click(), *want, "{name}");
+        assert_eq!(state.swallows_click(), *want, "{name}");
         let (after, _) = state.step(I::Clicked, at(500), &SwipeMetrics::default(), &());
-        assert_eq!(after.click(), Click::Passes, "{name}: one click only");
+        assert!(!after.swallows_click(), "{name}: one click only");
     }
 }
 

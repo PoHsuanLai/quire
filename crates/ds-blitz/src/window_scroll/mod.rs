@@ -18,6 +18,5 @@ mod state;
 pub mod wheel;
 
 pub use bounds::ScrollBounds;
-pub use events::Intercept;
 pub use handle::{ScrollHandle, use_scroll_handle};
-pub use state::{Frames, WheelUse, WindowScroll};
+pub use state::{Handled, WindowScroll};

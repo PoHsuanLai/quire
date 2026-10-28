@@ -17,7 +17,7 @@
 //! document, and the keeper then does nothing, even if the element leaves later.
 
 use crate::click_focus::nowhere;
-use crate::focus_chain::{Candidates, Mark, Presence};
+use crate::focus_chain::{Candidates, Mark};
 use crate::node_ref::{DocRef, NodeRef, Written};
 use blitz_dom::{BaseDocument, NodeId};
 use dioxus::prelude::MountedData;
@@ -96,9 +96,7 @@ impl FocusKeeper {
     /// keyboard on, so the opener it came from stays the one to return to.
     fn before_next(&self, doc: &BaseDocument) -> Candidates {
         match self.seen.held() {
-            Some(seen) if seen.node.presence(doc) == Presence::Here => {
-                seen.candidates.then(&under_pointer(doc))
-            }
+            Some(seen) if seen.node.is_here(doc) => seen.candidates.then(&under_pointer(doc)),
             Some(_) => self.before.clone(),
             None => under_pointer(doc),
         }
@@ -139,21 +137,17 @@ impl FocusKeeper {
         let Seen::On(held) = self.seen.clone() else {
             return None;
         };
-        match held.node.presence(doc) {
-            Presence::Here => {
-                self.seen = Seen::Released(held);
-                None
-            }
-            Presence::Gone => {
-                let next = self
-                    .opener_of(doc, held.node.node())
-                    .then(&held.candidates)
-                    .then(&self.before)
-                    .first_live(doc);
-                self.seen = Seen::Nothing;
-                next
-            }
+        if held.node.is_here(doc) {
+            self.seen = Seen::Released(held);
+            return None;
         }
+        let next = self
+            .opener_of(doc, held.node.node())
+            .then(&held.candidates)
+            .then(&self.before)
+            .first_live(doc);
+        self.seen = Seen::Nothing;
+        next
     }
 }
 

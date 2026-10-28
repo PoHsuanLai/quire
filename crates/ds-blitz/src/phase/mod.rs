@@ -15,6 +15,5 @@ mod caret;
 mod read;
 mod run;
 
-pub use caret::Early;
 pub(crate) use read::border_box;
 pub use run::{Layout, Phase, Ran};

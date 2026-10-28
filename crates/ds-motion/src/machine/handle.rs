@@ -32,22 +32,16 @@ pub(super) type OutHandler<M> = Box<dyn FnMut(<M as Machine>::Out, MachineRef<M>
 /// inside itself.
 pub(super) struct Pending<M: Machine> {
     outs: VecDeque<M::Out>,
-    drain: Drain,
+    draining: bool,
 }
 
 impl<M: Machine> Default for Pending<M> {
     fn default() -> Self {
         Pending {
             outs: VecDeque::new(),
-            drain: Drain::Idle,
+            draining: false,
         }
     }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Drain {
-    Idle,
-    Running,
 }
 
 impl<M: Machine> Clone for MachineRef<M> {
@@ -145,7 +139,7 @@ impl<M: Machine> MachineRef<M> {
     fn drain(self) {
         let mut pending = self.pending;
         match pending.try_write() {
-            Ok(mut queue) if queue.drain == Drain::Idle => queue.drain = Drain::Running,
+            Ok(mut queue) if !queue.draining => queue.draining = true,
             Ok(_) | Err(_) => return,
         }
         loop {
@@ -160,7 +154,7 @@ impl<M: Machine> MachineRef<M> {
             }
         }
         if let Ok(mut queue) = pending.try_write() {
-            queue.drain = Drain::Idle;
+            queue.draining = false;
         }
     }
 

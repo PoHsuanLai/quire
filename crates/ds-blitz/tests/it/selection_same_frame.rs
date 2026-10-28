@@ -11,7 +11,7 @@ use ds::host::position::{TextPosition, TextRange};
 use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_harness::{Clock, Harness, HarnessConfig, Input, PhaseOrder, Stepped, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, PhaseOrder, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -123,7 +123,7 @@ fn shown(harness: &mut Harness) -> Shown {
 fn frames_of(harness: &mut Harness) -> Vec<Shown> {
     let mut frames = Vec::new();
     let before = harness.frames();
-    while harness.step_frame() == Stepped::Painted {
+    while harness.step_frame() {
         frames.push(shown(harness));
         assert!(frames.len() < 8, "frames never ran out: {frames:?}");
     }

@@ -48,9 +48,10 @@ impl WindowDrop {
                 let entered = FileDragInput::Entered {
                     point: position.map(|p| logical(p.x, p.y)),
                 };
-                match fetch_paths(event_loop, *id) {
-                    Fetch::Asked => vec![entered],
-                    Fetch::NoFiles => vec![entered, FileDragInput::Offered(Offer::Other)],
+                if asked_for_paths(event_loop, *id) {
+                    vec![entered]
+                } else {
+                    vec![entered, FileDragInput::Offered(Offer::Other)]
                 }
             }
             WindowEvent::DataTransferReceived { id, value, .. } if self.transfer == Some(*id) => {
@@ -95,25 +96,14 @@ impl WindowDrop {
     }
 }
 
-/// Whether the drag may carry files.
-enum Fetch {
-    /// It offers a URI list; its paths are on their way.
-    Asked,
-    /// It offers none, or the platform would not fetch it.
-    NoFiles,
-}
-
-fn fetch_paths(event_loop: &dyn ActiveEventLoop, id: DataTransferId) -> Fetch {
+/// Whether the drag offers a URI list and its paths are on their way; false when it offers none or
+/// the platform would not fetch it.
+fn asked_for_paths(event_loop: &dyn ActiveEventLoop, id: DataTransferId) -> bool {
     let offers_uris = event_loop
         .data_transfer(id)
         .is_ok_and(|transfer| transfer.has_type(&TypeHint::UriList));
-    if offers_uris
+    offers_uris
         && event_loop
             .fetch_data_transfer(id, &TypeHint::UriList)
             .is_ok()
-    {
-        Fetch::Asked
-    } else {
-        Fetch::NoFiles
-    }
 }

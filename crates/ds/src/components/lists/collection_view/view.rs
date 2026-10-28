@@ -76,13 +76,6 @@ use std::hash::Hash;
 /// How many rows around the viewport are mounted besides the visible ones.
 const OVERSCAN_ROWS: usize = 2;
 
-/// Whether the view holds the keyboard.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Held {
-    Yes,
-    No,
-}
-
 /// `items` as a grid of tiles at `size`. `label` names the grid for a screen reader. `cursor` is
 /// the tile the keys rest on, kept in view; `onselect` hears a click or a key asking for another,
 /// `onreach` hears the same with how it was reached (in place of `onselect`), `selection` says
@@ -179,7 +172,7 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
             .map(|at| layout.span(at / columns)),
     );
     let marquee = use_marquee(scroller);
-    let mut held = use_signal(|| Held::No);
+    let mut held = use_signal(|| false);
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let reach = Reach {
         platform: use_platform(),
@@ -247,7 +240,7 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
         .unwrap_or_else(|| cursor.map_or_else(RowSelection::none, RowSelection::single));
     let data = common.data_attributes();
     let mounted = common.clone();
-    let away = (held() == Held::No).then_some("away");
+    let away = (!held()).then_some("away");
     let (above, below) = (layout.top(in_view.start).0, layout.below(in_view.end).0);
     let style = match extent {
         CollectionExtent::Fill => size.style_for(aspect),
@@ -272,8 +265,8 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
                 probe.on_mounted(event.clone());
                 mounted.mounted(event);
             },
-            onfocus: move |_| held.set(Held::Yes),
-            onblur: move |_| held.set(Held::No),
+            onfocus: move |_| held.set(true),
+            onblur: move |_| held.set(false),
             onkeydown,
             onpointerdown: move |event: PointerEvent| {
                 marquee.pressed(&event, began_with.clone(), onmarquee);

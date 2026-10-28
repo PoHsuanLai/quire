@@ -7,10 +7,10 @@
 
 use crate::error::HarnessError;
 use crate::fake_window::{FakeWindow, WindowSpec};
-use crate::headless_step::{Owed, PhaseOrder};
+use crate::headless_step::PhaseOrder;
 use crate::painter::{Canvas, PaintTime, Painter};
 use crate::recorded_window::{WindowHosting, WindowLog};
-use crate::round_budget::{MAX_ROUNDS, RoundBudget, Spent};
+use crate::round_budget::{MAX_ROUNDS, RoundBudget};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, DocumentConfig, NodeId, StyleThreading};
 use blitz_html::HtmlProvider;
@@ -111,7 +111,7 @@ pub(crate) struct Headless {
     /// Where in a frame the phase's early step runs.
     pub(crate) order: PhaseOrder,
     /// Whether a frame is owed to the document: input arrived, or the last frame asked for another.
-    pub(crate) owed: Owed,
+    pub(crate) owed: bool,
     /// How many frames the document has laid out and painted.
     pub(crate) frames: u64,
     /// The window's scrolling, run before each layout as the window loop runs it.
@@ -257,7 +257,7 @@ impl Headless {
             painter: Painter::Cpu,
             phase,
             order: PhaseOrder::default(),
-            owed: Owed::Nothing,
+            owed: false,
             frames: 0,
             scroll,
             window,
@@ -337,7 +337,7 @@ impl Headless {
         while self.doc.poll(Some(Context::from_waker(&waker))) {
             rendered = true;
             assert!(
-                budget.spend() == Spent::Within,
+                !budget.spend(),
                 "render loop: the document was still re-rendering after {MAX_ROUNDS} rounds of \
                  renders with no input, so a component writes state on every render or an \
                  effect keeps re-running itself.\ndocument:\n{}",
@@ -370,7 +370,7 @@ impl Headless {
             if wanted.is_empty() {
                 return;
             }
-            if budget.spend() == Spent::Over {
+            if budget.spend() {
                 break wanted;
             }
         };

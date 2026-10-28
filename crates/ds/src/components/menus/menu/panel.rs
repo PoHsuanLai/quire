@@ -9,7 +9,7 @@ use crate::components::menus::menu::blink::Blink;
 use crate::components::menus::menu::blink::highlighted as lit;
 use crate::components::menus::menu::choices::{Act, Choice, liveness};
 use crate::components::menus::menu::cursor::{MenuCursor, highlighted, seed};
-use crate::components::menus::menu::decide::{Child, Decision, Level, decide};
+use crate::components::menus::menu::decide::{Decision, Level, decide};
 use crate::components::menus::menu::keys::{KeyAct, key_act};
 use crate::components::menus::menu::pick::Picked;
 use crate::components::menus::menu::submenu::SubMenu;
@@ -69,12 +69,8 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
     }
 
     /// Whether this panel's own submenu is open.
-    pub(crate) fn child(&self) -> Child {
-        if self.tracker.has_open() {
-            Child::Open
-        } else {
-            Child::Closed
-        }
+    pub(crate) fn child_open(&self) -> bool {
+        self.tracker.has_open()
     }
 
     /// The rows of `items`, wired to this panel.
@@ -207,7 +203,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
     /// What `act` means from the highlighted choice. With nothing highlighted a move starts
     /// from an end and a pick or an open does nothing.
     fn decision(&self, act: &KeyAct) -> Decision<T> {
-        let (child, level) = (self.child(), self.level);
+        let (child, level) = (self.child_open(), self.level);
         match (self.current(), seed(act, self.choices.len())) {
             (Some(at), _) | (None, Some(at)) => decide(act, at, &self.choices, child, level),
             (None, None) => match act {

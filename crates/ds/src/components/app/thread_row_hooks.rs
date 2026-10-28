@@ -25,19 +25,13 @@ pub struct PartHooks {
     pub onpointerleave: EventHandler<PointerEvent>,
 }
 
-/// Where the pointer is, as the row's own enter and leave last said.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum OnRow {
-    On,
-    Off,
-}
-
 /// The row's pointer: where it is, and until when a part's leave waits to see whether the pointer
 /// came back to the row. A [`Machine`], so any crossing replaces the wait and nothing is left to
 /// cancel.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct RowPointer {
-    on_row: OnRow,
+    /// Whether the pointer is on the row, as the row's own enter and leave last said.
+    on_row: bool,
     wait: Option<Stamp>,
 }
 
@@ -45,7 +39,7 @@ pub(crate) struct RowPointer {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum RowIn {
     /// The pointer crossed onto or off the row, or entered a part (which is inside the row).
-    Crossed(OnRow),
+    Crossed(bool),
     /// The pointer left a part: wait the close grace, then say whether it is on the row.
     PartLeft,
     /// The grace's end came.
@@ -76,14 +70,12 @@ impl Machine for RowPointer {
                 },
                 Vec::new(),
             ),
-            RowIn::Elapsed => match (self.wait, self.on_row) {
-                (Some(until), OnRow::On) if at >= until => {
-                    (RowPointer { wait: None, ..self }, vec![()])
+            RowIn::Elapsed => match self.wait {
+                Some(until) if at >= until => {
+                    let back = if self.on_row { vec![()] } else { Vec::new() };
+                    (RowPointer { wait: None, ..self }, back)
                 }
-                (Some(until), OnRow::Off) if at >= until => {
-                    (RowPointer { wait: None, ..self }, Vec::new())
-                }
-                (Some(_) | None, OnRow::On | OnRow::Off) => (self, Vec::new()),
+                Some(_) | None => (self, Vec::new()),
             },
         }
     }
@@ -115,7 +107,7 @@ pub(crate) fn use_back(handler: Option<EventHandler<PointerEvent>>) -> Back {
     let left = use_hook(|| CopyValue::new(None::<PointerEvent>));
     let pointer = use_machine(
         |_| RowPointer {
-            on_row: OnRow::Off,
+            on_row: false,
             wait: None,
         },
         DelayToken::CardClose.delay(),
@@ -135,7 +127,7 @@ pub(crate) fn use_back(handler: Option<EventHandler<PointerEvent>>) -> Back {
 }
 
 impl Back {
-    fn cross(self, on_row: OnRow) {
+    fn cross(self, on_row: bool) {
         self.pointer.send(RowIn::Crossed(on_row));
     }
 
@@ -145,7 +137,7 @@ impl Back {
         handler: Option<EventHandler<PointerEvent>>,
     ) -> impl FnMut(PointerEvent) {
         move |event| {
-            self.cross(OnRow::On);
+            self.cross(true);
             relay(handler)(event);
         }
     }
@@ -156,7 +148,7 @@ impl Back {
         handler: Option<EventHandler<PointerEvent>>,
     ) -> impl FnMut(PointerEvent) {
         move |event| {
-            self.cross(OnRow::Off);
+            self.cross(false);
             relay(handler)(event);
         }
     }
@@ -164,7 +156,7 @@ impl Back {
     /// A part's enter: note it (a waiting `onpointerback` is off), then the caller's hook.
     pub(crate) fn part_enter(self, hooks: Option<PartHooks>) -> impl FnMut(PointerEvent) + 'static {
         move |event| {
-            self.cross(OnRow::On);
+            self.cross(true);
             enter(hooks)(event);
         }
     }
@@ -205,12 +197,12 @@ fn leave(hooks: Option<PartHooks>) -> impl FnMut(PointerEvent) + 'static {
 
 #[cfg(test)]
 mod tests {
-    use super::{OnRow, RowIn, RowPointer};
+    use super::{RowIn, RowPointer};
     use ds_core::machine::Machine;
     use ds_core::time::stamp::Stamp;
     use std::time::Duration;
 
-    fn pointer(on_row: OnRow, wait: Option<u64>) -> RowPointer {
+    fn pointer(on_row: bool, wait: Option<u64>) -> RowPointer {
         RowPointer {
             on_row,
             wait: wait.map(Stamp),
@@ -230,18 +222,19 @@ mod tests {
 
     #[test]
     fn a_part_leave_says_back_only_if_nothing_was_crossed_during_the_grace() {
-        use OnRow::{Off, On};
+        const ON: bool = true;
+        const OFF: bool = false;
         let grace = Duration::from_millis(150);
         #[rustfmt::skip]
         let cases: &[Case] = &[
-            ("a part's leave starts the wait", pointer(On, None), RowIn::PartLeft, 100, pointer(On, Some(250)), false, Some(250)),
-            ("the grace ends on the row: back", pointer(On, Some(250)), RowIn::Elapsed, 250, pointer(On, None), true, None),
-            ("woken early: nothing", pointer(On, Some(250)), RowIn::Elapsed, 249, pointer(On, Some(250)), false, Some(250)),
-            ("the grace ends off the row: nothing", pointer(Off, Some(250)), RowIn::Elapsed, 250, pointer(Off, None), false, None),
-            ("the row's leave cancels the wait", pointer(On, Some(250)), RowIn::Crossed(Off), 200, pointer(Off, None), false, None),
-            ("a part entered again cancels it too", pointer(On, Some(250)), RowIn::Crossed(On), 200, pointer(On, None), false, None),
-            ("the row left before the part: the pointer stays off", pointer(Off, None), RowIn::PartLeft, 100, pointer(Off, Some(250)), false, Some(250)),
-            ("a wake with no wait: nothing", pointer(On, None), RowIn::Elapsed, 900, pointer(On, None), false, None),
+            ("a part's leave starts the wait", pointer(ON, None), RowIn::PartLeft, 100, pointer(ON, Some(250)), false, Some(250)),
+            ("the grace ends on the row: back", pointer(ON, Some(250)), RowIn::Elapsed, 250, pointer(ON, None), true, None),
+            ("woken early: nothing", pointer(ON, Some(250)), RowIn::Elapsed, 249, pointer(ON, Some(250)), false, Some(250)),
+            ("the grace ends off the row: nothing", pointer(OFF, Some(250)), RowIn::Elapsed, 250, pointer(OFF, None), false, None),
+            ("the row's leave cancels the wait", pointer(ON, Some(250)), RowIn::Crossed(OFF), 200, pointer(OFF, None), false, None),
+            ("a part entered again cancels it too", pointer(ON, Some(250)), RowIn::Crossed(ON), 200, pointer(ON, None), false, None),
+            ("the row left before the part: the pointer stays off", pointer(OFF, None), RowIn::PartLeft, 100, pointer(OFF, Some(250)), false, Some(250)),
+            ("a wake with no wait: nothing", pointer(ON, None), RowIn::Elapsed, 900, pointer(ON, None), false, None),
         ];
         for (name, from, input, at, state, back, wake) in cases {
             let (next, out) = from.step(*input, Stamp(*at), &grace, &());

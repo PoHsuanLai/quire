@@ -11,7 +11,7 @@ use ds::host::position::TextPosition;
 use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_harness::{Clock, Harness, HarnessConfig, Input, PhaseOrder, Stepped, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, PhaseOrder, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -102,7 +102,7 @@ fn typing_frames(order: PhaseOrder) -> Vec<Shown> {
     harness.key_pending(ShortcutKey::Char('x'));
     let mut frames = Vec::new();
     let painted_before = harness.frames();
-    while harness.step_frame() == Stepped::Painted {
+    while harness.step_frame() {
         frames.push(shown(&mut harness));
         assert!(frames.len() < 8, "frames never ran out: {frames:?}");
     }

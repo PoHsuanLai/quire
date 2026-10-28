@@ -8,19 +8,14 @@ enum Token {
     Class(Class),
 }
 
-/// Whether a class lists the characters it takes or the ones it refuses.
-enum Polarity {
-    Plain,
-    Negated,
-}
-
 enum ClassItem {
     One(char),
     Range(char, char),
 }
 
 struct Class {
-    polarity: Polarity,
+    /// Whether the class lists the characters it refuses (`[!a]`) and not the ones it takes.
+    negated: bool,
     items: Vec<ClassItem>,
 }
 
@@ -30,10 +25,7 @@ impl Class {
             ClassItem::One(one) => *one == c,
             ClassItem::Range(low, high) => *low <= c && c <= *high,
         });
-        match self.polarity {
-            Polarity::Plain => hit,
-            Polarity::Negated => !hit,
-        }
+        hit != self.negated
     }
 }
 
@@ -52,20 +44,17 @@ impl Token {
 /// never closed, so the `[` is an ordinary character.
 fn class(chars: &[char], start: usize) -> Option<(Class, usize)> {
     let mut at = start;
-    let polarity = match chars.get(at).copied() {
-        Some('!' | '^') => {
-            at += 1;
-            Polarity::Negated
-        }
-        Some(_) | None => Polarity::Plain,
-    };
+    let negated = matches!(chars.get(at), Some('!' | '^'));
+    if negated {
+        at += 1;
+    }
     let mut items = Vec::new();
     let mut first = true;
     loop {
         let c = *chars.get(at)?;
         at += 1;
         if c == ']' && !first {
-            return Some((Class { polarity, items }, at));
+            return Some((Class { negated, items }, at));
         }
         first = false;
         let ranged = chars.get(at) == Some(&'-') && chars.get(at + 1).is_some_and(|n| *n != ']');

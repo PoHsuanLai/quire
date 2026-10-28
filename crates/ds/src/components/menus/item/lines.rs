@@ -6,7 +6,7 @@ use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::{MenuItem, SwatchRow};
 use crate::components::menus::item::swatches::{DotView, swatches};
 use crate::components::menus::item::view::{
-    Branch, Columns, ImageColumn, ItemView, RowEvents, StateColumn, header, info, item,
+    Branch, Columns, ItemView, RowEvents, header, info, item,
 };
 use dioxus::prelude::*;
 use ds_core::geometry::units::Point;
@@ -40,21 +40,13 @@ pub(crate) struct Drawn {
 pub(crate) fn columns<T>(items: &[MenuItem<T>]) -> Columns {
     let has = |wanted: fn(&MenuItem<T>) -> bool| items.iter().any(wanted);
     Columns {
-        state: if has(|item| matches!(item, MenuItem::Item { check: Some(_), .. })) {
-            StateColumn::Reserved
-        } else {
-            StateColumn::Absent
-        },
-        image: if has(|item| {
+        state: has(|item| matches!(item, MenuItem::Item { check: Some(_), .. })),
+        image: has(|item| {
             matches!(
                 item,
                 MenuItem::Item { image: Some(_), .. } | MenuItem::Submenu { image: Some(_), .. }
             )
-        }) {
-            ImageColumn::Reserved
-        } else {
-            ImageColumn::Absent
-        },
+        }),
     }
 }
 

@@ -38,14 +38,14 @@ use crate::app_handle::Remote;
 use crate::app_life::{Lifecycle, Verdict};
 use crate::close_request::{CloseAnswer, CloseGuard};
 use crate::open_window::WindowHandle;
-use crate::phase::{Early, Layout, Phase};
+use crate::phase::{Layout, Phase};
 use crate::startup_token::LaunchTokens;
 use crate::window_activate::raise;
 use crate::window_build::{Base, Shape, WindowParts, WindowSlot, window_config};
 use crate::window_frame::WindowFrame;
 use crate::window_requests::{Request, WindowKey, WindowLife};
 use crate::window_screen::screen_area;
-use crate::window_scroll::{Frames, Intercept, WindowScroll};
+use crate::window_scroll::WindowScroll;
 use anyrender::WindowRenderer;
 use blitz_shell::{BlitzShellEvent, BlitzShellProxy, WindowConfig};
 use dioxus_native::winit::application::ApplicationHandler;
@@ -120,20 +120,20 @@ impl Sub {
         }
     }
 
-    /// Give window scrolling `event` before the document hears it. `Taken` when the document
+    /// Give window scrolling `event` before the document hears it. True when the document
     /// must not see it (a wheel the engine scrolls for); a frame is asked for when scrolling
     /// moved something or still animates.
-    fn scroll_event(&self, event: &WindowEvent) -> Intercept {
+    fn scroll_event(&self, event: &WindowEvent) -> bool {
         let Some(window) = self.slot.window() else {
-            return Intercept::Passed;
+            return false;
         };
         let handled = self
             .scroll
             .event(event, window.scale_factor(), Instant::now());
-        if handled.frames == Frames::Wanted {
+        if handled.frames {
             window.request_redraw();
         }
-        handled.event
+        handled.taken
     }
 
     /// Before the window draws, ahead of everything else it does for the frame: step scrolling
@@ -145,7 +145,7 @@ impl Sub {
         let Some(window) = self.slot.window() else {
             return Vec::new();
         };
-        if self.scroll.frame(Instant::now()) == Frames::Wanted {
+        if self.scroll.frame(Instant::now()) {
             window.request_redraw();
         }
         self.hand_over(event_loop)
@@ -156,7 +156,7 @@ impl Sub {
     /// draw paints the text and the caret. The draw lays out again; only what the caret's box
     /// changed is left to do. Closes the window asked for come back.
     fn before_paint(&mut self, event_loop: &dyn ActiveEventLoop) -> Vec<WindowId> {
-        if self.phase.early() == Early::Idle {
+        if !self.phase.wants_early_run() {
             return Vec::new();
         }
         let Some(doc) = self.phase.document() else {
@@ -215,14 +215,7 @@ pub(crate) struct Windows {
     /// The activation tokens the process was started with, for the first window.
     tokens: LaunchTokens,
     /// Whether the loop can create windows yet (winit's `can_create_surfaces` has come).
-    surfaces: Surfaces,
-}
-
-/// Whether winit's `can_create_surfaces` has come.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Surfaces {
-    NotYet,
-    Ready,
+    surfaces_ready: bool,
 }
 
 impl Windows {
@@ -235,7 +228,7 @@ impl Windows {
             base,
             life,
             tokens,
-            surfaces: Surfaces::NotYet,
+            surfaces_ready: false,
         }
     }
 
@@ -306,7 +299,7 @@ impl Windows {
 
     /// Answer what the app's components and threads asked since the last wake.
     fn serve(&mut self, event_loop: &dyn ActiveEventLoop) {
-        if self.surfaces == Surfaces::NotYet {
+        if !self.surfaces_ready {
             // Windows cannot be created yet; `can_create_surfaces` serves what waits.
             return;
         }
@@ -438,7 +431,7 @@ impl Windows {
 
     /// Apply the app's policy: end the loop, or tell it when to look again.
     fn settle(&mut self, event_loop: &dyn ActiveEventLoop) {
-        if self.surfaces == Surfaces::NotYet {
+        if !self.surfaces_ready {
             return;
         }
         match self.life.verdict(Instant::now()) {
@@ -504,7 +497,7 @@ impl ApplicationHandler for Windows {
     fn can_create_surfaces(&mut self, event_loop: &dyn ActiveEventLoop) {
         self.all()
             .for_each(|sub| sub.app.can_create_surfaces(event_loop));
-        self.surfaces = Surfaces::Ready;
+        self.surfaces_ready = true;
         self.serve(event_loop);
         self.settle(event_loop);
     }
@@ -534,7 +527,7 @@ impl ApplicationHandler for Windows {
                 closes = sub.scroll_step(event_loop);
                 closes.extend(sub.before_paint(event_loop));
             }
-            if sub.scroll_event(&event) == Intercept::Passed {
+            if !sub.scroll_event(&event) {
                 sub.app.window_event(event_loop, window_id, event);
             }
             if drawn {

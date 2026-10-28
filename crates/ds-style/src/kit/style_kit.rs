@@ -10,7 +10,7 @@ use crate::css::{
     materials_css::{MATERIAL_VARS, TINT_ALPHA, materials_css},
     shape_css::{SHAPE_VARS, SQUIRCLE_VARS, shape_css},
 };
-use crate::icon::family::PlateShare;
+use crate::icon::{family::PlateShare, file_kind::FileKind};
 use crate::kit::Kits;
 use crate::material::{level::LEVEL_VARS, stack::STACK_INPUTS};
 use crate::space::{frame_vars::FrameVars, look::SpaceLook};
@@ -21,7 +21,7 @@ use crate::tokens::{
     easing::EasingToken,
     elevation::Shadow,
     emoji_face::EmojiFace,
-    file_icon::{FileIconColour, FileKindColour},
+    file_icon::FileIconColour,
     label_hue::HueColour,
     layer::ZLayer,
     name::VarName,
@@ -40,7 +40,7 @@ use crate::tokens::{
     size_vars::SizeToken,
     spacing::SpacingToken,
     status,
-    tag_colour::TagColour,
+    system_hue::SystemHue,
     terminal::{TerminalColour, TerminalMetric},
     timing::DurationToken,
     type_scale::{Family, FontSize},
@@ -59,9 +59,9 @@ pub static KIT: Kit = Kit {
         TokenSet::of::<SelectionToken>().at(Place::Scheme),
         TokenSet::of::<TerminalColour>().at(Place::Scheme),
         TokenSet::of::<SignalColour>().at(Place::Scheme),
-        TokenSet::of::<TagColour>().at(Place::Scheme),
+        TokenSet::of::<SystemHue>().at(Place::Scheme),
         TokenSet::of::<FileIconColour>().at(Place::Scheme),
-        TokenSet::of::<FileKindColour>().at(Place::Scheme),
+        TokenSet::of::<FileKind>().at(Place::Scheme),
         TokenSet::of::<Shadow>().at(Place::Scheme),
         TokenSet::of::<WidgetPaint>().at(Place::Scheme),
         TokenSet::of::<Radius>().at(Place::Shape),

@@ -14,14 +14,14 @@ use ds_core::vocab::{Availability, Check, FocusStyle, Selection};
 use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
-use ds_style::tokens::tag_colour::TagColour;
+use ds_style::tokens::system_hue::SystemHue;
 
 /// One dot as a menu draws it.
 pub(crate) struct DotView<'a> {
     /// The tag's name.
     pub name: &'a str,
     /// Its colour.
-    pub colour: TagColour,
+    pub colour: SystemHue,
     /// Whether the tag is on the files.
     pub check: Option<Check>,
     /// Whether this is the highlighted dot.

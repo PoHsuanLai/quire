@@ -7,7 +7,7 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::menus::item::text::{ItemText, Marks};
 use ds_core::vocab::{Availability, Check, Shortcut};
 use ds_style::icon::Icon;
-use ds_style::tokens::tag_colour::TagColour;
+use ds_style::tokens::system_hue::SystemHue;
 
 /// The image at an item's start.
 #[derive(Debug, Clone, PartialEq)]
@@ -21,7 +21,7 @@ pub enum MenuImage {
     Avatar(AvatarFace),
     /// A coloured dot in a tag's colour (`--tag-*`): a row for a Finder tag, in the menu that
     /// tags files. It keeps its colour under the highlight.
-    Swatch(TagColour),
+    Swatch(SystemHue),
 }
 
 /// What a pick does to the menu that holds the item.
@@ -136,7 +136,7 @@ pub struct MenuSwatch<T> {
     /// Its name: the tooltip's text and the dot's `aria-label`.
     pub name: String,
     /// Its colour (`--tag-*`).
-    pub colour: TagColour,
+    pub colour: SystemHue,
     /// Whether the tag is already on the files: `On` draws a check in the dot, `Mixed` a dash.
     pub check: Option<Check>,
     /// Whether a pick closes the menu.
@@ -145,7 +145,7 @@ pub struct MenuSwatch<T> {
 
 impl<T> MenuSwatch<T> {
     /// A dot named `name` in `colour` that yields `value`, shows no state and closes the menu.
-    pub fn new(value: T, name: impl Into<String>, colour: TagColour) -> Self {
+    pub fn new(value: T, name: impl Into<String>, colour: SystemHue) -> Self {
         MenuSwatch {
             value,
             name: name.into(),

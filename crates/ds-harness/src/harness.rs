@@ -24,7 +24,6 @@ pub use crate::harness_settle::{
     QUIET, SETTLE_BOUND, VIRTUAL_DRAIN_BOUND, assert_settles_to_zero_frames, settle_until,
 };
 use crate::headless::{Backdrop, Headless, Layout};
-use crate::headless_step::Owed;
 use crate::input::Input;
 use crate::query::first;
 use crate::snapshot::Viewport;
@@ -236,7 +235,7 @@ impl Harness {
         self.doc.doc.handle_ui_event(event);
         match delivery {
             Delivery::Settled => self.settle(),
-            Delivery::Pending => self.doc.owed = Owed::Frame,
+            Delivery::Pending => self.doc.owed = true,
         }
     }
 

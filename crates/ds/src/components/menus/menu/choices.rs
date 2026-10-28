@@ -102,7 +102,7 @@ pub(crate) fn liveness<T>(choices: &[Choice<T>]) -> Vec<Availability> {
 mod tests {
     use super::{Act, Slot, choices};
     use crate::components::menus::item::item::{MenuItem, MenuSwatch};
-    use ds_style::tokens::tag_colour::TagColour;
+    use ds_style::tokens::system_hue::SystemHue;
 
     #[test]
     fn a_row_of_swatches_is_one_choice_for_each_dot() {
@@ -112,8 +112,8 @@ mod tests {
             MenuItem::swatches(
                 "Tags",
                 vec![
-                    MenuSwatch::new(1, "Red", TagColour::Red),
-                    MenuSwatch::new(2, "Blue", TagColour::Blue),
+                    MenuSwatch::new(1, "Red", SystemHue::Red),
+                    MenuSwatch::new(2, "Blue", SystemHue::Blue),
                 ],
             ),
             MenuItem::new(3u8, "Delete"),

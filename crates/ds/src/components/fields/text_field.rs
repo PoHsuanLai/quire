@@ -34,25 +34,6 @@ use ds_motion::detail::{once::use_shake, touch::Touch, use_detail::use_detail};
 use ds_style::icon::Icon;
 use ds_style::tokens::control_size::ControlSize;
 
-/// Whether the field's input has the caret: the ring is drawn from it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Holds {
-    /// The input has the caret.
-    Caret,
-    /// Something else has the keyboard.
-    Elsewhere,
-}
-
-impl Holds {
-    /// `data-focus`: the field shows its focus as a ring while it holds the caret.
-    fn attr(self) -> Option<&'static str> {
-        match self {
-            Holds::Caret => Some(FocusStyle::Ring.slug()),
-            Holds::Elsewhere => None,
-        }
-    }
-}
-
 /// The text a field shows: a secure field's own state unless the caller holds it, else the
 /// caller's `value`.
 fn held(kind: FieldKind, text: FieldText, value: String, typed: Signal<String>) -> String {
@@ -70,7 +51,7 @@ fn held(kind: FieldKind, text: FieldText, value: String, typed: Signal<String>) 
 struct Round {
     generation: CopyValue<u32>,
     /// Whether the caret was in the field when the current generation began.
-    caret: CopyValue<Holds>,
+    caret: CopyValue<bool>,
 }
 
 impl Round {
@@ -80,18 +61,20 @@ impl Round {
 
     /// How the new generation's input takes the keyboard: the caret stays where it was.
     fn focus(self, asked: FieldFocus) -> FieldFocus {
-        match (self.generation() > 0, *self.caret.peek()) {
-            (true, Holds::Caret) => FieldFocus::OnMount,
-            (true, Holds::Elsewhere) | (false, _) => asked,
+        if self.generation() > 0 && *self.caret.peek() {
+            FieldFocus::OnMount
+        } else {
+            asked
         }
     }
 }
 
-/// The field's round: `caller_holds` is whether the caller holds a secret's text, `value` that text.
-fn use_round(caller_holds: bool, value: &str, holds: Holds) -> Round {
+/// The field's round: `caller_holds` is whether the caller holds a secret's text, `value` that text,
+/// `holds` whether the input has the caret.
+fn use_round(caller_holds: bool, value: &str, holds: bool) -> Round {
     let mut generation = use_hook(|| CopyValue::new(0u32));
     let mut filled = use_hook(|| CopyValue::new(false));
-    let mut caret = use_hook(|| CopyValue::new(Holds::Elsewhere));
+    let mut caret = use_hook(|| CopyValue::new(false));
     let emptied = caller_holds && value.is_empty() && *filled.peek();
     if emptied {
         let next = *generation.peek() + 1;
@@ -179,7 +162,7 @@ pub fn TextField(
     let blink = CaretBlink::use_new();
     let ime = FieldIme::use_new();
     let mut typed = use_signal(String::new);
-    let mut holds = use_signal(|| Holds::Elsewhere);
+    let mut holds = use_signal(|| false);
     let operation = use_busy(availability);
     let detail = use_detail(validity.clone(), Touch::Remote);
     let shake = use_shake(detail.cue()).attrs();
@@ -196,12 +179,12 @@ pub fn TextField(
     let submitted = held_text.clone();
     let blurred = held_text.clone();
     let focus_in = EventHandler::new(move |()| {
-        holds.set(Holds::Caret);
+        holds.set(true);
         blink.restart();
         onfocus.call(());
     });
     let focus_out = EventHandler::new(move |()| {
-        holds.set(Holds::Elsewhere);
+        holds.set(false);
         blink.stop();
         onblur.call(());
     });
@@ -279,7 +262,7 @@ pub fn TextField(
             "data-variant": bezel.slug(),
             "data-size": size.slug(),
             "data-availability": availability.slug(),
-            "data-focus": holds().attr(),
+            "data-focus": holds().then_some(FocusStyle::Ring.slug()),
             "data-validity": validity.attr(),
             "aria-disabled": availability.aria_disabled(),
             "aria-busy": availability.aria_busy(),

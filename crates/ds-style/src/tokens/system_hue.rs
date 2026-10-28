@@ -3,13 +3,20 @@
 //!
 //! The accents, the signal colours and the tag colours all read their hues here, so a hue is
 //! written once. The values are Apple's own (`color.json` of the HIG, 2025).
+//!
+//! As a token a hue is a tag colour (`--tag-red` … `--tag-gray`): the thirteen colours a person can
+//! give a tag, resolved like the accents. A tag's colour is a choice the person made, so it stays
+//! one of these thirteen and never a value of the app's own; an app stores the hue and paints
+//! `var(--tag-<hue>)`.
 
 use crate::appearance::{system::Contrast, theme::Scheme};
 use crate::tokens::hex::Hex;
+use crate::tokens::token::{CssValue, Token, TokenScope};
 use ds_core::word::Word;
 
 /// One of the thirteen system hues, in the order the HIG lists them.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "tag-", kind = fixed, css = tag_css)]
 #[non_exhaustive]
 pub enum SystemHue {
     /// systemRed.
@@ -104,6 +111,11 @@ impl SystemHue {
     }
 }
 
+/// A hue as the stylesheet writes its tag colour: its value in the scope's scheme.
+fn tag_css(token: SystemHue, scope: TokenScope) -> CssValue {
+    CssValue::computed(token.value(scope.scheme, Contrast::Normal).css())
+}
+
 #[cfg(test)]
 mod tests {
     use super::SystemHue;
@@ -120,6 +132,13 @@ mod tests {
                 "purple", "pink", "brown", "gray"
             ]
         );
+    }
+
+    #[test]
+    fn each_hue_is_the_tag_colour_of_the_same_name() {
+        for hue in SystemHue::ALL.iter().copied() {
+            assert_eq!(hue.var().as_str(), format!("--tag-{}", hue.slug()));
+        }
     }
 
     #[test]

@@ -23,31 +23,13 @@ use ds_core::vocab::{Check, RowState, Shortcut};
 /// last letters (gallery fix A).
 const NAME_BUDGET: usize = 26;
 
-/// Whether a name fits its column or runs past it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-enum NameFit {
-    /// Drawn whole, no fade.
-    Fitting,
-    /// Longer than the column: its end fades (`.ds-truncate`).
-    Overflowing,
-}
-
-impl NameFit {
-    /// Whether `name` fits in `budget` characters: what [`clip_chars`] would leave untouched.
-    fn of(name: &str, budget: usize) -> Self {
-        if clip_chars(name, budget) == name {
-            NameFit::Fitting
-        } else {
-            NameFit::Overflowing
-        }
-    }
-
-    /// The name span's class list.
-    fn class(self) -> &'static str {
-        match self {
-            NameFit::Fitting => "ds-thread-name",
-            NameFit::Overflowing => "ds-thread-name ds-truncate",
-        }
+/// The name span's class list: a name longer than the column (what [`clip_chars`] would cut) fades
+/// at its end (`.ds-truncate`); one that fits is drawn whole.
+fn name_class(name: &str, budget: usize) -> &'static str {
+    if clip_chars(name, budget) == name {
+        "ds-thread-name"
+    } else {
+        "ds-thread-name ds-truncate"
     }
 }
 
@@ -101,7 +83,7 @@ pub fn ThreadRow(
             div { class: "ds-thread-main",
                 div { class: "ds-thread-from",
                     span {
-                        class: NameFit::of(&name, NAME_BUDGET).class(),
+                        class: name_class(&name, NAME_BUDGET),
                         onpointerenter: back.part_enter(on_sender),
                         onpointerleave: back.part_leave(on_sender),
                         "{name}"
@@ -154,27 +136,25 @@ pub fn ThreadRow(
 
 #[cfg(test)]
 mod tests {
-    use super::{NAME_BUDGET, NameFit};
+    use super::{NAME_BUDGET, name_class};
+
+    const FITS: &str = "ds-thread-name";
+    const FADES: &str = "ds-thread-name ds-truncate";
 
     #[test]
     fn only_a_name_longer_than_its_column_fades() {
-        const CASES: &[(&str, NameFit)] = &[
-            ("", NameFit::Fitting),
-            ("Dana Okafor", NameFit::Fitting),
+        const CASES: &[(&str, &str)] = &[
+            ("", FITS),
+            ("Dana Okafor", FITS),
             // Exactly the budget: 26 characters.
-            ("Abcdefghij Klmnopqrs Tuvwx", NameFit::Fitting),
-            ("Abcdefghij Klmnopqrs Tuvwxy", NameFit::Overflowing),
-            (
-                "Maximilian Alexander von Hohenberg-Wittelsbach",
-                NameFit::Overflowing,
-            ),
+            ("Abcdefghij Klmnopqrs Tuvwx", FITS),
+            ("Abcdefghij Klmnopqrs Tuvwxy", FADES),
+            ("Maximilian Alexander von Hohenberg-Wittelsbach", FADES),
             // Characters, not bytes: 21 characters in 24 bytes.
-            ("Léa Martin-Ørsted-Åsa", NameFit::Fitting),
+            ("Léa Martin-Ørsted-Åsa", FITS),
         ];
         for (name, want) in CASES {
-            assert_eq!(NameFit::of(name, NAME_BUDGET), *want, "{name:?}");
+            assert_eq!(name_class(name, NAME_BUDGET), *want, "{name:?}");
         }
-        assert_eq!(NameFit::Fitting.class(), "ds-thread-name");
-        assert_eq!(NameFit::Overflowing.class(), "ds-thread-name ds-truncate");
     }
 }

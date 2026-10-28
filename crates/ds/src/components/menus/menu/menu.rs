@@ -17,7 +17,7 @@ use crate::components::menus::menu::decide::{Decision, Level};
 use crate::components::menus::menu::hand_back::{give_back, hand_back};
 use crate::components::menus::menu::hung::Hung;
 use crate::components::menus::menu::panel::Panel;
-use crate::components::menus::menu::pick::{Closer, Closing, Gesture, Picked, picker};
+use crate::components::menus::menu::pick::{Closer, Gesture, Picked, picker};
 use crate::components::menus::menu::placement::{MENU_INSET, MenuPlacement};
 use crate::components::menus::menu::scrolling::{use_in_view, use_scrolling};
 use crate::components::menus::menu::surface::{Surface, stacking};
@@ -113,7 +113,8 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let float = use_float(ZLayer::Menu, stacking(flow));
     use_hook(|| float.known(measured));
     let fade = use_motion_timer(Anim::MenuOut);
-    let mut closing = use_signal(|| Closing::No);
+    // Whether the menu is closing: playing `menu-out`, with `onclose` to run when it settles.
+    let mut closing = use_signal(|| false);
     let blink = use_signal(Blink::default);
     let alive = use_alive();
     let tracker = use_tracker(timing, MENU_INSET);
@@ -145,8 +146,8 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     });
     // Escape and an outside click fade the menu out, then close it (design/13 section 13.3.2).
     let fade_out = EventHandler::new(move |()| {
-        if *closing.peek() == Closing::No {
-            closing.set(Closing::Fading);
+        if !*closing.peek() {
+            closing.set(true);
             fade.start(onclose);
         }
     });
@@ -220,10 +221,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let opener = anchor.clone();
     let hover = panel.clone();
     let leave = panel.clone();
-    let presence = match (closing(), flow) {
-        (Closing::Fading, _) => "leaving",
-        (Closing::No, _) => "present",
-    };
+    let presence = if closing() { "leaving" } else { "present" };
     let surface = Surface::of(flow, float, &anchor, placement, hung);
     let data = common.data_attributes();
     let mounted = common.clone();

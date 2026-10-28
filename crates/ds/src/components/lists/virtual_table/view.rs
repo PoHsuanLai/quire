@@ -67,7 +67,7 @@ use crate::components::lists::row::row::Row;
 use crate::components::lists::table::head::{Fit, cells, use_resize};
 use crate::components::lists::table::look::TableLook;
 use crate::components::lists::table::model::{Sort, TableColumn};
-use crate::components::lists::table::rules::{ColumnRules, HeaderRule, Scrolled};
+use crate::components::lists::table::rules::{ColumnRules, HeaderRule, scrolled_word};
 use crate::components::lists::table::widths::fit_width;
 use crate::components::lists::virtual_list::layout::Layout;
 use crate::components::lists::virtual_list::view::use_cursor_reveal;
@@ -87,19 +87,11 @@ use ds_core::geometry::units::Px;
 use ds_core::press::Press;
 use ds_core::selection::{Pick, RowSelection};
 use ds_core::vocab::{RowState, Selection};
-use ds_core::word::Word;
 use ds_style::tokens::row_scale::ROW_SCALE;
 use std::rc::Rc;
 
 /// How many rows around the viewport are mounted besides the visible ones.
 const OVERSCAN_ROWS: usize = 4;
-
-/// Whether the table holds the keyboard.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Held {
-    Yes,
-    No,
-}
 
 /// How tall every row of a `VirtualTable` is: the compact row's token (`--row-compact-h`), in
 /// logical pixels. A row's top is `row * row_pitch()`, which is what a `ScrollerRef` needs to
@@ -230,7 +222,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     );
     let resize = use_resize();
     let marquee = use_marquee(scroller);
-    let mut held = use_signal(|| Held::No);
+    let mut held = use_signal(|| false);
     let hovered = use_signal(|| None::<usize>);
     let across = use_signal(|| Px(0.0));
     let reach = Reach {
@@ -333,7 +325,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
         .unwrap_or_else(|| cursor.map_or_else(RowSelection::none, RowSelection::single));
     let data = common.data_attributes();
     let mounted = common.clone();
-    let away = (held() == Held::No).then_some("away");
+    let away = (!held()).then_some("away");
     let scrolled = header_rule.attribute(scroller.scroll().read().offset);
     let (above, below) = (layout.top(start).0, layout.below(end).0);
     let height = pitch.0;
@@ -443,7 +435,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                 row_drag,
                 pitch,
             });
-            let ahead = Some(Scrolled::at(across()).slug());
+            let ahead = Some(scrolled_word(across()));
             (body, None, Some("yes"), ahead)
         }
     };
@@ -463,8 +455,8 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             "data-across": across_mark,
             style: inline,
             onmounted: move |event| mounted.mounted(event),
-            onfocus: move |_| held.set(Held::Yes),
-            onblur: move |_| held.set(Held::No),
+            onfocus: move |_| held.set(true),
+            onblur: move |_| held.set(false),
             onkeydown,
             onpointerdown: move |event: PointerEvent| {
                 marquee.pressed(&event, began_with.clone(), onmarquee);

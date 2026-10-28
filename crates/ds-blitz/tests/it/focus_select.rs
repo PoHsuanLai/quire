@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::focus::request::use_focus_request;
 use ds::focus::soon::focus_soon;
 use ds::prelude::*;
-use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Stepped, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -91,7 +91,7 @@ fn the_value_is_selected_in_the_frame_the_focus_lands() {
     harness.send(Input::click(again));
     let mut frames = 0;
     while harness.focus_of("#name input") != FocusState::Focused {
-        if harness.step_frame() == Stepped::Idle {
+        if !harness.step_frame() {
             harness.advance(ms(1));
         }
         frames += 1;

@@ -70,24 +70,13 @@ enum Source {
     Gone,
 }
 
-/// Whether the click that follows a pointer's release is a press on the card or the end of a
-/// drag (swallowed, so a swipe never also opens the notification).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Click {
-    /// The next click is a press.
-    #[default]
-    Passes,
-    /// The next click ends a drag and is not a press.
-    Swallowed,
-}
-
-/// Where a card is in a swipe: what moves it, how far it is off its place, and what the next
-/// click means.
+/// Where a card is in a swipe: what moves it, how far it is off its place, and whether the next
+/// click ends a drag (swallowed, so a swipe never also opens the notification) or is a press.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SwipeState {
     source: Source,
     offset: Px,
-    click: Click,
+    swallows_click: bool,
 }
 
 impl Default for SwipeState {
@@ -95,7 +84,7 @@ impl Default for SwipeState {
         SwipeState {
             source: Source::Idle,
             offset: Px(0.0),
-            click: Click::Passes,
+            swallows_click: false,
         }
     }
 }
@@ -158,9 +147,9 @@ impl SwipeState {
         }
     }
 
-    /// What the next click means.
-    pub fn click(&self) -> Click {
-        self.click
+    /// Whether the next click ends a drag and is not a press.
+    pub fn swallows_click(&self) -> bool {
+        self.swallows_click
     }
 }
 
@@ -180,7 +169,7 @@ impl Machine for SwipeState {
         let none = |state| (state, Vec::new());
         match (self.source, input) {
             (_, SwipeInput::Clicked) => none(SwipeState {
-                click: Click::Passes,
+                swallows_click: false,
                 ..self
             }),
             (Source::Gone, _) => none(self),
@@ -191,11 +180,11 @@ impl Machine for SwipeState {
                     before: None,
                 },
                 offset: Px(0.0),
-                click: Click::Passes,
+                swallows_click: false,
             }),
             (Source::Pointer { from, last, .. }, SwipeInput::Move { x }) => {
                 let raw = Px(x.0 - from.0);
-                let moved = (raw.0.abs() >= TAP_SLOP) || self.click == Click::Swallowed;
+                let moved = (raw.0.abs() >= TAP_SLOP) || self.swallows_click;
                 none(SwipeState {
                     source: Source::Pointer {
                         from,
@@ -203,11 +192,7 @@ impl Machine for SwipeState {
                         before: Some(last),
                     },
                     offset: shaped(raw, *metrics),
-                    click: if moved {
-                        Click::Swallowed
-                    } else {
-                        Click::Passes
-                    },
+                    swallows_click: moved,
                 })
             }
             (Source::Pointer { last, before, .. }, SwipeInput::Up) => {
@@ -228,7 +213,7 @@ impl Machine for SwipeState {
                         quiet_until: at.after_span(DelayToken::SwipeQuiet.delay()),
                     },
                     offset: shaped(raw, *metrics),
-                    click: self.click,
+                    swallows_click: self.swallows_click,
                 })
             }
             (Source::Scroll { quiet_until, .. }, SwipeInput::Elapsed) if at >= quiet_until => {
@@ -262,7 +247,7 @@ impl SwipeState {
         let back = SwipeState {
             source: Source::Idle,
             offset: Px(0.0),
-            click: self.click,
+            swallows_click: self.swallows_click,
         };
         (back, Vec::new())
     }

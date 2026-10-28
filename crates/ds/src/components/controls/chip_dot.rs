@@ -1,14 +1,14 @@
 //! The colour dot of a `Chip`: one of the person's tag colours, or any CSS colour.
 
 use ds_core::word::Word;
-use ds_style::tokens::tag_colour::TagColour;
+use ds_style::tokens::system_hue::SystemHue;
 
 /// What a chip's dot is painted with.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ChipDot {
     /// A tag colour the person chose (Finder's tags): painted `var(--tag-<hue>)`, so it follows
     /// the scheme and the contrast preference. A dot-only chip is named by the colour's word.
-    Tag(TagColour),
+    Tag(SystemHue),
     /// Any CSS colour.
     Colour(String),
 }

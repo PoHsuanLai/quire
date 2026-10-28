@@ -5,11 +5,17 @@
 //! Pure data. `ds::FileIcon` draws it; the lookup from a MIME type to a kind is in [`super::mime`].
 
 use super::Icon;
-use crate::tokens::tag_colour::TagColour;
+use crate::appearance::system::Contrast;
+use crate::appearance::theme::Scheme;
+use crate::tokens::hex::Hex;
+use crate::tokens::system_hue::SystemHue;
+use crate::tokens::token::{CssValue, Token, TokenScope};
 use ds_core::word::Word;
 
-/// What a file is, for drawing its icon.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+/// What a file is, for drawing its icon. As a token it is the colour of the kind's mark
+/// (`--file-kind-pdf`): the kind's system hue, light scheme in both.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "file-kind-", kind = fixed, css = kind_css)]
 #[non_exhaustive]
 pub enum FileKind {
     /// Text, rich text and word-processor files.
@@ -75,21 +81,26 @@ impl FileKind {
     }
 
     /// The tag colour the mark is drawn in (`--tag-*`, so it follows the scheme). `Other` is gray.
-    pub fn colour(self) -> TagColour {
+    pub fn colour(self) -> SystemHue {
         match self {
-            FileKind::Document => TagColour::Blue,
-            FileKind::Pdf => TagColour::Red,
-            FileKind::Spreadsheet => TagColour::Green,
-            FileKind::Presentation => TagColour::Orange,
-            FileKind::Image => TagColour::Purple,
-            FileKind::Audio => TagColour::Pink,
-            FileKind::Video => TagColour::Indigo,
-            FileKind::Archive => TagColour::Brown,
-            FileKind::Code => TagColour::Teal,
-            FileKind::Font | FileKind::Other => TagColour::Gray,
-            FileKind::DiskImage => TagColour::Cyan,
-            FileKind::Program => TagColour::Mint,
+            FileKind::Document => SystemHue::Blue,
+            FileKind::Pdf => SystemHue::Red,
+            FileKind::Spreadsheet => SystemHue::Green,
+            FileKind::Presentation => SystemHue::Orange,
+            FileKind::Image => SystemHue::Purple,
+            FileKind::Audio => SystemHue::Pink,
+            FileKind::Video => SystemHue::Indigo,
+            FileKind::Archive => SystemHue::Brown,
+            FileKind::Code => SystemHue::Teal,
+            FileKind::Font | FileKind::Other => SystemHue::Gray,
+            FileKind::DiskImage => SystemHue::Cyan,
+            FileKind::Program => SystemHue::Mint,
         }
+    }
+
+    /// The colour of the mark: the kind's tag hue in the light scheme.
+    pub fn hex(self) -> Hex {
+        self.colour().value(Scheme::Light, Contrast::Normal)
     }
 
     /// The per-file glyph a list row draws for this kind (the page-shaped glyphs of the actions
@@ -108,6 +119,10 @@ impl FileKind {
             FileKind::Font | FileKind::Other => Icon::File,
         }
     }
+}
+
+fn kind_css(token: FileKind, _scope: TokenScope) -> CssValue {
+    CssValue::computed(token.hex().css())
 }
 
 /// What a folder is, for drawing its icon.

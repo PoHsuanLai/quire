@@ -20,29 +20,13 @@ use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
-/// Whether an item's panel keeps a column for the state mark.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum StateColumn {
-    /// Some item has a state: every item keeps the column so the titles line up.
-    Reserved,
-    /// None does.
-    Absent,
-}
-
-/// Whether an item's panel keeps a column for the image.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ImageColumn {
-    /// Some item has an image.
-    Reserved,
-    /// None does.
-    Absent,
-}
-
 /// The leading columns a panel keeps, so its titles line up.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Columns {
-    pub state: StateColumn,
-    pub image: ImageColumn,
+    /// Some item has a state, so every item keeps the column for the state mark.
+    pub state: bool,
+    /// Some item has an image, so every item keeps the column for it.
+    pub image: bool,
 }
 
 /// Whether an item opens a submenu, and whether that submenu is open (`aria-expanded`).
@@ -119,19 +103,10 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
     };
     let highlighted = (view.highlight == Selection::Selected).then_some("true");
     let live = view.availability == Availability::Enabled;
-    let state = match view.columns.state {
-        StateColumn::Reserved => Some(state_mark(view.check)),
-        StateColumn::Absent => None,
-    };
+    let state = view.columns.state.then(|| state_mark(view.check));
     // Without the state column the title (or image) leads the row and takes the row's own inset.
-    let leading = match view.columns.state {
-        StateColumn::Reserved => None,
-        StateColumn::Absent => Some("absent"),
-    };
-    let image = match view.columns.image {
-        ImageColumn::Reserved => Some(image_mark(view.image)),
-        ImageColumn::Absent => None,
-    };
+    let leading = (!view.columns.state).then_some("absent");
+    let image = view.columns.image.then(|| image_mark(view.image));
     let end = match (view.branch, view.key) {
         (Branch::Parent(_), _) => chevron(),
         (Branch::Leaf, Some(key)) => rsx! {

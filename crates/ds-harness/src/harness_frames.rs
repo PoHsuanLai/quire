@@ -2,7 +2,7 @@
 //! frame runs until the test asks for it, so which frame shows what can be read.
 
 use crate::harness::Harness;
-use crate::headless_step::{PhaseOrder, Stepped};
+use crate::headless_step::PhaseOrder;
 use crate::input::Input;
 use ds::prelude::ShortcutKey;
 
@@ -31,8 +31,8 @@ impl Harness {
 
     /// Run the one frame the document is owed, in the window's order (render what is queued,
     /// lay out, paint, then run the frame phase), and read the document as that frame left it.
-    /// [`Stepped::Idle`] when nothing asked for a frame, as a window then draws none.
-    pub fn step_frame(&mut self) -> Stepped {
+    /// False when nothing asked for a frame, as a window then draws none; true when one painted.
+    pub fn step_frame(&mut self) -> bool {
         let at = self.clock;
         self.doc.step(at)
     }

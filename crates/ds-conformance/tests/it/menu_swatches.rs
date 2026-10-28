@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds::style::tokens::tag_colour::TagColour;
+use ds::style::tokens::system_hue::SystemHue;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
@@ -29,9 +29,9 @@ fn Page() -> Element {
         MenuItem::swatches(
             "Tags",
             vec![
-                MenuSwatch::new(1, "Red", TagColour::Red).with_check(Check::On),
-                MenuSwatch::new(2, "Blue", TagColour::Blue),
-                MenuSwatch::new(3, "Green", TagColour::Green),
+                MenuSwatch::new(1, "Red", SystemHue::Red).with_check(Check::On),
+                MenuSwatch::new(2, "Blue", SystemHue::Blue),
+                MenuSwatch::new(3, "Green", SystemHue::Green),
             ],
         ),
         MenuItem::new(9u8, "Delete"),

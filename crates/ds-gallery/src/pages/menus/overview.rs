@@ -9,7 +9,7 @@ use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::host::measure::{Anchor, MountedRef};
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds::style::tokens::tag_colour::TagColour;
+use ds::style::tokens::system_hue::SystemHue;
 
 /// The three placements, one at a time.
 const PLACEMENTS: [(MenuPlacement, &str); 3] = [
@@ -111,10 +111,10 @@ fn nested() -> Vec<MenuItem<u8>> {
             image: Some(MenuImage::Icon(Icon::Tag)),
             availability: Availability::Enabled,
             children: [
-                (30, "Red", TagColour::Red),
-                (31, "Orange", TagColour::Orange),
-                (32, "Green", TagColour::Green),
-                (33, "Blue", TagColour::Blue),
+                (30, "Red", SystemHue::Red),
+                (31, "Orange", SystemHue::Orange),
+                (32, "Green", SystemHue::Green),
+                (33, "Blue", SystemHue::Blue),
             ]
             .into_iter()
             .map(|(value, title, colour)| {
@@ -266,20 +266,20 @@ type PosedItems = (&'static str, Vec<MenuItem<u8>>, Option<usize>);
 /// Finder's seven tag colours as the dots of a swatch row; Red is on the files.
 fn tag_dots() -> Vec<MenuSwatch<u8>> {
     [
-        ("Red", TagColour::Red),
-        ("Orange", TagColour::Orange),
-        ("Yellow", TagColour::Yellow),
-        ("Green", TagColour::Green),
-        ("Blue", TagColour::Blue),
-        ("Purple", TagColour::Purple),
-        ("Gray", TagColour::Gray),
+        ("Red", SystemHue::Red),
+        ("Orange", SystemHue::Orange),
+        ("Yellow", SystemHue::Yellow),
+        ("Green", SystemHue::Green),
+        ("Blue", SystemHue::Blue),
+        ("Purple", SystemHue::Purple),
+        ("Gray", SystemHue::Gray),
     ]
     .into_iter()
     .zip(1u8..)
     .map(|((name, colour), value)| {
         let dot = MenuSwatch::new(value, name, colour);
         match colour {
-            TagColour::Red => dot.with_check(Check::On),
+            SystemHue::Red => dot.with_check(Check::On),
             _ => dot,
         }
     })

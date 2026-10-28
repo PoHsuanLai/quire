@@ -28,7 +28,7 @@ use crate::components::menus::palette::palette_motion::{Book, use_action_book, u
 use crate::components::menus::palette::palette_reveal::{Reveal, use_reveal};
 use crate::components::menus::palette::palette_rows::{SelectedLine, use_revision, use_row_rects};
 use crate::components::menus::palette::palette_select::{PaletteSelection, use_palette_selection};
-use crate::components::menus::palette::palette_shown::{Change, Seen, Showing, use_showing};
+use crate::components::menus::palette::palette_shown::{Change, Showing, use_showing};
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
@@ -288,8 +288,8 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
         )
     };
     let field = match showing.seen {
-        Seen::Yes => FieldFocus::Controlled(request),
-        Seen::Not => FieldFocus::Manual,
+        true => FieldFocus::Controlled(request),
+        false => FieldFocus::Manual,
     };
     let side = aside.map(|pane| {
         rsx! {

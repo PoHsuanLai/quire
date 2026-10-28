@@ -22,15 +22,6 @@ pub(crate) enum Gesture {
     Pressed,
 }
 
-/// Whether the menu is closing.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Closing {
-    /// Open.
-    No,
-    /// Playing `menu-out`; `onclose` runs when it settles.
-    Fading,
-}
-
 /// What a panel reports when a choice is picked.
 pub(crate) struct Picked<T> {
     /// What the item yields.
@@ -48,7 +39,7 @@ pub(crate) struct Picked<T> {
 /// often as it is picked.
 pub(crate) fn picker<T: 'static>(
     blink: Signal<Blink>,
-    closing: Signal<Closing>,
+    closing: Signal<bool>,
     flow: Flow,
     onpick: EventHandler<T>,
     close: Closer,
@@ -61,7 +52,7 @@ pub(crate) fn picker<T: 'static>(
                   depth,
                   after,
               }: Picked<T>| {
-            if picked(*blink.peek()) || *closing.peek() != Closing::No {
+            if picked(*blink.peek()) || *closing.peek() {
                 return;
             }
             if after == AfterPick::KeepOpen {

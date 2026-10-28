@@ -1,32 +1,32 @@
 //! What a new window asks of its platform at creation: the application id the desktop matches to
 //! the app's `.desktop` file, and the activation token the app was started with, which lets the
 //! compositor give the window the keyboard. winit takes both as platform attributes, one
-//! backend's at a time, so the backend is chosen the way winit's own event loop chooses it.
+//! display server's at a time, so the display server is chosen the way winit's own event loop chooses it.
 
 use crate::app_id::AppId;
 use dioxus_native::WindowAttributes;
 use dioxus_native::winit::window::ActivationToken;
 
-/// `window` with `id` as its application id and `token` as its activation token, on the backend
+/// `window` with `id` as its application id and `token` as its activation token, on the display server
 /// winit will open it on. Either may be absent.
 pub(crate) fn with_platform(
     window: WindowAttributes,
     id: Option<&AppId>,
     token: Option<ActivationToken>,
 ) -> WindowAttributes {
-    with_platform_on(backend(), window, id, token)
+    with_platform_on(display_server(), window, id, token)
 }
 
-/// The Linux display server winit opens its window on.
+/// The Linux display server winit opens its window on, and so which activation token a window can use.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Backend {
+pub(crate) enum DisplayServer {
     Wayland,
     X11,
 }
 
 #[cfg(target_os = "linux")]
 pub(crate) fn with_platform_on(
-    on: Backend,
+    on: DisplayServer,
     window: WindowAttributes,
     id: Option<&AppId>,
     token: Option<ActivationToken>,
@@ -38,7 +38,7 @@ pub(crate) fn with_platform_on(
         return window;
     }
     match on {
-        Backend::Wayland => {
+        DisplayServer::Wayland => {
             let named = match id {
                 Some(AppId(id)) => {
                     WindowAttributesWayland::default().with_name(id.as_str(), id.as_str())
@@ -51,7 +51,7 @@ pub(crate) fn with_platform_on(
             };
             window.with_platform_attributes(Box::new(attributes))
         }
-        Backend::X11 => {
+        DisplayServer::X11 => {
             let named = match id {
                 Some(AppId(id)) => {
                     WindowAttributesX11::default().with_name(id.as_str(), id.as_str())
@@ -70,7 +70,7 @@ pub(crate) fn with_platform_on(
 /// Elsewhere the application id comes from the bundle and focus from the system, not the window.
 #[cfg(not(target_os = "linux"))]
 pub(crate) fn with_platform_on(
-    _on: Backend,
+    _on: DisplayServer,
     window: WindowAttributes,
     _id: Option<&AppId>,
     _token: Option<ActivationToken>,
@@ -80,12 +80,12 @@ pub(crate) fn with_platform_on(
 
 /// Wayland whenever `WAYLAND_DISPLAY` or `WAYLAND_SOCKET` is set and not empty, as winit's
 /// event loop decides; X11 otherwise.
-fn backend() -> Backend {
+fn display_server() -> DisplayServer {
     let set = |name: &str| std::env::var(name).is_ok_and(|value| !value.is_empty());
     if set("WAYLAND_DISPLAY") || set("WAYLAND_SOCKET") {
-        Backend::Wayland
+        DisplayServer::Wayland
     } else {
-        Backend::X11
+        DisplayServer::X11
     }
 }
 
@@ -105,7 +105,7 @@ mod tests {
     fn a_wayland_window_carries_its_id_and_token() {
         let id = AppId("dev.quire.Test".to_owned());
         let attributes = with_platform_on(
-            Backend::Wayland,
+            DisplayServer::Wayland,
             WindowAttributes::default(),
             Some(&id),
             token("wl-token-1"),
@@ -120,7 +120,7 @@ mod tests {
     fn an_x11_window_carries_its_id_and_token() {
         let id = AppId("dev.quire.Test".to_owned());
         let attributes = with_platform_on(
-            Backend::X11,
+            DisplayServer::X11,
             WindowAttributes::default(),
             Some(&id),
             token("x-startup-1"),
@@ -134,7 +134,7 @@ mod tests {
     #[test]
     fn a_token_alone_names_no_application() {
         let attributes = with_platform_on(
-            Backend::Wayland,
+            DisplayServer::Wayland,
             WindowAttributes::default(),
             None,
             token("wl-token-2"),
@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn nothing_to_say_leaves_the_platform_attributes_unset() {
-        for on in [Backend::Wayland, Backend::X11] {
+        for on in [DisplayServer::Wayland, DisplayServer::X11] {
             let attributes = with_platform_on(on, WindowAttributes::default(), None, None);
             assert_eq!(platform_of(&attributes), "None", "{on:?}");
         }

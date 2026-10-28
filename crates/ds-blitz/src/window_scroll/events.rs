@@ -7,34 +7,10 @@ use blitz_kit::scroll::geom::ViewPoint;
 use dioxus_native::winit::event::{ElementState, MouseScrollDelta, TouchPhase, WindowEvent};
 
 use super::keys::scroll_key_of;
-use super::state::{Frames, WheelUse, WindowScroll};
+use super::state::{Handled, WindowScroll};
 use super::wheel::{WheelDelta, WheelInput};
 use crate::edit_window::modifiers_of;
 use crate::gesture_window::phase_of;
-
-/// Whether the document still gets an event.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Intercept {
-    /// Scrolling took it: the document must not see it.
-    Taken,
-    /// The document hears it as usual.
-    Passed,
-}
-
-/// What window scrolling made of one event.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Handled {
-    pub event: Intercept,
-    /// Whether the window must draw another frame for scrolling.
-    pub frames: Frames,
-}
-
-impl Handled {
-    const PASSED: Handled = Handled {
-        event: Intercept::Passed,
-        frames: Frames::Idle,
-    };
-}
 
 impl WindowScroll {
     /// Scrolling's part in `event` at display scale `scale`: it follows the pointer and the
@@ -59,12 +35,7 @@ impl WindowScroll {
                 let Some(input) = wheel_of(delta, *phase, scale) else {
                     return Handled::PASSED;
                 };
-                let (used, frames) = self.wheel(input, now);
-                let event = match used {
-                    WheelUse::Taken => Intercept::Taken,
-                    WheelUse::Passed => Intercept::Passed,
-                };
-                Handled { event, frames }
+                self.wheel(input, now)
             }
             WindowEvent::KeyboardInput { event, .. } => {
                 let (_, held) = self.pointer();
@@ -73,10 +44,10 @@ impl WindowScroll {
                         self.key(key, repeat_of(event.repeat), now)
                     }
                     Some(_) => self.key_up(now),
-                    None => Frames::Idle,
+                    None => false,
                 };
                 Handled {
-                    event: Intercept::Passed,
+                    taken: false,
                     frames,
                 }
             }

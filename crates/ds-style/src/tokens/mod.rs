@@ -42,7 +42,6 @@ pub(crate) mod size_vars;
 pub mod spacing;
 pub mod status;
 pub mod system_hue;
-pub mod tag_colour;
 pub mod terminal;
 pub mod timing;
 pub(crate) mod tint;

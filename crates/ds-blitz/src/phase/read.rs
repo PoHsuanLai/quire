@@ -39,25 +39,15 @@ pub(crate) fn scroll_of(doc: &BaseDocument, node: NodeId) -> Option<Scroll> {
 }
 
 /// Apply `write` to `node`; whether it moved anything.
-pub(super) fn apply(doc: &mut BaseDocument, node: NodeId, write: PhaseWrite) -> Moved {
+pub(super) fn apply(doc: &mut BaseDocument, node: NodeId, write: PhaseWrite) -> bool {
     match write {
         PhaseWrite::ScrollTo(offset) => {
             let Some(before) = doc.get_node(node).map(|found| *found.scroll_offset()) else {
-                return Moved::No;
+                return false;
             };
             doc.scroll_to(node, before.x, f64::from(offset.0), ScrollBehavior::Instant);
             let after = doc.get_node(node).map(|found| *found.scroll_offset());
-            match after == Some(before) {
-                true => Moved::No,
-                false => Moved::Yes,
-            }
+            after != Some(before)
         }
     }
-}
-
-/// Whether a write changed the document.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum Moved {
-    Yes,
-    No,
 }

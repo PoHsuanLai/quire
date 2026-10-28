@@ -77,20 +77,23 @@ impl FrameView {
     }
 }
 
-/// Whether the window needs another frame for scrolling: an offset moved, or an animation runs.
+/// What window scrolling made of one event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Frames {
-    Wanted,
-    Idle,
+pub struct Handled {
+    /// Scrolling took the event and the document must not see it (a wheel the engine scrolls for).
+    /// A wheel stays with the document over a `data-wheel="capture"` element, or with no document
+    /// or pointer yet.
+    pub taken: bool,
+    /// The window needs another frame for scrolling: an offset moved, or an animation runs.
+    pub frames: bool,
 }
 
-/// Whether a wheel went to the engine or stays with the document.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum WheelUse {
-    /// The engine scrolls for it; the document must not see the wheel.
-    Taken,
-    /// The document handles it: a `data-wheel="capture"` element, or no document or pointer yet.
-    Passed,
+impl Handled {
+    /// The document hears the event as usual and scrolling asks for no frame.
+    pub const PASSED: Handled = Handled {
+        taken: false,
+        frames: false,
+    };
 }
 
 /// One window's scroll state, shared by the loop that routes its events and the host component
@@ -266,7 +269,7 @@ impl WindowScroll {
 
     /// A wheel or touchpad event: the listeners hear it, and the engine scrolls for it unless
     /// the element under the pointer takes the wheel itself.
-    pub fn wheel(&self, input: WheelInput, now: Instant) -> (WheelUse, Frames) {
+    pub fn wheel(&self, input: WheelInput, now: Instant) -> Handled {
         let el = self.elapsed(now);
         let input = self.accelerated(input, el);
         let (gesture, pointer, held, detent_px, zoom) = {
@@ -294,7 +297,7 @@ impl WindowScroll {
             }
         }
         let Some(pointer) = pointer else {
-            return (WheelUse::Passed, Frames::Idle);
+            return Handled::PASSED;
         };
         // Fingers that latched a scroller keep it until they lift, whatever is under the pointer
         // now: a stretch can carry the content out from under a still pointer, and the rest of
@@ -321,11 +324,12 @@ impl WindowScroll {
                         .map(|scroll| state.driver.pointer(doc, scroll, pointer, env))
                         .fold(Moves::none(), Moves::then)
                 });
-                (WheelUse::Taken, self.frames_after(moved))
+                Handled {
+                    taken: true,
+                    frames: self.frames_after(moved),
+                }
             }
-            Some(WheelRoute::Capture | WheelRoute::Nothing) | None => {
-                (WheelUse::Passed, Frames::Idle)
-            }
+            Some(WheelRoute::Capture | WheelRoute::Nothing) | None => Handled::PASSED,
         }
     }
 
@@ -385,7 +389,7 @@ impl WindowScroll {
 
     /// A scroll key went down or repeated. The key still goes on to the document: the engine
     /// takes it only when nothing on the focus path does (`blitz_kit::scroll::doc::key_focus`).
-    pub fn key(&self, key: ScrollKey, repeat: KeyRepeat, now: Instant) -> Frames {
+    pub fn key(&self, key: ScrollKey, repeat: KeyRepeat, now: Instant) -> bool {
         let el = self.elapsed(now);
         let moved = self.with_doc(|doc, state| {
             let env = state.tuning.at(el);
@@ -395,7 +399,7 @@ impl WindowScroll {
     }
 
     /// A held scroll key came up.
-    pub fn key_up(&self, now: Instant) -> Frames {
+    pub fn key_up(&self, now: Instant) -> bool {
         let el = self.elapsed(now);
         let moved = self.with_doc(|doc, state| {
             let env = state.tuning.at(el);
@@ -407,7 +411,7 @@ impl WindowScroll {
     /// A frame is about to be drawn at `now`: run the queued commands, advance the engine, and
     /// hand the listeners that asked for eased detents this frame's share. Called before the
     /// document resolves, so the layout sees this frame's offsets.
-    pub fn frame(&self, now: Instant) -> Frames {
+    pub fn frame(&self, now: Instant) -> bool {
         let el = self.elapsed(now);
         let moved = self.with_doc(|doc, state| {
             let env = state.tuning.at(el);
@@ -454,7 +458,7 @@ impl WindowScroll {
     }
 
     /// Whether a frame is wanted after `moved`: an offset moved, or something still animates.
-    fn frames_after(&self, moved: Option<Moves>) -> Frames {
+    fn frames_after(&self, moved: Option<Moves>) -> bool {
         let state = self.shared.state.borrow();
         let moved = moved.map_or(Moved::Still, |moves| moves.moved());
         let animating = state.driver.motion() == Motion::Animating
@@ -462,9 +466,6 @@ impl WindowScroll {
             || state.coast.motion() == Motion::Animating
             || !state.commands.is_empty()
             || !state.frame_views.is_empty();
-        match (moved, animating) {
-            (Moved::Still, false) => Frames::Idle,
-            _ => Frames::Wanted,
-        }
+        !matches!((moved, animating), (Moved::Still, false))
     }
 }

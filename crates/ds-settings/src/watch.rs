@@ -149,7 +149,7 @@ async fn settle<D: SettingsDoc + Send>(
             }
             signals.catch_up();
         }
-        let (loaded, mut retry) = reread(&path, &mut good);
+        let (loaded, mut refused) = reread(&path, &mut good);
         if out.send(loaded).is_err() {
             return;
         }
@@ -158,7 +158,7 @@ async fn settle<D: SettingsDoc + Send>(
         // refusal is published; the same refusal again tells nobody anything new.
         let mut wait = RETRY_FIRST;
         for _ in 0..RETRIES {
-            if retry == Retry::Done {
+            if !refused {
                 break;
             }
             futures_timer::Delay::new(wait).await;
@@ -167,37 +167,30 @@ async fn settle<D: SettingsDoc + Send>(
             }
             wait = wait.saturating_mul(2);
             let (again, next) = reread(&path, &mut good);
-            retry = next;
-            if retry == Retry::Done && out.send(again).is_err() {
+            refused = next;
+            if !refused && out.send(again).is_err() {
                 return;
             }
         }
     }
 }
 
-/// Whether a read should be asked again.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Retry {
-    /// The system refused the file: nothing will announce when it stops.
-    Later,
-    /// The file was read, or is gone, or is wrongly written (an edit will announce its fix).
-    Done,
-}
-
-/// The file at `path` as the watch publishes it, updating `good` when it read cleanly or is gone.
-fn reread<D: SettingsDoc + Send>(path: &std::path::Path, good: &mut D) -> (Loaded<D>, Retry) {
+/// The file at `path` as the watch publishes it, updating `good` when it read cleanly or is gone,
+/// and whether the system refused it (nothing will announce when it stops, so read it again later;
+/// a file that was read, is gone or is wrongly written needs no retry, as an edit announces its fix).
+fn reread<D: SettingsDoc + Send>(path: &std::path::Path, good: &mut D) -> (Loaded<D>, bool) {
     match file_text(path, SETTINGS_CAP) {
         FileText::Text(text) => match read_within::<D>(&text, D::FORMAT, &D::limits()) {
-            Read::Garbled { reason } => (Loaded::garbled(good.clone(), reason), Retry::Done),
+            Read::Garbled { reason } => (Loaded::garbled(good.clone(), reason), false),
             Read::Loaded(loaded) => {
                 *good = loaded.value.clone();
-                (loaded, Retry::Done)
+                (loaded, false)
             }
         },
-        FileText::Unusable(reason) => (Loaded::garbled(good.clone(), reason), Retry::Later),
+        FileText::Unusable(reason) => (Loaded::garbled(good.clone(), reason), true),
         FileText::Missing => {
             *good = D::default();
-            (Loaded::default(), Retry::Done)
+            (Loaded::default(), false)
         }
     }
 }

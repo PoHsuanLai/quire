@@ -59,24 +59,6 @@ impl PillAction {
     }
 }
 
-/// Whether the send is still counting: `Running` counts, `Idle` is sent.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Sent {
-    /// The countdown is running.
-    Not,
-    /// It went.
-    Yes,
-}
-
-impl Sent {
-    fn of(operation: Operation) -> Self {
-        match operation {
-            Operation::Running(_) => Sent::Not,
-            Operation::Idle => Sent::Yes,
-        }
-    }
-}
-
 /// The undo-send pill.
 ///
 /// `operation` is the send: `Running` while it counts down, `Idle` once it is sent. `Fatal` turns
@@ -94,16 +76,13 @@ pub fn SendPill(
     #[props(default)] refusal: Option<String>,
     #[props(default)] common: Common,
 ) -> Element {
-    let sent = Sent::of(operation);
-    let word = match sent {
-        Sent::Not => action.word(),
-        Sent::Yes => None,
-    };
+    let sent = matches!(operation, Operation::Idle);
+    let word = if sent { None } else { action.word() };
     // The pill slides up on the frame after it mounts. Sent: "Sent" stays up for ToastHold, then
     // the pill slides away (S:2342).
     let entering = use_hold_for(FRAME_SLACK, Begin::AtMount);
     let leaving = use_hold_for(DelayToken::ToastHold.delay(), Begin::OnStart);
-    if sent == Sent::Yes && *leaving.state().peek() == HoldFor::Rest {
+    if sent && *leaving.state().peek() == HoldFor::Rest {
         leaving.send_from_render(HoldForIn::Start);
     }
     let shown = match (*entering.state().read(), *leaving.state().read()) {
@@ -112,7 +91,7 @@ pub fn SendPill(
     };
     let class = common.class("ds-send-pill");
     let data = common.data_attributes();
-    let busy = (sent == Sent::Not).then_some("true");
+    let busy = (!sent).then_some("true");
     rsx! {
         div {
             id: common.id.clone(),

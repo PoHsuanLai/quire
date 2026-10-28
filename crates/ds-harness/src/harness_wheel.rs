@@ -9,7 +9,7 @@ use crate::input::PointerInput;
 use blitz_traits::events::{BlitzWheelDelta, BlitzWheelEvent, PointerCoords, UiEvent};
 use ds::host::gesture::{Gesture, GesturePhase, ScrollSource};
 use ds::prelude::*;
-use ds_blitz::seam::{WheelDelta, WheelInput, WheelUse};
+use ds_blitz::seam::{WheelDelta, WheelInput};
 use ds_core::time::clock::now;
 use keyboard_types::Modifiers;
 
@@ -51,8 +51,8 @@ impl Harness {
             delta: WheelDelta::Lines { x, y },
             phase: GesturePhase::Changed,
         };
-        let (used, _) = self.doc.scroll.wheel(input, now());
-        if used == WheelUse::Passed {
+        let handled = self.doc.scroll.wheel(input, now());
+        if !handled.taken {
             self.deliver_wheel(at, BlitzWheelDelta::Lines(x, y));
         }
         self.settle_now();
@@ -74,8 +74,8 @@ impl Harness {
             },
             phase,
         };
-        let (used, _) = self.doc.scroll.wheel(input, now());
-        if used == WheelUse::Passed {
+        let handled = self.doc.scroll.wheel(input, now());
+        if !handled.taken {
             self.deliver_wheel(
                 at,
                 BlitzWheelDelta::Pixels(f64::from(dx.0), f64::from(dy.0)),

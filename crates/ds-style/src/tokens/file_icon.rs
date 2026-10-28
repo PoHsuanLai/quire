@@ -6,9 +6,7 @@
 
 use super::hex::Hex;
 use super::token::{CssValue, Token, TokenScope};
-use crate::appearance::system::Contrast;
 use crate::appearance::theme::Scheme;
-use crate::icon::file_kind::FileKind;
 use ds_core::word::Word;
 
 /// One colour of the file icon's own parts.
@@ -54,87 +52,4 @@ impl FileIconColour {
 
 fn file_css(token: FileIconColour, scope: TokenScope) -> CssValue {
     CssValue::computed(token.hex(scope.scheme).css())
-}
-
-/// The colour of a kind's mark (`--file-kind-pdf`): the kind's system hue, light scheme in both.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
-#[token(prefix = "file-kind-", kind = fixed, css = kind_css)]
-#[non_exhaustive]
-pub enum FileKindColour {
-    /// `--file-kind-document`.
-    Document,
-    /// `--file-kind-pdf`.
-    Pdf,
-    /// `--file-kind-spreadsheet`.
-    Spreadsheet,
-    /// `--file-kind-presentation`.
-    Presentation,
-    /// `--file-kind-image`.
-    Image,
-    /// `--file-kind-audio`.
-    Audio,
-    /// `--file-kind-video`.
-    Video,
-    /// `--file-kind-archive`.
-    Archive,
-    /// `--file-kind-code`.
-    Code,
-    /// `--file-kind-font`.
-    Font,
-    /// `--file-kind-disk-image`.
-    DiskImage,
-    /// `--file-kind-program`.
-    Program,
-    /// `--file-kind-other`.
-    Other,
-}
-
-impl FileKindColour {
-    /// The token of `kind`'s mark.
-    pub fn of(kind: FileKind) -> FileKindColour {
-        match kind {
-            FileKind::Document => FileKindColour::Document,
-            FileKind::Pdf => FileKindColour::Pdf,
-            FileKind::Spreadsheet => FileKindColour::Spreadsheet,
-            FileKind::Presentation => FileKindColour::Presentation,
-            FileKind::Image => FileKindColour::Image,
-            FileKind::Audio => FileKindColour::Audio,
-            FileKind::Video => FileKindColour::Video,
-            FileKind::Archive => FileKindColour::Archive,
-            FileKind::Code => FileKindColour::Code,
-            FileKind::Font => FileKindColour::Font,
-            FileKind::DiskImage => FileKindColour::DiskImage,
-            FileKind::Program => FileKindColour::Program,
-            FileKind::Other => FileKindColour::Other,
-        }
-    }
-
-    /// The kind this token colours.
-    pub fn kind(self) -> FileKind {
-        match self {
-            FileKindColour::Document => FileKind::Document,
-            FileKindColour::Pdf => FileKind::Pdf,
-            FileKindColour::Spreadsheet => FileKind::Spreadsheet,
-            FileKindColour::Presentation => FileKind::Presentation,
-            FileKindColour::Image => FileKind::Image,
-            FileKindColour::Audio => FileKind::Audio,
-            FileKindColour::Video => FileKind::Video,
-            FileKindColour::Archive => FileKind::Archive,
-            FileKindColour::Code => FileKind::Code,
-            FileKindColour::Font => FileKind::Font,
-            FileKindColour::DiskImage => FileKind::DiskImage,
-            FileKindColour::Program => FileKind::Program,
-            FileKindColour::Other => FileKind::Other,
-        }
-    }
-
-    /// The colour of the mark: the kind's tag hue in the light scheme.
-    pub fn hex(self) -> Hex {
-        let hue = self.kind().colour().hue();
-        hue.value(Scheme::Light, Contrast::Normal)
-    }
-}
-
-fn kind_css(token: FileKindColour, _scope: TokenScope) -> CssValue {
-    CssValue::computed(token.hex().css())
 }

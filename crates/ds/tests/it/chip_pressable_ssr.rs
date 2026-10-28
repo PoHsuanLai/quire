@@ -8,7 +8,7 @@ use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::components::controls::chip_dot::ChipDot;
 use ds::prelude::*;
 use ds_style::tokens::label_hue::LabelHue;
-use ds_style::tokens::tag_colour::TagColour;
+use ds_style::tokens::system_hue::SystemHue;
 
 fn render(app: fn() -> Element) -> String {
     let mut dom = VirtualDom::new(app);
@@ -59,7 +59,7 @@ fn Dotted() -> Element {
 #[allow(non_snake_case)]
 fn TagDot() -> Element {
     page(rsx! {
-        Chip { variant: ChipVariant::Neutral, text: "", dot: ChipDot::Tag(TagColour::Red) }
+        Chip { variant: ChipVariant::Neutral, text: "", dot: ChipDot::Tag(SystemHue::Red) }
     })
 }
 #[allow(non_snake_case)]
@@ -68,7 +68,7 @@ fn NamedDot() -> Element {
         Chip {
             variant: ChipVariant::Neutral,
             text: "",
-            dot: ChipDot::Tag(TagColour::Gray),
+            dot: ChipDot::Tag(SystemHue::Gray),
             label: "Home".to_owned(),
             onpress: |_| {},
         }

@@ -61,20 +61,11 @@ pub(crate) struct Showing {
     pub change: Change,
     /// Whether the card has been shown since it mounted: a palette mounted hidden does not
     /// take the keyboard until it is first shown.
-    pub seen: Seen,
+    pub seen: bool,
     timer: MotionTimer,
     alias: Signal<Alias>,
     /// The timer's settle callback, made in render: an effect has no scope to make one in.
     settled: EventHandler<()>,
-}
-
-/// Whether a palette has been shown since it mounted.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Seen {
-    /// Shown at least once.
-    Yes,
-    /// Mounted hidden and not shown yet.
-    Not,
 }
 
 /// The showing hook: `shown` is the caller's (`None`, always shown), `anim` the entrance.
@@ -86,15 +77,12 @@ pub(crate) fn use_showing(shown: Option<Shown>, anim: Anim) -> Showing {
         if now == Shown::Visible {
             timer.start(EventHandler::new(|()| {}));
         }
-        CopyValue::new(match now {
-            Shown::Visible => Seen::Yes,
-            Shown::Hidden => Seen::Not,
-        })
+        CopyValue::new(now == Shown::Visible)
     });
     let change = change(*last.peek(), now);
     last.set(Some(now));
     if change == Change::Show {
-        seen.set(Seen::Yes);
+        seen.set(true);
     }
     Showing {
         shown: now,

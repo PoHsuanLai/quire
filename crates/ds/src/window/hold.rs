@@ -18,15 +18,6 @@ pub(crate) enum Waiting {
     Hover(Stamp),
 }
 
-/// What the click that ends a press does.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Click {
-    /// Zoom, as a click on the green light does.
-    Zoom,
-    /// Nothing: the press opened the menu.
-    Swallow,
-}
-
 /// What starts a wait.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Wait {
@@ -40,14 +31,16 @@ pub(crate) enum Wait {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Hold {
     waiting: Waiting,
-    click: Click,
+    /// Whether the click that ends a press does nothing (the press opened the menu) and does not zoom,
+    /// as a click on the green light does.
+    swallow_click: bool,
 }
 
 impl Default for Hold {
     fn default() -> Self {
         Hold {
             waiting: Waiting::Nothing,
-            click: Click::Zoom,
+            swallow_click: false,
         }
     }
 }
@@ -101,7 +94,7 @@ impl Machine for Hold {
             (HoldIn::Wait(Wait::Press), _) => (
                 Hold {
                     waiting: Waiting::Press(at.after_span(timing.press)),
-                    click: Click::Zoom,
+                    swallow_click: false,
                 },
                 Vec::new(),
             ),
@@ -121,18 +114,19 @@ impl Machine for Hold {
             ),
             (HoldIn::Click, _) => (
                 Hold {
-                    click: Click::Zoom,
+                    swallow_click: false,
                     ..self
                 },
-                match self.click {
-                    Click::Zoom => vec![HoldOut::ToggleZoom],
-                    Click::Swallow => Vec::new(),
+                if self.swallow_click {
+                    Vec::new()
+                } else {
+                    vec![HoldOut::ToggleZoom]
                 },
             ),
             (HoldIn::Elapsed, Waiting::Press(until)) if at >= until => (
                 Hold {
                     waiting: Waiting::Nothing,
-                    click: Click::Swallow,
+                    swallow_click: true,
                 },
                 vec![HoldOut::OpenMenu],
             ),
@@ -159,7 +153,7 @@ impl Machine for Hold {
 
 #[cfg(test)]
 mod tests {
-    use super::{Click, Hold, HoldIn, HoldOut, HoldTiming, Wait, Waiting};
+    use super::{Hold, HoldIn, HoldOut, HoldTiming, Wait, Waiting};
     use ds_core::machine::Machine;
     use ds_core::time::stamp::Stamp;
     use std::time::Duration;
@@ -169,8 +163,11 @@ mod tests {
         hover: Duration::from_millis(800),
     };
 
-    fn hold(waiting: Waiting, click: Click) -> Hold {
-        Hold { waiting, click }
+    fn hold(waiting: Waiting, swallow_click: bool) -> Hold {
+        Hold {
+            waiting,
+            swallow_click,
+        }
     }
 
     fn press(until: u64) -> Waiting {
@@ -194,24 +191,25 @@ mod tests {
 
     #[test]
     fn a_hold_or_a_rest_opens_the_menu_and_a_click_zooms_unless_a_hold_opened_it() {
-        use Click::{Swallow, Zoom};
+        const ZOOM: bool = false;
+        const SWALLOW: bool = true;
         use HoldOut::{OpenMenu, ToggleZoom};
         let rest = Hold::default();
         #[rustfmt::skip]
         let cases: &[Case] = &[
-            ("a press starts the press wait", rest, HoldIn::Wait(Wait::Press), 100, hold(press(600), Zoom), &[], Some(600)),
-            ("a rest starts the hover wait", rest, HoldIn::Wait(Wait::Hover), 100, hold(hover(900), Zoom), &[], Some(900)),
-            ("a press ends: the menu opens, the click is swallowed", hold(press(600), Zoom), HoldIn::Elapsed, 600, hold(Waiting::Nothing, Swallow), &[OpenMenu], None),
-            ("a rest ends: the menu opens, the click still zooms", hold(hover(900), Zoom), HoldIn::Elapsed, 900, hold(Waiting::Nothing, Zoom), &[OpenMenu], None),
-            ("woken early: nothing", hold(press(600), Zoom), HoldIn::Elapsed, 599, hold(press(600), Zoom), &[], Some(600)),
+            ("a press starts the press wait", rest, HoldIn::Wait(Wait::Press), 100, hold(press(600), ZOOM), &[], Some(600)),
+            ("a rest starts the hover wait", rest, HoldIn::Wait(Wait::Hover), 100, hold(hover(900), ZOOM), &[], Some(900)),
+            ("a press ends: the menu opens, the click is swallowed", hold(press(600), ZOOM), HoldIn::Elapsed, 600, hold(Waiting::Nothing, SWALLOW), &[OpenMenu], None),
+            ("a rest ends: the menu opens, the click still zooms", hold(hover(900), ZOOM), HoldIn::Elapsed, 900, hold(Waiting::Nothing, ZOOM), &[OpenMenu], None),
+            ("woken early: nothing", hold(press(600), ZOOM), HoldIn::Elapsed, 599, hold(press(600), ZOOM), &[], Some(600)),
             ("a wake with nothing waiting: nothing", rest, HoldIn::Elapsed, 900, rest, &[], None),
-            ("a short press is cancelled: no menu", hold(press(600), Zoom), HoldIn::Cancel, 200, hold(Waiting::Nothing, Zoom), &[], None),
-            ("a leave cancels a rest", hold(hover(900), Zoom), HoldIn::Cancel, 200, hold(Waiting::Nothing, Zoom), &[], None),
-            ("a newer wait replaces an older one", hold(hover(900), Zoom), HoldIn::Wait(Wait::Press), 300, hold(press(800), Zoom), &[], Some(800)),
-            ("a rest after a swallowing hold keeps the swallow", hold(Waiting::Nothing, Swallow), HoldIn::Wait(Wait::Hover), 700, hold(hover(1500), Swallow), &[], Some(1500)),
-            ("a press clears the swallow", hold(Waiting::Nothing, Swallow), HoldIn::Wait(Wait::Press), 700, hold(press(1200), Zoom), &[], Some(1200)),
+            ("a short press is cancelled: no menu", hold(press(600), ZOOM), HoldIn::Cancel, 200, hold(Waiting::Nothing, ZOOM), &[], None),
+            ("a leave cancels a rest", hold(hover(900), ZOOM), HoldIn::Cancel, 200, hold(Waiting::Nothing, ZOOM), &[], None),
+            ("a newer wait replaces an older one", hold(hover(900), ZOOM), HoldIn::Wait(Wait::Press), 300, hold(press(800), ZOOM), &[], Some(800)),
+            ("a rest after a swallowing hold keeps the swallow", hold(Waiting::Nothing, SWALLOW), HoldIn::Wait(Wait::Hover), 700, hold(hover(1500), SWALLOW), &[], Some(1500)),
+            ("a press clears the swallow", hold(Waiting::Nothing, SWALLOW), HoldIn::Wait(Wait::Press), 700, hold(press(1200), ZOOM), &[], Some(1200)),
             ("a click zooms", rest, HoldIn::Click, 10, rest, &[ToggleZoom], None),
-            ("the click that ends a hold which opened the menu does nothing", hold(Waiting::Nothing, Swallow), HoldIn::Click, 10, rest, &[], None),
+            ("the click that ends a hold which opened the menu does nothing", hold(Waiting::Nothing, SWALLOW), HoldIn::Click, 10, rest, &[], None),
         ];
         for (name, from, input, at, state, outs, wake) in cases {
             let (next, out) = from.step(*input, Stamp(*at), &TIMING, &());

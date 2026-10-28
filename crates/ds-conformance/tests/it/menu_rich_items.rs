@@ -8,7 +8,7 @@ use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, Avata
 use ds::components::overlays::popover::Arrow;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds::style::tokens::tag_colour::TagColour;
+use ds::style::tokens::system_hue::SystemHue;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
@@ -129,8 +129,8 @@ fn a_result_row_draws_marks_an_avatar_and_a_second_line() {
 #[allow(non_snake_case)]
 fn SwatchPage() -> Element {
     let items = vec![
-        MenuItem::new(1, "Red").with_image(MenuImage::Swatch(TagColour::Red)),
-        MenuItem::new(2, "Blue").with_image(MenuImage::Swatch(TagColour::Blue)),
+        MenuItem::new(1, "Red").with_image(MenuImage::Swatch(SystemHue::Red)),
+        MenuItem::new(2, "Blue").with_image(MenuImage::Swatch(SystemHue::Blue)),
     ];
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,

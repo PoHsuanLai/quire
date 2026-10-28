@@ -18,7 +18,7 @@ use ds_core::geometry::units::Px;
 use ds_core::press::PointerButton;
 use ds_core::vocab::PressPhase;
 use ds_motion::detail::touch::{Contact, Touch};
-use ds_motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
+use ds_motion::swipe::{SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
 use ds_motion::use_swipe::{Swiper, use_swipe};
 use ds_motion::{
     spring_spec::SpringSpec,
@@ -126,8 +126,7 @@ impl SwipeGlue {
 
     /// Whether a click on the element is a press (not the end of a drag).
     pub fn click_passes(&self) -> bool {
-        self.live()
-            .is_none_or(|swiper| swiper.take_click() == Click::Passes)
+        self.live().is_none_or(|swiper| swiper.take_click())
     }
 
     /// A pointer went down on the element: only the primary button starts a drag.

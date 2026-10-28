@@ -31,13 +31,6 @@ use ds_style::tokens::control_size::SidebarSize;
 use std::hash::Hash;
 use std::rc::Rc;
 
-/// Whether the list holds the keyboard.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Held {
-    Yes,
-    No,
-}
-
 /// A list of `items`, the whole list on every render: a key missing from it leaves. `cursor` is
 /// the row the keys rest on (the caller draws it selected through the row's own state);
 /// `onselect` hears where an arrow, Home, End or a typed letter moved it, and `onpick` a press
@@ -106,7 +99,7 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
     let pitches = roster.pitches();
     let entries = roster.entries();
     let len = entries.len();
-    let mut held = use_signal(|| Held::No);
+    let mut held = use_signal(|| false);
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let data = common.data_attributes();
     let mounted = common.clone();
@@ -144,7 +137,7 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
             }
         }
     };
-    let away = (held() == Held::No).then_some("away");
+    let away = (!held()).then_some("away");
     rsx! {
         div {
             class: common.class("ds-list"),
@@ -169,8 +162,8 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
             },
             onpointerup: move |_| finish(),
             onpointerleave: move |_| leave(),
-            onfocus: move |_| held.set(Held::Yes),
-            onblur: move |_| held.set(Held::No),
+            onfocus: move |_| held.set(true),
+            onblur: move |_| held.set(false),
             onkeydown: onkey,
             ..data,
             for (index, entry) in entries.into_iter().enumerate() {

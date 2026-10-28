@@ -46,13 +46,6 @@ const COLUMN_WIDTH: Px = Px(220.0);
 /// The least a drag leaves a column.
 const LEAST_WIDTH: f32 = 120.0;
 
-/// Whether the browser holds the keyboard.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Held {
-    Yes,
-    No,
-}
-
 /// `columns` side by side. `label` names the browser for a screen reader. `onpick` hears a click
 /// or a key asking for a row, `onopen` hears Command-Down or a double-click, and `preview` fills
 /// the space after the last column while a row with nothing under it is selected there.
@@ -69,7 +62,7 @@ pub fn ColumnBrowser<K: Clone + PartialEq + 'static>(
     let platform = use_platform();
     let mut width = use_signal(|| column_width);
     let mut grab = use_signal(|| None::<EdgeGrab>);
-    let mut held = use_signal(|| Held::No);
+    let mut held = use_signal(|| false);
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let here = active(&columns);
     let hear = Hear {
@@ -109,7 +102,7 @@ pub fn ColumnBrowser<K: Clone + PartialEq + 'static>(
         }
     };
     let preview = preview.filter(|_| leaf_selected(&columns));
-    let away = (held() == Held::No).then_some("away");
+    let away = (!held()).then_some("away");
     let data = common.data_attributes();
     let mounted = common.clone();
     rsx! {
@@ -121,8 +114,8 @@ pub fn ColumnBrowser<K: Clone + PartialEq + 'static>(
             "aria-label": common.aria_label.clone().unwrap_or(label),
             "data-focus": away,
             onmounted: move |event| mounted.mounted(event),
-            onfocus: move |_| held.set(Held::Yes),
-            onblur: move |_| held.set(Held::No),
+            onfocus: move |_| held.set(true),
+            onblur: move |_| held.set(false),
             onkeydown,
             onpointermove: move |event: PointerEvent| {
                 if let Some(edge) = grab() {

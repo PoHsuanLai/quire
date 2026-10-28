@@ -3,7 +3,7 @@
 //! no timer of its own.
 
 use super::machine::{MachineRef, use_machine};
-use super::swipe::{Click, SwipeEffect, SwipeInput, SwipeMetrics, SwipeState};
+use super::swipe::{SwipeEffect, SwipeInput, SwipeMetrics, SwipeState};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::time::stamp::Stamp;
@@ -37,10 +37,10 @@ impl Swiper {
     }
 
     /// A click was heard: whether it is a press on the card (not the end of a drag).
-    pub fn take_click(&self) -> Click {
-        let click = self.machine.state().peek().click();
+    pub fn take_click(&self) -> bool {
+        let swallowed = self.machine.state().peek().swallows_click();
         self.feed(SwipeInput::Clicked);
-        click
+        !swallowed
     }
 
     /// Now, as the machine's stamp.

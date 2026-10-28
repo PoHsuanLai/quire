@@ -28,20 +28,6 @@ const OVERSCAN_ROWS: usize = 4;
 /// How many rows from the end `near_end` starts to be reported.
 const PAGE_ROWS: usize = 10;
 
-/// Whether the end of the list is near.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Near {
-    Yes,
-    No,
-}
-
-/// Whether the scroller has been measured.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Measured {
-    Yes,
-    No,
-}
-
 /// A row that left while mounted: what it drew and how tall it was, for as long as it plays out.
 struct Exiting<K> {
     key: K,
@@ -285,10 +271,7 @@ fn items<K: Clone + Eq + Hash + 'static>(
 /// Scroll the cursor's row, at `span`, into view when it moves, and once the scroller has been
 /// measured.
 pub(crate) fn use_cursor_reveal(scroller: ScrollerRef, span: Option<ScrollSpan>) {
-    let measured = use_memo(move || match scroller.scroll().read().viewport.0 > 0.0 {
-        true => Measured::Yes,
-        false => Measured::No,
-    });
+    let measured = use_memo(move || scroller.scroll().read().viewport.0 > 0.0);
     use_effect(use_reactive((&span,), move |(span,)| {
         let _ = measured();
         if let Some(span) = span {
@@ -312,17 +295,14 @@ fn use_paging(
                 content: layout.total(),
                 ..seen
             };
-            match whole.near_end(layout.page(page_rows)) {
-                true => Near::Yes,
-                false => Near::No,
-            }
+            whole.near_end(layout.page(page_rows))
         },
     ));
     // The newest handler, without its being a reason to report again.
     let mut handler = use_hook(|| CopyValue::new(near_end));
     handler.set(near_end);
     use_effect(use_reactive((&layout.len(),), move |(_,)| {
-        if let (Near::Yes, Some(near_end)) = (near(), *handler.peek()) {
+        if let (true, Some(near_end)) = (near(), *handler.peek()) {
             near_end.call(());
         }
     }));

@@ -17,15 +17,6 @@ pub(crate) enum Level {
     Sub,
 }
 
-/// Whether the panel's own submenu is open.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Child {
-    /// A submenu of this panel is open.
-    Open,
-    /// None is.
-    Closed,
-}
-
 /// What the panel does.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum Decision<T> {
@@ -83,7 +74,7 @@ pub(crate) fn decide<T: Clone>(
     act: &KeyAct,
     selected: usize,
     choices: &[Choice<T>],
-    child: Child,
+    child_open: bool,
     level: Level,
 ) -> Decision<T> {
     let across = match act {
@@ -114,7 +105,7 @@ pub(crate) fn decide<T: Clone>(
             Some(Act::Open(_)) => Decision::Expand(selected),
             Some(Act::Pick(..)) | None => Decision::Nothing,
         },
-        KeyAct::Back | KeyAct::Close if child == Child::Open => Decision::CloseSub,
+        KeyAct::Back | KeyAct::Close if child_open => Decision::CloseSub,
         KeyAct::Back | KeyAct::Close if level == Level::Sub => Decision::Back,
         KeyAct::Back => Decision::Nothing,
         KeyAct::Close => Decision::CloseMenu,
@@ -124,7 +115,7 @@ pub(crate) fn decide<T: Clone>(
 
 #[cfg(test)]
 mod tests {
-    use super::{AfterPick, Child, Decision, Level, decide};
+    use super::{AfterPick, Decision, Level, decide};
     use crate::components::menus::menu::choices::{Act, Choice, Slot};
     use crate::components::menus::menu::keys::KeyAct;
     use crate::stack::roving::{Edge, Step};
@@ -160,11 +151,11 @@ mod tests {
     #[test]
     fn keys_act_on_the_selected_choice_and_close_one_level() {
         let choices = vec![pick(10), off(11), parent(), pick(13)];
-        let (open, closed) = (Child::Open, Child::Closed);
+        let (open, closed) = (true, false);
         let (root, sub) = (Level::Root, Level::Sub);
         // (key, selected, child, level, want)
         #[rustfmt::skip]
-        let cases: Vec<(KeyAct, usize, Child, Level, Decision<u8>)> = vec![
+        let cases: Vec<(KeyAct, usize, bool, Level, Decision<u8>)> = vec![
             (KeyAct::Move(Step::Down), 0, closed, root, Decision::Select(2)),
             (KeyAct::Move(Step::Up), 2, closed, root, Decision::Select(0)),
             (KeyAct::Pick, 0, closed, root, Decision::Pick(10, AfterPick::Close)),
@@ -180,11 +171,11 @@ mod tests {
             (KeyAct::Close, 0, closed, root, Decision::CloseMenu),
             (KeyAct::Jump("a".into()), 0, closed, root, Decision::Nothing),
         ];
-        for (act, selected, child, level, want) in cases {
+        for (act, selected, child_open, level, want) in cases {
             assert_eq!(
-                decide(&act, selected, &choices, child, level),
+                decide(&act, selected, &choices, child_open, level),
                 want,
-                "{act:?} on {selected} ({child:?}, {level:?})"
+                "{act:?} on {selected} (child open: {child_open}, {level:?})"
             );
         }
     }
@@ -199,7 +190,7 @@ mod tests {
     #[test]
     fn a_row_of_dots_is_one_stop_for_up_and_down_and_left_and_right_walk_its_dots() {
         let choices = vec![pick(0), dot(1, 0), dot(2, 1), dot(3, 2), pick(4)];
-        let (closed, root, sub) = (Child::Closed, Level::Root, Level::Sub);
+        let (closed, root, sub) = (false, Level::Root, Level::Sub);
         // (key, selected, level, want)
         #[rustfmt::skip]
         let cases: Vec<(KeyAct, usize, Level, Decision<u8>)> = vec![

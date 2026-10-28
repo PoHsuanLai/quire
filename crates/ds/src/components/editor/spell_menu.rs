@@ -122,14 +122,14 @@ fn open(
 }
 
 /// The rows: the suggestions (or "No Guesses Found"), a rule, Ignore and Learn.
-fn entries(opened: &Opened, replaces: Replaces) -> Vec<MenuItem<SpellPick>> {
+fn entries(opened: &Opened, replaces: bool) -> Vec<MenuItem<SpellPick>> {
     let guesses: Vec<MenuItem<SpellPick>> = match (replaces, opened.suggestions.is_empty()) {
-        (Replaces::Yes, false) => opened
+        (true, false) => opened
             .suggestions
             .iter()
             .map(|word| MenuItem::new(SpellPick::Replace(word.clone()), word.clone()))
             .collect(),
-        (Replaces::Yes, true) | (Replaces::No, _) => vec![MenuItem::Info {
+        (true, true) | (false, _) => vec![MenuItem::Info {
             title: "No Guesses Found".to_owned(),
             detail: None,
         }],
@@ -142,13 +142,6 @@ fn entries(opened: &Opened, replaces: Replaces) -> Vec<MenuItem<SpellPick>> {
             MenuItem::new(SpellPick::Learn, "Learn Spelling"),
         ])
         .collect()
-}
-
-/// Whether the app takes replacements (it passed `on_replace`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Replaces {
-    Yes,
-    No,
 }
 
 /// Do what a row says.
@@ -245,11 +238,7 @@ pub fn SpellMarks(
 }
 
 fn spell_menu(link: &SpellLink, mut menu: Signal<Option<Opened>>, opened: Opened) -> Element {
-    let replaces = match link.on_replace {
-        Some(_) => Replaces::Yes,
-        None => Replaces::No,
-    };
-    let entries = entries(&opened, replaces);
+    let entries = entries(&opened, link.on_replace.is_some());
     let (picking, closing) = (link.clone(), link.clone());
     let mark = opened.mark.clone();
     rsx! {
@@ -307,7 +296,7 @@ impl PartialEq for SpellLink {
 
 #[cfg(test)]
 mod tests {
-    use super::{Opened, Replaces, SpellPick, entries};
+    use super::{Opened, SpellPick, entries};
     use crate::components::menus::item::item::MenuItem;
     use crate::host::position::EditNode;
     use crate::spell::marks::Misspelt;
@@ -342,7 +331,7 @@ mod tests {
 
     #[test]
     fn the_menu_lists_suggestions_then_ignore_and_learn() {
-        let rows = entries(&opened(&["the", "ten"]), Replaces::Yes);
+        let rows = entries(&opened(&["the", "ten"]), true);
         assert_eq!(
             values(&rows),
             vec![
@@ -353,12 +342,12 @@ mod tests {
                 "Learn"
             ]
         );
-        let none = entries(&opened(&[]), Replaces::Yes);
+        let none = entries(&opened(&[]), true);
         assert_eq!(
             values(&none),
             vec!["No Guesses Found", "---", "Ignore", "Learn"]
         );
-        let unreplaceable = entries(&opened(&["the"]), Replaces::No);
+        let unreplaceable = entries(&opened(&["the"]), false);
         assert_eq!(values(&unreplaceable)[0], "No Guesses Found");
     }
 }

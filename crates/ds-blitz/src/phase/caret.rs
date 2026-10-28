@@ -1,5 +1,4 @@
-//! An edit surface's caret box, read from the layout the surface's own text sits in, and whether
-//! the phase should read it before the frame paints.
+//! An edit surface's caret box, read from the layout the surface's own text sits in.
 
 use super::read::border_box;
 use crate::edit_geometry::{caret, selection};
@@ -8,16 +7,6 @@ use crate::edit_tree::segments;
 use blitz_dom::{BaseDocument, NodeId};
 use ds::host::position::{TextPosition, TextRange};
 use ds::prelude::{Point, Rect};
-
-/// Whether the phase has work to do before a frame paints.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Early {
-    /// A caret or a selection moved since its box was read: lay out, publish, and render what that changed, so
-    /// the frame draws the caret where the text it follows is.
-    Wanted,
-    /// Nothing moved; the frame paints as it is.
-    Idle,
-}
 
 /// The caret's box at `at` in `surface`, relative to the surface's border box; `None` when the
 /// surface or the position is not in the layout.
