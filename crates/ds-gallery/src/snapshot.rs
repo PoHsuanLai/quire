@@ -39,20 +39,13 @@ pub struct Shot {
     pub accent: Accent,
     /// The device scale in percent.
     pub scale: u16,
-    /// The typeface.
-    pub typeface: Typeface,
 }
 
 impl Shot {
-    /// Its file name: `tokens-light-blue.png`, with `-editorial` before the extension under
-    /// the Editorial typeface.
+    /// Its file name: `tokens-light-blue.png`.
     pub fn file(self) -> String {
-        let typeface = match self.typeface {
-            Typeface::System => "",
-            Typeface::Editorial => "-editorial",
-        };
         format!(
-            "{}-{}-{}{typeface}.png",
+            "{}-{}-{}.png",
             self.page.slug(),
             self.scheme.slug(),
             self.accent.slug()
@@ -71,7 +64,6 @@ impl Shot {
             accent: self.accent,
             motion: Motion::Standard,
             showcase: Showcase::Posed,
-            typeface: self.typeface,
             ..Axes::default()
         }
     }
@@ -103,7 +95,6 @@ pub fn shots_of(pages: &[Page]) -> Vec<Shot> {
                     scheme,
                     accent,
                     scale: 100,
-                    typeface: Typeface::System,
                 })
             })
         })
@@ -129,14 +120,12 @@ pub fn progress_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tools/progress/shots/gallery")
 }
 
-/// Render every shot into `dir` (only `page`'s when one is named, at `scale` percent, in
-/// `typeface`), write `dir/index.html`, and, when `progress` asks, copy the pictures to
+/// Render every shot into `dir` (only `page`'s when one is named, at `scale` percent), write `dir/index.html`, and, when `progress` asks, copy the pictures to
 /// [`progress_dir`]. Returns the pictures written.
 pub fn run(
     dir: &Path,
     page: Option<Page>,
     scale: u16,
-    typeface: Typeface,
     progress: ProgressCopy,
 ) -> Result<Vec<Shot>, GalleryError> {
     let made = |path: &Path| {
@@ -152,11 +141,7 @@ pub fn run(
         None => shots(),
     }
     .into_iter()
-    .map(|shot| Shot {
-        scale,
-        typeface,
-        ..shot
-    })
+    .map(|shot| Shot { scale, ..shot })
     .collect::<Vec<_>>();
     for (done, shot) in shots.iter().enumerate() {
         let picture = render(*shot)?;

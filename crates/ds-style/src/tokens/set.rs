@@ -3,7 +3,6 @@
 
 use super::name::VarName;
 use super::token::{Token, TokenScope};
-use crate::appearance::typeface::Typeface;
 
 /// Where a family's declarations sit inside the `.ds` block, in the order the block writes them.
 /// A kit places each of its sets, so the block's text does not depend on which crate a family
@@ -16,7 +15,7 @@ pub enum Place {
     Shape,
     /// The size ladder: each control size's geometry, then the shell's sizes on it.
     Ladder,
-    /// Identity swatches, spacing, the sizes that no typeface moves, layers and opacities.
+    /// Identity swatches, spacing, the type sizes, layers and opacities.
     Scale,
     /// Consumer-tuned geometry: the shell's type scale, dock, OSD, notifications and widgets.
     Metrics,
@@ -24,30 +23,18 @@ pub enum Place {
     Pixel,
     /// The emoji face's stack.
     Face,
-    /// Font families, the voice tokens and the sizes that follow the typeface.
-    Typeface,
+    /// Font families and the voice tokens.
+    Type,
     /// Durations, delays, easings and scalars.
     Motion,
-}
-
-/// Which members of a family a set lists.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Only {
-    /// Every member.
-    All,
-    /// The members the typeface does not move.
-    TypefaceFixed,
-    /// The members the typeface moves.
-    TypefaceVarying,
 }
 
 /// One family's tokens, type-erased.
 #[derive(Debug, Clone, Copy)]
 pub struct TokenSet {
     place: Place,
-    only: Only,
     vars: fn() -> Vec<VarName>,
-    declared: fn(TokenScope, Only) -> Vec<(VarName, String)>,
+    declared: fn(TokenScope) -> Vec<(VarName, String)>,
 }
 
 impl TokenSet {
@@ -55,7 +42,6 @@ impl TokenSet {
     pub const fn of<T: Token>() -> TokenSet {
         TokenSet {
             place: Place::Scale,
-            only: Only::All,
             vars: vars_of::<T>,
             declared: declared_of::<T>,
         }
@@ -66,25 +52,20 @@ impl TokenSet {
         TokenSet { place, ..self }
     }
 
-    /// `self` listing only `only`'s members in the stylesheet.
-    pub const fn only(self, only: Only) -> TokenSet {
-        TokenSet { only, ..self }
-    }
-
     /// Where the set's declarations sit in the `.ds` block.
     pub const fn place(&self) -> Place {
         self.place
     }
 
     /// Every custom property the family declares or reads: each member's, and each tuned
-    /// member's input. The linter's vocabulary; a set placed for a subset still names them all.
+    /// member's input. The linter's vocabulary.
     pub fn vars(&self) -> Vec<VarName> {
         (self.vars)()
     }
 
     /// The declarations the set writes in `scope`, `(property, value)`.
     pub fn declarations(&self, scope: TokenScope) -> Vec<(VarName, String)> {
-        (self.declared)(scope, self.only)
+        (self.declared)(scope)
     }
 }
 
@@ -95,24 +76,9 @@ fn vars_of<T: Token>() -> Vec<VarName> {
         .collect()
 }
 
-fn declared_of<T: Token>(scope: TokenScope, only: Only) -> Vec<(VarName, String)> {
+fn declared_of<T: Token>(scope: TokenScope) -> Vec<(VarName, String)> {
     T::ALL
         .iter()
-        .filter(|token| keeps(**token, only, scope))
         .map(|token| (token.var(), token.css_value(scope).to_string()))
         .collect()
-}
-
-/// Whether `token` is a member `only` lists: a member follows the typeface when its value
-/// differs between the two typefaces.
-fn keeps<T: Token>(token: T, only: Only, scope: TokenScope) -> bool {
-    let moved = || {
-        token.css_value(scope.in_typeface(Typeface::System))
-            != token.css_value(scope.in_typeface(Typeface::Editorial))
-    };
-    match only {
-        Only::All => true,
-        Only::TypefaceFixed => !moved(),
-        Only::TypefaceVarying => moved(),
-    }
 }

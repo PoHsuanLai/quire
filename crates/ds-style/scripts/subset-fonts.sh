@@ -15,7 +15,7 @@
 # history: its WOFF2s were cut from the OFL variable files Fedora ships
 # (`NotoSerif[wght].ttf`, `NotoSerif-Italic[wght].ttf`, version 2.015, weights 400-700) with the
 # same pyftsubset options and `--flavor=woff2`, one per subset, then converted here.
-# Inter (the System typeface) is the same: `cut-inter.sh` cuts its WOFF2s from the official
+# Inter (the interface faces) is the same: `cut-inter.sh` cuts its WOFF2s from the official
 # release's variable fonts and then runs this script on them.
 set -euo pipefail
 cd "$(dirname "$0")/../assets/fonts"
@@ -26,7 +26,7 @@ LATIN_EXT="U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+
 # The key-cap glyphs (⌃ ⌥ ⇧ ⌘ ⌫ ↩ ↵ ⇥ ⌦ ⇞ ⇟ and the arrows ← ↑ → ↓ ↖ ↘): Google's latin range has
 # none of them, so a `KeyEquivalent` fell to whatever face the system offered, and U+2303 drew as a
 # caret (`^`). The upright Inter text face carries them (Inter 4.1 draws all of them) and every
-# stack ends with "Inter" (`--font-code`, the Editorial stacks), so no typeface depends on the
+# stack ends with "Inter" (`--font-code`, the Editorial look's stacks), so no face depends on the
 # system for them. The italic and display cuts do not need them.
 KEYS="U+2190-2199,U+21A9,U+21B5,U+21DE-21DF,U+21E5,U+21E7,U+2303,U+2318,U+2325-2326,U+232B"
 

@@ -6,7 +6,7 @@
 //! linter's vocabulary (`TokenSet::of::<T>()` lists them all).
 
 use super::name::VarName;
-use crate::appearance::{motion::MotionLevel, theme::Scheme, typeface::Typeface};
+use crate::appearance::{motion::MotionLevel, theme::Scheme};
 use ds_core::word::Word;
 use std::borrow::Cow;
 
@@ -22,24 +22,20 @@ pub enum TokenKind {
     Tuned,
 }
 
-/// What a token's value can follow: the colour scheme, the motion level, the typeface.
+/// What a token's value can follow: the colour scheme and the motion level.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TokenScope {
     /// Light or dark.
     pub scheme: Scheme,
     /// The motion level.
     pub motion: MotionLevel,
-    /// The voice of the type.
-    pub typeface: Typeface,
 }
 
 impl TokenScope {
-    /// The scope `.ds` itself is declared in: light, Standard motion, the system
-    /// typeface.
+    /// The scope `.ds` itself is declared in: light, Standard motion.
     pub const BASE: TokenScope = TokenScope {
         scheme: Scheme::Light,
         motion: MotionLevel::Standard,
-        typeface: Typeface::System,
     };
 
     /// `self` in `scheme`.
@@ -50,11 +46,6 @@ impl TokenScope {
     /// `self` at `motion`.
     pub const fn at(self, motion: MotionLevel) -> TokenScope {
         TokenScope { motion, ..self }
-    }
-
-    /// `self` in `typeface`.
-    pub const fn in_typeface(self, typeface: Typeface) -> TokenScope {
-        TokenScope { typeface, ..self }
     }
 }
 

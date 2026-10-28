@@ -1,10 +1,9 @@
-//! Type: the five face jobs in the root's typeface with the files that ship for each, and every
+//! Type: the five face jobs with the files that ship for each, and every
 //! step of the size ramp drawn in each face.
 
 use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds::root::typeface::use_typeface;
 use ds::style::fonts::Subset;
 use ds::style::fonts::{FACES, Face, FaceStyle};
 use ds::style::tokens::token::{Token, TokenScope};
@@ -19,15 +18,14 @@ const PANGRAM: &str = "Sphinx of black quartz, judge my vow — 0123456789";
 /// The type page.
 #[component]
 pub fn TypePage() -> Element {
-    let typeface = use_typeface();
     rsx! {
-        Section { title: "Faces", note: "Each face at --fs-display, regular and bold, in the toolbar's typeface, with the files ds::style::fonts::FACES ships for it.",
+        Section { title: "Faces", note: "Each face at --fs-display, regular and bold, with the files ds::style::fonts::FACES ships for it.",
             for family in FAMILIES.iter().copied() {
                 div { class: "g-col",
                     div { style: "font-family:{family.var().reference()};font-size:var(--fs-display);font-weight:400", "{PANGRAM}" }
                     div { style: "font-family:{family.var().reference()};font-size:var(--fs-display);font-weight:700", "{PANGRAM}" }
-                    span { class: "g-code", "{family.var().as_str()}: {family.css_value(TokenScope::BASE.in_typeface(typeface))}" }
-                    span { class: "g-code", "{files(family, typeface)}" }
+                    span { class: "g-code", "{family.var().as_str()}: {family.css_value(TokenScope::BASE)}" }
+                    span { class: "g-code", "{files(family)}" }
                 }
             }
         }
@@ -40,7 +38,7 @@ pub fn TypePage() -> Element {
                 span { class: "g-head", "data" }
                 for size in FontSize::ALL.iter().copied() {
                     span { class: "g-code", "{size.var().as_str()}" }
-                    span { class: "g-code", "{size.css_in(typeface)}" }
+                    span { class: "g-code", "{size.css()}" }
                     for family in [Family::Ui, Family::Display, Family::Data] {
                         span {
                             class: "ds-truncate",
@@ -64,9 +62,9 @@ pub fn TypePage() -> Element {
     }
 }
 
-/// The files the face a family names under `typeface` ships: `normal 200-800 latin, …`.
-fn files(family: Family, typeface: Typeface) -> String {
-    let name = family.face_name(typeface);
+/// The files the face a family names ships: `normal 200-800 latin, …`.
+fn files(family: Family) -> String {
+    let name = family.face_name();
     FACES
         .iter()
         .filter(|face| face.name == name)

@@ -10,7 +10,6 @@ use super::rule::{Offence, Rule};
 use super::tokenize::Located;
 use super::walk::{CollectedRule, Decl};
 use ds_core::word::Word;
-use ds_style::appearance::typeface::Typeface;
 use ds_style::tokens::type_scale::FontSize;
 
 /// The pseudo-classes that mark a focus rule (`:focus-visible` and `:focus-within` are
@@ -99,7 +98,7 @@ fn min_font_size(selector: &str, property: &str, decl: &Decl, out: &mut Vec<Offe
             let excerpt = format!(
                 "{property}: var({}) is {} under System (under the 10 px floor)",
                 name.text,
-                size.css_in(Typeface::System)
+                size.css()
             );
             push(out, Rule::MinFontSize, name, selector, &excerpt);
         }
@@ -131,7 +130,7 @@ fn small_token(name: &str) -> Option<FontSize> {
     FontSize::ALL
         .iter()
         .copied()
-        .find(|size| size.var().as_str() == name && size.px_in(Typeface::System) < FontSize::MIN_PX)
+        .find(|size| size.var().as_str() == name && size.px() < FontSize::MIN_PX)
 }
 
 /// Whether `property` sets a corner.

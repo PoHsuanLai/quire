@@ -2,7 +2,6 @@
 //! same root. No stylesheet of its own.
 
 use super::chrome::{Ground, RootChrome};
-use super::typeface::use_typeface;
 use dioxus::prelude::*;
 use ds_core::word::Word;
 use ds_style::appearance::{accent::Accent, resolve::Resolved, theme::Scheme};
@@ -12,7 +11,7 @@ use ds_style::tokens::accent_band::text_grounds::{TextOn, text_on};
 use ds_style::tokens::shape::Corner;
 
 /// A subtree in `material`, optionally forcing `theme`, `accent` or `blur`: a nested `div.ds`
-/// stamping the scope's theme, the root's typeface, and the scope's accent, motion, material and
+/// stamping the scope's theme, accent, motion, material and
 /// blur, with no stylesheet and no frame variables (it inherits the root's). Each override left
 /// `None` inherits the enclosing scope's value, so a specimen in another accent or blur state
 /// needs no second `Ds`. `on` is
@@ -38,13 +37,11 @@ pub fn Surface(
 ) -> Element {
     let env = scope(use_scope(), material, theme, accent, blur);
     let ground = on.unwrap_or_else(|| Ground::of(material));
-    let typeface = use_typeface();
     use_scope_provider(env);
     rsx! {
         div {
             class: "ds",
             "data-theme": env.scheme.slug(),
-            "data-typeface": typeface.slug(),
             "data-accent": env.resolved.accent.slug(),
             "data-contrast": env.resolved.contrast.attribute(),
             "data-transparency": env.resolved.transparency.attribute(),
@@ -72,13 +69,11 @@ pub(crate) fn ClassedScope(
     children: Element,
 ) -> Element {
     let env = scope(use_scope(), material, None, None, None);
-    let typeface = use_typeface();
     use_scope_provider(env);
     rsx! {
         div {
             class: "ds {class}",
             "data-theme": env.scheme.slug(),
-            "data-typeface": typeface.slug(),
             "data-accent": env.resolved.accent.slug(),
             "data-contrast": env.resolved.contrast.attribute(),
             "data-transparency": env.resolved.transparency.attribute(),

@@ -33,7 +33,6 @@ use std::sync::Arc;
 ///         Ds {
 ///             appearance: now.settings.appearance.appearance(),
 ///             system: now.system,
-///             typeface: Some(now.settings.appearance.typeface()),
 ///             custom_styles: now.settings.appearance.custom_styles,
 ///             material: Material::Window,
 ///             {children}

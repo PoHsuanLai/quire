@@ -1,5 +1,5 @@
 //! The toolbar: every axis the gallery sweeps, built from quire's own controls: segmented
-//! controls for theme, typeface, accent and motion level, menus for the material and the Space, a toggle
+//! controls for theme, accent and motion level, menus for the material and the Space, a toggle
 //! for blur, tabs for the page.
 
 use crate::axes::{Axes, PresetIndex, material_label, motion_of};
@@ -24,11 +24,6 @@ pub fn Toolbar() -> Element {
         .iter()
         .copied()
         .map(|theme| (theme, theme.label().to_string()))
-        .collect::<Vec<_>>();
-    let typefaces = Typeface::ALL
-        .iter()
-        .copied()
-        .map(|typeface| (typeface, typeface.label().to_string()))
         .collect::<Vec<_>>();
     let accents = Accent::ALL
         .iter()
@@ -57,11 +52,6 @@ pub fn Toolbar() -> Element {
             Tool { name: "Theme",
                 SegmentedControl::<Theme> { label: "Theme", choices: Choice::pairs(themes), tracking: Tracking::SelectOne(now.theme), size: ControlSize::Mini,
                     onchange: move |theme| axes.with_mut(|axes| axes.theme = theme),
-                }
-            }
-            Tool { name: "Type",
-                SegmentedControl::<Typeface> { label: "Typeface", choices: Choice::pairs(typefaces), tracking: Tracking::SelectOne(now.typeface), size: ControlSize::Mini,
-                    onchange: move |typeface| axes.with_mut(|axes| axes.typeface = typeface),
                 }
             }
             Tool { name: "Accent",

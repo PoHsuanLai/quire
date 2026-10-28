@@ -16,8 +16,6 @@ enum Fixture {
     Themed,
     #[token(standard = "300ms", reduced = "60ms")]
     Timed,
-    #[token(system = "Inter", editorial = "Karla")]
-    Voiced,
     #[token(name = "renamed", value = "2px")]
     TwoWords,
 }
@@ -42,7 +40,6 @@ fn a_variant_is_the_custom_property_prefix_plus_its_slug_or_name() {
         (Fixture::Flat, "--fx-flat"),
         (Fixture::Themed, "--fx-themed"),
         (Fixture::Timed, "--fx-timed"),
-        (Fixture::Voiced, "--fx-voiced"),
         (Fixture::TwoWords, "--fx-renamed"),
     ];
     for (token, want) in CASES {
@@ -81,13 +78,6 @@ fn a_value_follows_the_dimension_its_attributes_name() {
             Fixture::Timed,
             base.at(MotionLevel::Reduced),
             "60ms",
-        ),
-        ("voiced system", Fixture::Voiced, base, "Inter"),
-        (
-            "voiced editorial",
-            Fixture::Voiced,
-            base.in_typeface(Typeface::Editorial),
-            "Karla",
         ),
     ];
     for (name, token, scope, want) in cases {
@@ -135,13 +125,7 @@ fn a_set_declares_each_member_in_the_scope() {
     let names: Vec<&str> = light.iter().map(|(var, _)| var.as_str()).collect();
     assert_eq!(
         names,
-        [
-            "--fx-flat",
-            "--fx-themed",
-            "--fx-timed",
-            "--fx-voiced",
-            "--fx-renamed"
-        ]
+        ["--fx-flat", "--fx-themed", "--fx-timed", "--fx-renamed"]
     );
     let dark = TokenSet::of::<Fixture>().declarations(TokenScope::BASE.in_scheme(Scheme::Dark));
     assert_ne!(light, dark);

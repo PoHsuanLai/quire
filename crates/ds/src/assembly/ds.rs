@@ -1,4 +1,4 @@
-//! The root: `div.ds` carrying `data-theme`, `data-typeface`, `data-accent`, `data-motion`,
+//! The root: `div.ds` carrying `data-theme`, `data-accent`, `data-motion`,
 //! `data-material`, `data-blur`, `data-modality` and the hover hub's `data-hover`, with the frame's `--f-*`
 //! inline; then the stylesheet (when inlined), the frame layers and grain, the children, the
 //! overlay host and the toast host. It provides `Scope`, `HoverHub`, `ToastHub`, `LayerStack`
@@ -44,12 +44,6 @@
 //! A client-decorated window passes `window: WindowFrame::Titlebar { .. }`: the root stamps
 //! `data-window-frame` and draws the titlebar, its children in `div.ds-window-body`, and the
 //! resize edges (`components/window_frame.rs`). The default draws nothing more.
-//! `typeface` picks the faces the family tokens name (design/02-TYPE.md section 2): System
-//! (Inter), or `Typeface::Editorial`, mail's Bricolage, Karla and Space Mono. `None` (the
-//! default) takes the enclosing root's, so a root nested in another speaks as it does, and a
-//! top-level root is System.
-//! The host reads it from `appearance.typeface` (`ds_settings::AppearanceSettings::typeface`), or
-//! an app that keeps its own voice passes Editorial outright.
 //! An overlay root passes `extent: RootExtent::Viewport` (`extent.rs`): a root holding only
 //! positioned content (a centred sheet) is otherwise 0 px tall. A popup document, whose host
 //! fits the surface to its content, passes `RootExtent::Popup`: the floating card lies in flow
@@ -67,7 +61,6 @@ use crate::keys::use_keys_provider;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
 use crate::root::extent::RootExtent;
 use crate::root::pointer_trail::{Movement, PointerTrail};
-use crate::root::typeface::{use_typeface, use_typeface_provider};
 use crate::stack::host::{OverlayHost, use_overlays_provider};
 use crate::stack::hover_hub::use_hover_hub_provider;
 use crate::stack::layer_stack::LayerStack;
@@ -77,9 +70,7 @@ use ds_core::geometry::scale::Scale;
 use ds_core::vocab::{Activity, InputModality};
 use ds_core::word::Word;
 use ds_motion::hover_intent::HoverWarmth;
-use ds_style::appearance::{
-    appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
-};
+use ds_style::appearance::{appearance::Appearance, resolve::resolve, system::SystemPrefs};
 use ds_style::appearance::{blur::BlurState, material::Material};
 use ds_style::kit::{CustomStyles, Styles};
 use ds_style::scale::use_root_scale;
@@ -116,16 +107,13 @@ pub fn Ds(
     #[props(default)] scale: Option<Scale>,
     #[props(default)] window: WindowFrame,
     #[props(default)] extent: RootExtent,
-    #[props(default)] typeface: Option<Typeface>,
     #[props(default)] styles: ReadSignal<Styles>,
     #[props(default)] custom_styles: CustomStyles,
     #[props(default)] surface: Option<&'static str>,
     #[props(default)] tip_delay: TipDelay,
     children: Element,
 ) -> Element {
-    let typeface = typeface.unwrap_or(use_typeface());
     use_keys_provider();
-    use_typeface_provider(typeface);
     let signals = use_hook(try_consume_context::<HostSignals>);
     let scale = use_root_scale(scale, signals.map(|signals| (signals.scale)()));
     let chrome = chrome.unwrap_or_else(|| RootChrome::of(material));
@@ -171,7 +159,6 @@ pub fn Ds(
         div {
             class: "ds",
             "data-theme": resolved.scheme.slug(),
-            "data-typeface": typeface.slug(),
             "data-accent": resolved.accent.slug(),
             "data-contrast": resolved.contrast.attribute(),
             "data-transparency": resolved.transparency.attribute(),

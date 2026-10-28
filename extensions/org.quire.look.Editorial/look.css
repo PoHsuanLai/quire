@@ -1,0 +1,23 @@
+/* Editorial: mail's voice for every quire surface (design/02-TYPE.md section 2). Bricolage
+   Grotesque for headings and big numbers, Karla for text and controls, Space Mono for machine
+   facts; the faces ship inside quire (ds-style fonts), so the stacks name them by family.
+   Every stack names Inter next, so a glyph a face lacks (the key caps) comes from Inter.
+   The tracking, weight and sizes below are the values these faces want for the same roles. */
+.ds {
+  --font-display: "Bricolage Grotesque", "Inter", "Trebuchet MS", system-ui, sans-serif;
+  --font-ui: "Karla", "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-data: "Space Mono", "Inter", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --tracking-heading: -.015em;
+  --tracking-lock-clock: -.035em;
+  --tracking-lock-date: .01em;
+  --fw-caps: 400;
+  --tracking-mono: -.02em;
+  --fs-mono: .78em;
+  --fs-dial: 9px;
+  --fs-nano: 9px;
+  --fs-micro: 9.5px;
+  --fs-dial-large: 18px;
+  --fs-widget-figure: 20px;
+  --fs-widget-hero: 47px;
+  --fs-lock-clock: 140px;
+}

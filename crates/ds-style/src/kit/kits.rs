@@ -62,7 +62,7 @@ impl Kits {
     }
 
     /// The `.ds` token blocks of every kit's families: the base declarations, then what the dark
-    /// scheme, the editorial typeface and each motion level change.
+    /// scheme and each motion level change.
     pub fn token_blocks(&self) -> String {
         token_blocks(&self.token_sets())
     }

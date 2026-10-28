@@ -1,5 +1,5 @@
 //! `#[token(...)]` on the enum (`prefix`, `kind`, `css`) and on a variant (`name`, `value`,
-//! `light`/`dark`, `standard`/`reduced`, `system`/`editorial`, `input`).
+//! `light`/`dark`, `standard`/`reduced`, `input`).
 
 use syn::{Attribute, LitStr, Path};
 
@@ -58,8 +58,6 @@ pub(crate) struct Values {
     pub dark: Option<String>,
     pub standard: Option<String>,
     pub reduced: Option<String>,
-    pub system: Option<String>,
-    pub editorial: Option<String>,
 }
 
 /// What the variant's `#[token(...)]` says.
@@ -94,14 +92,10 @@ pub(crate) fn variant_tokens(attrs: &[Attribute]) -> syn::Result<VariantTokens> 
                 values.standard = Some(text);
             } else if slot("reduced") {
                 values.reduced = Some(text);
-            } else if slot("system") {
-                values.system = Some(text);
-            } else if slot("editorial") {
-                values.editorial = Some(text);
             } else {
                 return Err(meta.error(
                     "a variant takes `name`, `input`, `value`, `light`/`dark`, \
-                     `standard`/`reduced` or `system`/`editorial`",
+                     or `standard`/`reduced`",
                 ));
             }
             Ok(())

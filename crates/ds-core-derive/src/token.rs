@@ -170,25 +170,20 @@ enum Pick {
         standard: String,
         others: Vec<(&'static str, String)>,
     },
-    Typeface {
-        system: String,
-        editorial: String,
-    },
 }
 
 /// Which dimension the variant's attributes name, or why they name none.
 fn resolve(values: &Values, ident: &Ident) -> syn::Result<Pick> {
     let scheme = values.light.is_some() || values.dark.is_some();
     let level = values.standard.is_some() || values.reduced.is_some();
-    let typeface = values.system.is_some() || values.editorial.is_some();
-    let named = [values.value.is_some(), scheme, level, typeface]
+    let named = [values.value.is_some(), scheme, level]
         .into_iter()
         .filter(|named| *named)
         .count();
     if named != 1 {
         return Err(syn::Error::new_spanned(
             ident,
-            "a variant names one of `value`, `light`+`dark`, `standard` (+ `reduced`) or `system`+`editorial`",
+            "a variant names one of `value`, `light`+`dark`, `standard` (+ `reduced`)",
         ));
     }
     let both = |first: &Option<String>, second: &Option<String>| match (first, second) {
@@ -204,10 +199,6 @@ fn resolve(values: &Values, ident: &Ident) -> syn::Result<Pick> {
     if scheme {
         let (light, dark) = both(&values.light, &values.dark)?;
         return Ok(Pick::Scheme { light, dark });
-    }
-    if typeface {
-        let (system, editorial) = both(&values.system, &values.editorial)?;
-        return Ok(Pick::Typeface { system, editorial });
     }
     let Some(standard) = values.standard.clone() else {
         return Err(syn::Error::new_spanned(
@@ -231,12 +222,6 @@ fn value_expr(pick: &Pick) -> TokenStream {
             match scope.scheme {
                 #style::appearance::theme::Scheme::Light => #light,
                 #style::appearance::theme::Scheme::Dark => #dark,
-            }
-        },
-        Pick::Typeface { system, editorial } => quote! {
-            match scope.typeface {
-                #style::appearance::typeface::Typeface::System => #system,
-                #style::appearance::typeface::Typeface::Editorial => #editorial,
             }
         },
         Pick::Level { standard, others } => {

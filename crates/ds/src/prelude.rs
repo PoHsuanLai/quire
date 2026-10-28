@@ -14,7 +14,6 @@ pub use ds_style::appearance::system::SystemPrefs;
 pub use ds_style::appearance::theme::Scheme;
 pub use ds_style::appearance::theme::Theme;
 pub use ds_style::appearance::transparency::Transparency;
-pub use ds_style::appearance::typeface::Typeface;
 pub use ds_style::scope::use_scope;
 pub use ds_style::space::look::{Grain, SpaceLook};
 pub use ds_style::space::provided::{use_space_frame, use_space_look};

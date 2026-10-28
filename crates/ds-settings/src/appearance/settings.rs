@@ -11,7 +11,6 @@ use ds_style::appearance::appearance::Appearance;
 use ds_style::appearance::motion::Motion;
 use ds_style::appearance::theme::Theme;
 use ds_style::appearance::transparency::Transparency;
-use ds_style::appearance::typeface::Typeface;
 use ds_style::kit::CustomStyles;
 use serde::{Deserialize, Serialize};
 
@@ -55,14 +54,6 @@ pub struct AppearanceSettings {
         section = "Accessibility"
     )]
     pub transparency: Transparency,
-    /// `appearance.typeface`: System (Inter) unless the person picks mail's editorial faces.
-    #[settings(
-        label = "Typeface",
-        help = "The font of windows and controls.",
-        note = "System is Inter; Editorial is Bricolage Grotesque and Karla. Code stays in Space Mono.",
-        section = "Text and time"
-    )]
-    pub typeface: Typeface,
     /// `appearance.look`: `standard`, or the id of an installed look Extension (a stylesheet
     /// that restyles every quire surface). A stored id that is not installed, or is turned off,
     /// reads as `standard` where the installed Extensions are known and is reported once.
@@ -106,7 +97,6 @@ impl Default for AppearanceSettings {
             accent: Accent::Blue,
             motion_level: Motion::Standard,
             transparency: Transparency::System,
-            typeface: Typeface::System,
             look: Provided::standard(),
             file_icons: Provided::standard(),
             custom_styles: CustomStyles::Use,
@@ -115,11 +105,6 @@ impl Default for AppearanceSettings {
 }
 
 impl AppearanceSettings {
-    /// `appearance.typeface`, as the root's `typeface` (`Ds { typeface }`).
-    pub fn typeface(&self) -> Typeface {
-        self.typeface
-    }
-
     /// The choices a `ds::prelude::Ds` root resolves.
     pub fn appearance(&self) -> Appearance {
         Appearance {

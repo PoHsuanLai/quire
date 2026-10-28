@@ -16,8 +16,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum Theme {
-    /// Follow the desktop.
+    /// Follow the desktop: "Auto", as macOS names it (the stored word stays `system`).
     #[default]
+    #[word(label = "Auto")]
     System,
     /// The light palette, even when the desktop is dark.
     Light,

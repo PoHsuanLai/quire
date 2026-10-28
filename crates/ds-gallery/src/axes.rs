@@ -59,8 +59,6 @@ pub struct Axes {
     pub look: SpaceLook,
     /// Whether overlays wait for a click or open posed, for a snapshot.
     pub showcase: Showcase,
-    /// The typeface the root speaks in.
-    pub typeface: Typeface,
 }
 
 /// How the pages that open things on demand start.
@@ -89,7 +87,6 @@ impl Default for Axes {
             preset: PresetIndex::default(),
             look: PresetIndex::default().look(),
             showcase: Showcase::Live,
-            typeface: settings.typeface,
         }
     }
 }

@@ -13,10 +13,13 @@ every conflict with `C`.
 
 Five jobs, each with one token: display for names and headings, UI for reading and controls,
 data for anything machine-shaped, code where a fixed pitch carries meaning, serif for a message a
-person writes in a serif. There is one voice: the System one. The earlier second typeface
-("Editorial": Bricolage Grotesque, Karla, Space Mono) is dropped (30 section 3.4); the typeface
-setting and `data-typeface=editorial` are history, and the Editorial values in the tables below
-are kept only as the prototype's record (marked "history").
+person writes in a serif. There is one voice: Inter, with Inter Display for display. The earlier
+second typeface ("Editorial": Bricolage Grotesque, Karla, Space Mono) is no longer a setting or a
+`data-typeface` value (30 section 3.4). It is the look Extension `org.quire.look.Editorial`
+(`extensions/org.quire.look.Editorial/`), which a person picks under Settings > Look and which
+layers its own stacks, tracking and sizes after quire's sheet. The Editorial values in the tables
+below are the prototype's record (marked "history"). Bricolage Grotesque and Karla still ship in
+`ds-style` so the look can name them.
 
 The user's decision (2026-09-26): "make this desktop use mostly inter". The reference desktop's
 system font (SF Pro) is licensed for its own platform only; Inter (SIL OFL 1.1, rsms/inter) is
@@ -40,7 +43,7 @@ aligned logs).
 --font-code:"Space Mono","Inter",ui-monospace,"SFMono-Regular",Menlo,monospace;
 ```
 
-History: the Editorial faces (Bricolage Grotesque, Karla) are not part of the design; the code that still ships or loads them goes in the clean-up phase (target). While it ships, each Editorial stack names "Inter" right after its own face too.
+History: the Editorial faces (Bricolage Grotesque, Karla) are not part of quire's own design; the Editorial look Extension names them, and each of its stacks names "Inter" right after its own face too.
 
 **Key-cap glyphs.** Google's latin range carries none of `⌃ ⌥ ⇧ ⌘ ⌫ ↩ ↵ ⇥ ⌦ ⇞ ⇟` (and Space Mono's
 lacks `← →`), so a `KeyEquivalent` fell to whatever face the system offered and U+2303 drew as a
@@ -130,12 +133,13 @@ Every size in 4.2 stays, role for role; the faces and the pairs move as follows.
 | 7.5-12.5 (display 800: initials, marks) | Inter Display | 800 | 0 | |
 | 9.5-10.5 (code: `Kbd`) | Space Mono (`--font-code`) | 400 | 0 | unchanged |
 
-Five sizes follow the typeface, because they were fitted to measured cap heights (the widgets
-against `23-WIDGETS.md` section 1.1 with the display face's cap at .66 em; the lock clock with
-them): under System each is the Editorial size x .66 / .7275 (Inter Display's cap height),
-rounded to .5 px, so the drawn caps keep the measured heights. Settled, open decision 8.
+Five sizes were fitted to measured cap heights (the widgets against `23-WIDGETS.md` section 1.1
+with the display face's cap at .66 em; the lock clock with them): each is the prototype's size
+x .66 / .7275 (Inter Display's cap height), rounded to .5 px, so the drawn caps keep the measured
+heights. Settled, open decision 8. The Editorial column is the prototype's value, which the
+Editorial look carries.
 
-| Token | Editorial | System | Cap drawn (System) |
+| Token | Editorial (history) | Inter Display | Cap drawn |
 | --- | --- | --- | --- |
 | `--fs-dial` | 9 | 10 (the floor, section 12; fitted it would be 8) | 7.28 (5.94 measured) |
 | `--fs-dial-large` | 18 | 16.5 | 12.00 (11.88) |
@@ -143,9 +147,8 @@ rounded to .5 px, so the drawn caps keep the measured heights. Settled, open dec
 | `--fs-widget-hero` | 47 | 42.5 | 30.92 (31.02) |
 | `--fs-lock-clock` | 140 | 127 | 92.39 (92.40) |
 
-Three more sizes follow the typeface: under System `--fs-nano` (9), `--fs-micro` (9.5) and
-`--fs-dial` (9, fitted to 8) are raised to the 10 px floor (section 12). The Editorial column keeps the
-prototype's values.
+Three more sizes are raised to the 10 px floor (section 12): `--fs-nano` (9), `--fs-micro` (9.5)
+and `--fs-dial` (9, fitted to 8). The Editorial column keeps the prototype's values.
 
 ### 4.2 The prototype's pairs (history, Editorial values)
 
@@ -206,10 +209,10 @@ Outside that span, the desktop widgets carry four sizes of their own, each set s
 height matches the reference widget's measured cap (`23-WIDGETS.md` section 1.1; the display
 face's cap height is .66 em): `--fs-dial` 9 (a world clock row's dial numerals), `--fs-dial-large`
 18 (a small clock's dial numerals), `--fs-widget-figure` 20 (a battery's percentage under its
-ring) and `--fs-widget-hero` 47 (a small battery's percentage). These are Editorial's; System's
-are in section 4.1.
+ring) and `--fs-widget-hero` 47 (a small battery's percentage). These are the prototype's (Editorial's); the
+values quire ships are in section 4.1.
 
-Above them sits `--fs-lock-clock` 140 (127 under System), the lock screen's time in the display face at 700
+Above them sits `--fs-lock-clock` 140 (127 in quire's sheet), the lock screen's time in the display face at 700
 (design/04 section 42; proposed, M11 2026-09-26: the user asked for a very large, heavy clock).
 
 ## 5. Tracking
@@ -410,8 +413,8 @@ control (lint `UnnamedControl`, a warning under Strict; design/27 section 3.1).
    font (`P:1471`); no size is settled for any shell surface.
 7. **Ellipsis in Blitz.** Whether the mask-fade replacement is acceptable visually for every row in
    section 10 is not specified (`P:420-422`).
-8. **Widget sizes under Inter.** Settled (2026-09-26): the five cap-fitted sizes follow the
-   typeface, section 4.1.
+8. **Widget sizes under Inter.** Settled (2026-09-26): the five sizes are cap-fitted
+   to Inter Display, section 4.1.
 
 ## Sources
 

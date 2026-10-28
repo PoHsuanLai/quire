@@ -55,21 +55,14 @@ fn main() {
         return;
     }
     if let Some(dir) = args.snapshot {
-        let typeface = args.typeface.unwrap_or_default();
-        if let Err(error) = snapshot::run(
-            &dir,
-            args.page,
-            args.scale.unwrap_or(100),
-            typeface,
-            args.progress,
-        ) {
+        if let Err(error) = snapshot::run(&dir, args.page, args.scale.unwrap_or(100), args.progress)
+        {
             eprintln!("ds-gallery: {error}");
             std::process::exit(1);
         }
     } else {
         start_with(Axes {
             page: args.page.unwrap_or(page::Page::Tokens),
-            typeface: args.typeface.unwrap_or_default(),
             ..Axes::default()
         });
         if let Err(error) = launch(

@@ -1,0 +1,11 @@
+id = "org.quire.look.Editorial"
+name = "Editorial"
+protocol = 1
+version = "1.0.0"
+licence = "MIT OR Apache-2.0"
+summary = "Mail's editorial faces: Bricolage Grotesque for headings, Karla for text and Space Mono for data."
+
+[[provides]]
+capability = "look"
+stylesheet = "look.css"
+styles_for = 1

@@ -34,7 +34,7 @@ pub fn entry(page: Page) -> Entry {
         Page::Type => Entry {
             page: Page::Type,
             title: "Type",
-            lede: "The five face jobs in the toolbar's typeface and the size ramp: every --fs step drawn at its size, with its role.",
+            lede: "The five face jobs and the size ramp: every --fs step drawn at its size, with its role.",
             height: 2500,
             body: crate::pages::foundations::type_ramp::TypePage,
         },

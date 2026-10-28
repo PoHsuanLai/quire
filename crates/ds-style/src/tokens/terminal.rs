@@ -85,7 +85,7 @@ pub enum TerminalColour {
     BrightWhite,
 }
 
-/// A measure of the terminal's cell grid that is the same in every scheme and typeface.
+/// A measure of the terminal's cell grid that is the same in every scheme.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "term-", kind = fixed)]
 #[non_exhaustive]

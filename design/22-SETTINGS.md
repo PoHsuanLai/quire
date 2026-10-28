@@ -109,7 +109,6 @@ hand-written. Where a note's default disagrees with the table, the table (the co
 | `appearance.accent` | choice {blue, purple, pink, red, orange, yellow, green, graphite} | `blue` |  | Appearance | Settings | may set |
 | `appearance.motion_level` | choice {standard, reduced} | `standard` |  | Appearance | Settings |  |
 | `appearance.transparency` | choice {system, reduced} | `system` |  | Appearance | Settings |  |
-| `appearance.typeface` | choice {system, editorial} | `system` |  | Appearance | Settings |  |
 | `appearance.look` | provided (look) | `standard` |  | Appearance | Settings | may set |
 | `appearance.file_icons` | provided (file_icons) | `standard` |  | Appearance | Settings | may set |
 | `appearance.custom_styles` | choice {use, off} | `use` |  | Appearance | Settings | may set |
@@ -122,7 +121,6 @@ hand-written. Where a note's default disagrees with the table, the table (the co
 | `appearance.accent` | settled 2026-09-30; a stored `postmark`, `amber` or `violet` is not migrated: it reads as an invalid value and falls to `Blue` | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
 | `appearance.motion_level` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
 | `appearance.transparency` | the portal has no key for it, so ours is a setting; `Reduced` paints every material solid and drops the vibrancy boost; the compositor reads it from this file, as it reads `theme` | `27-HIG-PARITY.md` section 3.1 | settled (adopted in 27) |
-| `appearance.typeface` | RETIRING: The second typeface (Editorial) is dropped (30 section 3.4): one voice, Inter, with Space Mono for code and `Kbd`. Target (clean-up phase): remove the key and `data-typeface`; a stored value is an unknown key | `02-TYPE.md#2-the-faces` | settled; to retire in the clean-up phase (2026-10-02) |
 | `appearance.look` | `standard`, or the id of an installed look Extension; a stored id that is not installed or is turned off reads as `standard` where the installed Extensions are known, and is reported once (`ds_extensions::chosen`). The choices come from the caller (9.1, `Provided`) | the customization design, sections 5 and 7.7 | proposed (2026-10-23) |
 | `appearance.file_icons` | `standard`, or the id of an installed file-icons Extension (a folder of pictures keyed by file type); a stored id that is not installed or is turned off reads as `standard` and is reported once (`ds_extensions::chosen`). A type the Extension has no picture for keeps the standard icon. Section "Files" of the Appearance page | the customization design, sections 5 and 6 | proposed (2026-10-24) |
 | `appearance.custom_styles` | "Use my styles": `off` makes `Ds` draw none of the look, the desktop-wide `style.css` or the app's `style.css`, live; the way back from a broken style (customization design section 7.4) | `customization/DESIGN.md` section 7.4 | proposed (2026-10-23) |
@@ -133,6 +131,11 @@ hand-written. Where a note's default disagrees with the table, the table (the co
 `--m-hairline-dark` (.6), `--m-shadow-strength` (1) and `--m-vibrancy` (1). Their defaults live in
 the material blocks, `Ds` writes none of them inline, and a look or the person's own style sheet
 sets them. A stored value is an unknown key: it is reported and kept in the file, never read.
+
+**Removed 2026-10-29.** `appearance.typeface` (the Typeface row) is gone with the second typeface
+(30 section 3.4). Editorial is the look Extension `org.quire.look.Editorial`, chosen under
+`appearance.look` (Settings > Look). A stored `appearance.typeface` is an unknown key: it is
+reported once and kept in the file, never read.
 
 Rows for keys that sill owns but this section names (they are stored under `appearance` for the
 vocabulary they use):
@@ -779,7 +782,7 @@ impl Default for ScrollSettings {
 
 ### 4.3 The rest, by name
 
-`AppearanceSettings` (theme, accent, motion_level, transparency, typeface, look, file_icons, custom_styles; the `material_*` keys are gone, section 3.1),
+`AppearanceSettings` (theme, accent, motion_level, transparency, look, file_icons, custom_styles; the `material_*` keys are gone, section 3.1),
 `IconsSettings`, `BarSettings`, `LauncherSettings`, `GesturesSettings` (palmrest crate:
 `scroll_speed`/`lock_*`/`swipe_*`/`tap_*`/`foreign_output`/`g4_*`/`live_workspace_*`/
 `gesture_action_map`), `PalmRejectionSettings`, `MenusSettings` (carries `switcher_*` as the nested
@@ -953,7 +956,7 @@ Widget by kind, fixed:
 | --- | --- |
 | one-variant enum | read-only label |
 | two-variant enum whose words are an on/off pair (below) | `Toggle` |
-| two-variant enum whose words are not (`ring`/`bar`, `bottom`/`left`, `system`/`editorial`) | `SegmentedControl` with two segments |
+| two-variant enum whose words are not (`ring`/`bar`, `bottom`/`left`) | `SegmentedControl` with two segments |
 | three to five variants | `SegmentedControl` |
 | more than five | `Menu` |
 | `Bounded` | `Slider` with its unit |

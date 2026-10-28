@@ -8,7 +8,6 @@ use crate::appearance::{
     peek::PeekMode,
     theme::{Scheme, Theme},
     transparency::Transparency,
-    typeface::Typeface,
 };
 use crate::tokens::label_hue::LabelHue;
 use ds_core::testing::word_matches_serde;
@@ -24,5 +23,4 @@ fn stored_vocabularies_serialise_as_their_slugs() {
     word_matches_serde::<Scheme>();
     word_matches_serde::<Theme>();
     word_matches_serde::<Transparency>();
-    word_matches_serde::<Typeface>();
 }

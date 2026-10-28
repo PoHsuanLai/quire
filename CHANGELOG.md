@@ -3,7 +3,15 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.58 (unreleased)
+## v0.3.58
+
+### wh-ed
+
+- **Editorial is a look Extension, and the typeface choice is gone** (the Settings prune of 2026-10-27). quire ships `extensions/org.quire.look.Editorial/` (`extension.toml` + `look.css`, capability `look`, `styles_for = 1`): mail's Bricolage Grotesque, Karla and Space Mono with their tracking and sizes, picked under Settings › Look (`appearance.look`). Install the folder as `<prefix>/share/quire/extensions/org.quire.look.Editorial/`. The faces still ship inside ds-style, so the look names them by family.
+  Deleted: `ds_style::appearance::typeface::Typeface` (and its prelude export), `Ds { typeface }`, `ds::root::typeface` (`use_typeface`), `data-typeface` on `.ds` roots and scopes, the `.ds[data-typeface=editorial]` token block, `TokenScope::typeface` and `in_typeface`, the token derive's `system`/`editorial` value pair, `set::Only` (and `TokenSet::only`), `FontSize::{FLOORED, CAP_FITTED}`, the `appearance.typeface` setting and `AppearanceSettings::typeface()`, and the gallery's typeface axis, `--typeface` and `-editorial` shots. `set::Place::Typeface` is `Place::Type`. An old settings file holding `appearance.typeface` still loads: the unknown key is reported once and kept, and nothing reads it.
+  Changed: `Family::face_name()`, `FontSize::css()`, `FontSize::px()` and `chrome::title_font()` take no typeface. Goldens lose `data-typeface="system"`, and the `.ds` block declares the `--fs-*` steps in one place.
+  **Consumer change:** delete `typeface: ..` from every `Ds { .. }`, and any `now.settings.appearance.typeface()` with it; `title_font(Typeface::System)` becomes `title_font()`; an app that kept mail's voice with `Typeface::Editorial` writes its own faces in its stylesheet or leaves it to the person's Look; a sheet selecting on `data-typeface` is refused by `ds-lint` (no root carries it).
+- **`appearance.theme`'s `system` word reads "Auto"** in Settings, as macOS names it; the stored word stays `system`.
 
 ### wh-qpin
 

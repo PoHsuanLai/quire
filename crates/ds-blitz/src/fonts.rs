@@ -44,30 +44,36 @@ mod tests {
     use ds::prelude::*;
     use ds::style::tokens::type_scale::Family;
 
-    /// Every family name a token's `font-family` stack leads with, in either typeface: Inter,
-    /// Inter Display, Bricolage Grotesque, Karla, Space Mono, Noto Serif.
-    fn names() -> Vec<(Family, String)> {
-        let mut names: Vec<(Family, String)> = Typeface::ALL
+    /// The Editorial look Extension's sheet: its stacks lead with faces quire ships.
+    const EDITORIAL: &str = include_str!("../../../extensions/org.quire.look.Editorial/look.css");
+
+    /// Every family name a `font-family` stack leads with, the standard stacks' and the Editorial
+    /// look's: Inter, Inter Display, Bricolage Grotesque, Karla, Space Mono, Noto Serif.
+    fn names() -> Vec<String> {
+        let mut names: Vec<String> = Family::ALL
             .iter()
-            .copied()
-            .flat_map(|typeface| {
-                Family::ALL
-                    .iter()
-                    .copied()
-                    .map(move |family| (family, family.face_name(typeface)))
-            })
+            .map(|family| family.face_name())
+            .chain(EDITORIAL.lines().filter_map(|line| {
+                let stack = line.trim().strip_prefix("--font-")?.split_once(':')?.1;
+                Some(
+                    stack
+                        .trim()
+                        .strip_prefix('"')?
+                        .split('"')
+                        .next()?
+                        .to_owned(),
+                )
+            }))
             .collect();
-        names.sort_by_key(|(_, name)| name.clone());
-        names.dedup_by_key(|(_, name)| name.clone());
+        names.sort();
+        names.dedup();
         names
     }
 
     #[test]
-    fn both_typefaces_name_six_faces() {
-        let mut got: Vec<String> = names().into_iter().map(|(_, name)| name).collect();
-        got.sort_unstable();
+    fn the_stacks_and_the_editorial_look_name_six_faces() {
         assert_eq!(
-            got,
+            names(),
             [
                 "Bricolage Grotesque",
                 "Inter",
@@ -82,10 +88,10 @@ mod tests {
     #[test]
     fn every_family_resolves_after_registration() {
         let mut fonts = SharedFonts::bundled(&faces()).for_document();
-        for (family, name) in names() {
+        for name in names() {
             assert!(
                 fonts.collection.family_by_name(&name).is_some(),
-                "{family:?}: {name} is not registered"
+                "{name} is not registered"
             );
         }
     }
@@ -93,10 +99,10 @@ mod tests {
     #[test]
     fn the_shared_context_carries_the_faces() {
         let mut fonts = font_context();
-        for (family, name) in names() {
+        for name in names() {
             assert!(
                 fonts.collection.family_by_name(&name).is_some(),
-                "{family:?}: {name} missing from font_context()"
+                "{name} missing from font_context()"
             );
         }
     }

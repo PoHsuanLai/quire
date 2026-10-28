@@ -55,7 +55,7 @@ mod surface;
 mod symbol_ssr;
 mod token_derive;
 mod toolbar_parts_ssr;
-mod typeface;
+mod type_faces;
 mod user_style_ssr;
 mod voice_orb_ssr;
 mod window_frame_ssr;

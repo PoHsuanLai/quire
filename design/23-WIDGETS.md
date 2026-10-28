@@ -209,7 +209,7 @@ The widget style's name is **Flat, bright, measured** (proposed 2026-09-26, the 
 Sizes (`02-TYPE.md`): `--fs-dial` 9 and `--fs-dial-large` 18 (the numerals, M18, M19),
 `--fs-widget-figure` 20 (a battery's percentage in a row, M15), `--fs-widget-hero` 47 (a small
 battery's percentage, M13), each set so the display face's cap (.66 em) matches the measured cap.
-These are the Editorial sizes; under the System typeface (Inter Display, cap .7275 em) they are
+These are the prototype's (Editorial) sizes; for Inter Display (cap .7275 em) quire's sheet uses
 8, 16.5, 18 and 42.5, the same caps (`02-TYPE.md` section 4.1).
 The third pass's `--soft-*` tokens are removed.
 

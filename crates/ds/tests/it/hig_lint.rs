@@ -313,19 +313,19 @@ fn quires_own_sheet_warns_only_where_reviewed() {
     assert!(left.is_empty(), "{}", left.join("\n"));
 }
 
-/// Under System every size step the interface draws text at is at least the floor; the one
-/// below it is a drawing.
+/// Every size step the interface draws text at is at least the floor; the one below it is a
+/// drawing.
 #[test]
-fn the_system_ramp_starts_at_the_floor() {
+fn the_ramp_starts_at_the_floor() {
     use ds::prelude::*;
     let under: Vec<FontSize> = FontSize::ALL
         .iter()
         .copied()
-        .filter(|size| size.px_in(Typeface::System) < FontSize::MIN_PX)
+        .filter(|size| size.px() < FontSize::MIN_PX)
         .collect();
     assert_eq!(under, [FontSize::Pico]);
-    for size in FontSize::FLOORED {
-        assert_eq!(size.css_in(Typeface::System), "10px", "{size:?}");
+    for size in [FontSize::Dial, FontSize::Nano, FontSize::Micro] {
+        assert_eq!(size.css(), "10px", "{size:?}");
     }
 }
 

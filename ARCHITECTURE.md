@@ -101,13 +101,13 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | Crate | Modules, lowest first |
 | --- | --- |
 | `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `command` (names, `CommandFace`, `AppCommand`, a shortcut's chord text), `press`, `standard_action`, `geometry` (units, scale, scroll, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock, `Stamp`, `FrameClock`), `machine` (the `Machine` trait, `Elapsed`), `selection` (`RowSelection`, `Pick`, `PickHow`), `spawner` (the `Spawner` trait), `error`, `text` (clip, `TypedText`), `codec` (png, base64) |
-| `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space` (palette, look, presets, frame vars, store, and `list`: the pure list of an app's Spaces), `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
+| `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space` (palette, look, presets, frame vars, store, and `list`: the pure list of an app's Spaces), `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `machine` (the hooks that run a `Machine`: `use_machine`, `use_machine_in`, `use_machine_state`, `MachineRef`, `MachineState`), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-behaviour` | `dir` (`Dir`) < `switcher`, `hot_corner`, `modifier_tap` (`tap`, `hold`), `space_swipe` (`numbers`, `velocity`, `finish`; each concept holds `model`, `step`, `tests`) |
 | `ds-extensions` | `capability` (`Capability`) < `fault` < `look`, `file_icons::{folder, pictures}` (the entry type `IconFolder`, a pack's picture table) < `provision` (`Provision`, the `Provides` impl) < `search` (`Search`, `Found`, `Off`) < `resolve` (`Found::resolve`, `Resolved`, `Problem`) < `choices` (`Choices`, `chosen`) < `your_changes` (`YourChanges`) < `file_icons::resolver` (the resolver `FileIcons`: it reads the scan, the choices and Your changes) < `extensions_file` |
 | `ds-peer` | `deadline` (`Deadline`) < `within` (`within`, `NotAnswering`) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
-| `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `keys` (the window's chordkit keymap), `machine` (re-exports `ds_motion::machine`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `forms` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
+| `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `keys` (the window's chordkit keymap), `machine` (re-exports `ds_motion::machine`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent) < components `content` < `controls` < `overlays` < `forms` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
 | `ds-shell` | `confirm`, `accounts` (`adapter` is the one file that reaches the components R2 makes controlled), `helpers` < `sheets` < `kit` < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `damaged` (`DamagedFile`, `Saved`: a file that is there and unusable is kept) < `doc` (`SettingsDoc`, `Format`, `FileName`) < `preserve` (a TOML save merged into the parsed file) < `store` < `writer` (`SettingsWriter`: one key patched in place) < `spaces_storage` < `watch` < `schema` (keys, pages, controls, the doc tables) < `target` (`SettingsTarget`) < `region` (`HourCycle`) < `appearance` (file, settings structs) < `portal` < `live` (feature `live`: `org.quire.SettingsModule1`) < `environment` (feature `dioxus`) < `icon_assets` < `units` |
 | `ds-settings-page` | `control` (the drawn control a kind gets; the on/off rule is `ds-settings::schema::TogglePair`), `words`, `edit` (`SettingEdit`, the value lookup), `groups` < `key_row`, `section` (`SectionRows`, `SchemaSection`) < `page` (`SettingsPage`) |
@@ -149,7 +149,7 @@ A name in `{...}` is a set of files. Anything not listed keeps its file name.
 
 | From | To |
 | --- | --- |
-| `ds/style/appearance/*`, `ds/root/typeface.rs` (the `Typeface` choice) | `ds-style::appearance::*` |
+| `ds/style/appearance/*` | `ds-style::appearance::*` |
 | `ds/style/env.rs` | `ds-style::scope` (`Env` -> `Scope`, `use_env` -> `use_scope`) |
 | `ds/style/tokens/*` except the files listed under `ds-shell` (now sill's `sill-shell-kit/src/tokens`, except `dock_floor.rs`, which stays in `ds-style` because the shape section draws `.ds-dock-floor`) | `ds-style::tokens::*` (`status.rs`, `emoji_face.rs`, `person.rs`, `plate.rs`, `size_*.rs`, `control_size.rs` stay: their consumers are generic) |
 | `ds/style/{material,space,icon,fonts.rs,scale.rs,css,emit.rs}` | same names in `ds-style` |
@@ -179,7 +179,7 @@ A name in `{...}` is a set of files. Anything not listed keeps its file name.
 | `host/*`, `focus/{host,caret,click,select,hand_back,selector}.rs`, `edit/host.rs`, `file_drop/host.rs`, `spell/host.rs`, `window/host.rs` | `ds::host::*` (the `Host*` newtypes are deleted) |
 | `focus/*`, `edit/*`, `file_drop/*`, `spell/*`, `window/*` (the rest) | same module names in `ds` |
 | `overlay/*` | `ds::stack::*` (the module is `stack` so `overlays` names only components) |
-| `root/{surface,chrome,extent,typeface}.rs` | `ds::root::*` |
+| `root/{surface,chrome,extent}.rs` | `ds::root::*` |
 | `components/{content,controls,overlays,lists,fields,menus,chrome,app}` | `ds::{...}` at the crate top level; `components/mod.rs` is gone |
 | `components/content/{emoji_grid,emoji_grid_nav}.rs`, `components/content/{preview_pane,preview_cue,preview_content,pane_switcher}.rs` | `ds::lists::{emoji_grid, preview}` |
 | `components/controls/level/{glyph,vocab}.rs` | `ds::content::level_glyph` (a status glyph draws it) |
@@ -404,7 +404,7 @@ pub trait Token: Word {
     const PREFIX: &'static str;               // "dur-", "s-", "shell-"
     const KIND: TokenKind;                    // Fixed | Tuned (default declared, override written inline)
     fn var(self) -> VarName { ... }           // "--" + PREFIX + slug
-    fn css_value(self, scope: TokenScope) -> CssValue;   // TokenScope { scheme: Scheme, motion: MotionLevel, typeface: Typeface }
+    fn css_value(self, scope: TokenScope) -> CssValue;   // TokenScope { scheme: Scheme, motion: MotionLevel }
 }
 pub struct TokenSet { ... }
 impl TokenSet { pub const fn of<T: Token>() -> TokenSet; }
@@ -681,7 +681,7 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 
 | Group | Names |
 | --- | --- |
-| Root and appearance | `Ds`, `Surface`, `Accent`, `Appearance`, `Material`, `Motion`, `MotionLevel`, `SystemPrefs`, `Scheme`, `Theme`, `Typeface`, `use_scope`, `SpaceLook` |
+| Root and appearance | `Ds`, `Surface`, `Accent`, `Appearance`, `Material`, `Motion`, `MotionLevel`, `SystemPrefs`, `Scheme`, `Theme`, `use_scope`, `SpaceLook` |
 | Vocabulary | `Availability`, `Check`, `DropState`, `Emphasis`, `Fraction`, `Percent`, `Selection`, `Shortcut`, `ShortcutKey`, `Shown`, `Word` |
 | Geometry | `Placement`, `Scale`, `Point`, `Px`, `Rect`, `Size`, `Alpha` |
 | Icons | `ExternalIcon`, `IconSource`, `IconView`, `BatteryGlyph`, `BluetoothGlyph`, `StatusState`, `VolumeGlyph`, `WifiGlyph`, `Icon`, `IconSize` |

@@ -31,7 +31,7 @@ use crate::tokens::{
     pixel::PixelToken,
     row_scale::{RowSize, SidebarToken},
     selection::SelectionToken,
-    set::{Only, Place, TokenSet},
+    set::{Place, TokenSet},
     shape::Radius,
     sheet_scale::SheetSize,
     shell_scale::ShellSize,
@@ -76,20 +76,15 @@ pub static KIT: Kit = Kit {
         TokenSet::of::<SpacingToken>().at(Place::Scale),
         TokenSet::of::<ChromeToken>().at(Place::Scale),
         TokenSet::of::<LightPaint>().at(Place::Scheme),
-        TokenSet::of::<FontSize>()
-            .at(Place::Scale)
-            .only(Only::TypefaceFixed),
+        TokenSet::of::<FontSize>().at(Place::Scale),
         TokenSet::of::<ZLayer>().at(Place::Scale),
         TokenSet::of::<OpacityToken>().at(Place::Scale),
         TokenSet::of::<PlateShare>().at(Place::Pixel),
         TokenSet::of::<PixelToken>().at(Place::Pixel),
         TokenSet::of::<EmojiFace>().at(Place::Face),
-        TokenSet::of::<Family>().at(Place::Typeface),
-        TokenSet::of::<VoiceToken>().at(Place::Typeface),
+        TokenSet::of::<Family>().at(Place::Type),
+        TokenSet::of::<VoiceToken>().at(Place::Type),
         TokenSet::of::<TerminalMetric>().at(Place::Scale),
-        TokenSet::of::<FontSize>()
-            .at(Place::Typeface)
-            .only(Only::TypefaceVarying),
         TokenSet::of::<DurationToken>().at(Place::Motion),
         TokenSet::of::<EasingToken>().at(Place::Motion),
     ],

@@ -6,4 +6,3 @@ pub mod extent;
 pub mod pass_through;
 pub(crate) mod pointer_trail;
 pub mod surface;
-pub mod typeface;

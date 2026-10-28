@@ -4,8 +4,8 @@
 
 /* One line, clipped, fading out at the end: the ellipsis Blitz cannot draw (spike S13). */
 .ds-truncate{white-space:nowrap;overflow:hidden;min-width:0;mask-image:linear-gradient(to right,#000 calc(100% - 1.5em),transparent)}
-/* Machine facts in the data face, a size smaller (`S:56`; .86em under the System typeface, whose
-   data face is Inter and not a wide monospace). */
+/* Machine facts in the data face, a size smaller (`S:56`; .86em, as
+   the data face is Inter and not a wide monospace). */
 .ds-mono{font-family:var(--font-data);font-size:var(--fs-mono);letter-spacing:var(--tracking-mono);font-variant-numeric:tabular-nums}
 /* The heading over a group of things (design/02-TYPE.md 2.1): sentence case, 11 px, secondary ink,
    semibold, not tracked. */

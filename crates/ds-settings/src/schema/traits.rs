@@ -105,11 +105,6 @@ mod tests {
                 stored_words::<ds_style::appearance::transparency::Transparency>(),
                 &["system", "reduced"],
             ),
-            (
-                "typeface",
-                stored_words::<ds_style::appearance::typeface::Typeface>(),
-                &["system", "editorial"],
-            ),
         ];
         for (name, got, want) in cases {
             assert_eq!(got, want, "{name}");

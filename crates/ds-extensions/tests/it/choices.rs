@@ -137,3 +137,34 @@ fn the_chosen_looks_stylesheet_is_read_with_its_folder() {
         None
     );
 }
+
+/// The looks quire ships, as their folders sit in the repo (`extensions/<id>/`).
+const SHIPPED: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../extensions");
+
+#[test]
+fn the_shipped_editorial_look_installs_as_a_usable_look() {
+    const EDITORIAL: &str = "org.quire.look.Editorial";
+    let scratch = Scratch::new();
+    let system = scratch.root("system");
+    let folder = system.join("quire").join("extensions").join(EDITORIAL);
+    for file in ["extension.toml", "look.css"] {
+        let text = std::fs::read_to_string(format!("{SHIPPED}/{EDITORIAL}/{file}"))
+            .unwrap_or_else(|e| panic!("{file}: {e}"));
+        write(&folder.join(file), &text);
+    }
+    let person = scratch.root("home");
+    let looks = Search::new(&person, &[system])
+        .scan(&[])
+        .resolve(Capability::Look);
+
+    let choices = choices_for(Capability::Look, looks.registry.installed());
+    assert_eq!(choices.words(), ["standard", EDITORIAL]);
+    assert_eq!(choices.labels().of(EDITORIAL), Some("Editorial"));
+    let sheet =
+        stylesheet_for(&Provided::new(EDITORIAL), &looks.registry).expect("Editorial reads");
+    assert!(
+        sheet.text.contains("--font-ui: \"Karla\""),
+        "{}",
+        sheet.text
+    );
+}

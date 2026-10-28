@@ -3,50 +3,39 @@
 //! The plan names the ends, `--fs-micro` 9.5 and `--fs-display` 26; the steps between are named
 //! here by role (design/02-TYPE.md open decision 3), one per distinct size in the ramp.
 
-use crate::appearance::typeface::Typeface;
 use crate::tokens::token::{Token, TokenScope};
 use ds_core::word::Word;
 
-/// A type family, by job. Which face does each job depends on the root's [`Typeface`]
-/// (design/02-TYPE.md section 2): the `.ds` block names the System faces and the
-/// `.ds[data-typeface=editorial]` block the Editorial ones.
+/// A type family, by job (design/02-TYPE.md section 2). A look may name other faces (the
+/// Editorial look Extension names mail's Bricolage Grotesque, Karla and Space Mono).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "font-", kind = fixed)]
 pub enum Family {
-    /// `--font-display`: Inter Display (System) or Bricolage Grotesque (Editorial). Headings,
+    /// `--font-display`: Inter Display. Headings,
     /// names, initials, big numbers.
-    #[token(
-        system = "\"Inter Display\",\"Inter\",system-ui,sans-serif",
-        editorial = "\"Bricolage Grotesque\",\"Inter\",\"Trebuchet MS\",system-ui,sans-serif"
-    )]
+    #[token(value = "\"Inter Display\",\"Inter\",system-ui,sans-serif")]
     Display,
-    /// `--font-ui`: Inter (System) or Karla (Editorial). Body text and every control.
-    #[token(
-        system = "\"Inter\",system-ui,sans-serif",
-        editorial = "\"Karla\",\"Inter\",\"Segoe UI\",system-ui,sans-serif"
-    )]
+    /// `--font-ui`: Inter. Body text and every control.
+    #[token(value = "\"Inter\",system-ui,sans-serif")]
     Ui,
-    /// `--font-data`: Inter, always tabular (System), or Space Mono (Editorial). Anything
+    /// `--font-data`: Inter, always tabular. Anything
     /// machine-shaped: times, counts, chips, eyebrows, section headers.
-    #[token(
-        system = "\"Inter\",system-ui,sans-serif",
-        editorial = "\"Space Mono\",\"Inter\",ui-monospace,\"SFMono-Regular\",Menlo,monospace"
-    )]
+    #[token(value = "\"Inter\",system-ui,sans-serif")]
     Data,
     /// `--font-serif`: Noto Serif. A message a person writes in a serif, and the control that
     /// offers it; never the interface's own text.
     #[token(value = "\"Noto Serif\",Georgia,\"Times New Roman\",serif")]
     Serif,
-    /// `--font-code`: Space Mono in either typeface. Only where a fixed pitch carries meaning:
+    /// `--font-code`: Space Mono. Only where a fixed pitch carries meaning:
     /// code, `KeyEquivalent` caps, aligned logs.
     #[token(value = "\"Space Mono\",\"Inter\",ui-monospace,\"SFMono-Regular\",Menlo,monospace")]
     Code,
 }
 
 impl Family {
-    /// The family name the stack leads with under `typeface`: the name its face registers as.
-    pub fn face_name(self, typeface: Typeface) -> String {
-        let value = self.css_value(TokenScope::BASE.in_typeface(typeface));
+    /// The family name the stack leads with: the name its face registers as.
+    pub fn face_name(self) -> String {
+        let value = self.css_value(TokenScope::BASE);
         let stack = value.as_str();
         stack
             .strip_prefix('"')
@@ -63,15 +52,15 @@ pub enum FontSize {
     /// `--fs-pico` 7.5: in-row provider mark.
     #[token(value = "7.5px")]
     Pico,
-    /// `--fs-dial` 9 (10 under System, the floor): a medium world clock dial's numerals
+    /// `--fs-dial` 10 (the floor): a medium world clock dial's numerals
     /// (design/23-WIDGETS.md section 4.2).
-    #[token(system = "10px", editorial = "9px")]
+    #[token(value = "10px")]
     Dial,
-    /// `--fs-nano` 9 (10 under System): pin count, favicon letter.
-    #[token(system = "10px", editorial = "9px")]
+    /// `--fs-nano` 10: pin count, favicon letter.
+    #[token(value = "10px")]
     Nano,
-    /// `--fs-micro` 9.5 (10 under System): chip, via, group header.
-    #[token(system = "10px", editorial = "9.5px")]
+    /// `--fs-micro` 10: chip, via, group header.
+    #[token(value = "10px")]
     Micro,
     /// `--fs-caption` 10: row time, section header, shortcut.
     #[token(value = "10px")]
@@ -119,11 +108,11 @@ pub enum FontSize {
     /// `--fs-heading-3` 16.5: composer `h3`.
     #[token(name = "heading-3", value = "16.5px")]
     Heading3,
-    /// `--fs-dial-large` 18: a small clock widget's dial numerals (design/23 section 4.2).
-    #[token(system = "16.5px", editorial = "18px")]
+    /// `--fs-dial-large` 16.5: a small clock widget's dial numerals (design/23 section 4.2).
+    #[token(value = "16.5px")]
     DialLarge,
-    /// `--fs-widget-figure` 20: a battery's percentage under its ring (design/23 section 4.1).
-    #[token(system = "18px", editorial = "20px")]
+    /// `--fs-widget-figure` 18: a battery's percentage under its ring (design/23 section 4.1).
+    #[token(value = "18px")]
     WidgetFigure,
     /// `--fs-subject` 20: reader subject.
     #[token(value = "20px")]
@@ -143,45 +132,31 @@ pub enum FontSize {
     /// `--fs-emoji-cell` 30: an emoji in an emoji grid's 56 px cell.
     #[token(value = "30px")]
     EmojiCell,
-    /// `--fs-widget-hero` 47: a widget's hero value, a small battery's percentage (design/23-WIDGETS.md section 3.2).
-    #[token(system = "42.5px", editorial = "47px")]
+    /// `--fs-widget-hero` 42.5: a widget's hero value, a small battery's percentage (design/23-WIDGETS.md section 3.2).
+    #[token(value = "42.5px")]
     WidgetHero,
     /// `--fs-emoji-preview` 96: one emoji in a preview pane.
     #[token(value = "96px")]
     EmojiPreview,
-    /// `--fs-lock-clock` 140: the lock screen's time, the largest type the shell draws
+    /// `--fs-lock-clock` 127: the lock screen's time, the largest type the shell draws
     /// (design/20-SURFACES.md section 1.9; design/04-COMPONENTS.md section 42).
-    #[token(system = "127px", editorial = "140px")]
+    #[token(value = "127px")]
     LockClock,
 }
 
 impl FontSize {
-    /// The smallest UI text size under System, in px: the Mac's 10 pt floor (design/27-HIG-PARITY.md
+    /// The smallest UI text size, in px: the Mac's 10 pt floor (design/27-HIG-PARITY.md
     /// section 3.16, `--fs-min`). The lint `MinFontSize` rejects a size below it.
     pub const MIN_PX: f32 = 10.0;
 
-    /// The steps the Editorial ramp draws below [`Self::MIN_PX`] and System raises to it
-    /// (design/27 section 7, H0). `Dial` is also cap-fitted; the floor wins.
-    pub const FLOORED: [FontSize; 3] = [FontSize::Dial, FontSize::Nano, FontSize::Micro];
-
-    /// The steps fitted to a measured cap height, whose size follows the typeface.
-    pub const CAP_FITTED: [FontSize; 5] = [
-        FontSize::Dial,
-        FontSize::DialLarge,
-        FontSize::WidgetFigure,
-        FontSize::WidgetHero,
-        FontSize::LockClock,
-    ];
-
-    /// The size as CSS under `typeface`: `13px`.
-    pub fn css_in(self, typeface: Typeface) -> String {
-        self.css_value(TokenScope::BASE.in_typeface(typeface))
-            .to_string()
+    /// The size as CSS: `13px`.
+    pub fn css(self) -> String {
+        self.css_value(TokenScope::BASE).to_string()
     }
 
-    /// The size in px under `typeface`, for a check against [`Self::MIN_PX`].
-    pub fn px_in(self, typeface: Typeface) -> f32 {
-        self.css_in(typeface)
+    /// The size in px, for a check against [`Self::MIN_PX`].
+    pub fn px(self) -> f32 {
+        self.css()
             .trim_end_matches("px")
             .parse()
             .unwrap_or(f32::NAN)

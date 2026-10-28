@@ -1,6 +1,6 @@
 //! The faces, shipped inside the binary as bytes (design/02-TYPE.md section 2): Inter and Inter
-//! Display (the System typeface), Bricolage Grotesque, Karla and Space Mono (the Editorial
-//! typeface; Space Mono is also the code face in both), and Noto Serif.
+//! Display (the interface's faces), Space Mono (the code face), Noto Serif, and Bricolage
+//! Grotesque and Karla (the faces the Editorial look Extension names, with Space Mono).
 //!
 //! On Blitz the bytes are registered with the renderer's font context once (`ds-blitz`'s
 //! `register_fonts`); nothing about fonts is in the stylesheet.
@@ -18,8 +18,8 @@
 //! The upright Inter text face also carries the key-cap glyphs (`⌃ ⌥ ⇧ ⌘ ⌫ ↩ ↵ ⇥ ⌦ ⇞ ⇟` and the
 //! arrows, `scripts/cut-inter.sh`), because Google's latin range has none of them and a
 //! `KeyEquivalent` fell to the system's face: U+2303 drew as a caret. Every stack names "Inter"
-//! after its own face (`tokens::type_scale::Family`), so the glyphs come from here in both
-//! typefaces, in the code face's key caps too.
+//! after its own face (`tokens::type_scale::Family`), so the glyphs come from here, in the code
+//! face's key caps too.
 //! Licences are in `assets/fonts/OFL-*.txt`.
 
 use crate::tokens::type_scale::Family;
@@ -56,8 +56,8 @@ pub enum Subset {
 pub struct Face {
     /// The family name it registers as, the name a `--font-*` stack leads with: `"Inter"`.
     pub name: &'static str,
-    /// The job it was cut for (under the typeface that names it; Space Mono also does
-    /// [`Family::Code`] in both).
+    /// The job it was cut for (Space Mono also does
+    /// [`Family::Code`]).
     pub family: Family,
     /// Upright or italic.
     pub style: FaceStyle,
@@ -272,7 +272,6 @@ pub static FACES: &[Face] = &[
 #[cfg(test)]
 mod tests {
     use super::{FACES, FaceStyle, Subset};
-    use crate::appearance::typeface::Typeface;
     use crate::tokens::type_scale::Family;
     use ds_core::word::Word;
 
@@ -300,17 +299,15 @@ mod tests {
             );
             assert!(twins.contains(&Subset::Latin) && twins.contains(&Subset::LatinExt));
         }
-        // Every stack, in either typeface, leads with a face that ships upright.
-        for typeface in Typeface::ALL.iter().copied() {
-            for family in Family::ALL {
-                let name = family.face_name(typeface);
-                assert!(
-                    FACES
-                        .iter()
-                        .any(|face| face.name == name && face.style == FaceStyle::Normal),
-                    "{family:?} under {typeface:?} leads with {name}, which ships no upright face"
-                );
-            }
+        // Every stack leads with a face that ships upright.
+        for family in Family::ALL {
+            let name = family.face_name();
+            assert!(
+                FACES
+                    .iter()
+                    .any(|face| face.name == name && face.style == FaceStyle::Normal),
+                "{family:?} leads with {name}, which ships no upright face"
+            );
         }
     }
 
@@ -368,18 +365,13 @@ mod tests {
     #[test]
     fn every_stack_falls_back_to_inter_before_the_system() {
         use crate::tokens::token::{Token, TokenScope};
-        for typeface in Typeface::ALL.iter().copied() {
-            for family in [Family::Display, Family::Ui, Family::Data, Family::Code] {
-                let value = family.css_value(TokenScope::BASE.in_typeface(typeface));
-                let stack: Vec<&str> = value.as_str().split(',').collect();
-                let at = stack
-                    .iter()
-                    .position(|name| name.trim_matches('"') == "Inter");
-                assert!(
-                    at.is_some_and(|at| at <= 1),
-                    "{family:?} under {typeface:?}: {value}"
-                );
-            }
+        for family in [Family::Display, Family::Ui, Family::Data, Family::Code] {
+            let value = family.css_value(TokenScope::BASE);
+            let stack: Vec<&str> = value.as_str().split(',').collect();
+            let at = stack
+                .iter()
+                .position(|name| name.trim_matches('"') == "Inter");
+            assert!(at.is_some_and(|at| at <= 1), "{family:?}: {value}");
         }
     }
 

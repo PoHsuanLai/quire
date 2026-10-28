@@ -1,4 +1,4 @@
-//! The gallery's command line: `ds-gallery [--page PAGE] [--typeface system|editorial]
+//! The gallery's command line: `ds-gallery [--page PAGE]
 //! [--snapshot DIR [--scale PERCENT]] [--detail-frames DIR]
 //! [--accent-sheet DIR] [--progress]`. A sheet is written only to its DIR; `--progress` also
 //! copies it into the progress page's tracked shots.
@@ -23,8 +23,6 @@ pub struct Args {
     pub detail_frames: Option<PathBuf>,
     /// With `--snapshot`, the device scale in percent (100 when absent; 100 to 300).
     pub scale: Option<u16>,
-    /// The typeface the root speaks in (the settings default when absent).
-    pub typeface: Option<Typeface>,
     /// Whether `--snapshot` and `--accent-sheet` also refresh the progress
     /// page's tracked pictures (`--progress`; skipped when absent).
     pub progress: ProgressCopy,
@@ -107,15 +105,6 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                     .ok_or_else(|| ArgsError(format!("--scale takes 100 to 300, not {word:?}")))?;
                 parsed.scale = once(parsed.scale.as_ref(), scale, "--scale")?;
             }
-            "--typeface" => {
-                let word = value("a typeface")?;
-                let typeface = Typeface::parse(&word).ok_or_else(|| {
-                    ArgsError(format!(
-                        "--typeface takes system or editorial, not {word:?}"
-                    ))
-                })?;
-                parsed.typeface = once(parsed.typeface.as_ref(), typeface, "--typeface")?;
-            }
             "--progress" => {
                 if inline.is_some() {
                     return Err(ArgsError("--progress takes no value".into()));
@@ -171,7 +160,6 @@ mod tests {
             accent_sheet: None,
             detail_frames: None,
             scale: None,
-            typeface: None,
             progress: ProgressCopy::Skip,
         }
     }
@@ -241,14 +229,7 @@ mod tests {
                     ..args(None, Some("out"))
                 }),
             ),
-            (
-                &["--typeface", "editorial"],
-                Ok(Args {
-                    typeface: Some(Typeface::Editorial),
-                    ..args(None, None)
-                }),
-            ),
-            (&["--typeface", "serif"], Err("--typeface takes system")),
+            (&["--typeface", "editorial"], Err("unknown argument")),
             (&["--scale", "50"], Err("--scale takes 100 to 300")),
             (&["--scale", "2x"], Err("--scale takes 100 to 300")),
             (&["--verbose"], Err("unknown argument")),

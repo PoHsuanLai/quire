@@ -290,7 +290,7 @@ a test) must cancel the margin itself or draw inside a `Ds`.
 
 Every quire component must be drawn inside one `Ds` (design/03-COLOR.md
 section 17.1; `crates/ds/src/assembly/ds.rs`). It resolves your appearance to a scheme, an accent
-and a motion level; stamps `data-theme`, `data-typeface`, `data-accent`, `data-motion`,
+and a motion level; stamps `data-theme`, `data-accent`, `data-motion`,
 `data-material`, `data-blur`, `data-modality` and `data-hover` on its own `div.ds`; injects the stylesheet
 (unless you ask it not to); and provides the `Scope`, `HoverHub`, `ToastHub`, `LayerStack` and
 `Overlays` contexts every component reads. It also renders `OverlayHost` and `ToastHost` after
@@ -327,7 +327,6 @@ fn App() -> Element {
 | `blur` | `BlurState` | `BlurState::default()` | whether the compositor blurs behind this surface |
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
 | `sheet` | `Option<&'static str>` | `None`: `ds::stylesheet()` | the text `Inject::Inline` writes; an app that takes `ds-shell` passes `Some(ds_shell::stylesheet())` |
-| `typeface` | `Option<Typeface>` | `None`: the appearance's own | overrides the appearance's typeface for this root |
 | `styles` | `ReadSignal<Styles>` | empty | the look and the person's desktop-wide and per-app stylesheets, drawn after the design system's (section 12) |
 | `custom_styles` | `CustomStyles` | `Use` | `Off` draws none of the three sheets (`appearance.custom_styles`, "Use my styles", section 12) |
 | `surface` | `Option<&'static str>` | `None` | stamped as `data-surface`, the name a user stylesheet selects this root by |
@@ -473,9 +472,8 @@ your own component.
 A subtree in a different `Material`, or forced to a scheme, accent or blur state other than the
 root's (a popover over a dark card, an always-light preview pane, a specimen in another accent)
 is a `Surface`, not a second `Ds`: no stylesheet, no frame layers, just a nested `div.ds` that
-re-stamps `data-theme`/`data-typeface`/`data-accent`/`data-motion`/`data-material`/`data-blur`
-(the typeface is always the root's) and updates the
-`Scope` every component under it reads.
+re-stamps `data-theme`/`data-accent`/`data-motion`/`data-material`/`data-blur`
+and updates the `Scope` every component under it reads.
 
 ```rust,ignore
 use ds::prelude::*;

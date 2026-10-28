@@ -467,7 +467,7 @@ it.
 
 | Value | The Look |
 | --- | --- |
-| Font UI / display / mono | Inter / Inter / Space Mono (Inter has no monospace; the bundled mono stays). One system face; there is no second "Editorial" face |
+| Font UI / display / mono | Inter / Inter / Space Mono (Inter has no monospace; the bundled mono stays). One system face; "Editorial" is not a second face of the base Look but the look Extension `org.quire.look.Editorial`, chosen under Settings > Look |
 | Accent (light / dark) | system blue #007AFF / #0A84FF (conf M); eight macOS accents (Blue default, Purple, Pink, Red, Orange, Yellow, Green, Graphite); the global accent is the desktop's, set in Settings |
 | Paper (window) | #ECECEC / #1E1E1E (conf M) |
 | Surface (control / content) | #FFFFFF / #2A2A2A (conf M) |
@@ -544,7 +544,7 @@ Orchestrator decisions
 - Status colours ok / warn / danger are the Mac system green / orange / red.
 - Kept, quieter: Quick-Look-style Peek, undo-send (`SendPill`), the link status pill. The outbox is
   not part of the deferred one-input work.
-- The "Editorial" typeface is dropped.
+- The "Editorial" typeface is dropped as a setting; it is the look Extension `org.quire.look.Editorial`, chosen under Look.
 - Space migration: an existing Space keeps its first colour's hue; extra stops are dropped; a grain
   value the user set is kept.
 - The control centre keeps a Dark Mode toggle and drops the accent picker (accent lives in Settings).
@@ -567,7 +567,7 @@ Each row is a DROP: name, then the reason.
 | Overshoot / spring pop keyframes, `--overshoot`, `--e-spring`, `menu-pop`, `pop-in`, `chip-in`, `chip-land`, `star-pop`, `seal-pop`, `cmdk-in`, `hc-in`, `osd-in` | R2: springs only on contact; menus open instantly |
 | `--tilt`, `--pickup`, `--stagger`, `Reveal`, `use_rise_on`, `StaggerIndex` | no macOS counterpart |
 | Motion levels Calm and Extra, per-Look motion tables (Post, Riso, Tide, Candy) | one model; levels are accessibility only |
-| Looks Post, Riso, Tide, Candy, warmth, Mochi; the Arc Look; the Space gradient backdrop; the frame model (`.ds-layer`, `.ds-frame`, `--f-*`, the inset card); `CardAccent`; caps-tracked labels; the "Editorial" face; the twelve shadow tokens | one quiet Look (3.4); history is in `archive/` |
+| Looks Post, Riso, Tide, Candy, warmth, Mochi; the Arc Look; the Space gradient backdrop; the frame model (`.ds-layer`, `.ds-frame`, `--f-*`, the inset card); `CardAccent`; caps-tracked labels; the Typeface setting (the "Editorial" face is now the look Extension `org.quire.look.Editorial`); the twelve shadow tokens | one quiet Look (3.4); history is in `archive/` |
 | Curl, Crumple, Fold, TabOut, BannerOut exits; `*Heavy` durations | Roster fade and slide |
 | `use_pulse`, `PulseKey`, `use_nudge`, `use_bump_on`, `Bumped`, `use_once` public | emphasis flourishes |
 | `RollDigits`, `use_count_up`, `CountUp` | numbers change instantly |

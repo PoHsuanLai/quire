@@ -1,9 +1,8 @@
-//! The `.ds` token blocks, written from the families alone: `.ds` (light, Standard, System
-//! typeface), then only what differs under `.ds[data-theme=dark]`, `.ds[data-typeface=editorial]`
-//! and each non-standard `.ds[data-motion=..]`, so every name a variant block sets is also
-//! declared on `.ds` (tests/tokens.rs).
+//! The `.ds` token blocks, written from the families alone: `.ds` (light, Standard), then only
+//! what differs under `.ds[data-theme=dark]` and each non-standard `.ds[data-motion=..]`, so every
+//! name a variant block sets is also declared on `.ds` (tests/tokens.rs).
 
-use crate::appearance::{motion::MotionLevel, theme::Scheme, typeface::Typeface};
+use crate::appearance::{motion::MotionLevel, theme::Scheme};
 use crate::emit::{attr_selector, declaration, rule};
 use crate::tokens::{set::TokenSet, token::TokenScope};
 use ds_core::word::Word;
@@ -25,16 +24,6 @@ pub(super) fn token_blocks(sets: &[TokenSet]) -> String {
     css.push_str(&rule(
         &format!(".ds{}", attr_selector("data-theme", Scheme::Dark.slug())),
         &dark,
-    ));
-    css.push_str(&rule(
-        &format!(
-            ".ds{}",
-            attr_selector("data-typeface", Typeface::Editorial.slug())
-        ),
-        &changed(
-            &base,
-            declared(TokenScope::BASE.in_typeface(Typeface::Editorial)),
-        ),
     ));
     css.push_str(&rule(
         &format!(
