@@ -3,7 +3,14 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## v0.3.55 (unreleased)
+## v0.3.56
+
+### wh-ar2
+
+- **`use_resolved` works under any Blitz host.** The readings it registers live in blitz-kit's `after_resolve::AfterResolve`, not in the frame phase's own book: `Phase::after_resolve()` hands out the phase's one, and a ds-blitz window and the headless `Harness` provide it as a root context. A host that does not use the frame phase (shell-host) provides its own `AfterResolve` and runs it after each resolve. No API change for components.
+- blitz-kit moves to bb56e04c (adds `after_resolve`; private scroll flags became bools). Consumers that pin blitz-kit move with it, and shell-host must be on a rev that provides `AfterResolve` for `use_resolved` to read under it.
+
+## v0.3.55
 
 ### wh-qres2
 
@@ -35,7 +42,7 @@ Public items that were two-way enums, mirror types or enum-wrapped trait objects
 - **`EmptyState { face: Option<TileFace> }`** draws the tile (`tile(face)`) 48 px square above the title, inside the empty state's padding, as System Settings' empty state does. A `face` replaces `icon`; `icon` keeps its faint 48 px glyph for the old case.
 - Expected to move: `crates/ds-shell/tests/snapshots/stylesheet.css` (the icon tile and empty state rules, and the `--plate-tile-glyph` declaration), and any consumer's own stylesheet snapshot after a re-pin (sill-shell-kit's).
 
-## v0.3.54 (unreleased)
+## v0.3.54
 
 ### wh-qstat
 

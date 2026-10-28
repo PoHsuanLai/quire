@@ -223,6 +223,7 @@ impl Headless {
         });
         // `use_resolved` registers its token readings with this phase, as in a window.
         doc.vdom.provide_root_context(phase.clone());
+        doc.vdom.provide_root_context(phase.after_resolve());
         let gestures = GestureBus::default();
         doc.vdom.provide_root_context(gestures.clone());
         let scroll = WindowScroll::new(

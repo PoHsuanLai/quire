@@ -6,18 +6,17 @@
 //!
 //! The sheets reach the document as a `<style>` whose text follows the `Styles` signal (a look
 //! or a style sheet change restyles the document on the next frame). A component that sizes
-//! itself from tokens uses [`use_resolved`]: the frame phase reads them after every resolved
-//! frame, outside render, and sets the component's signal only when the reading changed, so a
+//! itself from tokens uses [`use_resolved`]: the host reads them after every resolved frame
+//! (through the blitz-kit `AfterResolve` it provides), outside render, and sets the component's signal only when the reading changed, so a
 //! restyle re-renders it with the new values and nothing waits on a timer.
 //!
 //! [`Tokens`] reads on demand instead, for a read in an event handler or a task. It answers
 //! `None` while the document is borrowed, which is always the case during a component's render.
 
-use crate::phase::Phase;
 use blitz_dom::{Atom, BaseDocument, NodeId};
+use blitz_kit::after_resolve::{AfterResolve, Registration};
 use dioxus::prelude::*;
 use dioxus_native_dom::NodeHandle;
-use ds::host::phase::Watch;
 use ds::prelude::Px;
 use ds::style::task::try_set;
 use std::rc::Rc;
@@ -134,8 +133,8 @@ impl std::fmt::Debug for Lookup<'_> {
 /// `onmounted` and read [`ResolvedTokens::value`] in render.
 pub struct ResolvedTokens<T: 'static> {
     value: Signal<Option<T>>,
-    watch: Signal<Option<Watch>>,
-    phase: CopyValue<Option<Phase>>,
+    registration: Signal<Option<Registration>>,
+    after: CopyValue<Option<AfterResolve>>,
     read: fn(&Lookup) -> T,
 }
 
@@ -160,34 +159,42 @@ impl<T> std::fmt::Debug for ResolvedTokens<T> {
 }
 
 /// A value the calling component builds from the tokens its element sees, kept current by the
-/// frame phase: `read` runs after every resolved frame from the element's mount on, and the value
+/// host: `read` runs after every resolved frame from the element's mount on, and the value
 /// changes (re-rendering the component) only when what `read` returns does. `None` until the
 /// first frame after mount; the caller keeps its shipped value until then.
 pub fn use_resolved<T: PartialEq + Clone + 'static>(read: fn(&Lookup) -> T) -> ResolvedTokens<T> {
     ResolvedTokens {
         value: use_signal(|| None),
-        watch: use_signal(|| None),
-        phase: use_hook(|| CopyValue::new(try_consume_context::<Phase>())),
+        registration: use_signal(|| None),
+        after: use_hook(|| CopyValue::new(try_consume_context::<AfterResolve>())),
         read,
     }
 }
 
 impl<T: PartialEq + Clone + 'static> ResolvedTokens<T> {
     /// The value as last read; `None` before the first frame after mount, and without a
-    /// document phase (outside a ds-blitz window or harness).
+    /// host that provides an `AfterResolve` (a ds-blitz window, the harness or a shell-host
+    /// surface).
     pub fn value(&self) -> ReadSignal<Option<T>> {
         self.value.into()
     }
 
     /// Start reading the element `event` names, replacing a reading of an earlier element.
     pub fn mounted(mut self, event: MountedEvent) {
-        let Some(phase) = self.phase.peek().clone() else {
+        let Some(after) = self.after.peek().clone() else {
+            return;
+        };
+        let Some(node) = event
+            .data()
+            .downcast::<NodeHandle>()
+            .map(NodeHandle::node_id)
+        else {
             return;
         };
         let (sink, read) = (self.value, self.read);
         let mut last: Option<T> = None;
-        let watch = phase.watch_tokens(
-            &event.data(),
+        let registration = after.watch(
+            node,
             Box::new(move |doc, node| {
                 let now = read(&Lookup { doc, node });
                 if last.as_ref() == Some(&now) {
@@ -197,7 +204,7 @@ impl<T: PartialEq + Clone + 'static> ResolvedTokens<T> {
                 Some(Box::new(move || try_set(sink, Some(now)).is_ok()))
             }),
         );
-        self.watch.set(watch);
+        self.registration.set(Some(registration));
     }
 }
 

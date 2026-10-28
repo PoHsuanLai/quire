@@ -120,6 +120,7 @@ pub(crate) fn window_config(
     vdom.provide_root_context(base.handle.clone());
     vdom.provide_root_context(slot.clone());
     vdom.provide_root_context(scroll.phase());
+    vdom.provide_root_context(scroll.phase().after_resolve());
     vdom.provide_root_context(scroll.clone());
     vdom.provide_root_context(handle);
     vdom.provide_root_context(close.clone());
