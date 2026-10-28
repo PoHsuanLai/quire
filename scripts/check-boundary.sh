@@ -229,11 +229,12 @@ else
   fail=1
 fi
 
-# The pinned block consumers copy (docs/workspace-deps.toml) names the same Blitz and blitz-kit
-# revisions as the root manifest (it once lagged a toolchain bump and a consumer noticed).
-for crate in blitz-dom blitz-kit; do
-  root=$(grep -E "^$crate *=" Cargo.toml | grep -oE 'rev = "[0-9a-f]+"' | head -1)
-  doc=$(grep -E "^$crate *=" docs/workspace-deps.toml | grep -oE 'rev = "[0-9a-f]+"' | head -1)
+# The pinned block consumers copy (docs/workspace-deps.toml) names every git dependency at the
+# root manifest's revision or tag (it once lagged a toolchain bump, and later the chordkit rows lagged
+# a chordkit move, and a consumer noticed both).
+for crate in $(grep -E '^[A-Za-z0-9_-]+ *= *\{.*git = ' docs/workspace-deps.toml | cut -d= -f1 | tr -d ' '); do
+  root=$(grep -E "^$crate *=" Cargo.toml | grep -oE '(rev|tag) = "[^"]+"' | head -1)
+  doc=$(grep -E "^$crate *=" docs/workspace-deps.toml | grep -oE '(rev|tag) = "[^"]+"' | head -1)
   if [ -n "$root" ] && [ "$root" = "$doc" ]; then
     echo "pins hold: docs/workspace-deps.toml names $crate at the root manifest's $root"
   else

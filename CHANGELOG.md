@@ -3,6 +3,13 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.58 (unreleased)
+
+### wh-qpin
+
+- **`docs/workspace-deps.toml` names chordkit, chordkit-kde and chordkit-gnome at 99eec9dd**, the rev quire builds; it said eb0deff1, so a consumer that copied the block got two chordkits. `scripts/check-boundary.sh` now compares every git row of that block with the root manifest, not only Blitz and blitz-kit.
+  **Consumer change:** a lock that holds chordkit at eb0deff1 moves its three chordkit rows to 99eec9dd.
+
 ## v0.3.57
 
 ### wh-bz
