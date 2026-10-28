@@ -94,3 +94,39 @@ fn a_component_reads_the_tokens_its_element_sees() {
     assert_eq!(gap, Some(Px(7.0)));
     assert_eq!(gain, Some(2.0));
 }
+
+static GAP: GlobalSignal<Option<Px>> = Signal::global(|| None);
+static SHEET: GlobalSignal<&'static str> = Signal::global(|| ".ds { --gap: 7px }");
+
+#[allow(non_snake_case)]
+fn Sized() -> Element {
+    let gap = ds_blitz::use_resolved(|tokens| tokens.length("--gap"));
+    // Render reads the published value: no document borrow, no timer.
+    *GAP.write() = gap.value()().flatten();
+    rsx! {
+        style { "{SHEET}" }
+        div { class: "ds",
+            div { onmounted: move |event| gap.mounted(event) }
+        }
+    }
+}
+
+#[test]
+fn a_resolved_reading_reaches_render_and_follows_a_restyle() {
+    let mut harness = Harness::new(Sized, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(std::time::Duration::from_millis(16));
+    harness.advance(std::time::Duration::from_millis(16));
+    assert_eq!(
+        harness.within(|| *GAP.peek()),
+        Some(Px(7.0)),
+        "read after mount"
+    );
+    harness.within(|| *SHEET.write() = ".ds { --gap: 11px }");
+    harness.advance(std::time::Duration::from_millis(16));
+    harness.advance(std::time::Duration::from_millis(16));
+    assert_eq!(
+        harness.within(|| *GAP.peek()),
+        Some(Px(11.0)),
+        "the new sheet's value, re-rendered without a wait"
+    );
+}

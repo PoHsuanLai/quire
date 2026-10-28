@@ -1,7 +1,7 @@
 //! The phase itself: a window's (or the harness's) handle on its queue of writes and its watches,
 //! and the step the loop runs.
 
-use super::book::{Book, WatchId};
+use super::book::{Book, TokenPublish, TokenRead, WatchId};
 use super::caret::{caret_box, selection_boxes};
 use super::read::{apply, border_box, scroll_of};
 use crate::node_ref::{DocRef, NodeRef, Written};
@@ -104,6 +104,16 @@ impl Phase {
         Observed::Watching(Watch::new(move || forget(&book, id)))
     }
 
+    /// Run `read` on the element `el`'s resolved tokens after every resolved frame, until the
+    /// watch is dropped; `None` when no document is attached or `el` is not a Blitz node.
+    pub(crate) fn watch_tokens(&self, el: &MountedData, read: TokenRead) -> Option<Watch> {
+        self.shared.drive.borrow().as_ref()?;
+        let node = NodeRef::of(el)?;
+        let id = self.shared.book.borrow_mut().watch_tokens(node.node, read);
+        let book = Rc::clone(&self.shared);
+        Some(Watch::new(move || forget(&book, id)))
+    }
+
     /// Queue `write` to the element `el` for the next run.
     pub(crate) fn write(&self, el: &MountedData, write: PhaseWrite) -> Queued {
         let (Some(_), Some(node)) = (self.shared.drive.borrow().as_ref(), NodeRef::of(el)) else {
@@ -189,6 +199,7 @@ impl Phase {
             carets,
             selections,
         } = self.changed(reads);
+        let tokens = self.changed_tokens(drive);
         let _in_runtime = RuntimeGuard::new(Rc::clone(&drive.runtime));
         // A sink whose component has gone is skipped: its watch is dropped with it.
         let rects = rects
@@ -207,7 +218,27 @@ impl Phase {
             .into_iter()
             .filter(|(sink, read)| try_set(*sink, read.clone()).is_ok())
             .count();
-        rects + scrolls + carets + selections
+        let tokens = tokens
+            .into_iter()
+            .map(|publish| publish())
+            .filter(|lived| *lived)
+            .count();
+        rects + scrolls + carets + selections + tokens
+    }
+
+    /// The token readings that changed since they were last published; none while the document
+    /// is borrowed elsewhere (they are read again after the next frame).
+    fn changed_tokens(&self, drive: &Drive) -> Vec<TokenPublish> {
+        let mut book = self.shared.book.borrow_mut();
+        drive
+            .doc
+            .read(|doc| {
+                book.tokens
+                    .iter_mut()
+                    .filter_map(|watch| (watch.read)(doc, watch.node))
+                    .collect()
+            })
+            .unwrap_or_default()
     }
 
     /// Everything watched, read from the document; `None` while it is borrowed elsewhere.

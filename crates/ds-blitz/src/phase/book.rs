@@ -1,7 +1,7 @@
 //! What the phase holds between frames: the signals it publishes to, and the writes waiting to be
 //! applied (data only; `run` does the work).
 
-use blitz_dom::NodeId;
+use blitz_dom::{BaseDocument, NodeId};
 use dioxus::prelude::Signal;
 use dioxus::prelude::{CopyValue, ReadableExt};
 use ds::base::geometry::scroll::Scroll;
@@ -79,6 +79,21 @@ impl SelectionWatch {
     }
 }
 
+/// A reading of the node's resolved tokens, given the document after a frame was resolved. It
+/// keeps what it last read and answers with the publish to run (outside the document, inside the
+/// runtime) only when the reading changed; the publish says whether its signal still lived.
+pub(crate) type TokenRead = Box<dyn FnMut(&BaseDocument, NodeId) -> Option<TokenPublish>>;
+
+/// Setting a token reader's signal: `false` once its component is gone.
+pub(crate) type TokenPublish = Box<dyn FnOnce() -> bool>;
+
+/// A component's reading of the tokens its element sees (`use_resolved`).
+pub(super) struct TokenWatch {
+    pub(super) id: WatchId,
+    pub(super) node: NodeId,
+    pub(super) read: TokenRead,
+}
+
 /// A write waiting for its frame.
 #[derive(Clone, Copy)]
 pub(super) struct Waiting {
@@ -93,14 +108,27 @@ pub(super) struct Book {
     pub(super) scrolls: Vec<ScrollWatch>,
     pub(super) carets: Vec<CaretWatch>,
     pub(super) selections: Vec<SelectionWatch>,
+    pub(super) tokens: Vec<TokenWatch>,
     pub(super) writes: Vec<Waiting>,
 }
 
 impl Book {
-    /// Register `what` for `node`.
-    pub(super) fn watch(&mut self, node: NodeId, what: Observe) -> WatchId {
+    fn next_id(&mut self) -> WatchId {
         let id = WatchId(self.next);
         self.next += 1;
+        id
+    }
+
+    /// Register `read` for `node`'s resolved tokens.
+    pub(super) fn watch_tokens(&mut self, node: NodeId, read: TokenRead) -> WatchId {
+        let id = self.next_id();
+        self.tokens.push(TokenWatch { id, node, read });
+        id
+    }
+
+    /// Register `what` for `node`.
+    pub(super) fn watch(&mut self, node: NodeId, what: Observe) -> WatchId {
+        let id = self.next_id();
         match what {
             Observe::Rect(sink) => self.rects.push(RectWatch {
                 id,
@@ -140,6 +168,7 @@ impl Book {
         self.scrolls.retain(|watch| watch.id != id);
         self.carets.retain(|watch| watch.id != id);
         self.selections.retain(|watch| watch.id != id);
+        self.tokens.retain(|watch| watch.id != id);
     }
 
     /// Queue `write` for `node`, replacing one already waiting for it.
