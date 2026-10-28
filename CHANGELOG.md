@@ -3,6 +3,17 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.57
+
+### wh-bz
+
+- **Blitz moves to the fork's 841386a7** (branch quire-pin-next): 7649ca62 plus 7f8f6ace (a table row's block-level child is laid out in an anonymous cell instead of being dropped as a caption: a newsletter's block-in-table layout keeps its text width) and 5bcb2b4d (dragging a text selection past a scroll container's edge scrolls it). blitz-kit moves to fd08b468 on the same rev; shell-host moves with it. Consumers that mirror quire's blitz block move all its rows to 841386a7.
+
+### Missed in v0.3.55 (wave 1, 26f00b01)
+
+- **`TagColour` and `FileKindColour` are gone.** A tag colour is a `ds::style::tokens::system_hue::SystemHue`: the hue is the token (`SystemHue::Red.var()` is `--tag-red`, the same thirteen names with Gray), so `ChipDot::Tag`, `MenuImage::Swatch` and anything that stored a `TagColour` take a `SystemHue`. `FileKind::colour()` returns the `SystemHue` and `FileKind::hex()` that hue in the light scheme (the file mark's colour).
+  **Consumer change:** `TagColour::X` becomes `SystemHue::X`, `tag.hue()` is the hue itself, `use ds::style::tokens::tag_colour::TagColour` becomes `use ds::style::tokens::system_hue::SystemHue`, and `FileKindColour::of(kind).hex()` becomes `kind.hex()`.
+
 ## v0.3.56
 
 ### wh-ar2
