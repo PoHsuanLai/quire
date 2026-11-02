@@ -121,6 +121,21 @@ impl Layout {
         }
     }
 
+    /// How many rows to mount beyond the visible ones on each side: `asked` when the owner chose,
+    /// else a viewport's worth of rows (at the list's average height), never fewer than `least`.
+    /// A viewport's worth keeps the rows a fast scroll reaches in the next frames already mounted.
+    pub(crate) fn overscan(&self, viewport: Px, asked: Option<usize>, least: usize) -> usize {
+        if let Some(rows) = asked {
+            return rows;
+        }
+        let len = self.len();
+        let average = self.total().0 / len.max(1) as f32;
+        if len == 0 || !average.is_finite() || average <= 0.0 || !viewport.0.is_finite() {
+            return least;
+        }
+        ((viewport.0.max(0.0) / average).ceil() as usize).max(least)
+    }
+
     /// The distance from the list's end that is near: the height of its last `rows` rows.
     pub(crate) fn page(&self, rows: usize) -> Px {
         match self {
@@ -150,6 +165,32 @@ mod tests {
             viewport: Px(viewport),
             content: Px(0.0),
         }
+    }
+
+    #[test]
+    fn overscan_is_what_was_asked_or_a_viewports_worth_of_rows() {
+        let even = Layout::Even {
+            pitch: Px(20.0),
+            len: 100,
+        };
+        let none = Layout::Even {
+            pitch: Px(0.0),
+            len: 0,
+        };
+        // (name, layout, viewport, asked, wanted)
+        let cases: Vec<(&str, &Layout, f32, Option<usize>, usize)> = vec![
+            ("asked wins", &even, 400.0, Some(2), 2),
+            ("a viewport's worth", &even, 400.0, None, 20),
+            ("a part row counts whole", &even, 410.0, None, 21),
+            ("never below the least", &even, 40.0, None, 4),
+            ("not measured yet", &even, 0.0, None, 4),
+            ("no rows", &none, 400.0, None, 4),
+        ];
+        for (name, layout, viewport, asked, want) in cases {
+            assert_eq!(layout.overscan(Px(viewport), asked, 4), want, "{name}");
+        }
+        let uneven = uneven(&[60.0, 20.0, 60.0, 20.0]);
+        assert_eq!(uneven.overscan(Px(200.0), None, 1), 5, "average of 40");
     }
 
     #[test]

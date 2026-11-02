@@ -105,6 +105,20 @@ impl ScrollerRef {
         self.scroll_to(now.offset + delta);
     }
 
+    /// Scroll `delta` further in content that is now `content` long: the content the signal
+    /// holds is the last one observed, which a change of the rows has already outgrown, so the
+    /// range the offset is kept in is the new one.
+    pub(crate) fn by_in(&self, delta: Px, content: Px) {
+        let now = *self.scroll.peek();
+        let next = Scroll { content, ..now }.by(delta);
+        if next == now {
+            return;
+        }
+        let mut scroll = self.scroll;
+        scroll.set(next);
+        self.write(next.offset);
+    }
+
     /// Scroll the least that shows `span`.
     pub fn reveal(&self, span: ScrollSpan) {
         let now = *self.scroll.peek();

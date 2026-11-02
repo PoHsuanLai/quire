@@ -218,7 +218,9 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     let start = range.start.min(end);
     use_cursor_reveal(
         scroller,
-        cursor.filter(|at| *at < rows).map(|at| layout.span(at)),
+        cursor
+            .filter(|at| *at < rows)
+            .map(|at| (at, layout.span(at))),
     );
     let resize = use_resize();
     let marquee = use_marquee(scroller);

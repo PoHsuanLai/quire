@@ -169,7 +169,7 @@ pub fn CollectionView<K: Clone + Eq + Hash + 'static>(
         scroller,
         cursor
             .filter(|at| *at < len)
-            .map(|at| layout.span(at / columns)),
+            .map(|at| (at, layout.span(at / columns))),
     );
     let marquee = use_marquee(scroller);
     let mut held = use_signal(|| false);

@@ -56,6 +56,7 @@ fn Page() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "height:200px; width:300px; display:flex; flex-direction:column",
                 VirtualList::<u32> {
+                    overscan: Some(OVERSCAN),
                     label: "Rows",
                     keys: keys(),
                     row,

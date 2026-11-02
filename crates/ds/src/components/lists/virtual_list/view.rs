@@ -12,7 +12,7 @@ use crate::components::lists::list::entry::SetPlace;
 use crate::components::lists::list::keys::{ListKey, list_key};
 use crate::components::lists::list::list::node_key;
 use crate::components::lists::virtual_list::layout::Layout;
-use crate::components::lists::virtual_list::model::{Change, RowHeight, departed, roved};
+use crate::components::lists::virtual_list::model::{Change, RowHeight, anchored, departed, roved};
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::geometry::scroll::{Scroll, ScrollSpan};
@@ -23,7 +23,8 @@ use ds_motion::roster::{RosterEntry, RowPitch};
 use ds_motion::use_roster::{LeaveBy, RosterSpec, use_roster_from};
 use std::hash::Hash;
 
-/// How many rows around the viewport are mounted besides the visible ones.
+/// The fewest rows mounted around the viewport besides the visible ones, when `overscan` is not
+/// set (it is otherwise a viewport's worth).
 const OVERSCAN_ROWS: usize = 4;
 /// How many rows from the end `near_end` starts to be reported.
 const PAGE_ROWS: usize = 10;
@@ -49,10 +50,15 @@ struct Memory<K> {
     exiting: Vec<Exiting<K>>,
     /// Where the rows lay as of the last render.
     layout: Layout,
+    /// How far to scroll once this render is drawn so the rows being looked at stay put, and how
+    /// long the content then is.
+    anchor: Option<(Px, Px)>,
+    /// How many anchors have been asked for: the effect that scrolls runs when it grows.
+    anchors: u32,
 }
 
 /// `keys`, each drawn by `row` only while it is within the viewport (and `overscan` rows around
-/// it). `height` is every row's height, one for all or one per key. `cursor` is the key the owner's keys rest on: it is kept
+/// it); `overscan` is how many rows, `None` for a viewport's worth (and at least four). `height` is every row's height, one for all or one per key. `cursor` is the key the owner's keys rest on: it is kept
 /// in view, and the arrow keys, Home and End ask `onselect` to move it, Enter and Space ask
 /// `onpick`. `near_end` is called when fewer than `page_rows` rows lie below the viewport, and
 /// again when the list grows and it is still so. A row's content must fit its height.
@@ -66,7 +72,7 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
     keys: Vec<K>,
     row: Callback<K, Element>,
     height: RowHeight<K>,
-    #[props(default = OVERSCAN_ROWS)] overscan: usize,
+    #[props(default)] overscan: Option<usize>,
     #[props(default)] cursor: Option<K>,
     #[props(default)] onselect: Option<EventHandler<K>>,
     #[props(default)] onpick: Option<EventHandler<K>>,
@@ -89,12 +95,20 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
                 pitch: Px(0.0),
                 len: 0,
             },
+            anchor: None,
+            anchors: 0,
         })
     });
     let layout = height.layout(&keys, &memory.peek().layout);
     let window = use_memo(use_reactive(
         (&layout, &overscan),
-        move |(layout, overscan)| layout.window(*scroller.scroll().read(), overscan),
+        move |(layout, overscan)| {
+            let seen = *scroller.scroll().read();
+            layout.window(
+                seen,
+                layout.overscan(seen.viewport, overscan, OVERSCAN_ROWS),
+            )
+        },
     ));
     use_paging(scroller, &layout, page_rows, near_end);
     let end = window().end.min(len);
@@ -112,6 +126,13 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
     let mut state = mem.write();
     if state.keys != keys {
         let before = state.start..state.start + state.shown.len();
+        if change == Change::Edit {
+            let seen = *scroller.scroll().peek();
+            if let Some(shift) = anchored(&state.keys, &state.layout, &keys, &layout, seen) {
+                state.anchor = Some((shift, layout.total()));
+                state.anchors += 1;
+            }
+        }
         let gone = match change {
             Change::Edit => departed(&state.keys, before, &keys, &state.layout),
             Change::Replace => Vec::new(),
@@ -146,9 +167,14 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
         .as_ref()
         .and_then(|cursor| keys.iter().position(|key| key == cursor));
     let cursor_at = state.cursor;
+    let anchors = state.anchors;
     let items = items(&mut state, &entries, start, len, &layout, row);
     drop(state);
-    use_cursor_reveal(scroller, cursor_at.map(|at| layout.span(at)));
+    use_anchor(scroller, memory, anchors);
+    use_cursor_reveal(
+        scroller,
+        cursor_at.map(|at| (keys[at].clone(), layout.span(at))),
+    );
     let onkeydown = move |event: KeyboardEvent| {
         let Some(act) = list_key(&event.key(), event.modifiers()) else {
             return;
@@ -268,14 +294,37 @@ fn items<K: Clone + Eq + Hash + 'static>(
     items
 }
 
-/// Scroll the cursor's row, at `span`, into view when it moves, and once the scroller has been
-/// measured.
-pub(crate) fn use_cursor_reveal(scroller: ScrollerRef, span: Option<ScrollSpan>) {
+/// Scroll the cursor's row, at `cursor`'s span, into view when the cursor moves to another key,
+/// and once the scroller has been measured. A span that moves because the rows above it changed
+/// is not the cursor moving: the viewer's place is theirs. The owner reveals a row it asks
+/// for with the scroller.
+pub(crate) fn use_cursor_reveal<K: Clone + PartialEq + 'static>(
+    scroller: ScrollerRef,
+    cursor: Option<(K, ScrollSpan)>,
+) {
     let measured = use_memo(move || scroller.scroll().read().viewport.0 > 0.0);
-    use_effect(use_reactive((&span,), move |(span,)| {
+    let key = cursor.as_ref().map(|(key, _)| key.clone());
+    let mut span = use_hook(|| CopyValue::new(None::<ScrollSpan>));
+    span.set(cursor.map(|(_, span)| span));
+    use_effect(use_reactive((&key,), move |(key,)| {
         let _ = measured();
-        if let Some(span) = span {
+        if let (Some(_), Some(span)) = (key, *span.peek()) {
             scroller.reveal(span);
+        }
+    }));
+}
+
+/// Scroll by the shift the last change of the keys asked for, once its render is drawn, so the
+/// rows being looked at stay where they were.
+fn use_anchor<K: 'static>(scroller: ScrollerRef, memory: CopyValue<Memory<K>>, anchors: u32) {
+    let mut memory = memory;
+    use_effect(use_reactive((&anchors,), move |(_,)| {
+        let asked = memory
+            .try_write()
+            .ok()
+            .and_then(|mut held| held.anchor.take());
+        if let Some((shift, content)) = asked {
+            scroller.by_in(shift, content);
         }
     }));
 }
