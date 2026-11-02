@@ -1,5 +1,5 @@
 //! One window's scrolling (design/11): the shared engine (`blitz_kit::scroll`) driving the
-//! window's own Blitz document, so a wheel detent is 60 px eased over at most 200 ms, a touchpad
+//! window's own Blitz document, so a wheel detent is 60 px eased over at most 200 ms (a Mac: 40 px, 60 ms), a touchpad
 //! flick glides and stretches, and the arrow, page and Home/End keys scroll by the same steps as
 //! in a shell surface. What is host-specific is here: winit's wheel and keys as engine inputs,
 //! the window's frame requests, and the gestures `ds::host::gesture` listeners hear.

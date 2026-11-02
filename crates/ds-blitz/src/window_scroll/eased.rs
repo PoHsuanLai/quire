@@ -14,11 +14,11 @@ pub(super) struct Eased {
 }
 
 impl Eased {
-    /// Add `(x, y)` px to the targets at `now`.
-    pub(super) fn push(self, x: f64, y: f64, now: Elapsed) -> Eased {
+    /// Add `(x, y)` px to the targets at `now`, each easing over no more than `cap` seconds.
+    pub(super) fn push(self, x: f64, y: f64, now: Elapsed, cap: f64) -> Eased {
         Eased {
-            x: push_axis(self.x, x, now),
-            y: push_axis(self.y, y, now),
+            x: push_axis(self.x, x, now, cap),
+            y: push_axis(self.y, y, now, cap),
         }
     }
 
@@ -39,10 +39,10 @@ impl Eased {
 }
 
 /// `target` with `by` added, unchanged for no motion.
-fn push_axis(target: Target, by: f64, now: Elapsed) -> Target {
+fn push_axis(target: Target, by: f64, now: Elapsed, cap: f64) -> Target {
     match by == 0.0 {
         true => target,
-        false => target.push(by, now),
+        false => target.push_capped(by, now, cap),
     }
 }
 
@@ -57,7 +57,7 @@ mod tests {
 
     #[test]
     fn an_axis_that_was_not_pushed_stays_put() {
-        let eased = Eased::default().push(0.0, 60.0, at(0));
+        let eased = Eased::default().push(0.0, 60.0, at(0), f64::INFINITY);
         let (_, (dx, dy)) = eased.advance(at(30));
         assert_eq!(dx, 0.0);
         assert!(dy > 0.0 && dy < 60.0, "{dy}");
@@ -65,7 +65,7 @@ mod tests {
 
     #[test]
     fn the_frames_sum_to_the_push_and_then_stop() {
-        let mut eased = Eased::default().push(-60.0, 60.0, at(0));
+        let mut eased = Eased::default().push(-60.0, 60.0, at(0), f64::INFINITY);
         let mut sum = (0.0, 0.0);
         for ms in (8..=100).step_by(8) {
             let (next, (dx, dy)) = eased.advance(at(ms));
