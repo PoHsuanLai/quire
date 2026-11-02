@@ -7,6 +7,7 @@ use std::time::Instant;
 use blitz_dom::BaseDocument;
 use blitz_kit::scroll::accel::Accel;
 use blitz_kit::scroll::cmd::ScrollCmd;
+use blitz_kit::scroll::config::ScrollSettings;
 use blitz_kit::scroll::doc::{self, WheelRoute};
 use blitz_kit::scroll::driver::{KeyRepeat, Moved, Moves, ScrollDriver};
 use blitz_kit::scroll::engine::{Engine, Motion};
@@ -21,7 +22,7 @@ use keyboard_types::Modifiers;
 
 use super::coast::{Coast, Heard};
 use super::eased::Eased;
-use super::wheel::{WheelInput, pointer_scrolls};
+use super::wheel::{Role, Run, WheelInput, pointer_scrolls};
 use crate::frame_tag::FrameTag;
 use crate::node_ref::{DocRef, Written};
 use crate::phase::Phase;
@@ -128,6 +129,8 @@ struct State {
     platform: Platform,
     eased: Eased,
     coast: Coast,
+    /// Where the fingers' run is, to tell the system's momentum from them (macOS only).
+    run: Run,
     /// How fast the wheel is being spun, for its acceleration.
     accel: Accel,
     commands: Vec<ScrollCmd>,
@@ -175,7 +178,30 @@ fn heard_as_gestures(state: &State, heard: Vec<Heard>) -> Vec<Gesture> {
         .collect()
 }
 
+/// The scroll settings `platform` feels native with: macOS has its own wheel
+/// (`ScrollSettings::macos`), the rest the engine's defaults.
+fn settings_of(platform: Platform) -> ScrollSettings {
+    match platform {
+        Platform::MacOs => ScrollSettings::macos(),
+        _ => ScrollSettings::default(),
+    }
+}
+
 impl WindowScroll {
+    /// What a touchpad event is in the run on this platform. Only macOS follows the fingers'
+    /// lift with momentum of its own, which winit reports as more touchpad events; anywhere
+    /// else every event is the fingers'.
+    fn role_of(&self, input: WheelInput, el: Elapsed) -> Role {
+        let mut state = self.shared.state.borrow_mut();
+        if state.platform != Platform::MacOs {
+            return Role::Finger;
+        }
+        let grace = state.tuning.physics.lift_grace;
+        let (run, role) = state.run.hear(input, el, grace);
+        state.run = run;
+        role
+    }
+
     /// Scrolling the document `phase` is attached to, publishing gestures to `bus`, on a
     /// timeline that starts at `origin`, on `platform` (whose primary modifier zooms the wheel).
     pub fn new(phase: Phase, bus: GestureBus, origin: Instant, platform: Platform) -> WindowScroll {
@@ -186,12 +212,13 @@ impl WindowScroll {
                 origin,
                 state: RefCell::new(State {
                     driver: ScrollDriver::default(),
-                    tuning: Tuning::default(),
+                    tuning: Tuning::new(settings_of(platform)),
                     pointer: None,
                     held: Modifiers::empty(),
                     platform,
                     eased: Eased::default(),
                     coast: Coast::default(),
+                    run: Run::default(),
                     accel: Accel::default(),
                     commands: Vec::new(),
                     frame_views: Vec::new(),
@@ -271,6 +298,7 @@ impl WindowScroll {
     /// the element under the pointer takes the wheel itself.
     pub fn wheel(&self, input: WheelInput, now: Instant) -> Handled {
         let el = self.elapsed(now);
+        let role = self.role_of(input, el);
         let input = self.accelerated(input, el);
         let (gesture, pointer, held, detent_px, zoom) = {
             let state = self.shared.state.borrow();
@@ -293,7 +321,7 @@ impl WindowScroll {
             }
             (ScrollSource::Finger, _) => {
                 self.publish(|bus| bus.publish_to(WheelDelivery::AsReceived, gesture));
-                self.coast(input, detent_px, el);
+                self.coast(input, detent_px, el, role);
             }
         }
         let Some(pointer) = pointer else {
@@ -319,7 +347,7 @@ impl WindowScroll {
             Some(WheelRoute::Engine) => {
                 let moved = self.with_doc(|doc, state| {
                     let env = state.tuning.at(el);
-                    pointer_scrolls(input, held)
+                    pointer_scrolls(input, held, role)
                         .into_iter()
                         .map(|scroll| state.driver.pointer(doc, scroll, pointer, env))
                         .fold(Moves::none(), Moves::then)
@@ -357,23 +385,27 @@ impl WindowScroll {
         }
         let (x, y) = input.motion(detent_px);
         let mut state = self.shared.state.borrow_mut();
-        state.eased = state.eased.push(x, y, el);
+        let cap = state.tuning.physics.wheel_smooth;
+        state.eased = state.eased.push(x, y, el, cap);
     }
 
     /// The fingers' motion, for the listeners that asked for it eased: it passes through as it
     /// came, and their lift starts the engine's glide (`coast`), if any listens.
-    fn coast(&self, input: WheelInput, detent_px: f64, el: Elapsed) {
+    fn coast(&self, input: WheelInput, detent_px: f64, el: Elapsed, role: Role) {
         if !self.shared.bus.has_listener(WheelDelivery::Eased) {
             return;
         }
         let gestures = {
             let mut state = self.shared.state.borrow_mut();
-            let (next, heard) = std::mem::take(&mut state.coast).touch(
-                input.phase,
-                input.motion(detent_px),
-                el,
-                &state.tuning.physics,
-            );
+            let by = input.motion(detent_px);
+            let coast = std::mem::take(&mut state.coast);
+            let physics = state.tuning.physics;
+            let (next, heard) = match role {
+                Role::Finger => coast.touch(input.phase, by, el, &physics),
+                Role::Lift => coast.lifted(by, el, &physics),
+                Role::Tail => coast.tail(by, el, &physics),
+                Role::TailEnd => coast.tail_end(by, el, &physics),
+            };
             state.coast = next;
             heard_as_gestures(&state, heard)
         };

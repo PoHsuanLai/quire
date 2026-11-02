@@ -153,6 +153,43 @@ impl Phase {
         Ran { applied, published }
     }
 
+    /// Publish the scroll state of every watched scroller as the document has it now, ahead of
+    /// the frame's layout: the scroll step has just written this frame's offsets, so a component
+    /// that windows over the offset (`VirtualList`) renders for the offset the frame draws, not
+    /// the last one. The size of the viewport and the content are the last layout's; the run
+    /// after the layout publishes them when they changed. Returns how many signals changed.
+    pub fn publish_scrolls(&self) -> usize {
+        let Some(drive) = self.shared.drive.borrow().clone() else {
+            return 0;
+        };
+        let reads = {
+            let book = self.shared.book.borrow();
+            if book.scrolls.is_empty() {
+                return 0;
+            }
+            drive.doc.read(|doc| {
+                book.scrolls
+                    .iter()
+                    .map(|watch| (watch.id, scroll_of(doc, watch.node)))
+                    .collect::<Vec<_>>()
+            })
+        };
+        let Some(scrolls) = reads else {
+            return 0;
+        };
+        let Changed { scrolls, .. } = self.changed(Reads {
+            rects: Vec::new(),
+            scrolls,
+            carets: Vec::new(),
+            selections: Vec::new(),
+        });
+        let _in_runtime = RuntimeGuard::new(Rc::clone(&drive.runtime));
+        scrolls
+            .into_iter()
+            .filter(|(sink, read)| try_set(*sink, *read).is_ok())
+            .count()
+    }
+
     fn apply_writes(&self, drive: &Drive, layout: Layout) -> usize {
         let writes = {
             let mut book = self.shared.book.borrow_mut();

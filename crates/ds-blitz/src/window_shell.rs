@@ -148,6 +148,9 @@ impl Sub {
         if self.scroll.frame(Instant::now()) {
             window.request_redraw();
         }
+        // The offsets the step wrote are the ones this frame draws: a component that windows
+        // over them renders for them now, not after the draw.
+        self.phase.publish_scrolls();
         self.hand_over(event_loop)
     }
 

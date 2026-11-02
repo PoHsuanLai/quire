@@ -76,8 +76,13 @@ pub(super) enum Coast {
     Idle,
     /// The fingers are down.
     Down(Track),
+    /// They lifted, and the content will glide unless the system sends its own momentum within
+    /// the grace (`Physics::lift_grace`).
+    Lifted(Gliding),
     /// They lifted, and the content still glides.
     Gliding(Gliding),
+    /// The system's own momentum moves the content, as it is heard: no glide of ours.
+    Tail,
 }
 
 impl Coast {
@@ -91,7 +96,9 @@ impl Coast {
         physics: &Physics,
     ) -> (Coast, Vec<Heard>) {
         let (state, mut heard) = match self {
-            Coast::Gliding(_) => (Coast::Idle, vec![heard(GesturePhase::Ended, (0.0, 0.0))]),
+            Coast::Gliding(_) | Coast::Lifted(_) | Coast::Tail => {
+                (Coast::Idle, vec![heard(GesturePhase::Ended, (0.0, 0.0))])
+            }
             other => (other, Vec::new()),
         };
         let track = match state {
@@ -117,11 +124,57 @@ impl Coast {
         (next, heard)
     }
 
+    /// The fingers lifted with `by` as their last motion, on a system that may send momentum of
+    /// its own: a glide that would start waits out the grace first.
+    pub(super) fn lifted(
+        self,
+        by: (f64, f64),
+        now: Elapsed,
+        physics: &Physics,
+    ) -> (Coast, Vec<Heard>) {
+        let (next, heard) = self.touch(GesturePhase::Ended, by, now, physics);
+        match next {
+            Coast::Gliding(glide) => (Coast::Lifted(glide), heard),
+            other => (other, heard),
+        }
+    }
+
+    /// The system's momentum moved the content by `by`: heard 1:1, with no glide of ours.
+    pub(super) fn tail(
+        self,
+        by: (f64, f64),
+        now: Elapsed,
+        physics: &Physics,
+    ) -> (Coast, Vec<Heard>) {
+        match self {
+            Coast::Lifted(_) | Coast::Tail => (Coast::Tail, vec![heard(GesturePhase::Changed, by)]),
+            other => other.touch(GesturePhase::Changed, by, now, physics),
+        }
+    }
+
+    /// The system's momentum ended with `by` as its last motion.
+    pub(super) fn tail_end(
+        self,
+        by: (f64, f64),
+        now: Elapsed,
+        physics: &Physics,
+    ) -> (Coast, Vec<Heard>) {
+        match self {
+            Coast::Lifted(_) | Coast::Tail => (Coast::Idle, vec![heard(GesturePhase::Ended, by)]),
+            other => other.touch(GesturePhase::Ended, by, now, physics),
+        }
+    }
+
     /// A frame at `now`: what the glide moved since the last, and `Ended` on the frame it ran
     /// out.
     pub(super) fn advance(self, now: Elapsed, physics: &Physics) -> (Coast, Vec<Heard>) {
-        let Coast::Gliding(glide) = self else {
-            return (self, Vec::new());
+        let glide = match self {
+            Coast::Gliding(glide) => glide,
+            Coast::Lifted(glide) if since_secs(glide.since, now) >= physics.lift_grace => Gliding {
+                since: now,
+                ..glide
+            },
+            other => return (other, Vec::new()),
         };
         let secs = now.0.saturating_sub(glide.since.0).as_secs_f64();
         let at = |v0: f64| v0.signum() * physics.glide.travel(v0.abs(), secs);
@@ -152,10 +205,15 @@ impl Coast {
     /// Whether a frame is wanted.
     pub(super) fn motion(&self) -> Motion {
         match self {
-            Coast::Gliding(_) => Motion::Animating,
-            Coast::Idle | Coast::Down(_) => Motion::Still,
+            Coast::Gliding(_) | Coast::Lifted(_) => Motion::Animating,
+            Coast::Idle | Coast::Down(_) | Coast::Tail => Motion::Still,
         }
     }
+}
+
+/// Seconds from `t0` to `now`.
+fn since_secs(t0: Elapsed, now: Elapsed) -> f64 {
+    now.0.saturating_sub(t0.0).as_secs_f64()
 }
 
 fn heard(phase: GesturePhase, by: (f64, f64)) -> Heard {
@@ -340,5 +398,78 @@ mod tests {
             Some(GesturePhase::Ended),
             "the lift is heard at once"
         );
+    }
+
+    #[test]
+    fn the_systems_momentum_is_heard_one_to_one_with_no_glide_of_ours() {
+        let physics = physics();
+        let (mut coast, mut said, lifted) = flick(30.0, 6, &physics);
+        let Coast::Gliding(glide) = coast.clone() else {
+            panic!("{coast:?}");
+        };
+        // The same flick, the lift deferred.
+        let mut deferred = Coast::Idle;
+        for n in 0..6 {
+            let phase = if n == 0 {
+                GesturePhase::Began
+            } else {
+                GesturePhase::Changed
+            };
+            deferred = deferred.touch(phase, (0.0, 30.0), at(n * 8), &physics).0;
+        }
+        let (next, _) = deferred.lifted((0.0, 0.0), lifted, &physics);
+        assert!(matches!(next, Coast::Lifted(_)), "{next:?}");
+        assert_eq!(next.motion(), Motion::Animating, "frames while it waits");
+        coast = next;
+        said.clear();
+        let mut sum = 0.0;
+        for n in 1..=20 {
+            let by = (0.0, 12.0 - n as f64 * 0.5);
+            let (next, heard) = coast.tail(
+                by,
+                Elapsed(lifted.0 + Duration::from_millis(n * 8)),
+                &physics,
+            );
+            coast = next;
+            sum += by.1;
+            said.extend(heard);
+        }
+        assert!(said.iter().all(|h| h.phase == GesturePhase::Changed));
+        let heard_sum: f64 = said.iter().map(|h| h.by.1).sum();
+        assert!((heard_sum - sum).abs() < 1e-9);
+        // Frames after the grace add nothing.
+        let (coast, heard) =
+            coast.advance(Elapsed(lifted.0 + Duration::from_millis(500)), &physics);
+        assert!(heard.is_empty() && coast == Coast::Tail);
+        let (coast, heard) = coast.tail_end((0.0, 0.0), lifted, &physics);
+        assert_eq!(
+            (coast, phases(&heard)),
+            (Coast::Idle, vec![GesturePhase::Ended])
+        );
+        assert!(glide.v0.1 > 0.0, "the flick would have glided");
+    }
+
+    #[test]
+    fn a_lift_the_system_never_follows_glides_after_the_grace() {
+        let physics = physics();
+        let mut coast = Coast::Idle;
+        for n in 0..6 {
+            let phase = if n == 0 {
+                GesturePhase::Began
+            } else {
+                GesturePhase::Changed
+            };
+            coast = coast.touch(phase, (0.0, 30.0), at(n * 8), &physics).0;
+        }
+        let lifted = at(48);
+        let (coast, _) = coast.lifted((0.0, 0.0), lifted, &physics);
+        let early = Elapsed(lifted.0 + Duration::from_millis(100));
+        let (coast, heard) = coast.advance(early, &physics);
+        assert!(heard.is_empty() && matches!(coast, Coast::Lifted(_)));
+        let late = Elapsed(lifted.0 + Duration::from_millis(160));
+        let (coast, _) = coast.advance(late, &physics);
+        assert!(matches!(coast, Coast::Gliding(_)), "{coast:?}");
+        let (_, heard) = coast.advance(Elapsed(late.0 + Duration::from_millis(16)), &physics);
+        assert!(heard.iter().any(|h| h.by.1 > 0.0));
     }
 }
