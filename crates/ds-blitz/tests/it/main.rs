@@ -32,6 +32,7 @@ mod hit_outside_empty_parent;
 mod ime_texture_layer;
 mod keep_focus;
 mod kept_click_focus;
+mod native_scroll;
 mod net_policy;
 mod open_window_harness;
 mod pdf_app;

@@ -92,15 +92,21 @@ impl RectProbe {
 
     /// Hand this the element's `onmounted` event. It keeps the element; the host publishes its
     /// rect from then on ([`use_layout`](crate::host::layout::use_layout)).
+    /// An event queued before its owner went (a surface hidden before the event was delivered)
+    /// keeps nothing.
     pub fn on_mounted(&self, event: Event<MountedData>) {
-        let mut mounted = self.mounted;
-        mounted.set(Some(MountedRef(event.data())));
+        let _ = ds_style::task::try_set(self.mounted, Some(MountedRef(event.data())));
     }
 
     /// Read the element's rect again, now: layout may have moved it since its first read (a
     /// surface placed against an anchor read later than it). Call it from a task.
     pub(crate) async fn reread(&self) {
-        let Some(element) = (self.mounted)() else {
+        let Some(element) = self
+            .mounted
+            .try_read()
+            .ok()
+            .and_then(|mounted| mounted.clone())
+        else {
             return;
         };
         if let Some(read) = client_rect(&element.0).await.filter(|read| laid_out(*read)) {

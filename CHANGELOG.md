@@ -3,6 +3,14 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## Unreleased
+
+### steady-virtual-list
+
+- **A scrolled `VirtualList` stays where the viewer put it.** Rows arriving above a list that is scrolled away from the top leave the first whole visible row at the same viewport y (the offset moves by how far that row's top moved; at offset 0 it stays 0, and a `Change::Replace` never anchors). The cursor row is revealed when the cursor *key* changes, not when its span moves because rows above it changed. The default `overscan` is a viewport's worth of rows (at least 4) instead of 4.
+  Changed: `VirtualList { overscan }` is `Option<usize>` (`None`, the default, is a viewport's worth); `use_cursor_reveal` takes `Option<(K, ScrollSpan)>`.
+  **Consumer change:** `overscan: 4` becomes `overscan: Some(4)`, or is dropped to take the viewport-sized default.
+
 ## v0.3.58
 
 ### wh-ed

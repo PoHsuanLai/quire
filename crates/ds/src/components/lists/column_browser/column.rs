@@ -62,13 +62,13 @@ pub(crate) fn BrowserColumnView<K: Clone + PartialEq + 'static>(
     let pitch = row_pitch();
     use_cursor_reveal(
         scroller,
-        selection
-            .cursor()
-            .filter(|at| *at < rows.len())
-            .map(|at| ScrollSpan {
+        selection.cursor().filter(|at| *at < rows.len()).map(|at| {
+            let span = ScrollSpan {
                 start: at as f32 * pitch.0,
                 length: pitch.0,
-            }),
+            };
+            (at, span)
+        }),
     );
     let inactive = (activity == Activity::Parent).then_some("no");
     rsx! {

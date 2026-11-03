@@ -5,6 +5,7 @@
 use crate::components::lists::virtual_list::layout::Layout;
 use crate::stack::roving::{Edge, Rove, Step};
 use dioxus::prelude::Callback;
+use ds_core::geometry::scroll::Scroll;
 use ds_core::geometry::units::Px;
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -79,6 +80,33 @@ pub(crate) fn departed<K: Clone + Eq + Hash>(
         .collect()
 }
 
+/// How far to scroll so the rows the viewer is looking at stay where they are when the keys
+/// change from `old` (laid out as `before`) to `new` (laid out as `after`): the first row that
+/// shows whole in `seen` and is still listed is the anchor, and the shift is how far its top moved.
+/// `None` at the top of the list (new rows arriving there should show), when no row shows whole
+/// that is still listed, or when the anchor did not move.
+pub(crate) fn anchored<K: Eq + Hash>(
+    old: &[K],
+    before: &Layout,
+    new: &[K],
+    after: &Layout,
+    seen: Scroll,
+) -> Option<Px> {
+    if seen.offset.0 <= 0.0 || old.is_empty() {
+        return None;
+    }
+    let bottom = seen.offset.0 + seen.viewport.0;
+    let index: HashMap<&K, usize> = new.iter().enumerate().map(|(at, key)| (key, at)).collect();
+    let first = (0..old.len()).find(|at| before.top(*at).0 >= seen.offset.0)?;
+    (first..old.len())
+        .take_while(|at| before.top(*at + 1).0 <= bottom)
+        .find_map(|at| index.get(&old[at]).map(|now| (at, *now)))
+        .and_then(|(at, now)| {
+            let shift = after.top(now).0 - before.top(at).0;
+            (shift != 0.0).then_some(Px(shift))
+        })
+}
+
 /// Where the cursor goes from `at` for `rove` among `len` rows; `None` for an empty list. The
 /// cursor stops at the ends.
 pub(crate) fn roved(at: Option<usize>, len: usize, rove: Rove) -> Option<usize> {
@@ -95,9 +123,10 @@ pub(crate) fn roved(at: Option<usize>, len: usize, rove: Rove) -> Option<usize> 
 
 #[cfg(test)]
 mod tests {
-    use super::{Departed, departed, roved};
+    use super::{Departed, anchored, departed, roved};
     use crate::components::lists::virtual_list::layout::Layout;
     use crate::stack::roving::{Edge, Rove, Step};
+    use ds_core::geometry::scroll::Scroll;
     use ds_core::geometry::units::Px;
 
     /// A case: name, old keys, mounted old indexes, new keys, wanted leavers.
@@ -219,5 +248,93 @@ mod tests {
         for &(at, len, rove, want) in cases {
             assert_eq!(roved(at, len, rove), want, "{at:?} of {len} {rove:?}");
         }
+    }
+
+    fn even(len: usize) -> Layout {
+        Layout::Even {
+            pitch: Px(20.0),
+            len,
+        }
+    }
+
+    fn seen(offset: f32) -> Scroll {
+        Scroll {
+            offset: Px(offset),
+            viewport: Px(100.0),
+            content: Px(1000.0),
+        }
+    }
+
+    #[test]
+    fn rows_arriving_above_shift_the_offset_by_how_far_the_anchor_moved() {
+        let old: Vec<u32> = (10..40).collect();
+        let mut new: Vec<u32> = vec![1, 2, 3];
+        new.extend(&old);
+        // Scrolled to 205: row index 11 (top 220) is the first whole row.
+        let got = anchored(&old, &even(30), &new, &even(33), seen(205.0));
+        assert_eq!(got, Some(Px(60.0)));
+        // Exactly on a row: that row anchors.
+        let got = anchored(&old, &even(30), &new, &even(33), seen(200.0));
+        assert_eq!(got, Some(Px(60.0)));
+    }
+
+    #[test]
+    fn nothing_shifts_at_the_top_or_when_nothing_moved() {
+        let old: Vec<u32> = (10..40).collect();
+        let mut new: Vec<u32> = vec![1, 2, 3];
+        new.extend(&old);
+        assert_eq!(anchored(&old, &even(30), &new, &even(33), seen(0.0)), None);
+        assert_eq!(
+            anchored(&old, &even(30), &old, &even(30), seen(205.0)),
+            None
+        );
+        // Rows added below the viewer move nothing above them.
+        let mut below = old.clone();
+        below.push(99);
+        assert_eq!(
+            anchored(&old, &even(30), &below, &even(31), seen(205.0)),
+            None
+        );
+    }
+
+    #[test]
+    fn a_removed_anchor_falls_to_the_next_whole_row_that_is_still_listed() {
+        let old: Vec<u32> = (0..30).collect();
+        // Rows 0 and 11 are gone (11 is the first whole row at 205), 12 anchors.
+        let new: Vec<u32> = old
+            .iter()
+            .copied()
+            .filter(|k| *k != 0 && *k != 11)
+            .collect();
+        let got = anchored(&old, &even(30), &new, &even(28), seen(205.0));
+        assert_eq!(got, Some(Px(-40.0)));
+    }
+
+    #[test]
+    fn a_row_leaving_below_a_still_anchor_moves_nothing() {
+        let old: Vec<u32> = (0..30).collect();
+        // 11 and 12 show whole at 205 and stay put; 13 leaves, so 14 rises, but 11 anchors.
+        let gone: Vec<u32> = old.iter().copied().filter(|k| *k != 13).collect();
+        assert_eq!(
+            anchored(&old, &even(30), &gone, &even(29), seen(205.0)),
+            None
+        );
+        // A row arriving among the visible rows, below the anchor, moves nothing either.
+        let mut arrived = old.clone();
+        arrived.insert(13, 99);
+        assert_eq!(
+            anchored(&old, &even(30), &arrived, &even(31), seen(205.0)),
+            None
+        );
+    }
+
+    #[test]
+    fn nothing_shifts_when_no_whole_visible_row_is_still_listed() {
+        let old: Vec<u32> = (0..30).collect();
+        let new: Vec<u32> = (100..130).collect();
+        assert_eq!(
+            anchored(&old, &even(30), &new, &even(30), seen(205.0)),
+            None
+        );
     }
 }

@@ -397,6 +397,8 @@ impl Headless {
         // detents to writes its signal now, and this frame's renders show it.
         if self.layout != Layout::Held {
             self.scroll.frame(now());
+            // As the window does, so a component over a scroll offset renders this frame's.
+            self.phase.publish_scrolls();
         }
         let rendered = self.flush();
         // After the renders and tasks have run, so a component's own hand-back (a menu's
