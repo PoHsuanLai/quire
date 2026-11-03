@@ -100,8 +100,8 @@ pub(crate) fn anchored<K: Eq + Hash>(
     let first = (0..old.len()).find(|at| before.top(*at).0 >= seen.offset.0)?;
     (first..old.len())
         .take_while(|at| before.top(*at + 1).0 <= bottom)
-        .find_map(|at| {
-            let now = *index.get(&old[at])?;
+        .find_map(|at| index.get(&old[at]).map(|now| (at, *now)))
+        .and_then(|(at, now)| {
             let shift = after.top(now).0 - before.top(at).0;
             (shift != 0.0).then_some(Px(shift))
         })
@@ -308,6 +308,24 @@ mod tests {
             .collect();
         let got = anchored(&old, &even(30), &new, &even(28), seen(205.0));
         assert_eq!(got, Some(Px(-40.0)));
+    }
+
+    #[test]
+    fn a_row_leaving_below_a_still_anchor_moves_nothing() {
+        let old: Vec<u32> = (0..30).collect();
+        // 11 and 12 show whole at 205 and stay put; 13 leaves, so 14 rises, but 11 anchors.
+        let gone: Vec<u32> = old.iter().copied().filter(|k| *k != 13).collect();
+        assert_eq!(
+            anchored(&old, &even(30), &gone, &even(29), seen(205.0)),
+            None
+        );
+        // A row arriving among the visible rows, below the anchor, moves nothing either.
+        let mut arrived = old.clone();
+        arrived.insert(13, 99);
+        assert_eq!(
+            anchored(&old, &even(30), &arrived, &even(31), seen(205.0)),
+            None
+        );
     }
 
     #[test]
