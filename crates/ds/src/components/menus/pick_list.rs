@@ -6,7 +6,8 @@
 //!
 //! The caller owns the query and the rows, as the palette's caller does: it narrows `groups` by
 //! what `oninput` says, and a "Create" row is one more row it adds when nothing matches. Up and
-//! Down move the selection, Return picks it, Escape and a press outside close the popover. A
+//! Down move the selection, Return picks it, Escape clears a typed query and, on an empty
+//! field, closes the popover, as does a press outside. A
 //! row's [`AfterPick`] says whether its pick closes the list: a row that toggles a label keeps it
 //! open and the caller redraws the row with its new check, a row that moves the thread closes it.
 
@@ -48,7 +49,7 @@ fn below() -> Placement {
 ///
 /// `label` names the popover and its field; `placeholder` is the field's hint and `empty` what
 /// the list says when `groups` is empty. `oninput` hears the query as it is typed; `onpick` the
-/// value of a picked row; `onclose` Escape, a press outside, and a pick whose row closes the
+/// value of a picked row; `onclose` Escape on an empty field (with text, Escape calls `oninput("")` and the list stays), a press outside, and a pick whose row closes the
 /// list (before `onpick`, as the palette does). `arrow` points the popover at its control.
 #[component]
 pub fn PickList<T: Clone + PartialEq + 'static>(
@@ -93,6 +94,7 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
     };
     let onkey = {
         let (run, live, selection) = (run.clone(), live.clone(), selection.clone());
+        let typed = !query.is_empty();
         move |event: KeyboardEvent| match palette_key(&event.key()) {
             Some(PaletteKey::Move(step)) => {
                 if let Some(next) = travel(current, Travel::Vertical(step), &live, &[]) {
@@ -101,6 +103,13 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
                 }
             }
             Some(PaletteKey::Run) => run(current),
+            // Escape with text clears it and keeps the list; stopped here, the popover's own
+            // Escape (the next ancestor) never sees it. On an empty field it passes on and closes.
+            Some(PaletteKey::Close) if typed => {
+                event.stop_propagation();
+                event.prevent_default();
+                oninput.call(String::new());
+            }
             Some(PaletteKey::Side(_) | PaletteKey::Close) | None => {}
         }
     };
