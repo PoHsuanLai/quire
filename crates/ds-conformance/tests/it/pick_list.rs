@@ -268,3 +268,101 @@ fn escape_closes_the_list_after_its_fade() {
     assert_eq!(log(&harness), "close");
     assert_eq!(harness.count(".ds-pick-list"), 0);
 }
+
+fn query_of(harness: &Harness) -> String {
+    harness.text_of(".query").unwrap_or_default()
+}
+
+/// A list with the query echoed, so a test can see the field cleared.
+#[allow(non_snake_case)]
+fn Echo() -> Element {
+    let mut query = use_signal(String::new);
+    let mut open = use_signal(|| true);
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
+            p { class: "query", {query()} }
+            span { class: "state", if open() { "open" } else { "closed" } }
+            if open() {
+                PickList::<usize> {
+                    anchor: Anchor::Point(Point { x: Px(120.0), y: Px(80.0) }),
+                    label: "Labels",
+                    placeholder: "Filter labels",
+                    query: query(),
+                    groups: groups(&query(), &[]),
+                    empty: "No label matches.",
+                    oninput: move |text: String| query.set(text),
+                    onpick: |_| {},
+                    onclose: move |()| open.set(false),
+                }
+            }
+        }
+    }
+}
+
+fn echo() -> Harness {
+    let mut harness = Harness::new(Echo, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(ms(400));
+    harness
+}
+
+#[test]
+fn escape_with_text_clears_it_and_the_list_stays() {
+    let mut harness = echo();
+    type_text(&mut harness, "tra");
+    assert_eq!(query_of(&harness), "tra");
+    harness.send(Input::key(ShortcutKey::Escape));
+    harness.advance(ms(400));
+    assert_eq!(query_of(&harness), "", "the text is cleared");
+    assert_eq!(
+        harness.count(".ds-pick-list"),
+        1,
+        "and the list is still up"
+    );
+    assert_eq!(harness.text_of(".state").as_deref(), Some("open"));
+    harness.send(Input::key(ShortcutKey::Escape));
+    harness.advance(ms(400));
+    assert_eq!(
+        harness.count(".ds-pick-list"),
+        0,
+        "the next Escape closes it"
+    );
+    assert_eq!(harness.text_of(".state").as_deref(), Some("closed"));
+}
+
+#[test]
+fn escape_on_an_empty_field_closes() {
+    let mut harness = echo();
+    harness.send(Input::key(ShortcutKey::Escape));
+    harness.advance(ms(400));
+    assert_eq!(harness.text_of(".state").as_deref(), Some("closed"));
+}
+
+#[test]
+fn a_press_outside_closes_even_with_text() {
+    let mut harness = echo();
+    type_text(&mut harness, "tra");
+    let away = Point {
+        x: Px(600.0),
+        y: Px(400.0),
+    };
+    harness.send(Input::pointer_move(away));
+    harness.send(Input::click(away));
+    harness.advance(ms(400));
+    assert_eq!(harness.text_of(".state").as_deref(), Some("closed"));
+}
+
+#[test]
+fn arrows_and_return_are_unchanged_with_text_in_the_field() {
+    let mut harness = started();
+    type_text(&mut harness, "tra");
+    harness.send(Input::key(ShortcutKey::Down));
+    harness.advance(ms(20));
+    harness.send(Input::key(ShortcutKey::Enter));
+    harness.advance(ms(20));
+    assert_eq!(
+        log(&harness),
+        "pick:3",
+        "Down to Trash bin, Return toggles it"
+    );
+    assert_eq!(harness.count(".ds-pick-list"), 1);
+}
