@@ -7,7 +7,7 @@ use crate::components::menus::menu::placement::MenuPlacement;
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Float, Stacking, max_height_style, position_style};
 use crate::host::measure::Anchor;
-use ds_core::geometry::units::{Point, Px};
+use ds_core::geometry::units::Point;
 use ds_core::vocab::Dismiss;
 
 /// A floating menu is a layer that Escape and an outside press close; an inline one is part of
@@ -42,25 +42,33 @@ impl Surface {
             Flow::Floating => {
                 let field = float.anchor_rect(anchor);
                 let wanted = field.map(|rect| placement.placement(rect));
-                let at = wanted.map_or_else(Point::default, |(rect, want, gap)| {
-                    float.origin(Some(rect), want, gap)
-                });
                 // The menu grows to its rows until it meets the edge it opens toward, less the
-                // margin; the stylesheet's window-high cap holds until that is known. A context
-                // menu is not held to the edge it opens toward: placement shifts it back inside
-                // the window (as every desktop's does), so it scrolls only when the window itself
-                // is too short for its rows, and the window-high cap is its limit.
-                let room = match placement {
-                    MenuPlacement::Context => String::new(),
+                // margin, and is placed at that height; the stylesheet's window-high cap holds
+                // until that is known. A context menu is not held to the edge it opens toward:
+                // placement shifts it back inside the window (as every desktop's does), so it
+                // scrolls only when the window itself is too short for its rows, and the
+                // window-high cap is its limit.
+                let held = match placement {
+                    MenuPlacement::Context => None,
                     MenuPlacement::Bar | MenuPlacement::Popup => wanted
-                        .and_then(|(rect, want, gap)| float.room(Some(rect), want, gap))
-                        .map(|room| max_height_style(Px(room.0.max(MIN_ROOM.0))))
-                        .unwrap_or_default(),
+                        .and_then(|(rect, want, gap)| float.held(Some(rect), want, gap, MIN_ROOM)),
+                };
+                let (at, room) = match held {
+                    Some((at, room)) => (at, max_height_style(room)),
+                    None => (
+                        wanted.map_or_else(Point::default, |(rect, want, gap)| {
+                            float.origin(Some(rect), want, gap)
+                        }),
+                        String::new(),
+                    ),
                 };
                 let width = hung.width_style(field).unwrap_or_default();
-                // Until the anchor is measured the menu has no place: it is laid out (so it can
-                // be measured) but not drawn, and a press cannot land on it.
-                let waiting = field.map_or(UNPLACED, |_| "");
+                // Until the anchor and the menu itself are measured the menu has no place: it is
+                // laid out (so it can be measured) but not drawn, and a press cannot land on it.
+                let waiting = match (field, float.measured()) {
+                    (Some(_), true) => "",
+                    (None, _) | (_, false) => UNPLACED,
+                };
                 Surface {
                     class: "ds-popover ds-menu",
                     elevation: Some("pop"),

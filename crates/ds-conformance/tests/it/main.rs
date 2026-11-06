@@ -55,6 +55,7 @@ mod machine;
 mod machine_forms;
 mod marquee;
 mod menu_cursor;
+mod menu_first_frame;
 mod menu_in_card;
 mod menu_keep_open;
 mod menu_leave;

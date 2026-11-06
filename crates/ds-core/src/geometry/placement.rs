@@ -145,7 +145,8 @@ fn overflow(side: Side, anchor: Rect, content: Size, bounds: Rect, gap: Px) -> f
     }
 }
 
-fn opposite(side: Side) -> Side {
+/// The side across the anchor from `side`.
+pub fn opposite(side: Side) -> Side {
     match side {
         Side::Top => Side::Bottom,
         Side::Bottom => Side::Top,

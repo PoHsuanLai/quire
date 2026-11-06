@@ -101,7 +101,8 @@ impl<T: Clone + 'static> Moves<T> {
 /// it or an Escape that nothing else took; with no `place` it is drawn where it stands).
 ///
 /// `value` and `oninput` are the controlled pair of a `TextField`; `onpick` hears the picked
-/// row's value. A caller that wants the field to act on a pick sets `value` from it.
+/// row's value. A caller that wants the field to act on a pick sets `value` from it. `tokens`,
+/// `on_token` and `on_token_remove` are the `TextField`'s chips under the text.
 #[component]
 pub fn SearchField<T: Clone + PartialEq + 'static>(
     label: String,
@@ -109,6 +110,8 @@ pub fn SearchField<T: Clone + PartialEq + 'static>(
     #[props(default)] placeholder: String,
     #[props(default)] size: ControlSize,
     #[props(default)] tokens: Vec<String>,
+    #[props(default)] on_token: Option<EventHandler<usize>>,
+    #[props(default)] on_token_remove: Option<EventHandler<usize>>,
     #[props(default)] suggestions: Vec<SuggestionSection<T>>,
     #[props(default = PanelWidth::SameAsField)] width: PanelWidth,
     #[props(default)] highlight: InitialHighlight,
@@ -184,6 +187,8 @@ pub fn SearchField<T: Clone + PartialEq + 'static>(
             placeholder,
             size,
             tokens,
+            on_token,
+            on_token_remove,
             bezel,
             kind: FieldKind::Search,
             focus,

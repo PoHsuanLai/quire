@@ -25,6 +25,16 @@ struct Setup {
     stop_at_ends: bool,
     present: SuggestionsPresent,
     floated: bool,
+    long_row: bool,
+    chips: Chips,
+}
+
+/// The tokens under the field: none, shown, or shown with both handlers.
+#[derive(Clone, Copy, PartialEq)]
+enum Chips {
+    None,
+    Shown,
+    Live,
 }
 
 thread_local! {
@@ -35,6 +45,8 @@ thread_local! {
         stop_at_ends: false,
         present: SuggestionsPresent::Popup,
         floated: false,
+        long_row: false,
+        chips: Chips::None,
     }) };
 }
 
@@ -42,7 +54,11 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn sections() -> Vec<SuggestionSection<String>> {
+/// A name far wider than the card.
+const LONG: &str = "Invoices, receipts, statements and every other paper the accountant from \
+                    the firm downstairs asked for before the end of the quarter";
+
+fn sections(long_row: bool) -> Vec<SuggestionSection<String>> {
     let rows = |names: &[&str]| {
         names
             .iter()
@@ -53,6 +69,9 @@ fn sections() -> Vec<SuggestionSection<String>> {
         SuggestionSection::titled("Top hit", rows(&["Invoice from Dana"])),
         SuggestionSection::titled("People", rows(&["Dana Okafor", "Sam Lindqvist"])),
     ]
+    .into_iter()
+    .chain(long_row.then(|| SuggestionSection::titled("Mailboxes", rows(&[LONG]))))
+    .collect()
 }
 
 #[allow(non_snake_case)]
@@ -75,7 +94,13 @@ fn Page() -> Element {
                 SearchField::<String> {
                     label: "Search",
                     value: query(),
-                    suggestions: sections(),
+                    suggestions: sections(setup.long_row),
+                    tokens: match setup.chips {
+                        Chips::None => Vec::new(),
+                        Chips::Shown | Chips::Live => vec!["from:".to_owned(), "to:".to_owned()],
+                    },
+                    on_token: (setup.chips == Chips::Live).then(|| EventHandler::new(move |at: usize| log.with_mut(|log| log.push(format!("token:{at}"))))),
+                    on_token_remove: (setup.chips == Chips::Live).then(|| EventHandler::new(move |at: usize| log.with_mut(|log| log.push(format!("remove:{at}"))))),
                     highlight: setup.highlight,
                     escape: setup.escape,
                     open: setup.open,
@@ -299,4 +324,103 @@ fn a_card_picks_with_return_and_closes_its_rows() {
     press(&mut harness, ShortcutKey::Enter);
     assert_eq!(text(&harness, "#log"), "pick:Invoice from Dana");
     assert_eq!(harness.count(".ds-search-card .ds-menu-item"), 0);
+}
+
+/// The rows' own sideways offset and the window's, which a sideways scroll over the rows could
+/// move.
+fn sideways(harness: &Harness) -> (f64, f64) {
+    harness.with_doc(|doc| {
+        let rows = doc
+            .query_selector(".ds-search-card-rows")
+            .ok()
+            .flatten()
+            .and_then(|id| doc.get_node(id))
+            .map_or(0.0, |node| node.scroll_offset().x);
+        (rows, doc.viewport_scroll().x)
+    })
+}
+
+#[test]
+fn a_card_row_wider_than_the_card_does_not_scroll_it_sideways() {
+    let mut harness = start(Setup {
+        long_row: true,
+        ..card()
+    });
+    assert_eq!(harness.count(".ds-search-card .ds-menu-item"), 4);
+    let over = harness.centre(".ds-search-card-rows").expect("the rows");
+    for x in [8.0, -8.0, 8.0] {
+        harness.send(Input::detents(over, x, 0.0));
+        harness.advance(ms(200));
+        assert_eq!(sideways(&harness), (0.0, 0.0), "after {x} clicks sideways");
+    }
+}
+
+#[test]
+fn a_token_pressed_or_removed_is_told_and_the_caret_stays_in_the_field() {
+    let mut harness = start(Setup {
+        chips: Chips::Live,
+        ..popup()
+    });
+    assert_eq!(harness.count(".ds-text-field-tokens .ds-chip"), 2);
+    let second = harness
+        .centre(".ds-chip:nth-child(2) .ds-chip-press")
+        .expect("the second token's face");
+    harness.send(Input::click(second));
+    harness.advance(ms(300));
+    assert_eq!(text(&harness, "#log"), "token:1");
+    assert!(
+        harness.focus_of(".ds-input"),
+        "the caret is back in the field"
+    );
+    let remove = harness
+        .centre(".ds-chip:nth-child(1) .ds-chip-remove")
+        .expect("the first token's remove button");
+    harness.send(Input::click(remove));
+    harness.advance(ms(300));
+    assert_eq!(text(&harness, "#log"), "token:1,remove:0");
+    assert!(
+        harness.focus_of(".ds-input"),
+        "the caret is back in the field"
+    );
+}
+
+#[allow(non_snake_case)]
+fn Disabled() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            TextField {
+                label: "Search",
+                value: "",
+                kind: FieldKind::Search,
+                availability: Availability::Disabled,
+                tokens: vec!["from:".to_owned(), "to:".to_owned()],
+                on_token: EventHandler::new(|_: usize| {}),
+                on_token_remove: EventHandler::new(|_: usize| {}),
+                oninput: |_: String| {},
+            }
+        }
+    }
+}
+
+#[test]
+fn a_token_on_a_field_that_takes_no_input_is_a_plain_chip() {
+    let mut harness = Harness::new(
+        Disabled,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    harness.advance(ms(100));
+    assert_eq!(harness.count(".ds-text-field-tokens .ds-chip"), 2);
+    assert_eq!(harness.count(".ds-chip-press"), 0);
+    assert_eq!(harness.count(".ds-chip-remove"), 0);
+}
+
+#[test]
+fn a_token_with_no_handler_is_a_plain_chip() {
+    let harness = start(Setup {
+        chips: Chips::Shown,
+        ..popup()
+    });
+    assert_eq!(harness.count(".ds-text-field-tokens .ds-chip"), 2);
+    assert_eq!(harness.count(".ds-chip-press"), 0);
+    assert_eq!(harness.count(".ds-chip-remove"), 0);
 }
