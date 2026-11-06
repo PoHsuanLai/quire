@@ -9,6 +9,7 @@
 //! sections 5 and 18).
 
 use crate::components::overlays::catcher::Catcher;
+use crate::host::document::DocumentHost;
 use crate::host::measure::follow_rect;
 use crate::host::measure::{Anchor, MountedRef, RectProbe};
 use crate::root::common::Common;
@@ -17,7 +18,7 @@ use crate::stack::layer_stack::{Dismissal, LayerId, LayerStack};
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use ds_core::geometry::{
-    placement::{Placed, Placement, Side, place, room_on_side},
+    placement::{Flip, Placed, Placement, Side, opposite, place, room_on_side},
     units::{Point, Px, Rect, Size},
 };
 use ds_core::vocab::{Dismiss, Shown};
@@ -29,6 +30,7 @@ use ds_motion::presence::{
     use_presence::{Presented, use_presence},
 };
 use ds_style::tokens::layer::ZLayer;
+use std::rc::Rc;
 
 /// Whether a floating surface joins the layer stack: hover cards and tooltips never take
 /// Escape or a click, so they stay off it.
@@ -75,6 +77,8 @@ pub(crate) struct Float {
     surface: RectProbe,
     anchor: Signal<Option<Rect>>,
     asked: CopyValue<Option<MountedRef>>,
+    /// Whether the document has a host, which measures the surface: a server render has none.
+    hosted: bool,
 }
 
 /// Bounds used before the overlay wrapper has been measured: the window's top-left corner and
@@ -107,6 +111,7 @@ pub(crate) fn use_float(layer: ZLayer, stacking: Stacking) -> Float {
         surface: crate::host::measure::use_rect(),
         anchor: use_signal(|| None),
         asked: use_hook(|| CopyValue::new(None)),
+        hosted: try_use_context::<Rc<dyn DocumentHost>>().is_some(),
     };
     use_hook(move || {
         if let (Stacking::Layer(dismiss), Some(stack)) = (stacking, stack) {
@@ -217,12 +222,28 @@ impl Float {
         Some(place(anchor, content, bounds, want, gap))
     }
 
+    /// Whether the surface can be placed by its size: it has been laid out with one, or nothing
+    /// will measure it (a server render, with no host), so it is drawn where it is. Until then a
+    /// surface is drawn nowhere, or it would show for a frame where a zero-size box goes.
+    pub(crate) fn measured(&self) -> bool {
+        !self.hosted
+            || self
+                .surface
+                .rect()
+                .is_some_and(|rect| rect.size.width.0 > 0.0)
+    }
+
     /// A surface held to the room on the side it lands on: how tall it may be there (the room
     /// between `anchor` and the bounds' edge it opens toward, less the margin, but never under
     /// `floor`) and where it goes at that height. It is placed by the height it is drawn at, not
     /// by its rows' full height, so the frame that first caps it puts it where every later frame
-    /// does. `None` until the bounds are measured, so a surface not yet placed keeps its
-    /// stylesheet's cap.
+    /// does.
+    ///
+    /// Its measured height is the capped one, so a surface as tall as the room on the side it
+    /// wants is taken to have rows past it, as one that overflows does: it goes to the side with
+    /// more room (unless it may not flip). One shorter than that room fits, and stays. So a
+    /// surface capped to a short side moves to a roomier one when more rows arrive, and back when
+    /// they go. `None` until the bounds and the surface are measured.
     pub(crate) fn held(
         &self,
         anchor: Option<Rect>,
@@ -232,21 +253,30 @@ impl Float {
     ) -> Option<(Point, Px)> {
         let anchor = anchor?;
         let bounds = self.bounds.rect()?;
-        let full = self.placing(Some(anchor), want, gap)?;
-        let room = Px(room_on_side(anchor, bounds, full.side, gap).0.max(floor.0));
         let size = self
             .surface
             .rect()
-            .map(|rect| rect.size)
-            .unwrap_or_default();
+            .filter(|rect| rect.size.width.0 > 0.0)?
+            .size;
+        let room = |side: Side| room_on_side(anchor, bounds, side, gap);
+        let wanted = room(want.side);
+        let side = match want.flip {
+            Flip::Allowed if size.height.0 + 0.5 >= wanted.0 => {
+                let other = opposite(want.side);
+                if room(other).0 > wanted.0 {
+                    other
+                } else {
+                    want.side
+                }
+            }
+            Flip::Allowed | Flip::Never => want.side,
+        };
+        let room = Px(room(side).0.max(floor.0));
         let content = Size {
             width: size.width,
             height: Px(size.height.0.min(room.0)),
         };
-        let landed = Placement {
-            side: full.side,
-            ..want
-        };
+        let landed = Placement { side, ..want };
         let at = place(anchor, content, bounds, landed.no_flip(), gap).origin;
         Some((at, room))
     }

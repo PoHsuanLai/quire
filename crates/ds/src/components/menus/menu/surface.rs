@@ -63,9 +63,12 @@ impl Surface {
                     ),
                 };
                 let width = hung.width_style(field).unwrap_or_default();
-                // Until the anchor is measured the menu has no place: it is laid out (so it can
-                // be measured) but not drawn, and a press cannot land on it.
-                let waiting = field.map_or(UNPLACED, |_| "");
+                // Until the anchor and the menu itself are measured the menu has no place: it is
+                // laid out (so it can be measured) but not drawn, and a press cannot land on it.
+                let waiting = match (field, float.measured()) {
+                    (Some(_), true) => "",
+                    (None, _) | (_, false) => UNPLACED,
+                };
                 Surface {
                     class: "ds-popover ds-menu",
                     elevation: Some("pop"),

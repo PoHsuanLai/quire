@@ -384,6 +384,36 @@ fn a_token_pressed_or_removed_is_told_and_the_caret_stays_in_the_field() {
     );
 }
 
+#[allow(non_snake_case)]
+fn Disabled() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            TextField {
+                label: "Search",
+                value: "",
+                kind: FieldKind::Search,
+                availability: Availability::Disabled,
+                tokens: vec!["from:".to_owned(), "to:".to_owned()],
+                on_token: EventHandler::new(|_: usize| {}),
+                on_token_remove: EventHandler::new(|_: usize| {}),
+                oninput: |_: String| {},
+            }
+        }
+    }
+}
+
+#[test]
+fn a_token_on_a_field_that_takes_no_input_is_a_plain_chip() {
+    let mut harness = Harness::new(
+        Disabled,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    harness.advance(ms(100));
+    assert_eq!(harness.count(".ds-text-field-tokens .ds-chip"), 2);
+    assert_eq!(harness.count(".ds-chip-press"), 0);
+    assert_eq!(harness.count(".ds-chip-remove"), 0);
+}
+
 #[test]
 fn a_token_with_no_handler_is_a_plain_chip() {
     let harness = start(Setup {

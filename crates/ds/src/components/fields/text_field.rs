@@ -260,7 +260,13 @@ pub fn TextField(
         FieldKind::Plain | FieldKind::Search | FieldKind::Multiline => None,
     };
     let data = common.data_attributes();
-    let chips = token_chips(tokens, on_token, on_token_remove, &focuser);
+    let back = focuser.clone();
+    let refocus = use_callback(move |()| back.refocus());
+    // A token acts only while the field takes input, as its clear button shows only then.
+    let (on_token, on_token_remove) = match availability {
+        Availability::Enabled => (on_token, on_token_remove),
+        _ => (None, None),
+    };
     rsx! {
         span {
             class,
@@ -317,10 +323,17 @@ pub fn TextField(
                     Label { text: note, role: LabelRole::Secondary, style: LabelStyle::Footnote }
                 }
             }
-            if !chips.is_empty() {
+            if !tokens.is_empty() {
                 div { class: "ds-text-field-tokens",
-                    for (text, onpress, onremove) in chips {
-                        Chip { variant: ChipVariant::Token, text, onpress, onremove }
+                    for (at, text) in tokens.into_iter().enumerate() {
+                        TokenChip {
+                            key: "{at}:{text}",
+                            at,
+                            text,
+                            on_token,
+                            on_token_remove,
+                            refocus,
+                        }
                     }
                 }
             }
@@ -328,39 +341,34 @@ pub fn TextField(
     }
 }
 
-/// A token's text and the handlers its chip gets: pressing the token and removing it each tell
-/// the caller which token, by its place, then put the caret back in the field.
-type TokenChip = (
-    String,
-    Option<EventHandler<Press>>,
-    Option<EventHandler<()>>,
-);
-
-fn token_chips(
-    tokens: Vec<String>,
+/// One of a field's tokens, the `at`th: a button when `on_token` is set, with a remove button
+/// when `on_token_remove` is; either tells the caller `at`, then puts the caret back in the field.
+#[component]
+fn TokenChip(
+    at: usize,
+    text: String,
     on_token: Option<EventHandler<usize>>,
     on_token_remove: Option<EventHandler<usize>>,
-    focuser: &FieldFocuser,
-) -> Vec<TokenChip> {
-    tokens
-        .into_iter()
-        .enumerate()
-        .map(|(at, text)| {
-            let pressed = focuser.clone();
-            let removed = focuser.clone();
-            let onpress = on_token.map(|heard| {
-                EventHandler::new(move |_: Press| {
-                    heard.call(at);
-                    pressed.refocus();
-                })
-            });
-            let onremove = on_token_remove.map(|heard| {
-                EventHandler::new(move |()| {
-                    heard.call(at);
-                    removed.refocus();
-                })
-            });
-            (text, onpress, onremove)
-        })
-        .collect()
+    refocus: Callback<()>,
+) -> Element {
+    let press = use_callback(move |_: Press| {
+        if let Some(heard) = on_token {
+            heard.call(at);
+        }
+        refocus.call(());
+    });
+    let remove = use_callback(move |()| {
+        if let Some(heard) = on_token_remove {
+            heard.call(at);
+        }
+        refocus.call(());
+    });
+    rsx! {
+        Chip {
+            variant: ChipVariant::Token,
+            text,
+            onpress: on_token.map(|_| press),
+            onremove: on_token_remove.map(|_| remove),
+        }
+    }
 }
