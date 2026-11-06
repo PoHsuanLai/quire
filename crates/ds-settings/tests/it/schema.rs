@@ -317,6 +317,8 @@ mod provided {
     }
 }
 
+// `LiveSchema` is the `live` feature's.
+#[cfg(feature = "live")]
 mod unavailable {
     use ds_settings::live::LiveSchema;
     use ds_settings::schema::{
@@ -411,6 +413,8 @@ mod unavailable {
     }
 }
 
+// `LiveSchema` is the `live` feature's.
+#[cfg(feature = "live")]
 mod groups {
     use ds_settings::live::LiveSchema;
     use ds_settings::schema::{
@@ -545,6 +549,8 @@ mod groups {
     }
 }
 
+// `LiveSchema` is the `live` feature's.
+#[cfg(feature = "live")]
 mod places {
     use ds_settings::live::LiveSchema;
     use ds_settings::schema::{

@@ -5,7 +5,7 @@
    are. */
 .ds-search-card{ width:600px; max-width:100%; overflow:hidden; border-radius:inherit; }
 .ds-search-card[*|data-surface=own]{ background:var(--raise); color:var(--ink); border-radius:var(--r-panel); box-shadow:var(--shadow-pop); }
-.ds-search-card-rows{ max-height:440px; overflow-y:auto; scrollbar-width:none; border-top:var(--hair) solid var(--line-soft); }
+.ds-search-card-rows{ max-height:440px; overflow-x:hidden; overflow-y:auto; scrollbar-width:none; border-top:var(--hair) solid var(--line-soft); }
 /* The card is Spotlight's panel, so it keeps the command palette's launcher scale (the macOS
    polish pass, design/13 section 13.3.9), not a text menu's: the query row at 12 by 16 with the
    22/500 query beside the 20 px glyph, the rows 38 high (`--row-palette-h`) at the row title's

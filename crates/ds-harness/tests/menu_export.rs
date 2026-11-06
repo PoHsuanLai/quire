@@ -1,6 +1,10 @@
 //! An app's exported menu bar, read and driven over a private bus: the Edit menu lists Undo with
 //! its title and ⌘Z, a click on Undo runs the app's Undo, and disabling an item announces a new
 //! layout. The bus is a scratch `dbus-daemon`; the real session bus is never reached.
+//!
+//! It drives `ds-blitz`'s Linux menu export, so it is built on Linux only.
+
+#![cfg(target_os = "linux")]
 
 #[path = "menu_export/bus.rs"]
 mod bus;

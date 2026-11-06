@@ -28,6 +28,7 @@ use crate::focus::field::FieldHandle;
 use crate::focus::targets::Told;
 use crate::root::common::Common;
 use dioxus::prelude::*;
+use ds_core::press::Press;
 use ds_core::vocab::{Availability, FocusStyle};
 use ds_core::word::Word;
 use ds_motion::detail::{once::use_shake, touch::Touch, use_detail::use_detail};
@@ -119,7 +120,10 @@ fn clear_size(size: ControlSize) -> ControlSize {
 ///
 /// `kind` picks what it holds ([`FieldKind`]): `Secure` keeps its text out of the markup, `Search`
 /// draws a magnifier, a clear button and `tokens` under it, and `Multiline` is a `textarea`
-/// `rows` tall (Enter adds a line; the caret leaving commits). `bezel` is its edge ([`FieldBezel`]).
+/// `rows` tall (Enter adds a line; the caret leaving commits). `on_token` makes each token a
+/// button and hears which was pressed; `on_token_remove` puts a remove button on each and hears
+/// which was removed; either way the caret goes back to the field. Each is the token's place in
+/// `tokens`. `bezel` is its edge ([`FieldBezel`]).
 /// `onchange` hears the value committed: Enter, or the caret leaving (Blitz sends no `change`
 /// event, so the field makes its own, the same on both renderers). `onsubmit` hears the value on
 /// Enter alone (never on the caret leaving, never in a multi-line field, never while the field is
@@ -147,6 +151,8 @@ pub fn TextField(
     #[props(default)] prefix: Option<Element>,
     #[props(default)] suffix: Option<Element>,
     #[props(default)] tokens: Vec<String>,
+    #[props(default)] on_token: Option<EventHandler<usize>>,
+    #[props(default)] on_token_remove: Option<EventHandler<usize>>,
     oninput: EventHandler<String>,
     #[props(default)] onkey: EventHandler<KeyboardEvent>,
     #[props(default)] focus: FieldFocus,
@@ -254,6 +260,7 @@ pub fn TextField(
         FieldKind::Plain | FieldKind::Search | FieldKind::Multiline => None,
     };
     let data = common.data_attributes();
+    let chips = token_chips(tokens, on_token, on_token_remove, &focuser);
     rsx! {
         span {
             class,
@@ -310,13 +317,50 @@ pub fn TextField(
                     Label { text: note, role: LabelRole::Secondary, style: LabelStyle::Footnote }
                 }
             }
-            if !tokens.is_empty() {
+            if !chips.is_empty() {
                 div { class: "ds-text-field-tokens",
-                    for token in tokens {
-                        Chip { variant: ChipVariant::Token, text: token }
+                    for (text, onpress, onremove) in chips {
+                        Chip { variant: ChipVariant::Token, text, onpress, onremove }
                     }
                 }
             }
         }
     }
+}
+
+/// A token's text and the handlers its chip gets: pressing the token and removing it each tell
+/// the caller which token, by its place, then put the caret back in the field.
+type TokenChip = (
+    String,
+    Option<EventHandler<Press>>,
+    Option<EventHandler<()>>,
+);
+
+fn token_chips(
+    tokens: Vec<String>,
+    on_token: Option<EventHandler<usize>>,
+    on_token_remove: Option<EventHandler<usize>>,
+    focuser: &FieldFocuser,
+) -> Vec<TokenChip> {
+    tokens
+        .into_iter()
+        .enumerate()
+        .map(|(at, text)| {
+            let pressed = focuser.clone();
+            let removed = focuser.clone();
+            let onpress = on_token.map(|heard| {
+                EventHandler::new(move |_: Press| {
+                    heard.call(at);
+                    pressed.refocus();
+                })
+            });
+            let onremove = on_token_remove.map(|heard| {
+                EventHandler::new(move |()| {
+                    heard.call(at);
+                    removed.refocus();
+                })
+            });
+            (text, onpress, onremove)
+        })
+        .collect()
 }

@@ -9,6 +9,7 @@
 //! undefined behaviour on glibc, and the Tokio runtime and the event loop start threads. What was
 //! read waits in a [`LaunchTokens`] for the first window, which knows its session by then.
 
+#[cfg(any(target_os = "linux", test))]
 use crate::window_platform::DisplayServer;
 use dioxus_native::winit::event_loop::ActiveEventLoop;
 #[cfg(target_os = "linux")]
@@ -18,15 +19,20 @@ use dioxus_native::winit::platform::wayland::ActiveEventLoopExtWayland;
 use dioxus_native::winit::window::ActivationToken;
 
 /// The variable a Wayland launcher sets.
+#[cfg(any(target_os = "linux", test))]
 const WAYLAND_VAR: &str = "XDG_ACTIVATION_TOKEN";
 
 /// The variable an X11 launcher sets.
+#[cfg(any(target_os = "linux", test))]
 const X11_VAR: &str = "DESKTOP_STARTUP_ID";
 
-/// The tokens the process was started with, until the first window takes them.
+/// The tokens the process was started with, until the first window takes them. Only Linux
+/// hands a process one, so elsewhere it holds nothing.
 #[derive(Debug, Default)]
 pub(crate) struct LaunchTokens {
+    #[cfg(any(target_os = "linux", test))]
     wayland: Option<String>,
+    #[cfg(any(target_os = "linux", test))]
     x11: Option<String>,
 }
 

@@ -217,14 +217,38 @@ impl Float {
         Some(place(anchor, content, bounds, want, gap))
     }
 
-    /// How tall the surface may be on the side it landed on: the room between `anchor` and the
-    /// bounds' edge it opens toward, less the margin. `None` until the bounds are measured, so a
-    /// surface not yet placed keeps its stylesheet's cap.
-    pub(crate) fn room(&self, anchor: Option<Rect>, want: Placement, gap: Px) -> Option<Px> {
+    /// A surface held to the room on the side it lands on: how tall it may be there (the room
+    /// between `anchor` and the bounds' edge it opens toward, less the margin, but never under
+    /// `floor`) and where it goes at that height. It is placed by the height it is drawn at, not
+    /// by its rows' full height, so the frame that first caps it puts it where every later frame
+    /// does. `None` until the bounds are measured, so a surface not yet placed keeps its
+    /// stylesheet's cap.
+    pub(crate) fn held(
+        &self,
+        anchor: Option<Rect>,
+        want: Placement,
+        gap: Px,
+        floor: Px,
+    ) -> Option<(Point, Px)> {
         let anchor = anchor?;
         let bounds = self.bounds.rect()?;
-        let placed = self.placing(Some(anchor), want, gap)?;
-        Some(room_on_side(anchor, bounds, placed.side, gap))
+        let full = self.placing(Some(anchor), want, gap)?;
+        let room = Px(room_on_side(anchor, bounds, full.side, gap).0.max(floor.0));
+        let size = self
+            .surface
+            .rect()
+            .map(|rect| rect.size)
+            .unwrap_or_default();
+        let content = Size {
+            width: size.width,
+            height: Px(size.height.0.min(room.0)),
+        };
+        let landed = Placement {
+            side: full.side,
+            ..want
+        };
+        let at = place(anchor, content, bounds, landed.no_flip(), gap).origin;
+        Some((at, room))
     }
 
     /// Where the surface sits in client coordinates, once the bounds and its own size are
